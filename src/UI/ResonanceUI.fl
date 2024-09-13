@@ -101,7 +101,7 @@ class ResonanceGraph {: {public Fl_Box}
   Function {init(Resonance *respar_, Fl_Value_Output *khzvalue_, Fl_Value_Output *dbvalue_, int npart_, int kititem_, int engine_)} {} {
     code {//
     respar = respar_;
-    synth = respar->getSynthEngine();
+    synth = & respar->getSynthEngine();
     npart = npart_;
     kititem = kititem_;
     engine = engine_;
@@ -581,7 +581,7 @@ class ResonanceUI {: PresetsUI_
   Function {ResonanceUI(Resonance *respar_, int npart_, int kititem_, int engine_)} {} {
     code {//
     respar = respar_;
-    synth = respar->getSynthEngine();
+    synth = & respar->getSynthEngine();
     npart = npart_;
     kititem = kititem_;
     engine = engine_;

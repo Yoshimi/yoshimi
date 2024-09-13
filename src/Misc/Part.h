@@ -57,7 +57,7 @@ class Part
         enum NoteStatus { KEY_OFF, KEY_PLAYING, KEY_RELEASED_AND_SUSTAINED, KEY_RELEASED };
 
        ~Part();
-        Part(uchar id, Microtonal *microtonal_, fft::Calc& fft_, SynthEngine*);
+        Part(uchar id, Microtonal*, fft::Calc&, SynthEngine&);
 
         // shall not be copied or moved
         Part(Part&&)                 = delete;

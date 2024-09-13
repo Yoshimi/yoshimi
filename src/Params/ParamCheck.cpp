@@ -26,9 +26,3 @@
 #include "Params/ParamCheck.h"
 
 
-ParamBase::ParamBase(SynthEngine *_synth) :
-    synth(_synth),
-    updatedAt(0)
-{
-    ;
-}

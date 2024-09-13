@@ -37,7 +37,7 @@ class SynthEngine;
 class Resonance : public ParamBase
 {
     public:
-        Resonance(SynthEngine*);
+        Resonance(SynthEngine&);
 
         void defaults()  override;
 

@@ -51,7 +51,7 @@ using func::setRandomPan;
 
 
 SUBnote::SUBnote(SUBnoteParameters& parameters, Controller& ctl_, Note note_, bool portamento_)
-    : synth{*parameters.getSynthEngine()}
+    : synth{parameters.getSynthEngine()}
     , pars{parameters}
     , subNoteChange{parameters}
     , ctl{ctl_}

@@ -36,7 +36,7 @@ class SynthEngine;
 class EnvelopeParams : public ParamBase
 {
     public:
-        EnvelopeParams(uchar Penvstretch_, uchar Pforcedrelease_, SynthEngine*);
+        EnvelopeParams(uchar Penvstretch_, uchar Pforcedrelease_, SynthEngine&);
 
         void defaults() override;
 

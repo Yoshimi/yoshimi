@@ -50,15 +50,26 @@ private:
 class ParamBase
 {
     public:
-        ParamBase(SynthEngine *_synth);
-        virtual ~ParamBase() { }
-        SynthEngine *getSynthEngine() {return synth;}
+        virtual ~ParamBase()  = default;  ///< this is an interface
+
+        ParamBase(SynthEngine& _synth)
+            : synth(_synth)
+            , updatedAt(0)
+            { }
+
+        // shall not be copied nor moved
+        ParamBase(ParamBase&&)                 = delete;
+        ParamBase(ParamBase const&)            = delete;
+        ParamBase& operator=(ParamBase&&)      = delete;
+        ParamBase& operator=(ParamBase const&) = delete;
+
+        SynthEngine& getSynthEngine() {return synth;}
 
     private:
-        virtual void defaults() =0;
+        virtual void defaults()  =0;
 
     protected:
-        SynthEngine *synth;
+        SynthEngine& synth;
 
     private:
         int updatedAt; // Monotonically increasing counter that tracks last
@@ -105,7 +116,6 @@ class ParamBase
         void paramsChanged()
         {
             updatedAt++;
-            //std::cout << "update " << updatedAt << std::endl;
         }
 };
 

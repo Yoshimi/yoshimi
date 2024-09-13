@@ -34,7 +34,7 @@ using func::asDecibel;
 using func::power;
 
 
-FilterParams::FilterParams(uchar Ptype_, float Pfreq_, float Pq_, uchar Pfreqtrackoffset_, SynthEngine* _synth)
+FilterParams::FilterParams(uchar Ptype_, float Pfreq_, float Pq_, uchar Pfreqtrackoffset_, SynthEngine& _synth)
     : ParamBase{_synth}
     , changed{false}
     , Dtype{Ptype_}
@@ -80,7 +80,7 @@ void FilterParams::defaults(int n)
     int j = n;
     for (int i = 0; i < FF_MAX_FORMANTS; ++i)
     {
-        Pvowels[j].formants[i].freq = synth->randomINT() >> 24; // some random freqs
+        Pvowels[j].formants[i].freq = synth.randomINT() >> 24; // some random freqs
         Pvowels[j].formants[i].firstF = Pvowels[j].formants[i].freq; // the only time we set this
         Pvowels[j].formants[i].q = FILTDEF::formQ.def;
         Pvowels[j].formants[i].amp = FILTDEF::formAmp.def;
@@ -219,9 +219,9 @@ void FilterParams::formantfilterH(int nvowel, int nfreqs, float *freqs)
 
         filter_amp = getformantamp(Pvowels[nvowel].formants[nformant].amp);
 
-        if (filter_freq <= (synth->halfsamplerate_f - 100.0f))
+        if (filter_freq <= (synth.halfsamplerate_f - 100.0f))
         {
-            omega = TWOPI * filter_freq / synth->samplerate_f;
+            omega = TWOPI * filter_freq / synth.samplerate_f;
             sn = sinf(omega);
             cs = cosf(omega);
             alpha = sn / (2 * filter_q);
@@ -238,13 +238,13 @@ void FilterParams::formantfilterH(int nvowel, int nfreqs, float *freqs)
         for (int i = 0; i < nfreqs; ++i)
         {
             float freq = getfreqx(i / (float)nfreqs);
-            if (freq > synth->halfsamplerate_f)
+            if (freq > synth.halfsamplerate_f)
             {
                 for (int tmp = i; tmp < nfreqs; ++tmp)
                     freqs[tmp] = 0.0f;
                 break;
             }
-            float fr = freq / synth->samplerate_f * TWOPI;
+            float fr = freq / synth.samplerate_f * TWOPI;
             float x = c[0], y = 0.0f;
             for (int n = 1; n < 3; ++n)
             {

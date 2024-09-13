@@ -31,7 +31,7 @@
 #include "Effects/EQ.h"
 
 EffectMgr::EffectMgr(const bool insertion_, SynthEngine *_synth) :
-    ParamBase{_synth},
+    ParamBase{*_synth},
     efxoutl{size_t(_synth->buffersize)},
     efxoutr{size_t(_synth->buffersize)},
     insertion{insertion_},
@@ -63,35 +63,35 @@ void EffectMgr::changeeffect(int _nefx)
     switch (effectType + EFFECT::type::none)
     {
         case EFFECT::type::reverb:
-            efx.reset(new Reverb{insertion, efxoutl.get(), efxoutr.get(), synth});
+            efx.reset(new Reverb{insertion, efxoutl.get(), efxoutr.get(), &synth});
             break;
 
         case EFFECT::type::echo:
-            efx.reset(new Echo{insertion, efxoutl.get(), efxoutr.get(), synth});
+            efx.reset(new Echo{insertion, efxoutl.get(), efxoutr.get(), &synth});
             break;
 
         case EFFECT::type::chorus:
-            efx.reset(new Chorus{insertion, efxoutl.get(), efxoutr.get(), synth});
+            efx.reset(new Chorus{insertion, efxoutl.get(), efxoutr.get(), &synth});
             break;
 
         case EFFECT::type::phaser:
-            efx.reset(new Phaser{insertion, efxoutl.get(), efxoutr.get(), synth});
+            efx.reset(new Phaser{insertion, efxoutl.get(), efxoutr.get(), &synth});
             break;
 
         case EFFECT::type::alienWah:
-            efx.reset(new Alienwah{insertion, efxoutl.get(), efxoutr.get(), synth});
+            efx.reset(new Alienwah{insertion, efxoutl.get(), efxoutr.get(), &synth});
             break;
 
         case EFFECT::type::distortion:
-            efx.reset(new Distorsion{insertion, efxoutl.get(), efxoutr.get(), synth});
+            efx.reset(new Distorsion{insertion, efxoutl.get(), efxoutr.get(), &synth});
             break;
 
         case EFFECT::type::eq:
-            efx.reset(new EQ{insertion, efxoutl.get(), efxoutr.get(), synth});
+            efx.reset(new EQ{insertion, efxoutl.get(), efxoutr.get(), &synth});
             break;
 
         case EFFECT::type::dynFilter:
-            efx.reset(new DynamicFilter{insertion, efxoutl.get(), efxoutr.get(), synth});
+            efx.reset(new DynamicFilter{insertion, efxoutl.get(), efxoutr.get(), &synth});
             break;
 
             // put more effect here
@@ -114,8 +114,8 @@ int EffectMgr::geteffect()
 // Cleanup the current effect
 void EffectMgr::cleanup()
 {
-    memset(efxoutl.get(), 0, synth->bufferbytes);
-    memset(efxoutr.get(), 0, synth->bufferbytes);
+    memset(efxoutl.get(), 0, synth.bufferbytes);
+    memset(efxoutr.get(), 0, synth.bufferbytes);
     if (efx)
         efx->cleanup();
 }
@@ -171,28 +171,28 @@ void EffectMgr::out(float *smpsl, float *smpsr)
     {
         if (!insertion)
         {
-            memset(smpsl, 0, synth->sent_bufferbytes);
-            memset(smpsr, 0, synth->sent_bufferbytes);
-            memset(efxoutl.get(), 0, synth->sent_bufferbytes);
-            memset(efxoutr.get(), 0, synth->sent_bufferbytes);
+            memset(smpsl, 0, synth.sent_bufferbytes);
+            memset(smpsr, 0, synth.sent_bufferbytes);
+            memset(efxoutl.get(), 0, synth.sent_bufferbytes);
+            memset(efxoutr.get(), 0, synth.sent_bufferbytes);
         }
         return;
     }
-    memset(efxoutl.get(), 0, synth->sent_bufferbytes);
-    memset(efxoutr.get(), 0, synth->sent_bufferbytes);
+    memset(efxoutl.get(), 0, synth.sent_bufferbytes);
+    memset(efxoutr.get(), 0, synth.sent_bufferbytes);
     efx->out(smpsl, smpsr);
 
     if (effectType == (EFFECT::type::eq - EFFECT::type::none))
     {   // this is need only for the EQ effect
-        memcpy(smpsl, efxoutl.get(), synth->sent_bufferbytes);
-        memcpy(smpsr, efxoutr.get(), synth->sent_bufferbytes);
+        memcpy(smpsl, efxoutl.get(), synth.sent_bufferbytes);
+        memcpy(smpsr, efxoutr.get(), synth.sent_bufferbytes);
         return;
     }
 
     // Insertion effect
     if (insertion != 0)
     {
-        for (int i = 0; i < synth->sent_buffersize; ++i)
+        for (int i = 0; i < synth.sent_buffersize; ++i)
         {
             float volume = efx->volume.getAndAdvanceValue();
             float v1, v2;
@@ -228,7 +228,7 @@ void EffectMgr::out(float *smpsl, float *smpsr)
     }
     else
     { // System effect
-        for (int i = 0; i < synth->sent_buffersize; ++i)
+        for (int i = 0; i < synth.sent_buffersize; ++i)
         {
             float volume = efx->volume.getAndAdvanceValue();
             efxoutl[i] *= 2.0f * volume;

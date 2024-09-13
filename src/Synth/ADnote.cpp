@@ -107,7 +107,7 @@ ADnote::~ADnote() { /* all clean-up done automatically */ }
 // Internal: this constructor does the actual initialisation....
 ADnote::ADnote(ADnoteParameters& adpars_, Controller& ctl_, Note note_, bool portamento_
               ,ADnote* topVoice_, int subVoice_, int phaseOffset, float *parentFMmod_, bool forFM_)
-    : synth{*adpars_.getSynthEngine()}
+    : synth{adpars_.getSynthEngine()}
     , adpars{adpars_}
     , paramsUpdate{adpars}
     , ctl{ctl_}

@@ -42,7 +42,7 @@ class SynthEngine;
 class FilterParams : public ParamBase
 {
     public:
-        FilterParams(uchar Ptype_, float Pfreq, float Pq_, uchar Pfreqtrackoffset_, SynthEngine*);
+        FilterParams(uchar Ptype_, float Pfreq, float Pq_, uchar Pfreqtrackoffset_, SynthEngine&);
 
         void defaults()  override;
 

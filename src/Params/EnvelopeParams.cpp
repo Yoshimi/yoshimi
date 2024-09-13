@@ -35,7 +35,7 @@
 using func::power;
 
 
-EnvelopeParams::EnvelopeParams(uchar Penvstretch_, uchar Pforcedrelease_, SynthEngine* _synth) :
+EnvelopeParams::EnvelopeParams(uchar Penvstretch_, uchar Pforcedrelease_, SynthEngine& _synth) :
     ParamBase(_synth),
     Pfreemode(1),
     Penvpoints(1),

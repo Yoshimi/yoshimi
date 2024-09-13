@@ -42,7 +42,7 @@ class LFOParams : public ParamBase
     public:
         LFOParams(float Pfreq_, float Pintensity_, float Pstartphase_,
                   uchar PLFOtype_, float Prandomness_,
-                  float Pdelay_, uchar Pcontinous, int fel_, SynthEngine*);
+                  float Pdelay_, uchar Pcontinous, int fel_, SynthEngine&);
 
         void defaults() override;
 

@@ -30,7 +30,7 @@
 #include "Misc/SynthEngine.h"
 #include "Params/OscilParameters.h" // **** RHL ****
 
-OscilParameters::OscilParameters(fft::Calc const& fft, SynthEngine* _synth)
+OscilParameters::OscilParameters(fft::Calc const& fft, SynthEngine& _synth)
     : ParamBase{_synth}
     , basefuncSpectrum{fft.spectrumSize()}
 {

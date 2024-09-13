@@ -169,7 +169,7 @@ class PADnoteParameters : public ParamBase
         static constexpr size_t REBUILDTRIGGER_MAX = 60000; // milliseconds
 
     public:
-        PADnoteParameters(uchar pID, uchar kID, SynthEngine*);
+        PADnoteParameters(uchar pID, uchar kID, SynthEngine&);
 
         // shall not be copied or moved or assigned
         PADnoteParameters(PADnoteParameters&&)                 = delete;

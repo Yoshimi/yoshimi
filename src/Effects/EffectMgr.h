@@ -69,7 +69,6 @@ class EffectMgr : public ParamBase
         unsigned char geteffectpar(int npar);
         void getAllPar(EffectParArray&) const;
 
-        SynthEngine *getSynthEngine() {return synth;}
 
         Samples efxoutl;
         Samples efxoutr;

@@ -196,7 +196,7 @@ struct ADnoteVoiceParam { // Voice parameters
 class ADnoteParameters : public ParamBase
 {
     public:
-        ADnoteParameters(fft::Calc& fft_, SynthEngine*);
+        ADnoteParameters(fft::Calc&, SynthEngine&);
        ~ADnoteParameters() override;
         void defaults()    override;
         void voiceDefaults(int n) {defaults(n);};

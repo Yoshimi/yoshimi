@@ -38,7 +38,7 @@ class SynthEngine;
 class SUBnoteParameters : public ParamBase
 {
     public:
-        SUBnoteParameters(SynthEngine*);
+        SUBnoteParameters(SynthEngine&);
        ~SUBnoteParameters()  override;
 
         void defaults()  override;

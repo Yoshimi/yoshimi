@@ -35,7 +35,7 @@
 using func::power;
 
 
-Resonance::Resonance(SynthEngine* _synth) : ParamBase{_synth}
+Resonance::Resonance(SynthEngine& _synth) : ParamBase{_synth}
 {
     defaults();
 }
@@ -160,16 +160,16 @@ void Resonance::smooth()
 // Randomize the resonance function
 void Resonance::randomize(int type)
 {
-    uint32_t r = synth->randomINT() >> 24;
+    uint32_t r = synth.randomINT() >> 24;
     for (int i = 0; i < MAX_RESONANCE_POINTS; ++i)
     {
         Prespoints[i] = r;
-        if (type == 0 && synth->numRandom() < 0.1f)   // draw new random only for 10% of all slots
-            r = synth->randomINT() >> 24;
-        if (type == 1 && synth->numRandom() < 0.3f)   // ...only for 30% of all slots
-            r = synth->randomINT() >> 24;
+        if (type == 0 && synth.numRandom() < 0.1f)   // draw new random only for 10% of all slots
+            r = synth.randomINT() >> 24;
+        if (type == 1 && synth.numRandom() < 0.3f)   // ...only for 30% of all slots
+            r = synth.randomINT() >> 24;
         if (type == 2)
-            r = synth->randomINT() >> 24;
+            r = synth.randomINT() >> 24;
     }
     smooth();
 }

@@ -1706,7 +1706,7 @@ Oscillator}
   }
   Function {init(ADnoteParameters *parameters,int npart_, int kititem_, int nvoice_)} {} {
     code {//
-        synth = parameters->getSynthEngine();
+        synth = & parameters->getSynthEngine();
         pars = parameters;
         npart = npart_;
         kititem = kititem_;
@@ -1921,7 +1921,7 @@ class ADvoicelistitem {: {public Fl_Group}
   }
   Function {init(ADnoteParameters *parameters, int npart_, int kititem_, int nvoice_)} {} {
     code {//
-    synth = parameters->getSynthEngine();
+    synth = & parameters->getSynthEngine();
     pars = parameters;
     npart = npart_;
     kititem = kititem_;
@@ -2891,7 +2891,7 @@ class ADnoteUI {: {public PresetsUI_}
   }
   Function {ADnoteUI(ADnoteParameters *parameters, int npart_, int kititem_)} {} {
     code {//
-        synth = parameters->getSynthEngine();
+        synth = & parameters->getSynthEngine();
         pars = parameters;
         npart = npart_;
         kititem = kititem_;

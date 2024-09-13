@@ -177,7 +177,7 @@ class PADnoteOvertonePosition {: {public Fl_Box}
     code {pars=NULL;} {}
   }
   Function {init(PADnoteParameters *pars)} {} {
-    code {synth = pars->getSynthEngine();
+    code {synth = & pars->getSynthEngine();
 this->pars=pars;} {}
   }
   Function {draw()} {} {
@@ -1654,7 +1654,7 @@ class PADnoteUI {: {public PresetsUI_}
   }
   Function {PADnoteUI(PADnoteParameters *parameters)} {} {
     code {//
-    synth = parameters->getSynthEngine();
+    synth = & parameters->getSynthEngine();
     pars = parameters;
     npart = parameters->partID;
     kititem = parameters->kitID;

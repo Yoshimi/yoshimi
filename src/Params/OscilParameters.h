@@ -33,7 +33,7 @@
 class OscilParameters : public ParamBase
 {
     public:
-        OscilParameters(fft::Calc const& fft, SynthEngine*);
+        OscilParameters(fft::Calc const& fft, SynthEngine&);
 
         void defaults()  override;
 

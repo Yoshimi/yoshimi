@@ -59,7 +59,7 @@ PADnote::~PADnote() { }
 
 
 PADnote::PADnote(PADnoteParameters& parameters, Controller& ctl_, Note note_, bool portamento_)
-    : synth{*parameters.getSynthEngine()}
+    : synth{parameters.getSynthEngine()}
     , pars{parameters}
     , padSynthUpdate{parameters}
     , ctl{ctl_}

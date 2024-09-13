@@ -34,7 +34,7 @@ using func::setAllPan;
 using func::power;
 
 
-SUBnoteParameters::SUBnoteParameters(SynthEngine* _synth) : ParamBase{_synth}
+SUBnoteParameters::SUBnoteParameters(SynthEngine& _synth) : ParamBase{_synth}
 {
     AmpEnvelope = new EnvelopeParams(64, 1, synth);
     AmpEnvelope->ADSRinit_dB(0, 40, 127, 25);
@@ -53,7 +53,7 @@ SUBnoteParameters::SUBnoteParameters(SynthEngine* _synth) : ParamBase{_synth}
 void SUBnoteParameters::defaults()
 {
     PVolume = 96;
-    setPan(PPanning = 64, synth->getRuntime().panLaw);
+    setPan(PPanning = 64, synth.getRuntime().panLaw);
     PRandom = false;
     PWidth = 63;
     PAmpVelocityScaleFunction = 90;
@@ -122,7 +122,7 @@ void SUBnoteParameters::setPan(char pan, unsigned char panLaw)
 void SUBnoteParameters::add2XML(XMLwrapper& xml)
 {
     // currently not used
-    // bool yoshiFormat = synth->usingYoshiType;
+    // bool yoshiFormat = synth.usingYoshiType;
     xml.information.SUBsynth_used = 1;
 
     xml.addpar("num_stages",Pnumstages);
@@ -308,12 +308,12 @@ void SUBnoteParameters::getfromXML(XMLwrapper& xml)
         if (test < 64) // new Yoshi type
         {
             PWidth = test;
-            setPan(xml.getpar127("pan_pos",PPanning), synth->getRuntime().panLaw);
+            setPan(xml.getpar127("pan_pos",PPanning), synth.getRuntime().panLaw);
             PRandom = xml.getparbool("random_pan", PRandom);
         }
         else // legacy
         {
-            setPan(xml.getpar127("panning",PPanning), synth->getRuntime().panLaw);
+            setPan(xml.getpar127("panning",PPanning), synth.getRuntime().panLaw);
             if (PPanning == 0)
             {
                 PPanning = 64;

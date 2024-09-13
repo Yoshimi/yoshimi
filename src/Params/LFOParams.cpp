@@ -38,7 +38,7 @@ using func::power;
 LFOParams::LFOParams(float Pfreq_, float Pintensity_,
                      float Pstartphase_, uchar PLFOtype_,
                      float Prandomness_, float Pdelay_,
-                     uchar Pcontinous_, int fel_, SynthEngine* _synth) :
+                     uchar Pcontinous_, int fel_, SynthEngine& _synth) :
     ParamBase(_synth),
     fel(fel_),
     Dfreq(Pfreq_),
