@@ -68,16 +68,16 @@ class MidiLearn : private DataText, TextData
         };
         bool learning;
 
-        void setTransferBlock(CommandBlock* getData);
+        void setTransferBlock(CommandBlock& getData);
 
         bool runMidiLearn(int _value, ushort CC, uchar chan, bool in_place);
-        bool writeMidi(CommandBlock* putData, bool in_place);
+        bool writeMidi(CommandBlock& putData, bool in_place);
 
         int  findSize();
         void listLine(int lineNo);
         void listAll(list<string>& msg_buf);
         bool remove(int itemNumber);
-        void generalOperations(CommandBlock *getData);
+        void generalOperations(CommandBlock& getData);
         bool insertMidiListData(XMLwrapper&);
         bool loadList(const string& name);
         bool extractMidiListData(bool full, XMLwrapper&);
@@ -89,11 +89,11 @@ class MidiLearn : private DataText, TextData
         string       learnedName;
         CommandBlock learnTransferBlock;
 
-        int findEntry(list<LearnBlock>&, int lastpos, ushort CC, uchar chan, LearnBlock* block, bool show);
+        int findEntry(list<LearnBlock>&, int lastpos, ushort CC, uchar chan, LearnBlock& block, bool show);
         string findName(list<LearnBlock>::iterator it);
         void insertLine(ushort CC, uchar chan);
         bool saveList(string const& name);
-        void writeToGui(CommandBlock* putData);
+        void writeToGui(CommandBlock& putData);
 };
 
 #endif /*MIDILEARN_H*/

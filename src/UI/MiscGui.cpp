@@ -65,7 +65,7 @@ float collect_readData(SynthEngine *synth, float value, unsigned char control, u
     putData.data.parameter = parameter;
     putData.data.offset = offset;
     putData.data.miscmsg = miscmsg;
-    float result = synth->interchange.readAllData(&putData);
+    float result = synth->interchange.readAllData(putData);
     if (miscmsg != NO_MSG) // outgoing value - we want to read this text
         result = putData.data.miscmsg; // returned message ID
     return result;
@@ -107,7 +107,7 @@ void collect_writeData(SynthEngine *synth, float value, unsigned char action, un
                 // check range & if learnable
                 float newValue;
                 putData.data.type = 3 | TOPLEVEL::type::Limits;
-                newValue = synth->interchange.readAllData(&putData);
+                newValue = synth->interchange.readAllData(putData);
                 if (Fl::event_state(FL_CTRL) != 0)
                 {
                     if (putData.data.type & TOPLEVEL::type::Learnable)

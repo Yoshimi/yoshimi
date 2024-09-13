@@ -347,13 +347,13 @@ Upastewin->hide();}
     putData.data.offset = offset;
     putData.data.miscmsg = UNUSED;
     //synth->CBtest(&putData);
-    int value = synth->interchange.readAllData(&putData);
+    int value = synth->interchange.readAllData(putData);
     if (sent == 2)
     {
         return textMsgBuffer.fetch(value);
     }
     putData.data.value = 1;
-    int Ugroup = synth->interchange.readAllData(&putData);
+    int Ugroup = synth->interchange.readAllData(putData);
     groupName = textMsgBuffer.fetch(Ugroup);
     //std::cout << "In GUI >" << groupName << std::endl;
     return textMsgBuffer.fetch(value);} {}

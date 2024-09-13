@@ -64,7 +64,7 @@ class InterChange : private DataText
 
     private:
         static constexpr size_t commandBlockSize = sizeof (CommandBlock);
-        SynthEngine *synth;
+        SynthEngine& synth;
 
 #ifdef GUI_FLTK
         std::unique_ptr<MasterUI> guiMaster;
@@ -74,8 +74,14 @@ class InterChange : private DataText
 #endif
 
     public:
-        InterChange(SynthEngine *_synth);
-        ~InterChange();
+        InterChange(SynthEngine&);
+       ~InterChange();
+        // shall not be copied or moved or assigned
+        InterChange(InterChange&&)                 = delete;
+        InterChange(InterChange const&)            = delete;
+        InterChange& operator=(InterChange&&)      = delete;
+        InterChange& operator=(InterChange const&) = delete;
+
         bool Init();
 
 #ifdef GUI_FLTK
@@ -103,16 +109,16 @@ class InterChange : private DataText
 
         void generateSpecialInstrument(int npart, std::string name);
         void mediate();
-        void historyActionCheck(CommandBlock *getData);
-        void returns(CommandBlock *getData);
+        void historyActionCheck(CommandBlock&);
+        void returns(CommandBlock&);
         void doClearPartInstrument(int npart);
-        bool commandSend(CommandBlock *getData);
-        float readAllData(CommandBlock *getData);
-        float buildWindowTitle(CommandBlock *getData, SynthEngine *synth);
-        void resolveReplies(CommandBlock *getData);
-        std::string resolveText(CommandBlock *getData, bool addValue);
-        void testLimits(CommandBlock *getData);
-        float returnLimits(CommandBlock *getData);
+        bool commandSend(CommandBlock&);
+        float readAllData(CommandBlock&);
+        float buildWindowTitle(CommandBlock&);
+        void resolveReplies(CommandBlock&);
+        std::string resolveText(CommandBlock&, bool addValue);
+        void testLimits(CommandBlock&);
+        float returnLimits(CommandBlock&);
         void Log(std::string const& msg);
 
         std::atomic<bool> syncWrite;
@@ -122,56 +128,56 @@ class InterChange : private DataText
         void* sortResultsThread();
         static void* _sortResultsThread(void* arg);
         pthread_t  sortResultsThreadHandle;
-        void muteQueueWrite(CommandBlock *getData);
-        void indirectTransfers(CommandBlock *getData, bool noForward = false);
-        int indirectVector(CommandBlock *getData, SynthEngine *synth, unsigned char &newMsg, bool &guiTo, std::string &text);
-        int indirectMidi(CommandBlock *getData, SynthEngine *synth, unsigned char &newMsg, bool &guiTo, std::string &text);
-        int indirectScales(CommandBlock *getData, SynthEngine *synth, unsigned char &newMsg, bool &guiTo, std::string &text);
-        int indirectMain(CommandBlock *getData, SynthEngine *synth, unsigned char &newMsg, bool &guiTo, std::string &text, float &valuef);
-        int indirectBank(CommandBlock *getData, SynthEngine *synth, unsigned char &newMsg, bool &guiTo, std::string &text);
-        int indirectConfig(CommandBlock *getData, SynthEngine *synth, unsigned char &newMsg, bool &guiTo, std::string &text);
-        int indirectPart(CommandBlock *getData, SynthEngine *synth, unsigned char &newMsg, bool &guiTo, std::string &text);
+        void muteQueueWrite(CommandBlock&);
+        void indirectTransfers(CommandBlock&, bool noForward = false);
+        int indirectVector(CommandBlock&, uchar& newMsg, bool& guiTo, std::string& text);
+        int indirectMidi  (CommandBlock&, uchar& newMsg, bool& guiTo, std::string& text);
+        int indirectScales(CommandBlock&, uchar& newMsg, bool& guiTo, std::string& text);
+        int indirectMain  (CommandBlock&, uchar& newMsg, bool& guiTo, std::string& text, float& valuef);
+        int indirectBank  (CommandBlock&, uchar& newMsg, bool& guiTo, std::string& text);
+        int indirectConfig(CommandBlock&, uchar& newMsg, bool& guiTo, std::string& text);
+        int indirectPart  (CommandBlock&, uchar& newMsg, bool& guiTo, std::string& text);
         std::string formatScales(std::string text);
         std::string formatKeys(std::string text);
 
         unsigned int swapRoot1;
         unsigned int swapBank1;
         unsigned int swapInstrument1;
-        bool processAdd(CommandBlock *getData, SynthEngine *synth);
-        bool processVoice(CommandBlock *getData, SynthEngine *synth);
-        bool processSub(CommandBlock *getData, SynthEngine *synth);
-        bool processPad(CommandBlock *getData);
+        bool processAdd(CommandBlock&, SynthEngine&);
+        bool processVoice(CommandBlock&, SynthEngine&);
+        bool processSub(CommandBlock&, SynthEngine&);
+        bool processPad(CommandBlock&);
 
-        void commandMidi(CommandBlock *getData);
+        void commandMidi(CommandBlock&);
         void vectorClear(int Nvector);
-        void commandVector(CommandBlock *getData);
-        void commandMicrotonal(CommandBlock *getData);
-        void commandConfig(CommandBlock *getData);
-        void commandMain(CommandBlock *getData);
-        void commandBank(CommandBlock *getData);
-        void commandPart(CommandBlock *getData);
-        void commandControllers(CommandBlock *getData, bool write);
-        void commandAdd(CommandBlock *getData);
-        void commandAddVoice(CommandBlock *getData);
-        void commandSub(CommandBlock *getData);
-        bool commandPad(CommandBlock *getData, PADnoteParameters& pars);
-        void commandOscillator(CommandBlock *getData, OscilParameters *oscil);
-        void commandResonance(CommandBlock *getData, Resonance *respar);
-        void commandLFO(CommandBlock *getData);
-        void lfoReadWrite(CommandBlock *getData, LFOParams *pars);
-        void commandFilter(CommandBlock *getData);
-        void filterReadWrite(CommandBlock *getData, FilterParams *pars, unsigned char *velsnsamp, unsigned char *velsns);
-        void commandEnvelope(CommandBlock *getData);
-        void envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars);
-        void envelopePointAdd(CommandBlock *getData, EnvelopeParams *pars);
-        void envelopePointDelete(CommandBlock *getData, EnvelopeParams *pars);
-        void envelopePointChange(CommandBlock *getData, EnvelopeParams *pars);
+        void commandVector(CommandBlock&);
+        void commandMicrotonal(CommandBlock&);
+        void commandConfig(CommandBlock&);
+        void commandMain(CommandBlock&);
+        void commandBank(CommandBlock&);
+        void commandPart(CommandBlock&);
+        void commandControllers(CommandBlock&, bool write);
+        void commandAdd(CommandBlock&);
+        void commandAddVoice(CommandBlock&);
+        void commandSub(CommandBlock&);
+        bool commandPad(CommandBlock&, PADnoteParameters& pars);
+        void commandOscillator(CommandBlock&, OscilParameters *oscil);
+        void commandResonance(CommandBlock&, Resonance *respar);
+        void commandLFO(CommandBlock&);
+        void lfoReadWrite(CommandBlock&, LFOParams *pars);
+        void commandFilter(CommandBlock&);
+        void filterReadWrite(CommandBlock&, FilterParams*, uchar* velsnsamp, uchar* velsns);
+        void commandEnvelope(CommandBlock&);
+        void envelopeReadWrite(CommandBlock&, EnvelopeParams*);
+        void envelopePointAdd(CommandBlock&, EnvelopeParams*);
+        void envelopePointDelete(CommandBlock&, EnvelopeParams*);
+        void envelopePointChange(CommandBlock&, EnvelopeParams*);
 
-        void commandSysIns(CommandBlock *getData);
+        void commandSysIns(CommandBlock&);
 
-        void add2undo(CommandBlock *getData, bool& noteSeen, bool group = false);
-        void addFixed2undo(CommandBlock *getData);
-        void undoLast(CommandBlock *candidate);
+        void add2undo(CommandBlock&, bool& noteSeen, bool group = false);
+        void addFixed2undo(CommandBlock&);
+        void undoLast(CommandBlock& candidate);
         std::list<CommandBlock> undoList;
         std::list<CommandBlock> redoList;
         CommandBlock lastEntry;
@@ -190,10 +196,10 @@ class InterChange : private DataText
          * reached from SynthEngine by jack freewheeling NRPNs.
          * This avoids unnecessary (error prone) duplication.
          */
-        void commandEffects(CommandBlock *getData);
+        void commandEffects(CommandBlock&);
 
     private:
-        bool commandSendReal(CommandBlock *getData);
+        bool commandSendReal(CommandBlock&);
 
         int searchInst;
         int searchBank;

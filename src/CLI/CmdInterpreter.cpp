@@ -7150,7 +7150,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
             struct timeval tv1, tv2;
             gettimeofday(&tv1, NULL);
             for (int i = 0; i < repeat; ++ i)
-                value = synth->interchange.readAllData(&putData);
+                value = synth->interchange.readAllData(putData);
             gettimeofday(&tv2, NULL);
 
             if (tv1.tv_usec > tv2.tv_usec)

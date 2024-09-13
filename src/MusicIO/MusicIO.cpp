@@ -107,7 +107,7 @@ void MusicIO::handleMidi(uchar par0, uchar par1, uchar par2, bool in_place)
             putData.data.part = TOPLEVEL::section::midiIn;
             putData.data.kit = channel;
             putData.data.engine = par1;
-            synth.midilearn.writeMidi(&putData, false);
+            synth.midilearn.writeMidi(putData, false);
         }
         if (event == 0x90)
             synth.interchange.noteSeen = true;

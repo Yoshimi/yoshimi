@@ -225,7 +225,7 @@ void MidiDecode::sendMidiCC(bool inSync, uchar chan, int type, short par)
     putData.data.part = TOPLEVEL::section::midiIn;
     putData.data.kit = chan;
     putData.data.engine = type;
-    synth->midilearn.writeMidi(&putData, false);
+    synth->midilearn.writeMidi(putData, false);
 }
 
 /*
@@ -611,7 +611,7 @@ void MidiDecode::nrpnDirectPart(int dHigh, int par)
 
     putData.data.type = TOPLEVEL::type::Write | TOPLEVEL::type::Integer;
     putData.data.source = TOPLEVEL::action::toAll;
-    synth->midilearn.writeMidi(&putData, false);
+    synth->midilearn.writeMidi(putData, false);
 }
 
 
@@ -690,7 +690,7 @@ void MidiDecode::setMidiBankOrRootDir(uint bank_or_root_num, bool in_place, bool
     else
         putData.data.engine = bank_or_root_num;
 
-    synth->midilearn.writeMidi(&putData, false);
+    synth->midilearn.writeMidi(putData, false);
 }
 
 
@@ -729,11 +729,11 @@ void MidiDecode::setMidiProgram(uchar ch, int prg, bool in_place)
                 if (in_place)
                 {
                     synth->partonoffLock(npart, -1);
-                    synth->setProgramFromBank(&putData, false);
+                    synth->setProgramFromBank(putData, false);
                 }
                 else
                 {
-                    synth->midilearn.writeMidi(&putData, false);
+                    synth->midilearn.writeMidi(putData, false);
                 }
             }
         }
@@ -745,10 +745,10 @@ void MidiDecode::setMidiProgram(uchar ch, int prg, bool in_place)
         if (in_place)
         {
             synth->partonoffLock(ch, -1);
-            synth->setProgramFromBank(&putData, false);
+            synth->setProgramFromBank(putData, false);
         }
         else
-            synth->midilearn.writeMidi(&putData, false);
+            synth->midilearn.writeMidi(putData, false);
     }
 }
 

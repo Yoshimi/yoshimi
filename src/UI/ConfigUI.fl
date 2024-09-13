@@ -2250,7 +2250,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
             getData.data.value = value;
             getData.data.control = control;
             getData.data.part = 248;
-            synth->interchange.testLimits(&getData);
+            synth->interchange.testLimits(getData);
             return textMsgBuffer.fetch(getData.data.miscmsg);} {}
   }
   decl {SynthEngine *synth;} {private local

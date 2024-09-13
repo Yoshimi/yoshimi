@@ -128,8 +128,8 @@ class SynthEngine
         void SetController(uchar chan, int CCtype, short int par);
         void SetZynControls(bool in_place);
         int setRootBank(int root, int bank, bool notinplace = true);
-        int setProgramByName(CommandBlock *getData);
-        int setProgramFromBank(CommandBlock *getData, bool notinplace = true);
+        int setProgramByName(CommandBlock&);
+        int setProgramFromBank(CommandBlock&, bool notinplace = true);
         bool setProgram(string const& fname, int npart);
         int ReadBankRoot();
         int ReadBank();

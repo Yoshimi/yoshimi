@@ -27,7 +27,6 @@
 
 */
 
-#include <sys/time.h>
 #include <set>
 #include <iostream>
 #include <string>
@@ -36,6 +35,7 @@
 #include <optional>
 #include <memory>
 #include <thread>
+#include <chrono>
 
 #ifdef GUI_FLTK
     #include "MasterUI.h"
@@ -71,6 +71,10 @@ using func::string2int;
 
 using std::this_thread::sleep_for;
 using std::chrono_literals::operator ""us;
+using std::chrono::steady_clock;
+using std::chrono::duration_cast;
+using std::chrono::time_point;
+
 using std::to_string;
 using std::ofstream;
 using std::ios_base;
@@ -102,7 +106,7 @@ SynthEngine::SynthEngine(uint instanceID)
     , Runtime{*this}
     , rootCon{interchange.guiDataExchange.createConnection<InterfaceAnchor>()}
     , bank{this}
-    , interchange{this}
+    , interchange{*this}
     , midilearn{*this}
     , mididecode{this}
     , vectorcontrol{this}
@@ -975,9 +979,9 @@ void SynthEngine::SetZynControls(bool in_place)
     putData.data.engine = effnum;
 
     if (in_place)
-        interchange.commandEffects(&putData);
+        interchange.commandEffects(putData);
     else // TODO next line is a hack!
-        midilearn.writeMidi(&putData, false);
+        midilearn.writeMidi(putData, false);
 }
 
 
@@ -1061,17 +1065,18 @@ int SynthEngine::setRootBank(int root, int banknum, bool notinplace)
 }
 
 
-int SynthEngine::setProgramByName(CommandBlock *getData)
+int SynthEngine::setProgramByName(CommandBlock& cmd)
 {
-    struct timeval tv1, tv2;
+    steady_clock::time_point startTime;
     if (Runtime.showTimes)
-        gettimeofday(&tv1, NULL);
+        startTime = steady_clock::now();
+
     int msgID = NO_MSG;
     bool ok = true;
-    int npart = int(getData->data.kit);
-    string fname = textMsgBuffer.fetch(getData->data.miscmsg);
+    int npart = int(cmd.data.kit);
+    string fname{textMsgBuffer.fetch(cmd.data.miscmsg)};
     fname = setExtension(fname, EXTEN::yoshInst);
-    if (!isRegularFile(fname))
+    if (not isRegularFile(fname))
         fname = setExtension(fname, EXTEN::zynInst);
     string name = findLeafName(fname);
     if (name < "!")
@@ -1079,7 +1084,7 @@ int SynthEngine::setProgramByName(CommandBlock *getData)
         name = "Invalid instrument name " + name;
         ok = false;
     }
-    if (ok && !isRegularFile(fname))
+    if (ok and not isRegularFile(fname))
     {
         name = "Can't find " + fname;
         ok = false;
@@ -1087,24 +1092,19 @@ int SynthEngine::setProgramByName(CommandBlock *getData)
     if (ok)
     {
         ok = setProgram(fname, npart);
-        if (!ok)
+        if (not ok)
             name = "File " + name + "unrecognised or corrupted";
     }
 
-    if (ok && Runtime.showTimes)
+    if (ok and Runtime.showTimes)
     {
-        gettimeofday(&tv2, NULL);
-        if (tv1.tv_usec > tv2.tv_usec)
-        {
-            tv2.tv_sec--;
-            tv2.tv_usec += 1000000;
-        }
-        int actual = ((tv2.tv_sec - tv1.tv_sec) *1000 + (tv2.tv_usec - tv1.tv_usec)/ 1000.0f) + 0.5f;
-        name += ("  Time " + to_string(actual) + "mS");
+        using Millisec = std::chrono::duration<int, std::milli>;
+        auto duration = duration_cast<Millisec>(steady_clock::now() - startTime);
+        name += ("  Time " + to_string(duration.count()) + "ms");
     }
 
     msgID = textMsgBuffer.push(name);
-    if (!ok)
+    if (not ok)
     {
         msgID |= 0xFF0000;
         partonoffLock(npart, 2); // as it was
@@ -1119,18 +1119,18 @@ int SynthEngine::setProgramByName(CommandBlock *getData)
 }
 
 
-int SynthEngine::setProgramFromBank(CommandBlock *getData, bool notinplace)
+int SynthEngine::setProgramFromBank(CommandBlock& cmd, bool notinplace)
 {
-    struct timeval tv1, tv2;
-    if (notinplace && Runtime.showTimes)
-        gettimeofday(&tv1, NULL);
+    steady_clock::time_point startTime;
+    if (notinplace and Runtime.showTimes)
+        startTime = steady_clock::now();
 
-    int instrument = int(getData->data.value);
-    int banknum = getData->data.engine;
+    int instrument = int(cmd.data.value);
+    int banknum = cmd.data.engine;
     if (banknum == UNUSED)
         banknum = Runtime.currentBank;
-    int npart = getData->data.kit;
-    int root = getData->data.insert;
+    int npart = cmd.data.kit;
+    int root  = cmd.data.insert;
     if (root == UNUSED)
         root = Runtime.currentRoot;
 
@@ -1149,7 +1149,7 @@ int SynthEngine::setProgramFromBank(CommandBlock *getData, bool notinplace)
         ok = setProgram(fname, npart);
         if (notinplace)
         {
-            if (!ok)
+            if (not ok)
                 name = "Instrument " + name + " missing or corrupted";
         }
     }
@@ -1157,20 +1157,15 @@ int SynthEngine::setProgramFromBank(CommandBlock *getData, bool notinplace)
     int msgID = NO_MSG;
     if (notinplace)
     {
-        if (ok && Runtime.showTimes)
+        if (ok and Runtime.showTimes)
         {
-            gettimeofday(&tv2, NULL);
-            if (tv1.tv_usec > tv2.tv_usec)
-            {
-                tv2.tv_sec--;
-                tv2.tv_usec += 1000000;
-            }
-            int actual = ((tv2.tv_sec - tv1.tv_sec) *1000 + (tv2.tv_usec - tv1.tv_usec)/ 1000.0f) + 0.5f;
-            name += ("  Time " + to_string(actual) + "mS");
+            using Millisec = std::chrono::duration<int, std::milli>;
+            auto duration = duration_cast<Millisec>(steady_clock::now() - startTime);
+            name += ("  Time " + to_string(duration.count()) + "ms");
         }
         msgID = textMsgBuffer.push(name);
     }
-    if (!ok)
+    if (not ok)
     {
         msgID |= 0xFF0000;
         partonoffLock(npart, 2); // as it was
@@ -1977,7 +1972,7 @@ void SynthEngine::vectorSet(int dHigh, uchar chan, int par)
         putData.data.control = 8;
         putData.data.part = TOPLEVEL::section::midiIn;
         putData.data.kit = part;
-        midilearn.writeMidi(&putData, true);
+        midilearn.writeMidi(putData, true);
     }
 }
 
@@ -2026,7 +2021,7 @@ void SynthEngine::resetAll(bool andML)
         putData.data.type = 0;
         putData.data.control = MIDILEARN::control::clearAll;
         putData.data.part = TOPLEVEL::section::midiLearn;
-        midilearn.generalOperations(&putData);
+        midilearn.generalOperations(putData);
         textMsgBuffer.clear();
     }
     // possibly push changed effect state to GUI
