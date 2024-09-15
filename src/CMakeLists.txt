@@ -101,6 +101,7 @@ option (BuildForCore2_X86_64 "Build for Intel Core2 x86_64 system" OFF)
 option (BuildForRasPi4 "Build for ARM Cortex A9 system" OFF)
 option (BuildForThisCPU "Build for presently running system" OFF)
 option (BuildForDebug "Debug build without optimisation. Enable gdb debugging support" OFF)
+option (BuildForDiagnostic "Add diagnostics and debug info for optimised release build" OFF)
 
 option (BuildWithFLTK "Build with FLTK GUI" ON)
 
@@ -132,19 +133,21 @@ set (BuildOptions_RasPi4
     CACHE STRING "Raspberry Pi V4 compiler options"
 )
 
-set (BuildOptionsThisCPU
+set (BuildOptions_ThisCPU
     "-march=native -mtune=native -Wall"
     CACHE STRING "Current CPU compiler options"
 )
 
-set (BuildOptionsBasic
+set (BuildOptions_Basic
     "-ffast-math -fomit-frame-pointer"
     CACHE STRING "basic compiler options"
 )
 
-set (BuildOptionsDebug
-    "-O0 -g3 -ggdb -Wpointer-arith -Wpedantic -Wextra" CACHE STRING "Compile without optimisation and with debug information")
-set (BuildOptionsRelease
+set (BuildOptions_Debug
+    "-O0 -Wpointer-arith -Wpedantic -Wextra" CACHE STRING "Compile without optimisation and with debug information")
+set (BuildOptions_Diagnostic
+    "-g3 -ggdb" CACHE STRING "Additional flags for debug information and diagnostics")
+set (BuildOptions_Release
     "-O3" CACHE STRING "Compile with optimisation for Release builds")
 
 if (BuildWithFLTK)
@@ -260,19 +263,25 @@ elseif (BuildForCore2_X86_64)
 elseif (BuildForNEON)
     set (OurCxxFlags ${BuildOptions_NEON})
 elseif (BuildForThisCPU)
-    set (OurCxxFlags ${BuildOptionsThisCPU})
+    set (OurCxxFlags ${BuildOptions_ThisCPU})
 else()
-    set (OurCxxFlags ${BuildOptionsBasic})
+    set (OurCxxFlags ${BuildOptions_Basic})
 endif ()
 set (CMAKE_CXX_FLAGS "${OurCxxFlags} ${CMAKE_CXX_FLAGS}")
 
+if (BuildForDiagnostic OR BuildForDebug)
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${BuildOptions_Diagnostic}")
+else()
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -DNDEBUG ")
+endif ()
+
 if (BuildForDebug)
     set (CMAKE_BUILD_TYPE "Debug")
-    set (CMAKE_CXX_FLAGS_DEBUG ${BuildOptionsDebug})
+    set (CMAKE_CXX_FLAGS_DEBUG ${BuildOptions_Debug})
     message (STATUS "DEBUG Build, flags: ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_DEBUG}")
 else()
     set (CMAKE_BUILD_TYPE "Release")
-    set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptionsRelease})
+    set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptions_Release})
     message (STATUS "RELEASE Build, flags: ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE}")
 endif ()
 
