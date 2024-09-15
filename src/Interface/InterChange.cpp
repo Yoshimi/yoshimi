@@ -7162,6 +7162,11 @@ void InterChange::commandSysIns(CommandBlock *getData)
                     else
                     {
                         synth->insefx[effnum]->changeeffect(value_int);
+                        auto& destination = synth->Pinsparts[effnum];
+                        if (value_int > 0 and destination == -1)
+                        {// if it was disabled before, pre-select current part as convenience
+                            destination = synth.getRuntime().currentPart;
+                        }
                     }   // push GUI update since module for effnum is currently exposed in GUI
                     synth->pushEffectUpdate(npart);
                     getData->data.offset = 0;
