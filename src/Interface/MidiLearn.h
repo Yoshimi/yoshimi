@@ -41,47 +41,43 @@ using std::list;
 
 class MidiLearn : private DataText, TextData
 {
+        SynthEngine& synth;
+
     public:
-        MidiLearn(SynthEngine*);
-        ~MidiLearn();
-        CommandBlock data;//commandData;
+       ~MidiLearn() = default;
+        MidiLearn(SynthEngine&);
+        // shall not be copied or moved or assigned
+        MidiLearn(MidiLearn&&)                 = delete;
+        MidiLearn(MidiLearn const&)            = delete;
+        MidiLearn& operator=(MidiLearn&&)      = delete;
+        MidiLearn& operator=(MidiLearn const&) = delete;
 
-/*        struct Control{
-            unsigned char type = 0;
-            unsigned char control = 0;
-            unsigned char part = 0;
-            unsigned char kit = 0;
-            unsigned char engine = 0;
-            unsigned char insert = 0;
-            unsigned char parameter = 0;
-            unsigned char offset = 0;
-            unsigned char miscmsg = 0;
-        };*/
+        //commandData
+        CommandBlock data;
 
-        //Control data;
-
+        //Control data
         struct LearnBlock{
-            unsigned short int CC = 0;
-            unsigned char chan = 0;
-            unsigned char min_in = 0;
-            unsigned char max_in = 0;
-            unsigned char status = 0; // up to here must be specified on input
-            int min_out = 0; // defined programmatically
-            int max_out = 0; // defined programmatically
+            ushort CC{0};
+            uchar chan{0};
+            uchar min_in{0};
+            uchar max_in{0};
+            uchar status{0};    // up to here must be specified on input
+            int min_out{0};     // defined programmatically
+            int max_out{0};     // defined programmatically
             CommandBlock frame; // controller to learn
         };
         bool learning;
 
-        void setTransferBlock(CommandBlock *getData);
+        void setTransferBlock(CommandBlock& getData);
 
-        bool runMidiLearn(int _value, unsigned short int CC, unsigned char chan, bool in_place);
-        bool writeMidi(CommandBlock *putData, bool in_place);
+        bool runMidiLearn(int _value, ushort CC, uchar chan, bool in_place);
+        bool writeMidi(CommandBlock& putData, bool in_place);
 
-        int findSize();
+        int  findSize();
         void listLine(int lineNo);
         void listAll(list<string>& msg_buf);
         bool remove(int itemNumber);
-        void generalOperations(CommandBlock *getData);
+        void generalOperations(CommandBlock& getData);
         bool insertMidiListData(XMLwrapper&);
         bool loadList(const string& name);
         bool extractMidiListData(bool full, XMLwrapper&);
@@ -90,14 +86,15 @@ class MidiLearn : private DataText, TextData
 
     private:
         list<LearnBlock> midi_list;
-        string learnedName;
+        string       learnedName;
         CommandBlock learnTransferBlock;
-        int findEntry(list<LearnBlock> &midi_list, int lastpos, unsigned short int CC, unsigned char chan, LearnBlock *block, bool show);
+
+        int findEntry(list<LearnBlock>&, int lastpos, ushort CC, uchar chan, LearnBlock& block, bool show);
         string findName(list<LearnBlock>::iterator it);
-        void insertLine(unsigned short int CC, unsigned char chan);
-        bool saveList(const string& name);
-        SynthEngine *synth;
-        void writeToGui(CommandBlock *putData);
+        void insertLine(ushort CC, uchar chan);
+        bool saveList(string const& name);
+        void writeToGui(CommandBlock& putData);
 };
 
-#endif
+#endif /*MIDILEARN_H*/
+

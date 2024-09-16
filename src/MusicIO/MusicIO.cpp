@@ -32,32 +32,35 @@
 #include "Misc/FormatFuncs.h"
 #include "MusicIO/MusicIO.h"
 
+#include <utility>
+#include <chrono>
+
 using func::asString;
 
 
-MusicIO::MusicIO(SynthEngine *_synth, BeatTracker *_beatTracker) :
-    LV2_engine{_synth->getIsLV2Plugin()},
-    bufferAllocation{},  // Allocation happens later in prepBuffers()
-    zynLeft{0},
-    zynRight{0},
-    interleaved(),
-    beatTracker(_beatTracker),
-    synth(_synth)
-{ }
+MusicIO::MusicIO(SynthEngine& _synth, shared_ptr<BeatTracker>&& beat)
+    : bufferAllocation{}   // Allocation happens later in prepBuffers()
+    , zynLeft{0}
+    , zynRight{0}
+    , beatTracker{std::move(beat)}
+    , synth{_synth}
+    { }
 
 
+Config& MusicIO::runtime() { return synth.getRuntime(); }
 
-void MusicIO::setMidi(unsigned char par0, unsigned char par1, unsigned char par2, bool in_place)
+
+void MusicIO::handleMidi(uchar par0, uchar par1, uchar par2, bool in_place)
 {
-    if (synth->audioOut.load() != _SYS_::mute::Idle)
+    if (synth.audioOut.load() != _SYS_::mute::Idle)
         return; // nobody listening!
 
-    bool inSync = LV2_engine || (synth->getRuntime().audioEngine == jack_audio && synth->getRuntime().midiEngine == jack_midi);
+    bool inSync = runtime().isLV2 or (runtime().audioEngine == jack_audio and runtime().midiEngine == jack_midi);
 
     CommandBlock putData;
 
-    unsigned int event = par0 & 0xf0;
-    unsigned char channel = par0 & 0xf;
+    uint  event   = par0 & 0xf0;
+    uchar channel = par0 & 0xf;
 
 
 #ifdef AFTERTOUCH_EMULATE
@@ -66,7 +69,7 @@ void MusicIO::setMidi(unsigned char par0, unsigned char par1, unsigned char par2
     {
         par0 = 0xd0 | channel; // change to channel aftertouch
         par1 = par2; // shift parameter across
-        synth->mididecode.midiProcess(par0, par1, par2, in_place, inSync);
+        synth.mididecode.midiProcess(par0, par1, par2, in_place, inSync);
         return;
     }
 #endif
@@ -84,17 +87,17 @@ void MusicIO::setMidi(unsigned char par0, unsigned char par1, unsigned char par2
 
 #ifdef REPORT_NOTES_ON_OFF
         if (event == 0x80) // note test
-            ++synth->getRuntime().noteOffSent;
+            ++runtime().noteOffSent;
         else
-            ++synth->getRuntime().noteOnSent;
+            ++runtime().noteOnSent;
 #endif
 
         if (inSync)
         {
             if (event == 0x80)
-                synth->NoteOff(channel, par1);
+                synth.NoteOff(channel, par1);
             else
-                synth->NoteOn(channel, par1, par2);
+                synth.NoteOn(channel, par1, par2);
         }
         else
         {
@@ -104,17 +107,17 @@ void MusicIO::setMidi(unsigned char par0, unsigned char par1, unsigned char par2
             putData.data.part = TOPLEVEL::section::midiIn;
             putData.data.kit = channel;
             putData.data.engine = par1;
-            synth->midilearn.writeMidi(&putData, false);
+            synth.midilearn.writeMidi(putData, false);
         }
         if (event == 0x90)
-            synth->interchange.noteSeen = true;
+            synth.interchange.noteSeen = true;
         return;
     }
-    synth->mididecode.midiProcess(par0, par1, par2, in_place, inSync);
+    synth.mididecode.midiProcess(par0, par1, par2, in_place, inSync);
 }
 
 
-bool MusicIO::prepBuffers(void)
+bool MusicIO::prepBuffers()
 {
     size_t buffSize = getBuffersize();
     if (buffSize == 0)
@@ -135,64 +138,69 @@ bool MusicIO::prepBuffers(void)
 }
 
 
-BeatTracker::BeatTracker() :
-    songVsMonotonicBeatDiff(0)
-{
-}
+BeatTracker::BeatTracker()
+    : songVsMonotonicBeatDiff{0}
+    { }
 
-BeatTracker::~BeatTracker()
-{
-}
+BeatTracker::~BeatTracker() { }  // emit VTable here...
 
-void BeatTracker::adjustMonotonicRounding(BeatTracker::BeatValues *beats)
+
+void BeatTracker::adjustMonotonicRounding(BeatTracker::BeatValues& beats)
 {
     // Try to compensate for rounding errors in monotonic beat. If the
     // difference is small enough from the song beat, then we assume we have not
     // repositioned the transport and we derive an exact value of the monotonic
     // beat from the song beat, instead of adding BPM on every cycle, which
     // accumulates a lot of error over time.
-    if (fabsf(beats->songBeat + songVsMonotonicBeatDiff - beats->monotonicBeat) < 0.1f)
-        beats->monotonicBeat = beats->songBeat + songVsMonotonicBeatDiff;
+    if (fabsf(beats.songBeat + songVsMonotonicBeatDiff - beats.monotonicBeat) < 0.1f)
+        beats.monotonicBeat = beats.songBeat + songVsMonotonicBeatDiff;
     else
-        songVsMonotonicBeatDiff = beats->monotonicBeat - beats->songBeat;
+        songVsMonotonicBeatDiff = beats.monotonicBeat - beats.songBeat;
 }
+
+
+
+// to protect a critical section against concurrent access
+using Guard = const std::lock_guard<std::mutex>;
+
+// monotonic time scale in microseconds as unsigned 64bit
+using Mircos = std::chrono::duration<uint64_t, std::micro>;
+using std::chrono::steady_clock;
+using std::chrono::floor;
+
 
 MultithreadedBeatTracker::MultithreadedBeatTracker()
+    : mtx{}
+    , lastTimeUs{}
+    , lastSongBeat{0}
+    , lastMonotonicBeat{0}
+    , timeUs{}
+    , songBeat{0}
+    , monotonicBeat{0}
+    , bpm{120}
 {
-    timespec time;
-    clock_gettime(CLOCK_MONOTONIC, &time);
-
-    uint64_t clock = time.tv_sec * 1000000 + time.tv_nsec / 1000;
-
-    lastTimeUs = clock;
-    lastSongBeat = 0;
-    lastMonotonicBeat = 0;
-    timeUs = clock;
-    songBeat = 0;
-    monotonicBeat = 0;
-    bpm = 120;
-    pthread_mutex_init(&mutex, NULL);
+    auto now = steady_clock::now();
+    auto microTicks = floor<Mircos>(now.time_since_epoch())
+                           .count();
+    lastTimeUs = microTicks;
+    timeUs = microTicks;
 }
 
-MultithreadedBeatTracker::~MultithreadedBeatTracker()
-{
-    pthread_mutex_destroy(&mutex);
-}
+
+
 
 BeatTracker::BeatValues MultithreadedBeatTracker::setBeatValues(BeatTracker::BeatValues beats)
 {
-    timespec time;
-    clock_gettime(CLOCK_MONOTONIC, &time);
+    adjustMonotonicRounding(beats);
 
-    uint64_t clock = time.tv_sec * 1000000 + time.tv_nsec / 1000;
+    Guard lock(mtx); //--synced------------------------------
 
-    adjustMonotonicRounding(&beats);
-
-    //--------------------------------
-    pthread_mutex_lock(&mutex);
-
+    auto now = steady_clock::now();
+    auto microTicks = floor<Mircos>(now.time_since_epoch())
+                           .count();
     lastTimeUs = timeUs;
-
+    timeUs = microTicks;
+    bpm = beats.bpm;
     if (beats.songBeat >= LFO_BPM_LCM)
     {
         beats.songBeat -= LFO_BPM_LCM;
@@ -209,63 +217,46 @@ BeatTracker::BeatValues MultithreadedBeatTracker::setBeatValues(BeatTracker::Bea
     else
         lastMonotonicBeat = monotonicBeat;
 
-    timeUs = clock;
     songBeat = beats.songBeat;
     monotonicBeat = beats.monotonicBeat;
-    bpm = beats.bpm;
-
-    pthread_mutex_unlock(&mutex);
-    //--------------------------------
-
     return beats;
 }
 
+
 BeatTracker::BeatValues MultithreadedBeatTracker::getBeatValues()
 {
-    timespec t;
-    clock_gettime(CLOCK_MONOTONIC, &t);
-
-    uint64_t clock = t.tv_sec * 1000000 + t.tv_nsec / 1000;
-
+    Guard lock(mtx);  //--synced------------------------------
     BeatTracker::BeatValues ret;
 
-    pthread_mutex_lock(&mutex);
-    uint64_t lastTime = lastTimeUs;
-    float lastSongBeatTmp = lastSongBeat;
-    float lastMonotonicBeatTmp = lastMonotonicBeat;
-    uint64_t time = timeUs;
-    float songBeatTmp = songBeat;
-    float monotonicBeatTmp = monotonicBeat;
-    ret.bpm = bpm;
-    pthread_mutex_unlock(&mutex);
+    // read current monotonic time
+    auto now = steady_clock::now();
+    int64_t microTicks = floor<Mircos>(now.time_since_epoch())
+                              .count();
 
-    if (time == lastTime)
-    {
-        // Can only happen on the very first iteration. Avoid division by zero.
+    if (timeUs == lastTimeUs)
+    {   // Can only happen on the very first iteration. Avoid division by zero.
         ret.songBeat = 0;
         ret.monotonicBeat = 0;
     }
     else
-    {
-        // Based on beat and clock from MIDI thread, interpolate and find the
-        // beat for audio thread.
-        float ratio = (float)(clock - lastTime) / (time - lastTime);
-        ret.songBeat = ratio * (songBeatTmp - lastSongBeatTmp) + lastSongBeatTmp;
-        ret.monotonicBeat = ratio * (monotonicBeatTmp - lastMonotonicBeatTmp) + lastMonotonicBeatTmp;
+    {   // Based on beat and clock from MIDI thread,
+        // interpolate and find the beat for audio thread.
+        auto ratio = float(microTicks - lastTimeUs) / (timeUs - lastTimeUs);
+        ret.songBeat = ratio * (songBeat - lastSongBeat) + lastSongBeat;
+        ret.monotonicBeat = ratio * (monotonicBeat - lastMonotonicBeat) + lastMonotonicBeat;
     }
-
+    ret.bpm = bpm;
     return ret;
 }
 
 BeatTracker::BeatValues MultithreadedBeatTracker::getRawBeatValues()
 {
-    pthread_mutex_lock(&mutex);
+    Guard lock(mtx); //--synced------------------------------
     BeatValues ret = {
         songBeat,
         monotonicBeat,
         bpm,
     };
-    pthread_mutex_unlock(&mutex);
     return ret;
 }
 
@@ -283,10 +274,8 @@ BeatTracker::BeatValues SinglethreadedBeatTracker::setBeatValues(BeatTracker::Be
     if (beats.monotonicBeat >= LFO_BPM_LCM)
         beats.monotonicBeat -= LFO_BPM_LCM;
 
-    adjustMonotonicRounding(&beats);
-
+    adjustMonotonicRounding(beats);
     this->beats = beats;
-
     return beats;
 }
 

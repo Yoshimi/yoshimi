@@ -21,7 +21,6 @@
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
-#include <unistd.h>
 #include <pwd.h>
 #include <cstdio>
 #include <cerrno>
@@ -33,6 +32,7 @@
 #include <readline/history.h>
 #include <algorithm>
 #include <iterator>
+#include <thread>
 #include <atomic>
 #include <map>
 #include <list>
@@ -50,10 +50,8 @@
 #include "Misc/NumericFuncs.h"
 #include "Misc/FormatFuncs.h"
 #include "Misc/CliFuncs.h"
+#include "Misc/Util.h"
 
-
-// global variable; see SynthEngine.cpp and main.cpp
-extern SynthEngine *firstSynth;
 
 // used to hold back shutdown when running sound generation for test
 extern std::atomic <bool> waitForTest;
@@ -63,6 +61,10 @@ extern std::atomic <bool> waitForTest;
 const unsigned char type_read = TOPLEVEL::type::Adjust;
 
 namespace cli {
+
+using std::this_thread::sleep_for;
+using std::chrono_literals::operator ""ms;
+using std::chrono::duration;
 
 using std::string;
 using std::to_string;
@@ -86,6 +88,8 @@ using func::string2int127;
 using func::string2float;
 
 using cli::readControl;
+
+using test::TestInvoker;
 
 
 /*
@@ -117,7 +121,6 @@ CmdInterpreter::CmdInterpreter() :
     synth{nullptr},
     instrumentGroup{},
     textMsgBuffer{TextMsgBuffer::instance()},
-    testInvoker{},
 
     context{LEVEL::Top},
     section{UNUSED},
@@ -172,7 +175,7 @@ void CmdInterpreter::defaults()
 void CmdInterpreter::resetInstance(unsigned int newInstance)
 {
     currentInstance = newInstance;
-    synth = firstSynth->getSynthFromId(currentInstance);
+    synth = & Config::instances().findSynthByID(currentInstance);
     unsigned int newID = synth->getUniqueId();
     if (newID != currentInstance)
     {
@@ -182,13 +185,6 @@ void CmdInterpreter::resetInstance(unsigned int newInstance)
     defaults();
 }
 
-
-test::TestInvoker& CmdInterpreter::getTestInvoker()
-{
-    if (!testInvoker)
-        testInvoker.reset(new test::TestInvoker());
-    return *testInvoker;
-}
 
 
 string CmdInterpreter::buildStatus(bool showPartDetails)
@@ -567,7 +563,7 @@ string CmdInterpreter::buildTestStatus()
 {
     int expose = readControl(synth, 0, CONFIG::control::exposeStatus, TOPLEVEL::section::config);
     // render compact form when status is part of prompt
-    return getTestInvoker().showTestParams(expose == 2);
+    return TestInvoker::access().showTestParams(expose == 2);
 }
 
 
@@ -979,7 +975,7 @@ void CmdInterpreter::historyList(int listnum)
     }
     for (int type = start; type <= end; ++type)
     {
-        vector<string> listType = *synth->getHistory(type);
+        vector<string> const& listType{synth->getHistory(type)};
         if (listType.size() > 0)
         {
             msg.push_back(" ");
@@ -1005,8 +1001,10 @@ void CmdInterpreter::historyList(int listnum)
                     break;
             }
             int itemNo = 0;
-            for (vector<string>::iterator it = listType.begin(); it != listType.end(); ++it, ++ itemNo)
-                msg.push_back(to_string(itemNo + 1) + "  " + *it);
+            for (auto const& historyEntry : listType)
+            {
+                msg.push_back(to_string(1 + itemNo++) + "  " + historyEntry);
+            }
             found = true;
         }
     }
@@ -1019,7 +1017,7 @@ void CmdInterpreter::historyList(int listnum)
 
 string CmdInterpreter::historySelect(int listnum, size_t selection)
 {
-    vector<string> listType = *synth->getHistory(listnum - 1);
+    vector<string> const& listType{synth->getHistory(listnum - 1)};
     if (listType.size() == 0)
     {
         synth->getRuntime().Log("No saved entries");
@@ -1475,7 +1473,7 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
             else
             {
                 value = string2int(input) - 1;
-                if (value >= Runtime.NumAvailableParts || value < 0)
+                if (value >= int(Runtime.numAvailableParts) || value < 0)
                     return REPLY::range_msg;
             }
             effSend = value;
@@ -5343,8 +5341,7 @@ int CmdInterpreter::waveform(Parser& input, unsigned char controlType)
 
 int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
 {
-    Config &Runtime = synth->getRuntime();
-    int tmp = -1;
+    Config& Runtime = synth->getRuntime();
     section = npart;
     if (bitTest(context, LEVEL::AllFX))
         return effects(input, controlType);
@@ -5386,22 +5383,22 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
 
     if (input.isdigit())
     {
-        tmp = string2int127(input);
+        uint num = string2int127(input);
         input.skipChars();
-        if (tmp > 0)
+        if (num > 0)
         {
-            tmp -= 1;
+            num -= 1;
             if (!inKitEditor)
             {
-                if (tmp >= Runtime.NumAvailableParts)
+                if (num >= Runtime.numAvailableParts)
                 {
                     Runtime.Log("Part number too high");
                     return REPLY::done_msg;
                 }
 
-                //if (npart != tmp) // TODO sort this properly!
+                //if (npart != num) // TODO sort this properly!
                 {
-                    npart = tmp;
+                    npart = num;
                     section = npart;
                     if (controlType == TOPLEVEL::type::Write)
                     {
@@ -5420,9 +5417,9 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
             {
                 if (controlType == TOPLEVEL::type::Write)
                 {
-                    if (tmp >= NUM_KIT_ITEMS)
+                    if (num >= NUM_KIT_ITEMS)
                         return REPLY::range_msg;
-                    kitNumber = tmp;
+                    kitNumber = num;
                     voiceNumber = 0;// to avoid confusion
                 }
                 Runtime.Log("Kit item number " + to_string(kitNumber + 1));
@@ -5506,7 +5503,7 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
                 sendDirect(synth, 0, inst, controlType, MAIN::control::loadInstrumentFromBank, TOPLEVEL::section::main, npart, bank, root);
                 return REPLY::done_msg;
             }
-            tmp = string2int(input) - 1;
+            int tmp = string2int(input) - 1;
             if (tmp < 0 || tmp >= MAX_INSTRUMENTS_IN_BANK)
                 return REPLY::range_msg;
             sendDirect(synth, 0, tmp, controlType, MAIN::control::loadInstrumentFromBank, TOPLEVEL::section::main, npart);
@@ -5545,7 +5542,7 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
     if (!readControl(synth, 0, PART::control::enable, npart))
         return REPLY::inactive_msg;
 
-    tmp = -1;
+    int tmp = -1;
     if (input.matchnMove(3, "normal"))
         tmp = PART::kitType::Off;
     else if (input.matchnMove(2, "multi"))
@@ -5905,25 +5902,24 @@ int CmdInterpreter::commandTest(Parser& input, unsigned char controlType)
     }// note: the following handler will consume the "swapwave" command and store the offset parameter
 
     string response;
-    if (getTestInvoker().handleParameterChange(input, controlType, response, synth->buffersize))
+    if (TestInvoker::access().handleParameterChange(input, controlType, response, synth->buffersize))
         synth->getRuntime().Log(response);
 
     // proceed to launch the test invocation and then cause termination of Yoshimi
     if (controlType == TOPLEVEL::type::Write && input.matchnMove(3, "execute"))
     {
-        size_t wait_at_least_one_cycle = ceil(1.1 * (synth->buffersize_f / synth->samplerate_f) * 1000*1000);
+        using Seconds = duration<float>;
+        auto at_least_one_cycle = Seconds(synth->buffersize_f / synth->samplerate_f);
 
         sendNormal(synth, 0, 0, TOPLEVEL::type::Write,MAIN::control::stopSound, TOPLEVEL::section::main);
-        do usleep(wait_at_least_one_cycle); // with buffersize 128 and 48kHz -> one buffer lasts ~ 2.6ms
+        do sleep_for(at_least_one_cycle); // with buffersize 128 and 48kHz -> one buffer lasts ~ 2.6ms
         while (synth->audioOut != _SYS_::mute::Idle);
 
+        // Activate test sound computation at end of main()
+        TestInvoker::access().activated = true;
         // NOTE: the following initiates a shutdown
-        waitForTest = true;
         synth->getRuntime().runSynth = false;
-        usleep(wait_at_least_one_cycle);
 
-        // Launch computation for automated acceptance test
-        getTestInvoker().performSoundCalculation(*synth);
         return REPLY::exit_msg;
     }
     else if (!input.isAtEnd())
@@ -6327,23 +6323,15 @@ Reply CmdInterpreter::processSrcriptFile(const string& filename, bool toplevel)
         }
         if (scriptParser.matchnMove(4, "wait"))
         {
-            int mSec = string2int(scriptParser);
-            if (mSec < 2)
-                mSec = 2;
-            else if (mSec > 30000)
-                mSec = 30000;
-            mSec -= 1; //allow for internal time
-            Runtime.Log("Waiting " + to_string(mSec) + "mS");
-            if (mSec > 1000)
-            {
-                sleep (mSec / 1000);
-                mSec = mSec % 1000;
-            }
-            usleep(mSec * 1000);
+            using MilliSec = duration<int, std::milli>;
+            MilliSec mSec{string2int(scriptParser) - 1};            // -1ms for internal overhead
+            mSec = util::limited(MilliSec{2}, mSec, MilliSec{30000});
+            Runtime.Log("Waiting " + to_string(mSec.count()) + "ms");
+            sleep_for(mSec);
         }
         else
         {
-            usleep(2000); // the loop is too fast otherwise!
+            sleep_for(2ms); // the loop is too fast otherwise!
             Reply reply = cmdIfaceProcessCommand(scriptParser);
             if (reply.code > REPLY::done_msg)
             {
@@ -6476,8 +6464,8 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
                     input.reset_to_mark();
                 else
                 {
-                    int tmp = string2int(input);
-                    if (tmp < 1 || tmp > Runtime.NumAvailableParts)
+                    uint tmp = string2int(input);
+                    if (tmp < 1 || tmp > Runtime.numAvailableParts)
                         return REPLY::range_msg;
 
                     npart = tmp -1;
@@ -6610,7 +6598,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
             int forceId = string2int(input);
             if (forceId < 1 || forceId >= 32)
                 forceId = 0;
-            sendDirect(synth, TOPLEVEL::action::lowPrio, forceId, TOPLEVEL::type::Write, MAIN::control::startInstance, TOPLEVEL::section::main);
+            sendNormal(synth, TOPLEVEL::action::lowPrio, forceId, TOPLEVEL::type::Write, MAIN::control::startInstance, TOPLEVEL::section::main);
             return Reply::DONE;
         }
         else
@@ -6733,7 +6721,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
                     Runtime.Log("Instance can't close itself");
                 else
                 {
-                    sendDirect(synth, TOPLEVEL::action::lowPrio, to_close, TOPLEVEL::type::Write, MAIN::control::stopInstance, TOPLEVEL::section::main);
+                    sendNormal(synth, TOPLEVEL::action::lowPrio, to_close, TOPLEVEL::type::Write, MAIN::control::stopInstance, TOPLEVEL::section::main);
                 }
                 return Reply::DONE;
             }
@@ -7162,7 +7150,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
             struct timeval tv1, tv2;
             gettimeofday(&tv1, NULL);
             for (int i = 0; i < repeat; ++ i)
-                value = synth->interchange.readAllData(&putData);
+                value = synth->interchange.readAllData(putData);
             gettimeofday(&tv2, NULL);
 
             if (tv1.tv_usec > tv2.tv_usec)

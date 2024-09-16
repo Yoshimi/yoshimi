@@ -64,6 +64,8 @@ public:
     Samples& operator=(Samples&&)      = delete;
     Samples& operator=(Samples const&) = delete;
 
+    explicit operator bool()  const { return bool(get()); } ///< to detect an empty samples buffer
+
     /** discard existing allocation and possibly create/manage new allocation */
     void reset(size_t newSize =0)
     {

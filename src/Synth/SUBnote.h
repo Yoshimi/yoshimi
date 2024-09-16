@@ -59,15 +59,15 @@ class SUBnote
         void legatoFadeIn(Note);
         void legatoFadeOut();
 
-        void noteout(float *outl,float *outr);
-        void releasekey(void);
+        void noteout(float* outl, float* outr);
+        void releasekey();
         bool finished() const { return noteStatus == NOTE_DISABLED; }
 
     private:
-        void computecurrentparameters(void);
+        void computecurrentparameters();
         void initparameters(float freq);
-        void killNote(void);
-        void updatefilterbank(void);
+        void killNote();
+        void updatefilterbank();
 
 
         SynthEngine& synth;

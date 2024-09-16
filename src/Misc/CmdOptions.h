@@ -21,24 +21,28 @@
 #ifndef CMDOPTIONS_H
 #define CMDOPTIONS_H
 
-#include <string>
-#include <list>
-
 #include "globals.h"
 
-using std::string;
+#include <vector>
+#include <string>
+
+class Config;
+
 
 class CmdOptions
 {
     public:
-        CmdOptions(int argc, char **argv, std::list<string> &allArgs, int &guin, int &cmdn);
-        std::list<string> settings;
-        int gui;
-        int cmd;
+        using Settings = std::vector<std::pair<char,std::string>>;
+
+        CmdOptions()   = default;
+        CmdOptions(int argc, char **argv);
+
+        void applyTo(Config&)  const;
 
     private:
-        void loadCmdArgs(int argc, char **argv);
+        Settings settings;
 
+        static Settings parseCmdline(int argc, char **argv);
 };
 
 #endif /*CMDOPTIONS_H*/

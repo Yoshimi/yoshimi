@@ -164,14 +164,14 @@ class ADnote
             unisonDetuneFactorFromParent = factor;
         }
         void computeUnisonFreqRap(int nvoice);
-        void computeNoteParameters(void);
-        void computeWorkingParameters(void);
+        void computeNoteParameters();
+        void computeWorkingParameters();
         void computePhaseOffsets(int nvoice);
         void computeFMPhaseOffsets(int nvoice);
-        void initParameters(void);
-        void initSubVoices(void);
+        void initParameters();
+        void initSubVoices();
         void killVoice(int nvoice);
-        void killNote(void);
+        void killNote();
         float getVoiceBaseFreq(int nvoice);
         float getFMVoiceBaseFreq(int nvoice);
         void computeVoiceOscillatorLinearInterpolation(int nvoice);

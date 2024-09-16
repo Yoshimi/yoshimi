@@ -36,17 +36,18 @@ class SynthEngine;
 class Controller
 {
     public:
+       ~Controller() = default;
         Controller(SynthEngine *_synth);
-        ~Controller() { };
-        void resetall(void);
+
+        void resetall();
 
         void add2XML(XMLwrapper& xml);
-        void defaults(void);
+        void defaults();
         void getfromXML(XMLwrapper& xml);
 
         // Controllers functions
         void setpitchwheel(int value);
-        void setpitchwheelbendrange(unsigned short int value);
+        void setpitchwheelbendrange(ushort value);
         void setexpression(int value);
         void setfiltercutoff(int value);
         void setfilterq(int value);
@@ -61,88 +62,89 @@ class Controller
         void setresonancebw(int value);
         void setPanDepth(char par) { panning.depth = par;}
         bool initportamento(float oldfreq, float newfreq, bool in_progress); // returns true if portamento's preconditions are met
-        void updateportamento(void); // update portamento values
+        void updateportamento(); // update portamento values
         float getLimits(CommandBlock *getData);
 
         // Controllers values
         struct { // Pitch Wheel
-            int data;
-            short int bendrange; // bendrange is in cents
-            float relfreq; // the relative frequency (default is 1.0)
+            int   data;
+            short bendrange; // bendrange is in cents
+            float relfreq;   // the relative frequency (default is 1.0)
         } pitchwheel;
 
         struct { // Expression
-            int data;
+            int   data;
             float relvolume;
-            unsigned char receive;
+            uchar receive;
         } expression;
 
         struct { // Panning
-            int data;
+            int  data;
             char depth;
         } panning;
 
         struct { // Filter cutoff
-            int data;
+            int   data;
             float relfreq;
-            unsigned char depth;
+            uchar depth;
         } filtercutoff;
 
         struct { // Filter Q
-            int data;
+            int   data;
             float relq;
-            unsigned char depth;
+            uchar depth;
         } filterq;
 
         struct { // Bandwidth
-            int data;
+            int   data;
             float relbw;
-            unsigned char depth;
-            unsigned char exponential;
+            uchar depth;
+            uchar exponential;
         } bandwidth;
 
         struct { // Modulation Wheel
-            int data;
+            int   data;
             float relmod;
-            unsigned char depth;
-            unsigned char exponential;
+            uchar depth;
+            uchar exponential;
         } modwheel;
 
         struct { // FM amplitude
-            int data;
+            int   data;
             float relamp;
-            unsigned char receive;
+            uchar receive;
         } fmamp;
 
         struct { // Volume
-            int data;
+            int   data;
             float volume;
-            unsigned char receive;
+            uchar receive;
         } volume;
 
         struct { // Sustain
-            int data,sustain;
-            unsigned char receive;
+            int   data;
+            int   sustain;
+            uchar receive;
         } sustain;
 
         struct { // Portamento
             // parameters
-            int data;
-            unsigned char portamento;
+            int   data;
+            uchar portamento;
 
-            unsigned char receive;
-            unsigned char time;
-            unsigned char proportional;
-            unsigned char propRate;
-            unsigned char propDepth;
-            unsigned char pitchthresh;
-            unsigned char pitchthreshtype;
+            uchar receive;
+            uchar time;
+            uchar proportional;
+            uchar propRate;
+            uchar propDepth;
+            uchar pitchthresh;
+            uchar pitchthreshtype;
 
-            unsigned char updowntimestretch;
+            uchar updowntimestretch;
 
             float freqrap;
-            int noteusing;
-            int used;
+            int   noteusing;
+            int   used;
             // internal data
             float x;  // x is from 0.0 (start portamento) to 1.0 (finished portamento),
             float dx; // dx is x increment
@@ -150,15 +152,15 @@ class Controller
         } portamento;
 
         struct { // Resonance Center Frequency
-            int data;
+            int   data;
             float relcenter;
-            unsigned char depth;
+            uchar depth;
         } resonancecenter;
 
         struct { // Resonance Bandwidth
-            int data;
+            int   data;
             float relbw;
-            unsigned char depth;
+            uchar depth;
         } resonancebandwidth;
 private:
         SynthEngine *synth;

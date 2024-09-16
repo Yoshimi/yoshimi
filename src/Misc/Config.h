@@ -26,18 +26,23 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#include <atomic>
 #include <csignal>
 #include <cstring>
+#include <bitset>
 #include <deque>
 #include <list>
 
 #include "Misc/Alloc.h"
+#include "Misc/InstanceManager.h"
 #include "MusicIO/MusicClient.h"
 #ifdef GUI_FLTK
 #include "FL/Fl.H"
 #endif
 #include "globals.h"
 
+using std::atomic_bool;
+using std::bitset;
 using std::string;
 using std::list;
 
@@ -46,82 +51,78 @@ class SynthEngine;
 
 class Config
 {
+        // each Config instance is hard wired to a specific SynthEngine instance
+        SynthEngine& synth;
+
     public:
-        Config(SynthEngine *_synth, list<string>& allArgs, bool isLV2Plugin);
-       ~Config();
+        /** convenience access to the global InstanceManager */
+        static InstanceManager& instances() { return InstanceManager::get(); }
+        static Config&          primary()   { return instances().accessPrimaryConfig(); }
+
+
+       ~Config() = default;
+        Config(SynthEngine&);
         // shall not be copied or moved or assigned
         Config(Config&&)                 = delete;
         Config(Config const&)            = delete;
         Config& operator=(Config&&)      = delete;
         Config& operator=(Config const&) = delete;
 
-        bool Setup(void);
-        void StartupReport(const string& clientName);
-        void Announce(void);
-        void Usage(void);
-        void Log(const string& msg, char tostderr = _SYS_::LogNormal);
-        void LogError(const string& msg);
-        void flushLog(void);
-        bool loadPresetsList(void);
-        bool savePresetsList(void);
-        bool saveConfig(bool master = false);
-        bool loadConfig(void);
+        void init();
+        void populateFromPrimary();
+        void startupReport(string const& clientName);
+        void announce();
+        void usage();
+        void Log(string const& msg, char tostderr = _SYS_::LogNormal);
+        void LogError(string const& msg);
+        void flushLog();
+        bool loadPresetsList();
+        bool savePresetsList();
+        bool saveMasterConfig();
+        bool saveInstanceConfig();
+        void loadConfig();
         bool updateConfig(int control, int value);
-        void restoreConfig(SynthEngine *_synth);
         bool saveSessionData(string savefile);
         bool restoreSessionData(string sessionfile);
         bool restoreJsession();
-        void setJackSessionSave(int event_type, const string& session_file);
-        float getConfigLimits(CommandBlock *getData);
+        void setJackSessionSave(int event_type, string const& session_file);
+        float getConfigLimits(CommandBlock*);
 
         string testCCvalue(int cc);
         string masterCCtest(int cc);
 
         static void sigHandler(int sig);
-        void setInterruptActive(void);
-        void setLadi1Active(void);
-        void signalCheck(void);
+        void setInterruptActive();
+        void setLadi1Active();
+        void signalCheck();
         void setRtprio(int prio);
-        bool startThread(pthread_t *pth, void *(*thread_fn)(void*), void *arg,
-                         bool schedfifo, char lowprio, const string& name = "");
-        const string& programCmd(void) { return programcommand; }
+        using ThreadFun = void*(void*);
+        bool startThread(pthread_t*, ThreadFun*, void* arg,
+                         bool schedfifo, char lowprio, string const& name = "");
+        string const& programCmd()     { return programcommand; }
 
-        bool isRuntimeSetupCompleted() {return bRuntimeSetupCompleted;}
+        bool    isLV2;
+        bool    isMultiFeed;        // can produce separate audio feeds for each part (Jack or LV2)
+        uint    build_ID;
+        int     lastXMLmajor;
+        int     lastXMLminor;
+        bool    stateChanged;
+        bool    oldConfig;
 
-        string        defaultStateName;
-        string        defaultSession;
-        string        ConfigFile;
-        string        paramsLoad;
-        string        instrumentLoad;
-        int           load2part;
-        string        midiLearnLoad;
-        string        rootDefine;
-        unsigned int  build_ID;
-        bool          stateChanged;
-        string        StateFile;
-        string        remoteGuiTheme;
-        bool          restoreJackSession;
-        string        jackSessionFile;
-        int           lastXMLmajor;
-        int           lastXMLminor;
-        bool          oldConfig;
+        static bool        showSplash;
+        static bool        singlePath;
+        static bool        autoInstance;
+        static bitset<32>  activeInstances;
+        static int         showCLIcontext;
 
-        static bool          showSplash;
-        static bool          autoInstance;
-        static unsigned int  activeInstance;
-        static int           showCLIcontext;
-
-        unsigned int  guiThemeID;
-        string        guiTheme;
-
-        bool          runSynth;
-        bool          isLittleEndian;
+        atomic_bool   runSynth;
         bool          finishedCLI;
-        int           VirKeybLayout;
+        bool          isLittleEndian;
+        int           virKeybLayout;
 
-        audio_drivers audioEngine;
+        audio_driver  audioEngine;
         bool          engineChanged;
-        midi_drivers  midiEngine;
+        midi_driver   midiEngine;
         bool          midiChanged;
         int           alsaMidiType;
         string        audioDevice;
@@ -133,100 +134,119 @@ class Config
         bool          connectJackaudio;
         bool          connectJackChanged;
         string        jackSessionUuid;
+        static string globalJackSessionUuid;
 
         string        alsaAudioDevice;
         string        alsaMidiDevice;
         string        nameTag;
 
         bool          loadDefaultState;
+        string        defaultStateName;
+        string        defaultSession;
+        string        configFile;
+        string        paramsLoad;
+        string        instrumentLoad;
+        uint          load2part;
+        string        midiLearnLoad;
+        string        rootDefine;
+        string        stateFile;
+        uint          guiThemeID;
+        string        guiTheme;
+        string        remoteGuiTheme;
+        bool          restoreJackSession;
+        string        jackSessionFile;
         int           sessionStage;
         int           Interpolation;
         string        presetsDirlist[MAX_PRESETS];
-        list<string> lastfileseen;
+        list<string>  lastfileseen;
         bool          sessionSeen[TOPLEVEL::XML::ScalaMap + 1];
         bool          historyLock[TOPLEVEL::XML::ScalaMap + 1];
         int           xmlType;
-        unsigned char instrumentFormat;
-        int           EnableProgChange;
+        uchar         instrumentFormat;
+        int           enableProgChange;
         bool          toConsole;
         int           consoleTextSize;
         bool          hideErrors;
         bool          showTimes;
         bool          logXMLheaders;
         bool          xmlmax;
-        unsigned int  GzipCompression;
+        uint          gzipCompression;
         string        guideVersion;
 
-        unsigned int  Samplerate;
-        bool          rateChanged;
-        unsigned int  Buffersize;
-        bool          bufferChanged;
-        unsigned int  Oscilsize;
-        bool          oscilChanged;
-        bool          showGui;
-        bool          storedGui;
-        bool          guiChanged;
-        bool          showCli;
-        bool          storedCli;
-        bool          cliChanged;
-        bool          singlePath;
-        bool          banksChecked;
-        unsigned char panLaw;
-        bool          configChanged;
+        uint  samplerate;
+        bool  rateChanged;
+        uint  buffersize;
+        bool  bufferChanged;
+        uint  oscilsize;
+        bool  oscilChanged;
+        bool  showGui;
+        bool  storedGui;
+        bool  guiChanged;
+        bool  showCli;
+        bool  storedCli;
+        bool  cliChanged;
+        bool  banksChecked;
+        uchar panLaw;
+        bool  configChanged;
 
-        unsigned char handlePadSynthBuild;
-        bool useLegacyPadBuild() { return handlePadSynthBuild == 0; }
-        bool usePadAutoApply()   { return handlePadSynthBuild == 2; }
+        uchar handlePadSynthBuild;
+        bool  useLegacyPadBuild() { return handlePadSynthBuild == 0; }
+        bool  usePadAutoApply()   { return handlePadSynthBuild == 2; }
 
-        int           rtprio;
-        int           midi_bank_root;
-        int           midi_bank_C;
-        int           midi_upper_voice_C;
-        bool          enable_NRPN;
-        bool          ignoreResetCCs;
-        bool          monitorCCin;
-        bool          showLearnedCC;
-        int           NumAvailableParts;
-        int           currentPart;
-        unsigned int  currentBank;
-        unsigned int  currentRoot;
-        bool          bankHighlight;
-        int           lastBankPart;
-        int           presetsRootID;
-        int           tempBank;
-        int           tempRoot;
-        int           noteOnSent; // note test
-        int           noteOnSeen;
-        int           noteOffSent;
-        int           noteOffSeen;
-        unsigned int  VUcount;
-        unsigned char channelSwitchType;
-        unsigned char channelSwitchCC;
-        unsigned char channelSwitchValue;
-        unsigned char nrpnL;
-        unsigned char nrpnH;
-        unsigned char dataL;
-        unsigned char dataH;
-        bool          nrpnActive;
+        int   rtprio;
+        int   midi_bank_root;
+        int   midi_bank_C;
+        int   midi_upper_voice_C;
+        bool  enable_NRPN;
+        bool  ignoreResetCCs;
+        bool  monitorCCin;
+        bool  showLearnedCC;
+        uint  numAvailableParts;
+        int   currentPart;
+        uint  currentBank;
+        uint  currentRoot;
+        bool  bankHighlight;
+        int   lastBankPart;
+        int   presetsRootID;
+        int   tempBank;
+        int   tempRoot;
+#ifdef REPORT_NOTES_ON_OFF
+        int   noteOnSent; // note test
+        int   noteOnSeen;
+        int   noteOffSent;
+        int   noteOffSeen;
+#endif //REPORT_NOTES_ON_OFF
+        uint  VUcount;
+        uchar channelSwitchType;
+        uchar channelSwitchCC;
+        uchar channelSwitchValue;
+        uchar nrpnL;
+        uchar nrpnH;
+        uchar dataL;
+        uchar dataH;
+        bool  nrpnActive;
 
-        struct{
-            unsigned char Xaxis[NUM_MIDI_CHANNELS];
-            unsigned char Yaxis[NUM_MIDI_CHANNELS];
-            unsigned char Xfeatures[NUM_MIDI_CHANNELS];
-            unsigned char Yfeatures[NUM_MIDI_CHANNELS];
-            unsigned char Xcc2[NUM_MIDI_CHANNELS];
-            unsigned char Ycc2[NUM_MIDI_CHANNELS];
-            unsigned char Xcc4[NUM_MIDI_CHANNELS];
-            unsigned char Ycc4[NUM_MIDI_CHANNELS];
-            unsigned char Xcc8[NUM_MIDI_CHANNELS];
-            unsigned char Ycc8[NUM_MIDI_CHANNELS];
+        struct Vectordata{
+            uchar Xaxis[NUM_MIDI_CHANNELS];
+            uchar Yaxis[NUM_MIDI_CHANNELS];
+            uchar Xfeatures[NUM_MIDI_CHANNELS];
+            uchar Yfeatures[NUM_MIDI_CHANNELS];
+            uchar Xcc2[NUM_MIDI_CHANNELS];
+            uchar Ycc2[NUM_MIDI_CHANNELS];
+            uchar Xcc4[NUM_MIDI_CHANNELS];
+            uchar Ycc4[NUM_MIDI_CHANNELS];
+            uchar Xcc8[NUM_MIDI_CHANNELS];
+            uchar Ycc8[NUM_MIDI_CHANNELS];
             string Name[NUM_MIDI_CHANNELS];
             int Part;
             int Controller;
             bool Enabled[NUM_MIDI_CHANNELS];
-        }vectordata;
+        };
+        Vectordata vectordata;
 
-        list<string> LogList;
+        list<string> logList;
+        string manualFile;
+        int exitType;
 
         /*
          * These replace local memory allocations that
@@ -243,71 +263,30 @@ class Config
         Samples genMixr;
 
     private:
-        void *findManual(void);
-        static void *_findManual(void *arg);
-        pthread_t  findManualHandle;
+        void findManual();
+        static void* _findManual(void*);
+        pthread_t  findManual_Thread;
 
-        void applyOptions(Config*settings, list<string>& allArgs);
-        void defaultPresets(void);
+        void defaultPresets();
+        bool initFromPersistentConfig();
         bool extractBaseParameters(XMLwrapper& xml);
         bool extractConfigData(XMLwrapper& xml);
         void addConfigXML(XMLwrapper& xml);
-        void saveJackSession(void);
+        void saveJackSession();
 
-        std::string findHtmlManual(void);
+        string findHtmlManual();
 
 
         int sigIntActive;
         int ladi1IntActive;
-        //int sse_level;
         int jsessionSave;
         const string programcommand;
         string jackSessionDir;
         string baseConfig;
         string presetDir;
 
-        SynthEngine *synth;
-        bool bRuntimeSetupCompleted;
-
         friend class YoshimiLV2Plugin;
-
-    public:
-        std::string manualFile;
-        int exitType;
 };
 
+#endif /*CONFIG_H*/
 
-//struct GuiThreadMsg must be allocated by caller via `new` and is freed by receiver via `delete`
-class GuiThreadMsg
-{
-private:
-    GuiThreadMsg()
-        : data{nullptr}
-        , length{0}
-        , index{0}
-        , type{GuiThreadMsg::UNDEFINED}
-        { }
-public:
-    enum
-    {
-        NewSynthEngine,
-        UNDEFINED = 9999
-    };
-    void *data; //custom data, must be static or handled by called, does nod freed by receiver
-    unsigned long length; //length of data member (determined by type member, can be set to 0, if data is known struct/class)
-    unsigned int index; // if there is integer data, it can be passed through index (to remove additional receiver logic)
-    unsigned int type; // type of gui message (see enum above)
-    static void sendMessage(void *_data, unsigned int _type, unsigned int _index)
-    {
-        GuiThreadMsg *msg = new GuiThreadMsg;
-        msg->data = _data;
-        msg->type = _type;
-        msg->index = _index;
-#ifdef GUI_FLTK
-        Fl::awake((void *)msg); // we probably need to review all of this :(
-#endif
-    }
-    static void processGuiMessages();
-};
-
-#endif

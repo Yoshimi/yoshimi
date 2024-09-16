@@ -51,7 +51,7 @@ using func::setRandomPan;
 
 
 SUBnote::SUBnote(SUBnoteParameters& parameters, Controller& ctl_, Note note_, bool portamento_)
-    : synth{*parameters.getSynthEngine()}
+    : synth{parameters.getSynthEngine()}
     , pars{parameters}
     , subNoteChange{parameters}
     , ctl{ctl_}
@@ -213,7 +213,7 @@ SUBnote::~SUBnote()
 
 
 // Kill the note
-void SUBnote::killNote(void)
+void SUBnote::killNote()
 {
     if (noteStatus != NOTE_DISABLED)
     {
@@ -394,7 +394,7 @@ inline void SubFilterB(const float coeff[4], float &src, float work[4])
 //in quite a bit of wasted time
 void SUBnote::filter(bpfilter &filter, float *smps)
 {
-    if (synth.getIsLV2Plugin()){
+    if (synth.getRuntime().isLV2){
         filterVarRun(filter, smps);
         return;
     }
@@ -481,7 +481,7 @@ void SUBnote::initparameters(float freq)
         bandWidthEnvelope.reset(new Envelope{pars.BandWidthEnvelope, freq, &synth});
     if (pars.PGlobalFilterEnabled != 0)
     {
-        globalFilterL.reset(new Filter{pars.GlobalFilter, &synth});
+        globalFilterL.reset(new Filter{*pars.GlobalFilter, synth});
         /* TODO
          * Sort this properly it is a temporary fix to stop a segfault
          * with the following very specific settings:
@@ -491,7 +491,7 @@ void SUBnote::initparameters(float freq)
          * Subsynth Stereo disabled
          */
         //if (stereo)
-            globalFilterR.reset(new Filter{pars.GlobalFilter, &synth});
+            globalFilterR.reset(new Filter{*pars.GlobalFilter, synth});
         globalFilterEnvelope.reset(new Envelope{pars.GlobalFilterEnvelope, freq, &synth});
     }
 }
@@ -580,7 +580,7 @@ void SUBnote::computeallfiltercoefs()
 }
 
 // Compute Parameters of SUBnote for each tick
-void SUBnote::computecurrentparameters(void)
+void SUBnote::computecurrentparameters()
 {
     if (freqEnvelope != NULL
         || bandWidthEnvelope != NULL
@@ -752,7 +752,7 @@ void SUBnote::noteout(float *outl, float *outr)
 
 
 // Release Key (Note Off)
-void SUBnote::releasekey(void)
+void SUBnote::releasekey()
 {
     if (noteStatus == NOTE_LEGATOFADEOUT)
         return; // keep envelopes in sustained state (thereby blocking NoteOff)
@@ -801,7 +801,7 @@ float SUBnote::getHgain(int harmonic)
     return hgain;
 }
 
-void SUBnote::updatefilterbank(void)
+void SUBnote::updatefilterbank()
 {
     int createdFilters = createNewFilters();
 

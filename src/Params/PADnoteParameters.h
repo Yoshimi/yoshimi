@@ -58,8 +58,8 @@ class SynthEngine;
 
 // defines quality / resolution of PADSynth wavetables
 struct PADQuality {
-    unsigned char samplesize;
-    unsigned char basenote, oct, smpoct;
+    uchar samplesize;
+    uchar basenote, oct, smpoct;
 
     PADQuality() { resetToDefaults(); }
 
@@ -169,8 +169,7 @@ class PADnoteParameters : public ParamBase
         static constexpr size_t REBUILDTRIGGER_MAX = 60000; // milliseconds
 
     public:
-        PADnoteParameters(uchar pID, uchar kID, SynthEngine *_synth);
-       ~PADnoteParameters()  = default;
+        PADnoteParameters(uchar pID, uchar kID, SynthEngine&);
 
         // shall not be copied or moved or assigned
         PADnoteParameters(PADnoteParameters&&)                 = delete;
@@ -179,9 +178,10 @@ class PADnoteParameters : public ParamBase
         PADnoteParameters& operator=(PADnoteParameters const&) = delete;
 
 
-        void defaults(void);
+        void defaults()  override;
+
         void reseed(int value);
-        void setPan(char pan, unsigned char panLaw);
+        void setPan(char pan, uchar panLaw);
 
         void add2XML(XMLwrapper& xml);
         void getfromXML(XMLwrapper& xml);
@@ -203,29 +203,29 @@ class PADnoteParameters : public ParamBase
         // (controls the frequency distribution of a single harmonic)
         struct HarmonicProfile {
             struct BaseFunction {
-                unsigned char type;
-                unsigned char pwidth;
+                uchar type;
+                uchar pwidth;
             };
             struct Modulator{
-                unsigned char pstretch;
-                unsigned char freq;
+                uchar pstretch;
+                uchar freq;
             };
             struct AmplitudeMultiplier {
-                unsigned char mode;
-                unsigned char type;
-                unsigned char par1;
-                unsigned char par2;
+                uchar mode;
+                uchar type;
+                uchar par1;
+                uchar par2;
             };
 
             BaseFunction base;
-            unsigned char freqmult;  // frequency multiplier of the distribution
-            Modulator modulator;     // the modulator of the distribution
-            unsigned char width;     // the width of the resulting function after the modulation
+            uchar freqmult;        // frequency multiplier of the distribution
+            Modulator modulator;   // the modulator of the distribution
+            uchar width;           // the width of the resulting function after the modulation
             AmplitudeMultiplier amp; // the amplitude multiplier of the harmonic profile
 
             bool autoscale;        //  if the scale of the harmonic profile is
                                    // computed automatically
-            unsigned char onehalf; // what part of the base function is used to
+            uchar onehalf;         // what part of the base function is used to
                                    // make the distribution
             void defaults();
         };
@@ -235,11 +235,11 @@ class PADnoteParameters : public ParamBase
         // or shifted away for distorted spectrum
         // see calcHarmonicPositionFactor(partial)
         struct HarmonicPos {
-            unsigned char type = 0;  // harmonic,ushift,lshift,upower,lpower,sine,power,shift
-            unsigned char par1 = 64; // strength of the shift
-            unsigned char par2 = 64; // depending on type, defines threshold, exponent or frequency
-            unsigned char par3 = 0;  // forceH : increasingly shift towards next harmonic position
-                                     // these params are 0..255
+            uchar type = 0;        // harmonic,ushift,lshift,upower,lpower,sine,power,shift
+            uchar par1 = 64;       // strength of the shift
+            uchar par2 = 64;       // depending on type, defines threshold, exponent or frequency
+            uchar par3 = 0;        // forceH : increasingly shift towards next harmonic position
+                                   // these params are 0..255
             void defaults();
         };
 
@@ -248,33 +248,33 @@ class PADnoteParameters : public ParamBase
 
         //the mode: 0 - bandwidth, 1 - discrete (bandwidth=0), 2 - continuous
         //the harmonic profile is used only on mode 0
-        unsigned char Pmode;
+        uchar Pmode;
 
-        PADQuality Pquality;     // Quality settings; controls number and size of wavetables
+        PADQuality Pquality;       // Quality settings; controls number and size of wavetables
 
         HarmonicProfile PProfile;
 
-        unsigned int Pbandwidth; // the values are from 0 to 1000
-        unsigned char Pbwscale;  // how the bandwidth is increased according to
-                                 // the harmonic's frequency
-        HarmonicPos Phrpos;      // Positioning of partials (harmonic / distorted)
+        unsigned int Pbandwidth;   // the values are from 0 to 1000
+        uchar Pbwscale;            // how the bandwidth is increased according to
+                                   // the harmonic's frequency
+        HarmonicPos Phrpos;        // Positioning of partials (harmonic / distorted)
 
         // Frequency parameters
-        unsigned char Pfixedfreq; // If the base frequency is fixed to 440 Hz
+        uchar Pfixedfreq;          // If the base frequency is fixed to 440 Hz
 
         // Equal temperate (this is used only if the Pfixedfreq is enabled)
         // If this parameter is 0, the frequency is fixed (to 440 Hz);
         // if this parameter is 64, 1 MIDI halftone -> 1 frequency halftone
-        unsigned char      PfixedfreqET;
+        uchar      PfixedfreqET;
 
-        unsigned char PBendAdjust; // Pitch Bend
-        unsigned char POffsetHz;
+        uchar PBendAdjust;    // Pitch Bend
+        uchar POffsetHz;
 
-        unsigned short int PDetune;       // fine detune
-        unsigned short int PCoarseDetune; // coarse detune+octave
-        unsigned char      PDetuneType;   // detune type
+        ushort PDetune;       // fine detune
+        ushort PCoarseDetune; // coarse detune+octave
+        uchar  PDetuneType;   // detune type
 
-        fft::Calc fft; // private instance used by OscilGen
+        fft::Calc fft;        // private instance used by OscilGen
 
         unique_ptr<OscilParameters> POscil;
         unique_ptr<Resonance> resonance;
@@ -284,27 +284,27 @@ class PADnoteParameters : public ParamBase
         unique_ptr<LFOParams> FreqLfo;           // Frequency LFO
 
         // Amplitude parameters
-        unsigned char PStereo;
-        unsigned char PPanning;  // 1 left, 64 center, 127 right
+        uchar PStereo;
+        uchar PPanning;            // 1 left, 64 center, 127 right
         bool  PRandom;
         char  PWidth;
-        float         pangainL;  // derived from PPanning
-        float         pangainR;  // ^^
-        unsigned char PVolume;
-        unsigned char PAmpVelocityScaleFunction;
+        float pangainL;            // derived from PPanning
+        float pangainR;            // ^^
+        uchar PVolume;
+        uchar PAmpVelocityScaleFunction;
 
         unique_ptr<EnvelopeParams> AmpEnvelope;
         unique_ptr<LFOParams> AmpLfo;
 
         // Adjustment factor for anti-pop fadein
-        unsigned char Fadein_adjustment;
+        uchar Fadein_adjustment;
 
-        unsigned char PPunchStrength, PPunchTime, PPunchStretch, PPunchVelocitySensing;
+        uchar PPunchStrength, PPunchTime, PPunchStretch, PPunchVelocitySensing;
 
         // Filter Parameters
         unique_ptr<FilterParams> GlobalFilter;
-        unsigned char PFilterVelocityScale; // filter velocity sensing
-        unsigned char PFilterVelocityScaleFunction; // filter velocity sensing
+        uchar PFilterVelocityScale;         // filter velocity sensing
+        uchar PFilterVelocityScaleFunction; // filter velocity sensing
 
         unique_ptr<EnvelopeParams> FilterEnvelope;
         unique_ptr<LFOParams> FilterLfo;

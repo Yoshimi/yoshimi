@@ -24,9 +24,9 @@
 */
 
 #include <cmath>
-#include <iostream>
 #include <algorithm>
 #include <limits.h>
+#include <string>
 
 #include "Misc/Config.h"
 #include "Misc/XMLwrapper.h"
@@ -39,8 +39,6 @@
 using func::power;
 using file::loadText;
 using file::findLeafName;
-using std::cout;
-using std::endl;
 using std::string;
 using std::to_string;
 
@@ -103,7 +101,6 @@ string Microtonal::reformatline(string text)
         if (Chr == '.' || Chr == '/' || (Chr >= '0' && Chr <= '9'))
             formattext += Chr;
     }
-    //cout << "Formatted >" << formattext << endl;
     size_t found;
     found = formattext.find('.');
     if (found < 4)
@@ -148,9 +145,6 @@ void Microtonal::defaults(int type)
         PformalOctaveSize = 12;
         Pmappingenabled = 0;
 
-        // suppress 'unused' warning till we know what to do with it!
-        PformalOctaveSize = PformalOctaveSize;
-
         for (int i = 0; i < 128; ++i)
         {
             Pmapping[i] = i;
@@ -162,7 +156,7 @@ void Microtonal::defaults(int type)
     for (size_t i = 0; i < MAX_OCTAVE_SIZE; ++i)
     {
         octave[i].text = reformatline(to_string((i % octavesize + 1) * 100)+ ".0");
-        octave[i].tuning = pow(2.0, (i % octavesize + 1) / 12.0);
+        octave[i].tuning = power<2>((i % octavesize + 1) / 12.0);
         octave[i].type = 1;
         octave[i].x1 = (i % octavesize + 1) * 100;
         octave[i].x2 = 0;
@@ -289,7 +283,7 @@ float Microtonal::getNoteFreq(int note, int keyshift)
 
 
 // Convert a line to tunings; returns 0 if ok
-int Microtonal::linetotunings(unsigned int nline, string text)
+int Microtonal::linetotunings(uint nline, string text)
 {
     text = func::trimEnds(text); // just to be sure
     size_t pos = text.find_first_of(" !"); // pull out any comment first
@@ -433,7 +427,7 @@ int Microtonal::texttomapping(string page)
 }
 
 
-string Microtonal::keymaptotext(void)
+string Microtonal::keymaptotext()
 {
     string text = "";
     if (Pmapsize > 0)
@@ -458,7 +452,7 @@ string Microtonal::keymaptotext(void)
 
 
 // Convert tuning to text line
-void Microtonal::tuningtoline(unsigned int n, string& line)
+void Microtonal::tuningtoline(uint n, string& line)
 {
     line = "";
     if (n > octavesize || n > MAX_OCTAVE_SIZE)
@@ -502,7 +496,7 @@ string Microtonal::tuningtotext()
 
 
 // Loads the tunings from a scl file
-int Microtonal::loadscl(const string& filename)
+int Microtonal::loadscl(string const& filename)
 {
     string text = loadText(filename);
     if (text == "")
@@ -553,7 +547,7 @@ int Microtonal::loadscl(const string& filename)
 
 
 // Loads the mapping from a kbm file
-int Microtonal::loadkbm(const string& filename)
+int Microtonal::loadkbm(string const& filename)
 {
     string text = loadText(filename);
     if (text == "")
@@ -915,10 +909,10 @@ int Microtonal::getfromXML(XMLwrapper& xml)
 }
 
 
-bool Microtonal::saveXML(const string& filename)
+bool Microtonal::saveXML(string const& filename)
 {
     synth->getRuntime().xmlType = TOPLEVEL::XML::Scale;
-    auto xml{std::make_unique<XMLwrapper>(synth)};
+    auto xml{std::make_unique<XMLwrapper>(*synth)};
 
     xml->beginbranch("MICROTONAL");
     add2XML(*xml);
@@ -929,10 +923,10 @@ bool Microtonal::saveXML(const string& filename)
 }
 
 
-int Microtonal::loadXML(const string& filename)
+int Microtonal::loadXML(string const& filename)
 {
     int err = 0;
-    auto xml{std::make_unique<XMLwrapper>(synth)};
+    auto xml{std::make_unique<XMLwrapper>(*synth)};
     if (!xml->loadXMLfile(filename))
     {
         return 1;
@@ -958,14 +952,12 @@ float Microtonal::getLimits(CommandBlock *getData)
     int request = int(getData->data.type & TOPLEVEL::type::Default);
     int control = getData->data.control;
 
-    unsigned char type = 0;
-
     // microtonal defaults
     int min = 0;
     float def = 0;
     int max = MAX_OCTAVE_SIZE - 1;
-    type |= TOPLEVEL::type::Integer;
-    unsigned char learnable = TOPLEVEL::type::Learnable;
+    uchar type = TOPLEVEL::type::Integer;
+    uchar learnable = TOPLEVEL::type::Learnable;
 
     switch (control)
     {

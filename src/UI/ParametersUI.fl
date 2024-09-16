@@ -44,7 +44,7 @@ decl {using std::vector;} {private global
 }
 
 class ParametersUI {} {
-  Function {make_window(void)} {} {
+  Function {make_window()} {} {
     Fl_Window Recent {
       label {Yoshimi : Parameters}
       callback {CloseRecent->do_callback();}
@@ -58,33 +58,33 @@ class ParametersUI {} {
             return;
         CloseRecent->hide();
         Loading->show();
-        if(H_type <= TOPLEVEL::XML::MLearn)
+        if (H_type <= TOPLEVEL::XML::MLearn)
         {
-            vector<string> listType = *synth->getHistory(H_type);
-            string fle = listType.at(o->value()-1);
+            vector<string> const& listType{synth->getHistory(H_type)};
+            string const& file{listType.at(o->value()-1)};
             switch(H_type)
             {
                 case TOPLEVEL::XML::Instrument:
-                    synth->getGuiMaster()->do_load_instrument(fle);
+                    synth->getGuiMaster()->do_load_instrument(file);
                     break;
                 case TOPLEVEL::XML::Patch:
-                    synth->getGuiMaster()->do_load_master(fle);
+                    synth->getGuiMaster()->do_load_master(file);
                     break;
                 case TOPLEVEL::XML::Presets:
                     break; // not from here
                 case TOPLEVEL::XML::Scale:
-                    synth->getGuiMaster()->do_load_scale(fle);
+                    synth->getGuiMaster()->do_load_scale(file);
                     break;
                 case TOPLEVEL::XML::State:
-                    synth->getGuiMaster()->setState(fle);
+                    synth->getGuiMaster()->setState(file);
                     CloseRecent->hide();
                     Loading->show();
                     break;
                 case TOPLEVEL::XML::Vector:
-                    synth->getGuiMaster()->vectorui->loadVector(fle);
+                    synth->getGuiMaster()->vectorui->loadVector(file);
                     break;
                 case TOPLEVEL::XML::MLearn:
-                    synth->getGuiMaster()->midilearnui->loadMidi(fle);
+                    synth->getGuiMaster()->midilearnui->loadMidi(file);
                     break;
             }
         }
@@ -150,7 +150,7 @@ class ParametersUI {} {
     name = textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push(name), partNo, TOPLEVEL::windowTitle));
     Recent->copy_label(name.c_str());
 
-    vector<string> listType = *synth->getHistory(H_type);
+    vector<string> const& listType{synth->getHistory(H_type)};
     BrowseRecent->clear();
     const int colwidths[] = { 64, 128, 0 };
     BrowseRecent->column_widths(colwidths);
@@ -161,9 +161,9 @@ class ParametersUI {} {
     else
     {
         emptytext->hide();
-        for (vector<string>::iterator it = listType.begin(); it != listType.end(); ++it)
+        for (auto const& historyEntry : listType)
         {
-            name = *it;
+            name = historyEntry;
             name_start = name.rfind("/");
             name_end = name.rfind(".");
             name = name.substr(name_start + 1, name_end - name_start - 1);

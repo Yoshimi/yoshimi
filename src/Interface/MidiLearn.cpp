@@ -20,13 +20,6 @@
 
 */
 
-const int fromText = 1;
-/*
- * 0 = use legacy numbers
- * 1 = decode from text
- * 2 = use legacy numbers report difference
- * 3 = decode from text report difference
- */
 
 #include "Interface/MidiLearn.h"
 #include "Interface/InterChange.h"
@@ -40,10 +33,13 @@ const int fromText = 1;
 #include <list>
 #include <vector>
 #include <string>
-#include <unistd.h>  // for usleep()
+#include <thread>
 #include <iostream>
 
-//#include <sys/time.h>
+#include <chrono>
+
+using std::this_thread::sleep_for;
+using std::chrono_literals::operator ""us;
 
 using file::isRegularFile;
 using file::make_legit_filename;
@@ -64,36 +60,40 @@ enum scan : int { noList = -3, listEnd, listBlocked};
 namespace { // Implementation details...
 
     TextMsgBuffer& textMsgBuffer = TextMsgBuffer::instance();
+
+
+    const int DECODE_MODE = 1;
+    /*
+     * 0 = use legacy numbers
+     * 1 = decode from text
+     * 2 = use legacy numbers report difference
+     * 3 = decode from text report difference
+     */
 }
 
 
-MidiLearn::MidiLearn(SynthEngine *_synth) :
-    learning(false),
-    synth(_synth)
+MidiLearn::MidiLearn(SynthEngine& synthInstance)
+    : synth(synthInstance)
+    , data{}
+    , learning{false}
+    , midi_list{}
+    , learnedName{}
+    , learnTransferBlock{}
+    { }
+
+
+
+void MidiLearn::setTransferBlock(CommandBlock& cmd)
 {
- //init
-}
-
-
-MidiLearn::~MidiLearn()
-{
-    //close
-}
-
-
-void MidiLearn::setTransferBlock(CommandBlock *getData)
-{
-    //synth->CBtest(getData);
-
-    memcpy(learnTransferBlock.bytes, getData->bytes, sizeof(learnTransferBlock));
-    learnedName = resolveAll(synth, getData, false);
+    memcpy(learnTransferBlock.bytes, cmd.bytes, sizeof(learnTransferBlock));
+    learnedName = resolveAll(synth, cmd, false);
     learning = true;
-    synth->getRuntime().Log("Learning " + learnedName);
+    synth.getRuntime().Log("Learning " + learnedName);
     updateGui(MIDILEARN::control::sendLearnMessage);
 }
 
 
-bool MidiLearn::runMidiLearn(int _value, unsigned short int CC, unsigned char chan, bool in_place)
+bool MidiLearn::runMidiLearn(int intVal, ushort CC, uchar chan, bool in_place)
 {
     if (learning)
     {
@@ -109,7 +109,7 @@ bool MidiLearn::runMidiLearn(int _value, unsigned short int CC, unsigned char ch
     bool firstLine = true;
     while (lastpos != scan::listEnd)
     {
-        lastpos = findEntry(midi_list, lastpos, CC, chan, &foundEntry, false);
+        lastpos = findEntry(midi_list, lastpos, CC, chan, foundEntry, false);
         if (lastpos == scan::noList)
             return false;
         int status = foundEntry.status;
@@ -124,14 +124,14 @@ bool MidiLearn::runMidiLearn(int _value, unsigned short int CC, unsigned char ch
         if (CC >= MIDI::CC::identNRPN || CC == MIDI::CC::pitchWheelAdjusted)
         {
             if (status & 16) // 7 bit NRPN
-                value = float(_value & 0x7f);
+                value = float(intVal & 0x7f);
             else
-                value = _value / 128.999f; // convert from 14 bit
+                value = intVal / 128.999f; // convert from 14 bit
         }
         else if (CC != MIDI::CC::keyPressureAdjusted)
-            value = float(_value);
+            value = float(intVal);
         else
-            value = float(_value >> 8);
+            value = float(intVal >> 8);
 
         float minIn = foundEntry.min_in / 1.5748f;
         float maxIn = foundEntry.max_in / 1.5748f;
@@ -164,28 +164,26 @@ bool MidiLearn::runMidiLearn(int _value, unsigned short int CC, unsigned char ch
             value = minOut +((maxOut - minOut) * value / 127.0f);
         else if (minOut != 0) // it's just a shift
             value += minOut;
-        CommandBlock putData;
 
-        memcpy(putData.bytes, foundEntry.frame.bytes, sizeof(CommandBlock));
-        putData.data.value = value;
-        putData.data.type = TOPLEVEL::type::Write | (foundEntry.frame.data.type & TOPLEVEL::type::Integer);
-        // write command from midi with original integer / float type
-        putData.data.source = TOPLEVEL::action::toAll;
-
-        if (writeMidi(&putData, in_place))
+        CommandBlock resultCmd;
+        memcpy(resultCmd.bytes, foundEntry.frame.bytes, sizeof(CommandBlock));
+        resultCmd.data.value  = value;
+        resultCmd.data.source = TOPLEVEL::action::toAll;
+        resultCmd.data.type   = TOPLEVEL::type::Write | (foundEntry.frame.data.type & TOPLEVEL::type::Integer);
+                                // publish result command into MIDI stream with original integer / float type
+        if (writeMidi(resultCmd, in_place))
         {
-            if (firstLine && !in_place) // not in_place
-            // we only want to send an activity once
-            // and it's not relevant to jack freewheeling
-            {
-                if (CC >= MIDI::CC::identNRPN)
-                    putData.data.type |= 0x10; // mark as NRPN
+            if (firstLine and not in_place)
+            {// we only want to send an activity once
+             // and it's not relevant to jack freewheeling
                 firstLine = false;
-                putData.data.control = MIDILEARN::control::reportActivity;
-                putData.data.part = TOPLEVEL::section::midiLearn;
-                putData.data.kit = (CC & 0xff);
-                putData.data.engine = chan;
-                writeMidi(&putData, in_place);
+                if (CC >= MIDI::CC::identNRPN)
+                    resultCmd.data.type |= 0x10; // mark as NRPN
+                resultCmd.data.control = MIDILEARN::control::reportActivity;
+                resultCmd.data.part    = TOPLEVEL::section::midiLearn;
+                resultCmd.data.kit     = (CC & 0xff);
+                resultCmd.data.engine  = chan;
+                writeMidi(resultCmd, in_place);
             }
         }
         if (lastpos == scan::listBlocked) // blocking all of this CC/chan pair
@@ -195,32 +193,30 @@ bool MidiLearn::runMidiLearn(int _value, unsigned short int CC, unsigned char ch
 }
 
 
-bool MidiLearn::writeMidi(CommandBlock *putData, bool in_place)
+bool MidiLearn::writeMidi(CommandBlock& cmd, bool in_place)
 {
-    putData->data.source |= TOPLEVEL::action::fromMIDI;
-    unsigned int tries = 0;
-    bool ok = true;
+    cmd.data.source |= TOPLEVEL::action::fromMIDI;
+    uint tries{0};
+    bool ok{true};
     if (in_place)
     {
-        synth->interchange.commandSend(putData);
-        synth->interchange.returns(putData);
+        synth.interchange.commandSend(cmd);
+        synth.interchange.returns(cmd);
     }
     else
     {
         do
         {
             ++ tries;
-            ok = synth->interchange.fromMIDI.write(putData->bytes);
-            if (!ok)
-                usleep(1);
+            ok = synth.interchange.fromMIDI.write(cmd.bytes);
+            if (not ok)
+                sleep_for(1us);
         // we can afford a short delay for buffer to clear
         }
-        while (!ok && tries < 3);
-        if (!ok)
-        {
-            synth->getRuntime().Log("Midi buffer full!");
-            ok = false;
-        }
+        while (not ok and tries < 3);
+
+        if (not ok)
+            synth.getRuntime().Log("MidiLearn: congestion on MIDI->Engine");
     }
     return ok;
 }
@@ -230,7 +226,7 @@ bool MidiLearn::writeMidi(CommandBlock *putData, bool in_place)
  * This will only be called by incoming midi. It is the only function that
  * needs to be really quick
  */
-int MidiLearn::findEntry(list<LearnBlock> &midi_list, int lastpos, unsigned short int CC, unsigned char chan, LearnBlock *block, bool show)
+int MidiLearn::findEntry(list<LearnBlock>& midi_list, int lastpos, ushort CC, uchar chan, LearnBlock& block, bool show)
 {
     int newpos = 0; // 'last' comes in at listBlocked for the first call
     list<LearnBlock>::iterator it = midi_list.begin();
@@ -256,15 +252,15 @@ int MidiLearn::findEntry(list<LearnBlock> &midi_list, int lastpos, unsigned shor
         if ((it->chan >= 16 || chan == it->chan) && CC == it->CC)
         {
             if (show)
-                synth->getRuntime().Log("Found line " + findName(it) + "  at " + to_string(newpos)); // a test!
-            block->chan = it->chan;
-            block->CC = it->CC;
-            block->min_in = it->min_in;
-            block->max_in = it->max_in;
-            block->status = it->status;
-            block->min_out = it->min_out;
-            block->max_out = it->max_out;
-            block->frame.data = it->frame.data;
+                synth.getRuntime().Log("Found line " + findName(it) + "  at " + to_string(newpos)); // a test!
+            block.chan    = it->chan;
+            block.CC      = it->CC;
+            block.min_in  = it->min_in;
+            block.max_in  = it->max_in;
+            block.status  = it->status;
+            block.min_out = it->min_out;
+            block.max_out = it->max_out;
+            block.frame.data = it->frame.data;
             if ((it->status & 5) == 1) // blocked, not muted
                 return scan::listBlocked; // don't allow any more of this CC and channel;
             return newpos;
@@ -288,7 +284,7 @@ void MidiLearn::listLine(int lineNo)
     int found = 0;
     if (midi_list.size() == 0)
     {
-        synth->getRuntime().Log("No learned lines");
+        synth.getRuntime().Log("No learned lines");
         return;
     }
 
@@ -299,7 +295,7 @@ void MidiLearn::listLine(int lineNo)
     }
     if (it == midi_list.end())
     {
-        synth->getRuntime().Log("No entry for number " + to_string(lineNo + 1));
+        synth.getRuntime().Log("No entry for number " + to_string(lineNo + 1));
         return;
     }
     else
@@ -332,7 +328,7 @@ void MidiLearn::listLine(int lineNo)
             CCtype = to_string(CC);
         else
             CCtype = asHexString((CC >> 7) & 0x7f) + asHexString(CC & 0x7f) + " h";
-        synth->getRuntime().Log("Line " + to_string(lineNo + 1) + mute
+        synth.getRuntime().Log("Line " + to_string(lineNo + 1) + mute
                 + "  CC " + CCtype
                 + chan
                 + "  Min " + asString(float(it->min_in / 2.0f)) + "%"
@@ -392,23 +388,22 @@ bool MidiLearn::remove(int itemNumber)
 }
 
 
-void MidiLearn::generalOperations(CommandBlock *getData)
+void MidiLearn::generalOperations(CommandBlock& cmd)
 {
-    int value = getData->data.value;
-    unsigned char type = getData->data.type;
-    unsigned char control = getData->data.control;
-//    unsigned char part = getData->data.part;
-    unsigned int kit = getData->data.kit; // may need to set as an NRPN
-    unsigned char engine = getData->data.engine;
-    unsigned char insert = getData->data.insert;
-    unsigned char parameter = getData->data.parameter;
-    unsigned char offset = getData->data.offset;
-    unsigned char par2 = getData->data.miscmsg;
+    int  value      = cmd.data.value;
+    uchar type      = cmd.data.type;
+    uchar control   = cmd.data.control;
+//  uchar part      = cmd.data.part;
+    uint  kit       = cmd.data.kit; // may need to set as an NRPN
+    uchar engine    = cmd.data.engine;
+    uchar insert    = cmd.data.insert;
+    uchar parameter = cmd.data.parameter;
+    uchar offset    = cmd.data.offset;
+    uchar par2      = cmd.data.miscmsg;
 
     if (control == MIDILEARN::control::sendRefreshRequest)
     {
         updateGui();
-//        synth->getRuntime().Log("GUI refreshed");
         return;
     }
 
@@ -416,7 +411,7 @@ void MidiLearn::generalOperations(CommandBlock *getData)
     {
         midi_list.clear();
         updateGui();
-        synth->getRuntime().Log("List cleared");
+        synth.getRuntime().Log("List cleared");
         return;
     }
 
@@ -427,15 +422,15 @@ void MidiLearn::generalOperations(CommandBlock *getData)
         if (loadList(name))
         {
             updateGui();
-            synth->getRuntime().Log("Loaded " + name);
+            synth.getRuntime().Log("Loaded " + name);
         }
-        synth->getRuntime().finishedCLI = true;
+        synth.getRuntime().finishedCLI = true;
         return;
     }
     if (control == MIDILEARN::control::loadFromRecent)
     {
         int pos = 0;
-        vector<string> &listtype = *synth->getHistory(TOPLEVEL::XML::MLearn);
+        vector<string>& listtype{synth.getHistory(TOPLEVEL::XML::MLearn)};
         vector<string>::iterator it = listtype.begin();
         while (it != listtype.end() && pos != value)
         {
@@ -444,31 +439,31 @@ void MidiLearn::generalOperations(CommandBlock *getData)
         }
         if (it == listtype.end())
         {
-            synth->getRuntime().Log("No entry for number " + to_string(int(value + 1)));
+            synth.getRuntime().Log("No entry for number " + to_string(int(value + 1)));
         }
         else
         {
             name = *it;
             if (loadList(name))
-                synth->getRuntime().Log("Loaded " + name);
+                synth.getRuntime().Log("Loaded " + name);
             updateGui();
         }
-        synth->getRuntime().finishedCLI = true;
+        synth.getRuntime().finishedCLI = true;
         return;
     }
     if (control == MIDILEARN::control::saveList)
     {
         name = (textMsgBuffer.fetch(par2));
         if (saveList(name))
-            synth->getRuntime().Log("Saved " + name);
-        synth->getRuntime().finishedCLI = true;
+            synth.getRuntime().Log("Saved " + name);
+        synth.getRuntime().finishedCLI = true;
         return;
     }
     if (control == MIDILEARN::control::cancelLearn)
     {
         learning = false;
-        synth->getRuntime().finishedCLI = true;
-        synth->getRuntime().Log("Midi Learn cancelled");
+        synth.getRuntime().finishedCLI = true;
+        synth.getRuntime().Log("Midi Learn cancelled");
         updateGui(MIDILEARN::control::cancelLearn);
         return;
     }
@@ -488,7 +483,7 @@ void MidiLearn::generalOperations(CommandBlock *getData)
     string lineName;
     if (it == midi_list.end())
     {
-        synth->getRuntime().Log("Line " + to_string(lineNo + 1) + " not found");
+        synth.getRuntime().Log("Line " + to_string(lineNo + 1) + " not found");
         return;
     }
 
@@ -565,7 +560,7 @@ void MidiLearn::generalOperations(CommandBlock *getData)
     {
         remove(value);
         updateGui();
-        synth->getRuntime().Log("Removed line " + to_string(int(value + 1)));
+        synth.getRuntime().Log("Removed line " + to_string(int(value + 1)));
         return;
     }
 
@@ -574,10 +569,10 @@ void MidiLearn::generalOperations(CommandBlock *getData)
         if (control > MIDILEARN::control::sevenBit)
         {
             type = it->status;
-            synth->getRuntime().Log("Line " + to_string(lineNo + 1) + " " + lineName);
+            synth.getRuntime().Log("Line " + to_string(lineNo + 1) + " " + lineName);
         }
         else{
-            unsigned char tempType = it->status;
+            uchar tempType = it->status;
             bool isOn = (type & 0x1f) > 0;
             string name;
             switch (control)
@@ -603,26 +598,26 @@ void MidiLearn::generalOperations(CommandBlock *getData)
                 name += " enabled";
             else
                 name += " disabled";
-            synth->getRuntime().Log("Line " + to_string(lineNo + 1) + " " + name);
+            synth.getRuntime().Log("Line " + to_string(lineNo + 1) + " " + name);
         }
 
-        CommandBlock putData;
-        memset(&putData.bytes, 255, sizeof(putData));
+        CommandBlock response;
+        memset(&response.bytes, 255, sizeof(response));
         // need to work on this more
-        putData.data.value = value;
-        putData.data.type = type;
-        putData.data.control = MIDILEARN::control::ignoreMove;
-        putData.data.kit = kit;
-        putData.data.engine = engine;
-        putData.data.insert = insert;
-        putData.data.parameter = parameter;
-        putData.data.offset = offset;
+        response.data.value     = value;
+        response.data.type      = type;
+        response.data.control   = MIDILEARN::control::ignoreMove;
+        response.data.kit       = kit;
+        response.data.engine    = engine;
+        response.data.insert    = insert;
+        response.data.parameter = parameter;
+        response.data.offset    = offset;
         it->CC = kit;
         it->chan = engine;
         it->min_in = insert;
         it->max_in = parameter;
         it->status = type;
-        writeToGui(&putData);
+        writeToGui(response);
         return;
     }
 
@@ -636,7 +631,7 @@ void MidiLearn::generalOperations(CommandBlock *getData)
         entry.min_out = it->min_out;
         entry.max_out = it->max_out;
         entry.frame.data = it->frame.data;
-        unsigned int CC = entry.CC;
+        uint CC = entry.CC;
         int chan = entry.chan;
 
         midi_list.erase(it);
@@ -662,7 +657,7 @@ void MidiLearn::generalOperations(CommandBlock *getData)
         else
             midi_list.insert(it, entry);
 
-        synth->getRuntime().Log("Moved line to " + to_string(lineNo + 1) + " " + lineName);
+        synth.getRuntime().Log("Moved line to " + to_string(lineNo + 1) + " " + lineName);
         updateGui();
         return;
     }
@@ -672,15 +667,15 @@ void MidiLearn::generalOperations(CommandBlock *getData)
 
 string MidiLearn::findName(list<LearnBlock>::iterator it)
 {
-    CommandBlock putData;
-    memcpy(putData.bytes, it->frame.bytes, sizeof(CommandBlock));
-    putData.data.value = 0;
-    putData.data.source = 0;
-    string name = resolveAll(synth, &putData, false);
-    return name;
+    CommandBlock cmd;
+    memcpy(cmd.bytes, it->frame.bytes, sizeof(CommandBlock));
+    cmd.data.value = 0;
+    cmd.data.source = 0;
+    return resolveAll(synth, cmd, false);
 }
 
-void MidiLearn::insertLine(unsigned short int CC, unsigned char chan)
+
+void MidiLearn::insertLine(ushort CC, uchar chan)
 {
     /*
      * This will eventually be part of a paging system of
@@ -688,22 +683,21 @@ void MidiLearn::insertLine(unsigned short int CC, unsigned char chan)
      */
     if (midi_list.size() >= MIDI_LEARN_BLOCK)
     {
-        CommandBlock putData;
-        int putSize = sizeof(putData);
-        memset(&putData, 0xff, putSize);
-        putData.data.value = 0;
-        putData.data.source = TOPLEVEL::action::toAll;
-        putData.data.type = TOPLEVEL::type::Write | TOPLEVEL::type::Integer;
-        putData.data.control = TOPLEVEL::control::textMessage;
-        putData.data.part = TOPLEVEL::section::midiIn;
-        putData.data.parameter = 0x80;
-        putData.data.miscmsg = textMsgBuffer.push("Midi Learn full!");
-        writeMidi(&putData, false);
+        CommandBlock cmd;
+        memset(&cmd, 0xff, sizeof(cmd));
+        cmd.data.value     = 0;
+        cmd.data.source    = TOPLEVEL::action::toAll;
+        cmd.data.type      = TOPLEVEL::type::Write | TOPLEVEL::type::Integer;
+        cmd.data.control   = TOPLEVEL::control::textMessage;
+        cmd.data.part      = TOPLEVEL::section::midiIn;
+        cmd.data.parameter = 0x80;
+        cmd.data.miscmsg   = textMsgBuffer.push("Midi Learn full!");
+        writeMidi(cmd, false);
         learning = false;
         return;
     }
 
-    unsigned char status = 0;
+    uchar status{0};
     if (CC >= MIDI::CC::channelPressureAdjusted)
         status |= 1; // set 'block'
     if (CC >= MIDI::CC::identNRPN)
@@ -715,13 +709,11 @@ void MidiLearn::insertLine(unsigned short int CC, unsigned char chan)
     entry.max_in = 200;
     entry.status = status;
 
-    //std::cout << "SEND Control " << (int) learnTransferBlock.data.control << " Part " << (int) learnTransferBlock.data.part << "  Kit " << (int) learnTransferBlock.data.kit << " Engine " << (int) learnTransferBlock.data.engine << "  Insert " << (int) learnTransferBlock.data.insert << std::std::endl;
-
-    unsigned char type = learnTransferBlock.data.type & TOPLEVEL::type::Integer;
+    uchar type = learnTransferBlock.data.type & TOPLEVEL::type::Integer;
     learnTransferBlock.data.type = (type | TOPLEVEL::type::Limits | TOPLEVEL::type::Minimum);
-    entry.min_out = synth->interchange.readAllData(&learnTransferBlock);
+    entry.min_out = synth.interchange.readAllData(learnTransferBlock);
     learnTransferBlock.data.type = (type | TOPLEVEL::type::Limits | TOPLEVEL::type::Maximum);
-    entry.max_out = synth->interchange.readAllData(&learnTransferBlock);
+    entry.max_out = synth.interchange.readAllData(learnTransferBlock);
 
     memcpy(entry.frame.bytes, learnTransferBlock.bytes, sizeof(CommandBlock));
     entry.frame.data.type = type;
@@ -746,72 +738,71 @@ void MidiLearn::insertLine(unsigned short int CC, unsigned char chan)
     else
         midi_list.insert(it, entry);
 
-    //synth->getRuntime().Log("Learned ");
-    unsigned int CCh = entry.CC;
+    uint CCh = entry.CC;
     string CCtype;
     if (CCh < 0xff)
         CCtype = "CC " + to_string(CCh);
     else
         CCtype = "NRPN " + asHexString((CCh >> 7) & 0x7f) + " " + asHexString(CCh & 0x7f);
-    synth->getRuntime().Log("Learned " + CCtype + "  Chan " + to_string((int)entry.chan + 1) + "  " + learnedName);
+    synth.getRuntime().Log("Learned " + CCtype + "  Chan " + to_string((int)entry.chan + 1) + "  " + learnedName);
     updateGui(MIDILEARN::control::limit);
     learning = false;
 }
 
 
-void MidiLearn::writeToGui(CommandBlock *putData)
+void MidiLearn::writeToGui(CommandBlock& cmd)
 {
 #ifdef GUI_FLTK
-    if (!synth->getRuntime().showGui)
+    if (!synth.getRuntime().showGui)
         return;
-    putData->data.part = TOPLEVEL::section::midiLearn;
+    cmd.data.part = TOPLEVEL::section::midiLearn;
     int tries = 0;
     bool ok = false;
     do
     {
-        ok = synth->interchange.toGUI.write(putData->bytes);
+        ok = synth.interchange.toGUI.write(cmd.bytes);
         ++tries;
         if (!ok)
-                usleep(100);
+                sleep_for(100us);
         // we can afford a short delay for buffer to clear
     }
     while (!ok && tries < 3);
 
     if (!ok)
-        synth->getRuntime().Log("toGui buffer full!", _SYS_::LogNotSerious | _SYS_::LogError);
+        synth.getRuntime().Log("toGui buffer full!", _SYS_::LogNotSerious | _SYS_::LogError);
 #endif // GUI_FLTK
 }
 
 
 void MidiLearn::updateGui(int opp)
 {
-    if (!synth->getRuntime().showGui)
+    if (!synth.getRuntime().showGui)
         return;
-    CommandBlock putData;
+    CommandBlock cmd;
     if (opp == MIDILEARN::control::sendLearnMessage)
     {
-        putData.data.control = MIDILEARN::control::sendLearnMessage;
-        putData.data.miscmsg = textMsgBuffer.push("Learning " + learnedName);
+        cmd.data.control = MIDILEARN::control::sendLearnMessage;
+        cmd.data.miscmsg = textMsgBuffer.push("Learning " + learnedName);
     }
     else if (opp == MIDILEARN::control::cancelLearn)
     {
-        putData.data.control = MIDILEARN::control::cancelLearn;
-        putData.data.miscmsg = NO_MSG;
+        cmd.data.control = MIDILEARN::control::cancelLearn;
+        cmd.data.miscmsg = NO_MSG;
     }
     else if (opp == MIDILEARN::control::limit)
     {
-        putData.data.control = TOPLEVEL::control::textMessage;
-        putData.data.miscmsg = NO_MSG;
+        cmd.data.control = TOPLEVEL::control::textMessage;
+        cmd.data.miscmsg = NO_MSG;
     }
     else
     {
-        putData.data.control = MIDILEARN::control::clearAll;
-        putData.data.miscmsg = NO_MSG;
+        cmd.data.control = MIDILEARN::control::clearAll;
+        cmd.data.miscmsg = NO_MSG;
         if (opp == MIDILEARN::control::hideGUI)
             return;
     }
-    putData.data.value = 0;
-    writeToGui(&putData);
+    cmd.data.value = 0;
+    writeToGui(cmd);
 
     if (opp >= MIDILEARN::control::hideGUI) // just sending back gui message
         return;
@@ -820,74 +811,69 @@ void MidiLearn::updateGui(int opp)
     list<LearnBlock>::iterator it;
     it = midi_list.begin();
 /*
-    struct timeval tv1, tv2;
-    gettimeofday(&tv1, NULL);
+using std::chrono::steady_clock;
+using Dur = std::chrono::duration<double, std::micro>;
+auto start = steady_clock::now();
 */
     while (it != midi_list.end())
     {
-        unsigned short int newCC = (it->CC) & MIDI::CC::maxNRPN;
-        putData.data.value = lineNo;
-        putData.data.type = it->status;
-        putData.data.source = TOPLEVEL::action::toAll;
-        putData.data.control = MIDILEARN::control::CCorChannel;
-        putData.data.kit = (newCC & 0xff);
-        putData.data.engine = it->chan;
-        putData.data.insert = it->min_in;
-        putData.data.parameter = it->max_in;
-        putData.data.miscmsg = textMsgBuffer.push(findName(it));
-        writeToGui(&putData);
+        ushort newCC = (it->CC) & MIDI::CC::maxNRPN;
+        cmd.data.value     = lineNo;
+        cmd.data.type      = it->status;
+        cmd.data.source    = TOPLEVEL::action::toAll;
+        cmd.data.control   = MIDILEARN::control::CCorChannel;
+        cmd.data.kit       = (newCC & 0xff);
+        cmd.data.engine    = it->chan;
+        cmd.data.insert    = it->min_in;
+        cmd.data.parameter = it->max_in;
+        cmd.data.miscmsg   = textMsgBuffer.push(findName(it));
+        writeToGui(cmd);
         if (it->status & 8)
         { // status used in case NRPN is < 0x100
-            putData.data.control = MIDILEARN::control::nrpnDetected; // it's an NRPN
-            putData.data.engine = (newCC >> 8);
-            writeToGui(&putData);
+            cmd.data.control = MIDILEARN::control::nrpnDetected; // it's an NRPN
+            cmd.data.engine = (newCC >> 8);
+            writeToGui(cmd);
         }
         ++it;
         ++lineNo;
         if (lineNo & 32)
-            usleep(10); // allow message list to clear a bit
+            sleep_for(10us); // allow message list to clear a bit
     }
 /*
-    gettimeofday(&tv2, NULL);
-    if (tv1.tv_usec > tv2.tv_usec)
-    {
-        tv2.tv_sec--;
-        tv2.tv_usec += 1000000;
-    }
-    int actual = (tv2.tv_sec - tv1.tv_sec) *1000000 + (tv2.tv_usec - tv1.tv_usec);
-    std::cout << "Delay " << to_string(actual) << "uS" << std::endl;
+Dur duration = steady_clock::now () - start;
+std::cout << "MidiLearn->GUI: Δt = " << duration.count() << "µs" << std::endl;
 */
-    if (synth->getRuntime().showLearnedCC == true && !midi_list.empty()) // open the gui editing window
+    if (synth.getRuntime().showLearnedCC == true && !midi_list.empty()) // open the gui editing window
     {
-        putData.data.control = MIDILEARN::control::sendRefreshRequest;
-        writeToGui(&putData);
+        cmd.data.control = MIDILEARN::control::sendRefreshRequest;
+        writeToGui(cmd);
     }
 }
 
 
-bool MidiLearn::saveList(const string& name)
+bool MidiLearn::saveList(string const& name)
 {
     if (name.empty())
     {
-        synth->getRuntime().Log("No filename");
+        synth.getRuntime().Log("No filename");
         return false;
     }
 
     if (midi_list.size() == 0)
     {
-        synth->getRuntime().Log("No Midi Learn list");
+        synth.getRuntime().Log("No Midi Learn list");
         return false;
     }
 
     string file = setExtension(name, EXTEN::mlearn);
-    synth->getRuntime().xmlType = TOPLEVEL::XML::MLearn;
+    synth.getRuntime().xmlType = TOPLEVEL::XML::MLearn;
     auto xml{std::make_unique<XMLwrapper>(synth, true)};
     bool ok = insertMidiListData(*xml);
     if (xml->saveXMLfile(file))
-        synth->addHistory(file, TOPLEVEL::XML::MLearn);
+        synth.addHistory(file, TOPLEVEL::XML::MLearn);
     else
     {
-        synth->getRuntime().Log("Failed to save data to " + file);
+        synth.getRuntime().Log("Failed to save data to " + file);
         ok = false;
     }
     return ok;
@@ -917,20 +903,20 @@ bool MidiLearn::insertMidiListData(XMLwrapper& xml)
              * For user display they are split and shown as
              * MSB and LSB.
              */
-            xml.addpar("Midi_Channel", it->chan);
-            xml.addparreal("Midi_Min", it->min_in / 1.575f);
-            xml.addparreal("Midi_Max", it->max_in / 1.575f);
-            xml.addparbool("Limit", (it->status & 2) > 0);
-            xml.addparbool("Block", (it->status & 1) > 0);
-            xml.addpar("Convert_Min", it->min_out);
-            xml.addpar("Convert_Max", it->max_out);
+            xml.addpar("Midi_Channel",  it->chan);
+            xml.addparreal("Midi_Min",  it->min_in / 1.575f);
+            xml.addparreal("Midi_Max",  it->max_in / 1.575f);
+            xml.addparbool("Limit",    (it->status & 2) > 0);
+            xml.addparbool("Block",    (it->status & 1) > 0);
+            xml.addpar("Convert_Min",   it->min_out);
+            xml.addpar("Convert_Max",   it->max_out);
             xml.beginbranch("COMMAND");
-                xml.addpar("Type", it->frame.data.type);
-                xml.addpar("Control", it->frame.data.control);
-                xml.addpar("Part", it->frame.data.part);
-                xml.addpar("Kit_Item", it->frame.data.kit);
-                xml.addpar("Engine", it->frame.data.engine);
-                xml.addpar("Insert", it->frame.data.insert);
+                xml.addpar("Type",      it->frame.data.type);
+                xml.addpar("Control",   it->frame.data.control);
+                xml.addpar("Part",      it->frame.data.part);
+                xml.addpar("Kit_Item",  it->frame.data.kit);
+                xml.addpar("Engine",    it->frame.data.engine);
+                xml.addpar("Insert",    it->frame.data.insert);
                 xml.addpar("Parameter", it->frame.data.parameter);
                 xml.addpar("Secondary_Parameter", it->frame.data.offset);
                 xml.addparstr("Command_Name",findName(it));
@@ -944,17 +930,17 @@ bool MidiLearn::insertMidiListData(XMLwrapper& xml)
 }
 
 
-bool MidiLearn::loadList(const string& name)
+bool MidiLearn::loadList(string const& name)
 {
     if (name.empty())
     {
-        synth->getRuntime().Log("No filename");
+        synth.getRuntime().Log("No filename");
         return false;
     }
-    string file = setExtension(name, EXTEN::mlearn);
+    string file{setExtension(name, EXTEN::mlearn)};
     if (!isRegularFile(file))
     {
-        synth->getRuntime().Log("Can't find " + file);
+        synth.getRuntime().Log("Can't find " + file);
         return false;
     }
 
@@ -963,7 +949,7 @@ bool MidiLearn::loadList(const string& name)
     bool ok = extractMidiListData(true,  *xml);
     if (!ok)
         return false;
-    synth->addHistory(file, TOPLEVEL::XML::MLearn);
+    synth.addHistory(file, TOPLEVEL::XML::MLearn);
     return true;
 }
 
@@ -974,15 +960,15 @@ bool MidiLearn::extractMidiListData(bool full,  XMLwrapper& xml)
     if (!xml.enterbranch("MIDILEARN"))
     {
         if (full)
-            synth->getRuntime().Log("Extract Data, no MIDILEARN branch");
+            synth.getRuntime().Log("Extract Data, no MIDILEARN branch");
         return false;
     }
     LearnBlock entry;
-    CommandBlock allData;
+    CommandBlock cmd;
     midi_list.clear();
     int ID = 0;
     int status;
-    unsigned int ident;
+    uint ident;
     while (true)
     {
         status = 0;
@@ -1027,52 +1013,51 @@ bool MidiLearn::extractMidiListData(bool full,  XMLwrapper& xml)
                 entry.frame.data.parameter = xml.getpar255("Parameter", 0);
                 entry.frame.data.offset    = xml.getpar255("Secondary_Parameter", 0);
 
-if (fromText)
+if (DECODE_MODE)
 {
                 string test = xml.getparstr("Command_Name");
-                TextData::encodeAll(synth, test, allData);
-                //synth->CBtest(&allData);
+                TextData::encodeAll(&synth, test, cmd);
 }
-if (fromText >= 2)
+if (DECODE_MODE >= 2)
 {
                 bool ok = true;
                 if (ID == 0)
                     cout << endl;
                 cout << "line " << (ID + 1);
-                if (allData.data.control != entry.frame.data.control)
+                if (cmd.data.control != entry.frame.data.control)
                 {
                     ok = false;
-                    cout << " changed control Old " << int(entry.frame.data.control) << " > New " << int(allData.data.control);
+                    cout << " changed control Old " << int(entry.frame.data.control) << " > New " << int(cmd.data.control);
                 }
-                if (allData.data.part != entry.frame.data.part)
+                if (cmd.data.part != entry.frame.data.part)
                 {
                     ok = false;
-                    cout << " changed part Old " << int(entry.frame.data.part) << " > New " << int(allData.data.part);
+                    cout << " changed part Old " << int(entry.frame.data.part) << " > New " << int(cmd.data.part);
                 }
-                if (allData.data.kit != entry.frame.data.kit)
+                if (cmd.data.kit != entry.frame.data.kit)
                 {
                     ok = false;
-                    cout << " changed kit Old " << int(entry.frame.data.kit) << " > New " << int(allData.data.kit);
+                    cout << " changed kit Old " << int(entry.frame.data.kit) << " > New " << int(cmd.data.kit);
                 }
-                if (allData.data.engine != entry.frame.data.engine)
+                if (cmd.data.engine != entry.frame.data.engine)
                 {
                     ok = false;
-                    cout << " changed engine Old " << int(entry.frame.data.engine) << " > New " << int(allData.data.engine);
+                    cout << " changed engine Old " << int(entry.frame.data.engine) << " > New " << int(cmd.data.engine);
                 }
-                if (allData.data.insert != entry.frame.data.insert)
+                if (cmd.data.insert != entry.frame.data.insert)
                 {
                     ok = false;
-                    cout << " changed insert Old " << int(entry.frame.data.insert) << " > New " << int(allData.data.insert);
+                    cout << " changed insert Old " << int(entry.frame.data.insert) << " > New " << int(cmd.data.insert);
                 }
-                if (allData.data.parameter != entry.frame.data.parameter)
+                if (cmd.data.parameter != entry.frame.data.parameter)
                 {
                     ok = false;
-                    cout << " changed parameter Old " << int(entry.frame.data.parameter) << " > New " << int(allData.data.parameter);
+                    cout << " changed parameter Old " << int(entry.frame.data.parameter) << " > New " << int(cmd.data.parameter);
                 }
-                if (allData.data.offset != entry.frame.data.offset)
+                if (cmd.data.offset != entry.frame.data.offset)
                 {
                     ok = false;
-                    cout << " changed offset Old " << int(entry.frame.data.offset) << " > " << int(allData.data.offset);
+                    cout << " changed offset Old " << int(entry.frame.data.offset) << " > " << int(cmd.data.offset);
                 }
                 if (ok)
                 {
@@ -1080,15 +1065,15 @@ if (fromText >= 2)
                 }
                 cout << endl;
 }
-if (fromText & 1)
+if (DECODE_MODE & 1)
 {
-                entry.frame.data.control = allData.data.control;
-                entry.frame.data.part = allData.data.part;
-                entry.frame.data.kit = allData.data.kit;
-                entry.frame.data.engine = allData.data.engine;
-                entry.frame.data.insert = allData.data.insert;
-                entry.frame.data.parameter = allData.data.parameter;
-                entry.frame.data.offset = allData.data.offset;
+                entry.frame.data.control   = cmd.data.control;
+                entry.frame.data.part      = cmd.data.part;
+                entry.frame.data.kit       = cmd.data.kit;
+                entry.frame.data.engine    = cmd.data.engine;
+                entry.frame.data.insert    = cmd.data.insert;
+                entry.frame.data.parameter = cmd.data.parameter;
+                entry.frame.data.offset    = cmd.data.offset;
 }
                 xml.exitbranch();
             xml.exitbranch();
@@ -1098,6 +1083,6 @@ if (fromText & 1)
         }
     }
     xml.exitbranch(); // MIDILEARN
-    //synth->CBtest(&allData);
     return true;
 }
+

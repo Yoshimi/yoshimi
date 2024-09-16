@@ -107,7 +107,7 @@ ADnote::~ADnote() { /* all clean-up done automatically */ }
 // Internal: this constructor does the actual initialisation....
 ADnote::ADnote(ADnoteParameters& adpars_, Controller& ctl_, Note note_, bool portamento_
               ,ADnote* topVoice_, int subVoice_, int phaseOffset, float *parentFMmod_, bool forFM_)
-    : synth{*adpars_.getSynthEngine()}
+    : synth{adpars_.getSynthEngine()}
     , adpars{adpars_}
     , paramsUpdate{adpars}
     , ctl{ctl_}
@@ -650,7 +650,7 @@ void ADnote::allocateUnison(size_t unisonCnt, size_t buffSize)
     }
 }
 
-void ADnote::initSubVoices(void)
+void ADnote::initSubVoices()
 {
     for (int nvoice = 0; nvoice < NUM_VOICES; ++nvoice)
     {
@@ -847,7 +847,7 @@ void ADnote::killNote()
 
 
 // Init the parameters
-void ADnote::initParameters(void)
+void ADnote::initParameters()
 {
     int nvoice, i;
 
@@ -861,9 +861,9 @@ void ADnote::initParameters(void)
 
     noteGlobal.filterEnvelope.reset(new Envelope{adpars.GlobalPar.FilterEnvelope, note.freq, &synth});
     noteGlobal.filterLFO     .reset(new LFO{adpars.GlobalPar.FilterLfo, note.freq, &synth});
-    noteGlobal.filterL.reset(new Filter{adpars.GlobalPar.GlobalFilter, &synth});
+    noteGlobal.filterL.reset(new Filter{* adpars.GlobalPar.GlobalFilter, synth});
     if (stereo)
-        noteGlobal.filterR.reset(new Filter{adpars.GlobalPar.GlobalFilter, &synth});
+        noteGlobal.filterR.reset(new Filter{* adpars.GlobalPar.GlobalFilter, synth});
 
     // Forbids the Modulation Voice to be greater or equal than voice
     for (i = 0; i < NUM_VOICES; ++i)
@@ -909,8 +909,8 @@ void ADnote::initParameters(void)
         // Voice Filter Parameters Init
         if (adpars.VoicePar[nvoice].PFilterEnabled)
         {
-            NoteVoicePar[nvoice].voiceFilterL.reset(new Filter{adpars.VoicePar[nvoice].VoiceFilter, &synth});
-            NoteVoicePar[nvoice].voiceFilterR.reset(new Filter{adpars.VoicePar[nvoice].VoiceFilter, &synth});
+            NoteVoicePar[nvoice].voiceFilterL.reset(new Filter{* adpars.VoicePar[nvoice].VoiceFilter, synth});
+            NoteVoicePar[nvoice].voiceFilterR.reset(new Filter{* adpars.VoicePar[nvoice].VoiceFilter, synth});
         }
 
         if (adpars.VoicePar[nvoice].PFilterEnvelopeEnabled)
@@ -1002,7 +1002,7 @@ void ADnote::initParameters(void)
 }
 
 
-void ADnote::computeNoteParameters(void)
+void ADnote::computeNoteParameters()
 {
     paramRNG.init(paramSeed);
 
@@ -1477,7 +1477,7 @@ float ADnote::getVoiceBaseFreq(int nvoice)
 
 
 // Computes all the parameters for each tick
-void ADnote::computeWorkingParameters(void)
+void ADnote::computeWorkingParameters()
 {
     float filterCenterPitch =
         adpars.GlobalPar.GlobalFilter->getfreq() // center freq
@@ -2677,7 +2677,7 @@ void ADnote::noteout(float *outl, float *outr)
 
 
 // Release the key (NoteOff)
-void ADnote::releasekey(void)
+void ADnote::releasekey()
 {
     if (noteStatus == NOTE_LEGATOFADEOUT)
         return; // keep envelopes in sustained state (thereby blocking NoteOff)

@@ -62,7 +62,7 @@ inline std::string asString(long n)
 }
 
 
-inline std::string asString(unsigned int n)
+inline std::string asString(uint n)
 {
    std::ostringstream oss;
    oss << n;
@@ -70,7 +70,7 @@ inline std::string asString(unsigned int n)
 }
 
 
-inline std::string asString(unsigned int n, unsigned int width)
+inline std::string asString(uint n, uint width)
 {
     std::ostringstream oss;
     oss << n;
@@ -84,7 +84,7 @@ inline std::string asString(unsigned int n, unsigned int width)
 }
 
 
-inline std::string asString(unsigned char c)
+inline std::string asString(uchar c)
 {
     std::ostringstream oss;
     oss.width(1);
@@ -194,10 +194,10 @@ inline int string2int(std::string str)
     return intval;
 }
 
-inline int string2long(std::string str)
+inline int64_t string2int64(std::string str)
 {
     std::istringstream machine(str);
-    long longval;
+    int64_t longval;
     machine >> longval;
     return longval;
 }
@@ -217,10 +217,10 @@ inline int string2int127(std::string str)
 }
 
 
-inline unsigned int string2uint(std::string str)
+inline uint string2uint(std::string str)
 {
     std::istringstream machine(str);
-    unsigned int intval;
+    uint intval;
     machine >> intval;
     return intval;
 }

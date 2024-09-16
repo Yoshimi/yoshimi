@@ -57,7 +57,7 @@ Envelope::Envelope(EnvelopeParams *envpars, float basefreq_, SynthEngine *_synth
 
 
 // Release the key (note envelope)
-void Envelope::releasekey(void)
+void Envelope::releasekey()
 {
     if (keyreleased == 1)
         return;
@@ -112,7 +112,7 @@ void Envelope::recomputePoints()
 }
 
 // Envelope Output
-float Envelope::envout(void)
+float Envelope::envout()
 {
     if (envUpdate.checkUpdated())
         recomputePoints();
@@ -183,7 +183,7 @@ float Envelope::envout(void)
 
 
 // Envelope Output (dB)
-float Envelope::envout_dB(void)
+float Envelope::envout_dB()
 {
     if (envUpdate.checkUpdated())
         recomputePoints();

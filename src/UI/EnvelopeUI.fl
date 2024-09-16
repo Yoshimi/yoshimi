@@ -93,7 +93,7 @@ pair=NULL;} {}
     currentpoint = -1;
     cpx = 0;
     lastpoint = -1;
-    synth = env->getSynthEngine();
+    synth = & env->getSynthEngine();
     npart = npart_;
     kititem = kititem_;
     engine = engine_;
@@ -1178,7 +1178,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
   Function {init(EnvelopeParams *env_, int npart_, int kititem_, int engine_, int group_)} {} {
     code {//
     env=env_;
-    synth = env->getSynthEngine();
+    synth = & env->getSynthEngine();
     npart = npart_;
     kititem = kititem_;
     engine = engine_;

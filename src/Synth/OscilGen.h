@@ -72,10 +72,10 @@ class OscilGen : private WaveShapeSamples
         void displayWaveformForGui(fft::Waveform&);
 
         // convert the current Oscil settings into a "user base function"
-        void useasbase(void);
+        void useasbase();
 
-        void genDefaults(void);
-        void defaults(void);
+        void genDefaults();
+        void defaults();
         void convert2sine();
 
         // Draw a new random seed for randomisation of harmonics - called every noteon event
@@ -100,17 +100,17 @@ class OscilGen : private WaveShapeSamples
         void buildSpectrum(float freqHz, bool applyResonance, bool forGUI, bool forPAD);
 
         // computes the basefunction and make the FFT;
-        void changebasefunction(void);
+        void changebasefunction();
 
-        void waveshape(void); // Waveshaping (no kidding!)
+        void waveshape();      // Waveshaping (no kidding!)
 
-        void oscilfilter(); // Filter the oscillator according to Pfiltertype and Pfilterpar
+        void oscilfilter();    // Filter the oscillator according to Pfiltertype and Pfilterpar
 
-        void spectrumadjust(void); // Adjust the spectrum
+        void spectrumadjust(); // Adjust the spectrum
 
-        void shiftharmonics(void); // Shift the harmonics
+        void shiftharmonics(); // Shift the harmonics
 
-        void modulation(void); // Do the oscil modulation stuff
+        void modulation();     // Do the oscil modulation stuff
 
 
         // Basic/base functions (Functiile De Baza)

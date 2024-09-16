@@ -25,11 +25,13 @@
 #ifndef ALSA_ENGINE_H
 #define ALSA_ENGINE_H
 
+#include "MusicIO/MusicIO.h"
+
 #include <pthread.h>
 #include <alsa/asoundlib.h>
 #include <string>
 
-#include "MusicIO/MusicIO.h"
+using std::string;
 
 #define MIDI_CLOCKS_PER_BEAT 24
 #define MIDI_CLOCK_DIVISION 3
@@ -41,77 +43,86 @@
 
 class SynthEngine;
 
+
 class AlsaEngine : public MusicIO
 {
     public:
-        AlsaEngine(SynthEngine *_synth, BeatTracker *_beatTracker);
-        ~AlsaEngine() { }
+        // shall not be copied nor moved
+        AlsaEngine(AlsaEngine&&)                 = delete;
+        AlsaEngine(AlsaEngine const&)            = delete;
+        AlsaEngine& operator=(AlsaEngine&&)      = delete;
+        AlsaEngine& operator=(AlsaEngine const&) = delete;
+        AlsaEngine(SynthEngine&, shared_ptr<BeatTracker>);
+       ~AlsaEngine() { Close(); }
 
-        bool openAudio(void);
-        bool openMidi(void);
-        bool Start(void);
-        void Close(void);
 
-        unsigned int getSamplerate(void) { return audio.samplerate; }
-        int getBuffersize(void) { return audio.period_size; }
+        /* ====== MusicIO interface ======== */
+        bool openAudio()               override;
+        bool openMidi()                override;
+        bool Start()                   override;
+        void Close()                   override;
+        void registerAudioPort(int)    override { /*ignore*/ }
 
-        std::string audioClientName(void);
-        std::string midiClientName(void);
-        int audioClientId(void) { return audio.alsaId; }
-        int midiClientId(void) { return midi.alsaId; }
-        virtual void registerAudioPort(int )  {}
-
-        bool little_endian;
-        bool card_endian;
-        int card_bits;
-        bool card_signed;
-        unsigned int card_chans;
+        uint   getSamplerate()   const override { return audio.samplerate; }
+        int    getBuffersize()   const override { return audio.period_size; }
+        string audioClientName() const override ;
+        int    audioClientId()   const override { return audio.alsaId; }
+        string midiClientName()  const override ;
+        int    midiClientId()    const override { return midi.alsaId; }
 
     private:
-        bool prepHwparams(void);
-        bool prepSwparams(void);
+        bool prepHwparams();
+        bool prepSwparams();
         void Interleave(int buffersize);
         void Write(snd_pcm_uframes_t towrite);
         bool Recover(int err);
-        bool xrunRecover(void);
-        bool alsaBad(int op_result, std::string err_msg);
-        void closeAudio(void);
-        void closeMidi(void);
+        bool xrunRecover();
+        bool alsaBad(int op_result, string err_msg);
+        void closeAudio();
+        void closeMidi();
 
-        std::string findMidiClients(snd_seq_t *seq);
+        string findMidiClients(snd_seq_t* seq);
 
-        void *AudioThread(void);
-        static void *_AudioThread(void *arg);
-        void *MidiThread(void);
-        static void *_MidiThread(void *arg);
+        void* AudioThread();
+        static void* _AudioThread(void* arg);
+        void *MidiThread();
+        static void* _MidiThread(void* arg);
 
         void handleMidiEvents(uint64_t clock);
         void handleMidiClockSilence(uint64_t clock);
 
-        snd_pcm_sframes_t (*pcmWrite)(snd_pcm_t *handle, const void *data,
-                                      snd_pcm_uframes_t nframes);
-
         void handleSongPos(float beat);
         void handleMidiClock(uint64_t clock);
 
-        struct {
-            std::string        device;
-            snd_pcm_t         *handle;
-            unsigned int       period_count;
-            unsigned int       samplerate;
-            snd_pcm_uframes_t  period_size;
-            snd_pcm_uframes_t  buffer_size;
-            int                alsaId;
-            snd_pcm_state_t    pcm_state;
-            pthread_t          pThread;
-        } audio;
+        bool little_endian;
+        bool card_endian;
+        bool card_signed;
+        uint card_chans;
+        int  card_bits;
 
-        struct {
-            std::string        device;
-            snd_seq_t         *handle;
-            snd_seq_addr_t     addr;
-            int                alsaId;
-            pthread_t          pThread;
+        using PcmOutput = snd_pcm_sframes_t(snd_pcm_t*, const void*, snd_pcm_uframes_t);
+        PcmOutput* pcmWrite;
+
+        unique_ptr<int[]> interleaved; // output buffer for 16bit interleaved audio
+
+        struct Audio {
+            string            device{};
+            snd_pcm_t*        handle{nullptr};
+            uint              period_count{0}; // re-used as number of periods
+            uint              samplerate{0};
+            snd_pcm_uframes_t period_size{0};
+            snd_pcm_uframes_t buffer_size{0};
+            int               alsaId{-1};
+            snd_pcm_state_t   pcm_state{SND_PCM_STATE_DISCONNECTED};
+            pthread_t         pThread{0};
+        };
+
+        struct Midi {
+            string            device{};
+            snd_seq_t*        handle{nullptr};
+            snd_seq_addr_t    addr{0,0};
+            int               alsaId{-1};
+            pthread_t         pThread{0};
 
             // When receiving MIDI clock messages, to avoid precision errors
             // (MIDI_CLOCKS_PER_BEAT (24) does not cleanly divide 1), store
@@ -120,18 +131,20 @@ class AlsaEngine : public MusicIO
             // value is not necessarily an exact multiple of
             // 1/MIDI_CLOCK_DIVISION, but we only ever add
             // (1/MIDI_CLOCK_DIVISION) beats to it.
-            float             lastDivSongBeat;
-            float             lastDivMonotonicBeat;
+            float             lastDivSongBeat{0};
+            float             lastDivMonotonicBeat{0};
             // Reset to zero every MIDI_CLOCK_DIVISION. This is actually an
             // integer, but stored as float for calculation purposes.
-            float             clockCount;
+            float             clockCount{0};
 
             float             prevBpms[ALSA_MIDI_BPM_MEDIAN_WINDOW];
-            int               prevBpmsPos;
-            int64_t           prevClockUs;
-        } midi;
+            int               prevBpmsPos{0};
+            int64_t           prevClockUs{-1};
+        };
+
+        Audio audio;
+        Midi midi;
 };
 
-#endif
-
-#endif
+#endif /*ALSA_ENGINE_H*/
+#endif /*defined(HAVE_ALSA)*/

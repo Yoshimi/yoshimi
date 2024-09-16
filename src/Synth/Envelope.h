@@ -37,10 +37,10 @@ class Envelope
     public:
         Envelope(EnvelopeParams *envpars, float basefreq_, SynthEngine *_synth);
         ~Envelope() { };
-        void releasekey(void);
-        float envout(void);
-        float envout_dB(void);
-        int finished(void) { return envfinish; };
+        void releasekey();
+        float envout();
+        float envout_dB();
+        int finished() { return envfinish; };
 
     private:
         EnvelopeParams *_envpars;
@@ -61,7 +61,7 @@ class Envelope
 
         SynthEngine *synth;
 
-        void recomputePoints(void);
+        void recomputePoints();
 };
 
 #endif

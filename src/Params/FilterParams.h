@@ -42,25 +42,25 @@ class SynthEngine;
 class FilterParams : public ParamBase
 {
     public:
-        FilterParams(unsigned char Ptype_, float Pfreq, float Pq_, unsigned char Pfreqtrackoffset_, SynthEngine *_synth);
-        ~FilterParams() { }
+        FilterParams(uchar Ptype_, float Pfreq, float Pq_, uchar Pfreqtrackoffset_, SynthEngine&);
+
+        void defaults()  override;
 
         void add2XML(XMLwrapper& xml);
         void add2XMLsection(XMLwrapper& xml, int n);
-        void defaults(void);
         void getfromXML(XMLwrapper& xml);
         void getfromXMLsection(XMLwrapper& xml, int n);
 
 
         void getfromFilterParams(FilterParams *pars);
 
-        float getfreq(void);
-        float getq(void);
+        float getfreq();
+        float getq();
         float getfreqtracking(float notefreq);
-        float getgain(void);
+        float getgain();
 
-        float getcenterfreq(void);
-        float getoctavesfreq(void);
+        float getcenterfreq();
+        float getoctavesfreq();
         float getfreqpos(float freq);
         float getfreqx(float x);
 
@@ -73,37 +73,35 @@ class FilterParams : public ParamBase
         float getformantq(float q)
             { return power<25>((q - 32.0f) / 64.0f); }
 
-        unsigned char Pcategory;  // Filter category (Analog/Formant/StVar)
-        unsigned char Ptype;      // Filter type  (for analog lpf,hpf,bpf..)
-        float Pfreq;              // Frequency (64-central frequency)
-        float Pq;                 // Q parameters (resonance or bandwidth)
-        unsigned char Pstages;    // filter stages+1
-        float Pfreqtrack;         // how the filter frequency is changing
-                                  // according the note frequency
-        unsigned char Pfreqtrackoffset;  // Shift range for freq tracking
-        float Pgain;      // filter's output gain
+        uchar Pcategory;         // Filter category (Analog/Formant/StVar)
+        uchar Ptype;             // Filter type  (for analog lpf,hpf,bpf..)
+        float Pfreq;             // Frequency (64-central frequency)
+        float Pq;                // Q parameters (resonance or bandwidth)
+        uchar Pstages;           // filter stages+1
+        float Pfreqtrack;        // how the filter frequency is changing
+                                 // according the note frequency
+        uchar Pfreqtrackoffset;  // Shift range for freq tracking
+        float Pgain;             // filter's output gain
 
         // Formant filter parameters
-        unsigned char Pnumformants;     // how many formants are used
-        unsigned char Pformantslowness; // how slow varies the formants
-        unsigned char Pvowelclearness;  // how vowels are kept clean (how much try
-                                        // to avoid "mixed" vowels)
-        unsigned char Pcenterfreq;      // the centre frequency of the res. func.
-        unsigned char Poctavesfreq;     // the number of octaves
+        uchar Pnumformants;      // how many formants are used
+        uchar Pformantslowness;  // how slow varies the formants
+        uchar Pvowelclearness;   // how vowels are kept clean (how much try
+                                 // to avoid "mixed" vowels)
+        uchar Pcenterfreq;       // the centre frequency of the res. func.
+        uchar Poctavesfreq;      // the number of octaves
         struct {
             struct {
                 float firstF, freq, amp, q; // frequency,amplitude,Q
             } formants[FF_MAX_FORMANTS];
         } Pvowels[FF_MAX_VOWELS];
 
-        unsigned char Psequencesize;     // how many vowels are in the sequence
-        float Psequencestretch;  // how the sequence is stretched (how
-                                         // the input from filter envelopes/LFOs/etc.
-                                         // is "stretched")
-        unsigned char Psequencereversed; // if the input from filter envelopes/LFOs/etc.
-                                         // is reversed(negated)
+        uchar Psequencesize;     // how many vowels are in the sequence
+        float Psequencestretch;  // how the sequence is stretched (how the input from filter envelopes/LFOs/etc. is "stretched")
+        uchar Psequencereversed; // if the input from filter envelopes/LFOs/etc. is reversed(negated)
+
         struct {
-            unsigned char nvowel; // the vowel from the position
+            uchar nvowel; // the vowel from the position
         } Psequence[FF_MAX_SEQUENCE];
 
         bool changed;
@@ -112,10 +110,10 @@ class FilterParams : public ParamBase
         void defaults(int n);
 
         // stored default parameters
-        unsigned char Dtype;
+        uchar Dtype;
         float Dfreq;
         float Dq;
-        unsigned char Dfreqtrackoffset;
+        uchar Dfreqtrackoffset;
 };
 
 class filterLimit

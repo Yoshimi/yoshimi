@@ -31,6 +31,7 @@
 #include <limits.h>
 #include <cstdlib>
 #include <semaphore.h>
+#include <functional>
 #include <string>
 #include <memory>
 #include <vector>
@@ -46,7 +47,6 @@
 #include "Interface/MidiDecode.h"
 #include "Interface/Vectors.h"
 #include "Misc/Config.h"
-#include "Params/UnifiedPresets.h"
 #include "globals.h"
 
 class Part;
@@ -63,94 +63,82 @@ class MasterUI;
 #endif
 
 using std::string;
+using std::to_string;
 using std::unique_ptr;
 
 
-enum LV2PluginType
-{
-    LV2PluginTypeNone,
-    LV2PluginTypeSingle,
-    LV2PluginTypeMulti
-};
-
 class SynthEngine
 {
-    private:
-        unsigned int uniqueId;
-        LV2PluginType lv2PluginType;
-        bool needsSaving;
+        const uint uniqueId;
+        Config Runtime;
+
+        GuiDataExchange::Connection<InterfaceAnchor> rootCon;
+
     public:
-        std::atomic <uint8_t> audioOut;
         Bank bank;
         InterChange interchange;
         MidiLearn midilearn;
         MidiDecode mididecode;
         Vectors vectorcontrol;
-        UnifiedPresets unifiedpresets;
-    private:
-        Config Runtime;
-        GuiDataExchange::Connection<InterfaceAnchor> rootCon;
+
+        Config& getRuntime()     {return Runtime;}
+        uint getUniqueId() const {return uniqueId;}
+
     public:
-        TextMsgBuffer& textMsgBuffer;
-        SynthEngine(std::list<string>& allArgs, LV2PluginType _lv2PluginType = LV2PluginTypeNone, unsigned int forceId = 0);
+        SynthEngine(uint instanceID);
        ~SynthEngine();
-        // shall not be copied or moved
+        // shall not be copied nor moved
         SynthEngine(SynthEngine&&)                 = delete;
         SynthEngine(SynthEngine const&)            = delete;
         SynthEngine& operator=(SynthEngine&&)      = delete;
         SynthEngine& operator=(SynthEngine const&) = delete;
 
-        bool Init(unsigned int audiosrate, int audiobufsize);
-        size_t publishGuiAnchor();
-        void postGuiStartHook();
+        bool Init(uint audiosrate, int audiobufsize);
+        void publishGuiAnchor();
+        void postBootHook(bool);
 
         bool savePatchesXML(string filename);
         void add2XML(XMLwrapper& xml);
         string manualname();
-        void defaults(void);
+        void defaults();
 
-        bool loadXML(const string& filename);
-        bool loadStateAndUpdate(const string& filename);
-        bool saveState(const string& filename);
+        bool loadXML(string const& filename);
+        bool loadStateAndUpdate(string const& filename);
+        bool saveState(string const& filename);
         bool loadPatchSetAndUpdate(string filename);
-        bool installBanks(void);
-        bool saveBanks(void);
+        bool installBanks();
+        bool saveBanks();
         void newHistory(string name, int group);
-        void addHistory(const string& name, int group);
-        std::vector<string> *getHistory(int group);
+        void addHistory(string const& name, int group);
+        std::vector<string>& getHistory(int group);
         void setHistoryLock(int group, bool status);
         bool getHistoryLock(int group);
         string lastItemSeen(int group);
-        bool loadHistory(void);
-        bool saveHistory(void);
-        //unsigned char loadVectorAndUpdate(unsigned char baseChan, const string& name);
-        //unsigned char loadVector(unsigned char baseChan, const string& name, bool full);
-        //unsigned char extractVectorData(unsigned char baseChan, XMLwrapper& xml, const string& name);
-        //unsigned char saveVector(unsigned char baseChan, const string& name, bool full);
-        //bool insertVectorData(unsigned char baseChan, bool full, XMLwrapper& xml, const string& name);
+        bool loadHistory();
+        bool saveHistory();
 
         bool getfromXML(XMLwrapper& xml);
 
         int getalldata(char **data);
         void putalldata(const char *data, int size);
 
-        void NoteOn(unsigned char chan, unsigned char note, unsigned char velocity);
-        void NoteOff(unsigned char chan, unsigned char note);
-        int RunChannelSwitch(unsigned char chan, int value);
-        void SetController(unsigned char chan, int CCtype, short int par);
+        void NoteOn(uchar chan, uchar note, uchar velocity);
+        void NoteOff(uchar chan, uchar note);
+        int RunChannelSwitch(uchar chan, int value);
+        void SetController(uchar chan, int CCtype, short int par);
         void SetZynControls(bool in_place);
         int setRootBank(int root, int bank, bool notinplace = true);
-        int setProgramByName(CommandBlock *getData);
-        int setProgramFromBank(CommandBlock *getData, bool notinplace = true);
-        bool setProgram(const string& fname, int npart);
-        int ReadBankRoot(void);
-        int ReadBank(void);
-        void SetPartChan(unsigned char npart, unsigned char nchan);
+        int setProgramByName(CommandBlock&);
+        int setProgramFromBank(CommandBlock&, bool notinplace = true);
+        bool setProgram(string const& fname, int npart);
+        int ReadBankRoot();
+        int ReadBank();
+        void SetPartChan(uchar npart, uchar nchan);
         void SetPartPortamento(int npart, bool state);
         bool ReadPartPortamento(int npart);
         void SetPartKeyMode(int npart, int mode);
         int  ReadPartKeyMode(int npart);
-        void cliOutput(std::list<string>& msg_buf, unsigned int lines);
+        void cliOutput(std::list<string>& msg_buf, uint lines);
         void ListPaths(std::list<string>& msg_buf);
         void ListBanks(int rootNum, std::list<string>& msg_buf);
         void ListInstruments(int bankNum, std::list<string>& msg_buf);
@@ -158,21 +146,23 @@ class SynthEngine
         bool SingleVector(std::list<string>& msg_buf, int chan);
         void ListSettings(std::list<string>& msg_buf);
         int SetSystemValue(int type, int value);
-        int LoadNumbered(unsigned char group, unsigned char entry);
-        bool vectorInit(int dHigh, unsigned char chan, int par);
-        void vectorSet(int dHigh, unsigned char chan, int par);
-        void ClearNRPNs(void);
+        int LoadNumbered(uchar group, uchar entry);
+        bool vectorInit(int dHigh, uchar chan, int par);
+        void vectorSet(int dHigh, uchar chan, int par);
+        void ClearNRPNs();
         void resetAll(bool andML);
-        void ShutUp(void);
+        void ShutUp();
         int MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_MIDI_PARTS + 1], int to_process = 0);
-        void partonoffLock(int npart, int what);
-        void partonoffWrite(int npart, int what);
-        char partonoffRead(int npart);
-        sem_t partlock;
-        unsigned char legatoPart;
+        void partonoffLock(uint npart, int what);
+        void partonoffWrite(uint npart, int what);
+        char partonoffRead(uint npart);
         void setPartMap(int npart);
-        void setAllPartMaps(void);
+        void setAllPartMaps();
+
         void audioOutStore(uint8_t num);
+        std::atomic <uint8_t> audioOut;
+        sem_t partlock;
+        uchar legatoPart;
 
         bool masterMono;
         bool fileCompatible;
@@ -185,24 +175,24 @@ class SynthEngine
 
 
         Part *part[NUM_MIDI_PARTS];
-        unsigned int fadeAll;
-        // Per sample change in gain calculated whenever samplerate changes (which
-        // is currently only on init). fadeStep is used in SynthEngine, while
-        // fadeStepShort is used directly by notes, currently only for legato.
+        uint  fadeAll;
+        // Per sample change in gain calculated whenever samplerate changes
+        // (which is currently only on init). fadeStep is used in SynthEngine,
+        // while fadeStepShort is used directly by notes, currently only for legato.
         float fadeStep;
         float fadeStepShort;
         float fadeLevel;
 
         // parameters
-        unsigned int samplerate;
+        uint  samplerate;
         float samplerate_f;
         float halfsamplerate_f;
-        int buffersize;
+        int   buffersize;
         float buffersize_f;
-        int bufferbytes;
-        int oscilsize;
+        int   bufferbytes;
+        int   oscilsize;
         float oscilsize_f;
-        int halfoscilsize;
+        int   halfoscilsize;
         float halfoscilsize_f;
         float oscil_sample_step_f;
         float oscil_norm_factor_pm;
@@ -212,18 +202,18 @@ class SynthEngine
         static constexpr float samplerate_ref_f = 44100.0f;
         static constexpr float oscilsize_ref_f = float(1024 * 256);
 
-        int           sent_buffersize; //used for variable length runs
-        int           sent_bufferbytes; //used for variable length runs
-        float         sent_buffersize_f; //used for variable length runs
-        float         fixed_sample_step_f;
-        float         TransVolume;
-        float         Pvolume;
-        float         ControlStep;
-        int           Paudiodest;
-        int           Pkeyshift;
-        float         PbpmFallback;
-        unsigned char Psysefxvol[NUM_SYS_EFX][NUM_MIDI_PARTS];
-        unsigned char Psysefxsend[NUM_SYS_EFX][NUM_SYS_EFX];
+        int   sent_buffersize; //used for variable length runs
+        int   sent_bufferbytes; //used for variable length runs
+        float sent_buffersize_f; //used for variable length runs
+        float fixed_sample_step_f;
+        float TransVolume;
+        float Pvolume;
+        float ControlStep;
+        int   Paudiodest;
+        int   Pkeyshift;
+        float PbpmFallback;
+        uchar Psysefxvol[NUM_SYS_EFX][NUM_MIDI_PARTS];
+        uchar Psysefxsend[NUM_SYS_EFX][NUM_SYS_EFX];
 
         // parameters control
         void setPvolume(float value);
@@ -233,11 +223,11 @@ class SynthEngine
         void setPaudiodest(int value);
 
         // effects
-        unsigned char  syseffnum;
-        bool syseffEnable[NUM_SYS_EFX];
-        unsigned char  inseffnum;
-        EffectMgr *sysefx[NUM_SYS_EFX]; // system
-        EffectMgr *insefx[NUM_INS_EFX]; // insertion
+        uchar  syseffnum;
+        bool   syseffEnable[NUM_SYS_EFX];
+        uchar  inseffnum;
+        EffectMgr* sysefx[NUM_SYS_EFX]; // system
+        EffectMgr* insefx[NUM_INS_EFX]; // insertion
 
         // part that's apply the insertion effect; -1 to disable
         int Pinsparts[NUM_INS_EFX];
@@ -254,60 +244,54 @@ class SynthEngine
         void maybePublishEffectsToGui();
 
         // others ...
-        Controller *ctl;
+        Controller* ctl;
         Microtonal microtonal;
         unique_ptr<fft::Calc> fft;
+        TextMsgBuffer& textMsgBuffer;
 
         // peaks for VU-meters
         union VUtransfer{
             struct{
-                float vuOutPeakL;
-                float vuOutPeakR;
-                float vuRmsPeakL;
-                float vuRmsPeakR;
+                float vuOutPeakL{0};
+                float vuOutPeakR{0};
+                float vuRmsPeakL{0};
+                float vuRmsPeakR{0};
                 float parts[NUM_MIDI_PARTS];
                 float partsR[NUM_MIDI_PARTS];
-                int buffersize;
+                int buffersize{0};
             } values;
             char bytes [sizeof(values)];
         };
         VUtransfer VUpeak, VUcopy, VUdata;
-        unsigned int VUcount;
+        uint VUcount;
         bool VUready;
-        void fetchMeterData(void);
+        void fetchMeterData();
 
-        inline LV2PluginType getLV2PluginType() {return lv2PluginType;}
-        inline bool getIsLV2Plugin() {return lv2PluginType != LV2PluginTypeNone; }
-        inline Config &getRuntime() {return Runtime;}
-        unsigned int getUniqueId() {return uniqueId;}
-        SynthEngine *getSynthFromId(unsigned int uniqueId);
-        void guiClosed(bool stopSynth);
-        void setGuiClosedCallback(void( *_guiClosedCallback)(void*), void *arg)
+        using CallbackGuiClosed = std::function<void()>;
+        void installGuiClosedCallback(CallbackGuiClosed callback)
         {
-            guiClosedCallback = _guiClosedCallback;
-            guiCallbackArg = arg;
+            callbackGuiClosed = std::move(callback);
         }
-        void closeGui();
-        int64_t getLFOtime() {return LFOtime;}
-        float getSongBeat() {return songBeat;}
-        float getMonotonicBeat() {return monotonicBeat;}
-        float getBPM() { return bpm; }
-        bool isBPMAccurate() { return bpmAccurate; }
+        void signalGuiWindowClosed();
+        void shutdownGui();
+        int64_t getLFOtime()      const { return LFOtime;}
+        float getSongBeat()       const { return songBeat;}
+        float getMonotonicBeat()  const { return monotonicBeat;}
+        float getBPM()            const { return bpm; }
+        bool isBPMAccurate()      const { return bpmAccurate; }
         void setBPMAccurate(bool value) { bpmAccurate = value; }
-        void setBeatValues(float songBeat, float monotonicBeat, float bpm) {
+        void setBeatValues(float songBeat, float monotonicBeat, float bpm)
+        {
             this->songBeat = songBeat;
             this->monotonicBeat = monotonicBeat;
             this->bpm = bpm;
         }
-        string makeUniqueName(const string& name);
+        string makeUniqueName(string const& name);
 
-        Bank &getBankRef() {return bank;}
-        Bank *getBankPtr() {return &bank;}
-
-        string getWindowTitle() {return windowTitle;}
-        void setWindowTitle(const string& _windowTitle = "");
-        void setNeedsSaving(bool ns) { needsSaving = ns; }
-        bool getNeedsSaving() { return needsSaving; }
+        void setWindowTitle(string const& t){ if (!t.empty()) windowTitle = t; }
+        string getWindowTitle()             { return windowTitle;}
+        void setNeedsSaving(bool ns)        { needsSaving = ns; }
+        bool getNeedsSaving()               { return needsSaving; }
     private:
         float volume;
         float sysefxvol[NUM_SYS_EFX][NUM_MIDI_PARTS];
@@ -318,23 +302,21 @@ class SynthEngine
     public:
 #ifdef GUI_FLTK
         ///////////////////TODO 1/2024 : retract direct usage of direct SynthEngine* from UI
-        MasterUI *getGuiMaster();
+        MasterUI* getGuiMaster();
 #endif
     private:
-        void( *guiClosedCallback)(void*);
-        void *guiCallbackArg;
-
-        int64_t CHtimer;
-
-        int64_t LFOtime; // used by Pcontinous without Pbpm
-        float songBeat; // used by Pbpm without Pcontinous
-        float monotonicBeat; // used by Pbpm
-        float bpm; // used by Echo Effect
-        bool bpmAccurate; // Set to false by engines that can't provide an
-                          // accurate BPM value.
-
+        CallbackGuiClosed callbackGuiClosed;
         string windowTitle;
-        //MusicClient *musicClient;
+        bool needsSaving;
+
+        int64_t channelTimer;
+
+        int64_t LFOtime;     // used by Pcontinous without Pbpm
+        float songBeat;      // used by Pbpm without Pcontinous
+        float monotonicBeat; // used by Pbpm
+        float bpm;           // used by Echo Effect
+        bool  bpmAccurate;   // Set to false by engines that can't provide an accurate BPM value.
+
 
         RandomGen prng;
     public:

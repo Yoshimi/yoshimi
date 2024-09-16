@@ -30,39 +30,18 @@ using func::decibel;
 using func::power;
 
 
-Filter::Filter(FilterParams *pars_, SynthEngine *_synth):
-    pars(pars_),
-    parsUpdate(*pars_),
-    synth(_synth)
+Filter_* Filter::buildImpl(SynthEngine& synth)
 {
-    unsigned char Ftype = pars->Ptype;
-    unsigned char Fstages = pars->Pstages;
-
-    category = pars->Pcategory;
-
+    uchar type = params.Ptype;
+    uchar stages = params.Pstages;
     switch (category)
     {
-        case 1:
-            filter = new FormantFilter(pars, synth);
-            break;
-
-        case 2:
-            filter = new SVFilter(Ftype, 1000.0f, pars->getq(), Fstages, synth);
-            break;
-
-        default:
-            filter = new AnalogFilter(Ftype, 1000.0f, pars->getq(), Fstages, synth);
-            break;
+        case 1 : return new FormantFilter(&synth, &params);
+        case 2 : return new SVFilter(&synth, type, 1000.0f, params.getq(), stages);
+        default: return new AnalogFilter(synth, type, 1000.0f, params.getq(), stages);
     }
-
-    updateCurrentParameters();
 }
 
-
-Filter::~Filter()
-{
-    delete filter;
-}
 
 void Filter::updateCurrentParameters()
 {
@@ -73,17 +52,17 @@ void Filter::updateCurrentParameters()
             break;
 
         case 2:
-            filter->outgain = decibel(pars->getgain());
-            if (filter->outgain > 1.0f)
-                filter->outgain = sqrtf(filter->outgain);
+            filterImpl->outgain = decibel(params.getgain());
+            if (filterImpl->outgain > 1.0f)
+                filterImpl->outgain = sqrtf(filterImpl->outgain);
             break;
 
         default:
-            unsigned char Ftype = pars->Ptype;
-            if (Ftype >= 6 && Ftype <= 8)
-                filter->setgain(pars->getgain());
+            uchar Ftype = params.Ptype;
+            if (Ftype >= 6 and Ftype <= 8)
+                filterImpl->setgain(params.getgain());
             else
-                filter->outgain = decibel(pars->getgain());
+                filterImpl->outgain = decibel(params.getgain());
             break;
     }
 }
@@ -93,25 +72,25 @@ void Filter::filterout(float *smp)
     if (parsUpdate.checkUpdated())
         updateCurrentParameters();
 
-    filter->filterout(smp);
+    filterImpl->filterout(smp);
 }
 
 
 void Filter::setfreq(float frequency)
 {
-    filter->setfreq(frequency);
+    filterImpl->setfreq(frequency);
 }
 
 
 void Filter::setfreq_and_q(float frequency, float q_)
 {
-    filter->setfreq_and_q(frequency, q_);
+    filterImpl->setfreq_and_q(frequency, q_);
 }
 
 
 void Filter::setq(float q_)
 {
-    filter->setq(q_);
+    filterImpl->setq(q_);
 }
 
 

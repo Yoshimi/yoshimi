@@ -35,7 +35,7 @@
 #include <map>
 #include <list>
 #include <sstream>
-#include <sys/time.h>
+#include <thread>
 
 #include "Misc/Bank.h"
 
@@ -45,14 +45,15 @@
 #include "Misc/FormatFuncs.h"
 #include "Misc/CliFuncs.h"
 
+using std::this_thread::sleep_for;
+using std::chrono_literals::operator ""ms;
+
 using std::string;
 
 using func::asString;
-
 using cli::readControl;
 
 
-extern SynthEngine *firstSynth;
 
 CmdInterface::CmdInterface() :
     interpreter{}
@@ -82,9 +83,9 @@ void CmdInterface::cmdIfaceCommandLoop()
     }
     cli::Parser parser;
     parser.setHistoryFile(hist_filename);
-    interpreter.synth = firstSynth;
-    bool exit = false;
-    while (!exit)
+    interpreter.synth = & Config::instances().findSynthByID(0);
+    bool exit{false};
+    while (not exit)
     {
         parser.readline();
         if (parser.isTooLarge())
@@ -92,7 +93,7 @@ void CmdInterface::cmdIfaceCommandLoop()
         else if (parser.isValid())
         {
             // in case it's been changed from elsewhere
-            interpreter.synth = firstSynth->getSynthFromId(interpreter.currentInstance);
+            interpreter.synth = & Config::instances().findSynthByID(interpreter.currentInstance);
 
             cli::Reply reply = interpreter.cmdIfaceProcessCommand(parser);
             exit = (reply.code == REPLY::exit_msg);
@@ -103,15 +104,17 @@ void CmdInterface::cmdIfaceCommandLoop()
                 Log(replies[reply.code]);
         }
 
-        if (!exit)
+        exit |= not getRuntime().runSynth.load(std::memory_order_acquire);
+        if (not exit)
         {
             do
             { // create enough delay for most ops to complete
-                usleep(2000);
+                sleep_for(2ms);
             }
-            while (getRuntime().runSynth && !getRuntime().finishedCLI);
+            while (getRuntime().runSynth.load(std::memory_order_relaxed)
+                   and not getRuntime().finishedCLI);
         }
-        if (getRuntime().runSynth)
+        if (getRuntime().runSynth.load(std::memory_order_acquire))
         {
             string prompt = "yoshimi";
             if (interpreter.currentInstance > 0)
@@ -131,7 +134,7 @@ void CmdInterface::cmdIfaceCommandLoop()
             parser.setPrompt(prompt);
         }
 
-        if (!exit && getRuntime().runSynth)
-            usleep(20000);
+        if (not exit and getRuntime().runSynth.load(std::memory_order_relaxed))
+            sleep_for(20ms);
     }
 }

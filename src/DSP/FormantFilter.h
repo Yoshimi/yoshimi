@@ -38,15 +38,16 @@ class SynthEngine;
 class FormantFilter : public Filter_
 {
     public:
-        FormantFilter(FilterParams *pars_, SynthEngine *_synth);
-        FormantFilter(const FormantFilter &orig);
-        ~FormantFilter();
-        Filter_* clone() { return new FormantFilter(*this); };
+       ~FormantFilter();
+        FormantFilter(SynthEngine*, FilterParams*);
+        FormantFilter(FormantFilter const&);
+        Filter_* clone() override { return new FormantFilter(*this); };
+
         void filterout(float *smp);
         void setfreq(float frequency);
         void setfreq_and_q(float frequency, float q_);
         void setq(float q_);
-        void cleanup(void);
+        void cleanup();
 
     private:
         void setpos(float input);

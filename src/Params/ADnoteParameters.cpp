@@ -39,9 +39,9 @@ using func::power;
 int ADnoteParameters::ADnote_unison_sizes[] =
 {2, 3, 4, 5, 6, 8, 10, 12, 15, 20, 25, 30, 40, 50, 0};
 
-ADnoteParameters::ADnoteParameters(fft::Calc& fft_, SynthEngine *_synth) :
-    ParamBase(_synth),
-    fft(fft_)
+ADnoteParameters::ADnoteParameters(fft::Calc& fft_, SynthEngine& _synth)
+    : ParamBase{_synth}
+    , fft(fft_)
 {
     GlobalPar.FreqEnvelope = new EnvelopeParams(0, 0, synth);
     GlobalPar.FreqEnvelope->ASRinit(64, 50, 64, 60);
@@ -63,7 +63,7 @@ ADnoteParameters::ADnoteParameters(fft::Calc& fft_, SynthEngine *_synth) :
 }
 
 
-void ADnoteParameters::defaults(void)
+void ADnoteParameters::defaults()
 {
     // Frequency Global Parameters
     GlobalPar.PStereo = true; // stereo
@@ -76,7 +76,7 @@ void ADnoteParameters::defaults(void)
 
     // Amplitude Global Parameters
     GlobalPar.PVolume = 90;
-    setGlobalPan(GlobalPar.PPanning = 64, synth->getRuntime().panLaw); // center
+    setGlobalPan(GlobalPar.PPanning = 64, synth.getRuntime().panLaw); // center
     GlobalPar.PAmpVelocityScaleFunction = 64;
     GlobalPar.PRandom = false;
     GlobalPar.PWidth = 63;
@@ -131,7 +131,7 @@ void ADnoteParameters::defaults(int n)
     VoicePar[nvoice].PDelay = 0;
     VoicePar[nvoice].PVolume = 100;
     VoicePar[nvoice].PVolumeminus = 0;
-    setVoicePan(nvoice, VoicePar[nvoice].PPanning = 64, synth->getRuntime().panLaw); // center
+    setVoicePan(nvoice, VoicePar[nvoice].PPanning = 64, synth.getRuntime().panLaw); // center
     VoicePar[nvoice].PRandom = false;
     VoicePar[nvoice].PWidth = 63;
     VoicePar[nvoice].PDetune = 8192; // 8192 = 0
@@ -189,8 +189,8 @@ void ADnoteParameters::enableVoice(int nvoice)
 {
     VoicePar[nvoice].POscil = new OscilParameters(fft, synth);
     VoicePar[nvoice].POscilFM = new OscilParameters(fft, synth);
-    VoicePar[nvoice].OscilSmp = new OscilGen(fft, GlobalPar.Reson, synth, VoicePar[nvoice].POscil);
-    VoicePar[nvoice].FMSmp = new OscilGen(fft, NULL, synth, VoicePar[nvoice].POscilFM);
+    VoicePar[nvoice].OscilSmp = new OscilGen(fft, GlobalPar.Reson, &synth, VoicePar[nvoice].POscil);
+    VoicePar[nvoice].FMSmp = new OscilGen(fft, NULL, &synth, VoicePar[nvoice].POscilFM);
 
     VoicePar[nvoice].AmpEnvelope = new EnvelopeParams(64, 1, synth);
     VoicePar[nvoice].AmpEnvelope->ADSRinit_dB(0, 100, 127, 100);
@@ -213,7 +213,7 @@ void ADnoteParameters::enableVoice(int nvoice)
 
 
 // Get the Multiplier of the fine detunes of the voices
-float ADnoteParameters::getBandwidthDetuneMultiplier(void)
+float ADnoteParameters::getBandwidthDetuneMultiplier()
 {
     float bw = (GlobalPar.PBandwidth - 64.0f) / 64.0f;
     bw = power<2>(bw * pow(fabs(bw), 0.2f) * 5.0f);
@@ -296,7 +296,7 @@ void ADnoteParameters::add2XMLsection(XMLwrapper& xml, int n)
         return;
 
     // currently not used
-    // bool yoshiFormat = synth->usingYoshiType;
+    // bool yoshiFormat = synth.usingYoshiType;
     int oscilused = 0, fmoscilused = 0; // if the oscil or fmoscil are used by another voice
 
     for (int i = 0; i < NUM_VOICES; ++i)
@@ -467,7 +467,7 @@ void ADnoteParameters::add2XMLsection(XMLwrapper& xml, int n)
 void ADnoteParameters::add2XML(XMLwrapper& xml)
 {
     // currently not used
-    // bool yoshiFormat = synth->usingYoshiType;
+    // bool yoshiFormat = synth.usingYoshiType;
     xml.information.ADDsynth_used = 1;
 
     xml.addparbool("stereo", GlobalPar.PStereo);
@@ -561,12 +561,12 @@ void ADnoteParameters::getfromXML(XMLwrapper& xml)
         if (test < 64) // new Yoshi type
         {
             GlobalPar.PWidth = test;
-            setGlobalPan(xml.getpar127("pan_pos", GlobalPar.PPanning), synth->getRuntime().panLaw);
+            setGlobalPan(xml.getpar127("pan_pos", GlobalPar.PPanning), synth.getRuntime().panLaw);
             GlobalPar.PRandom = xml.getparbool("random_pan", GlobalPar.PRandom);
         }
         else // legacy
         {
-            setGlobalPan(xml.getpar127("panning", GlobalPar.PPanning), synth->getRuntime().panLaw);
+            setGlobalPan(xml.getpar127("panning", GlobalPar.PPanning), synth.getRuntime().panLaw);
 
             if (GlobalPar.PPanning == 0)
             {
@@ -720,12 +720,12 @@ void ADnoteParameters::getfromXMLsection(XMLwrapper& xml, int n)
         if (test < 64) // new Yoshi type
         {
             VoicePar[nvoice].PWidth = test;
-            setVoicePan(nvoice, xml.getpar127("pan_pos", VoicePar[nvoice].PPanning), synth->getRuntime().panLaw);
+            setVoicePan(nvoice, xml.getpar127("pan_pos", VoicePar[nvoice].PPanning), synth.getRuntime().panLaw);
             VoicePar[nvoice].PRandom = xml.getparbool("random_pan", VoicePar[nvoice].PRandom);
         }
         else  // legacy
         {
-            setVoicePan(nvoice, xml.getpar127("panning", VoicePar[nvoice].PPanning), synth->getRuntime().panLaw);
+            setVoicePan(nvoice, xml.getpar127("panning", VoicePar[nvoice].PPanning), synth.getRuntime().panLaw);
             if (VoicePar[nvoice].PPanning == 0)
             {
                 VoicePar[nvoice].PPanning = 64;

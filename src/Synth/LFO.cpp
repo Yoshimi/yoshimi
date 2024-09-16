@@ -86,7 +86,7 @@ LFO::LFO(LFOParams *_lfopars, float _basefreq, SynthEngine *_synth):
     computenextincrnd(); // twice because I want incrnd & nextincrnd to be random
 }
 
-inline void LFO::Recompute(void)
+inline void LFO::Recompute()
 {
     // mostly copied from LFO::LFO()
     RecomputeFreq();
@@ -126,7 +126,7 @@ inline void LFO::Recompute(void)
         startPhase = fmodf((((int)lfopars->Pstartphase - 64) / 127.0f + 1.0f), 1.0f);
 }
 
-inline void LFO::RecomputeFreq(void)
+inline void LFO::RecomputeFreq()
 {
     float lfostretch =
         powf(basefreq / 440.0f, (float)((int)lfopars->Pstretch - 64) / 63.0f); // max 2x/octave
@@ -317,7 +317,7 @@ float LFO::amplfoout()
 }
 
 
-void LFO::computenextincrnd(void)
+void LFO::computenextincrnd()
 {
     if (!freqrndenabled)
         return;

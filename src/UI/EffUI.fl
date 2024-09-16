@@ -1684,7 +1684,6 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
     {
         offset = dfp->value();
     }
-std::cout<<"EffUI::send_data value="<<value<<" act="<<action<<" type="<<type<<" ctrl="<<control<<" npart="<<npart<<" grp="<<group<<" neff="<<effNum()<<" param="<<parameter<<" off="<<offset<<std::endl;
     collect_writeData(synth, value, action, type, control, npart, group, effNum(), UNUSED, parameter, offset);} {}
   }
   Function {fetchData(float value, int control, int part, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int offset = UNUSED, int miscmsg = UNUSED, int request = UNUSED)} {return_type float
@@ -2216,7 +2215,6 @@ std::cout<<"EffUI::send_data value="<<value<<" act="<<action<<" type="<<type<<" 
         case EFFECT::type::dynFilter:
             if (isdynfilter)
             { // shouldn't get here
-                //cout << "DyneFilter" << endl;
                 return;
             }
             switch (control)
@@ -2346,7 +2344,6 @@ std::cout<<"EffUI::send_data value="<<value<<" act="<<action<<" type="<<type<<" 
     if (lastEff != nextEff)
     {
         presetNum = 0;
-        //std::cout << "EFF changed" << std::endl;
     }
     auto __setColor = [this](auto& widget, auto& preset, uint paramIdx)
                       {widget->selection_color(setKnob(widget->value(),preset[presetNum][paramIdx]));};
@@ -2734,11 +2731,10 @@ std::cout<<"EffUI::send_data value="<<value<<" act="<<action<<" type="<<type<<" 
             dfp->redraw();
             break;
     }
-    //cout << "Col " << textCol << "  eff " << efftype << endl;} {}
+    //} {}
   }
   Function {effRtext(float dScale, int efftype)} {} {
     code {//
-        //std::cout << "scale " << dScale << "  type " << efftype << std::endl;
         int size9 = int(9 * dScale);
         int size = int(10 * dScale);
         int size11 = int(11 * dScale);

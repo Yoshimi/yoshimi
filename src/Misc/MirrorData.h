@@ -46,7 +46,7 @@ class MirrorData
 
     void pushUpdate(RoutingTag const& tag, void* buffer)  override
     {
-        assert(tag.verifyType<DAT>());
+        assert(tag.verifyType<DAT>());  (void)tag;
         assert(buffer);
         data.~DAT(); // copy-construct into data storage
         new(&data) DAT{* reinterpret_cast<DAT*>(buffer)};

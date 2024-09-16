@@ -29,6 +29,7 @@ class SynthEngine;
 
 using std::string;
 
+
 class Vectors
 {
     public:
@@ -36,17 +37,17 @@ class Vectors
         ~Vectors();
         CommandBlock data;//commandData;
 
-        unsigned char loadVectorAndUpdate(unsigned char baseChan, const string& name);
-        unsigned char loadVector(unsigned char baseChan, const string& name, bool full);
-        unsigned char extractVectorData(unsigned char baseChan, XMLwrapper& xml, const string& name);
+        uchar loadVectorAndUpdate(uchar baseChan, string const& name);
+        uchar loadVector(uchar baseChan, string const& name, bool full);
+        uchar extractVectorData(uchar baseChan, XMLwrapper& xml, string const& name);
 
-        unsigned char saveVector(unsigned char baseChan, const string& name, bool full);
-        bool insertVectorData(unsigned char baseChan, bool full, XMLwrapper& xml, const string& name);
+        uchar saveVector(uchar baseChan, string const& name, bool full);
+        bool insertVectorData(uchar baseChan, bool full, XMLwrapper& xml, string const& name);
 
         float getVectorLimits(CommandBlock *getData);
 
         SynthEngine *synth;
 };
 
-
 #endif /*VECTORS_H*/
+

@@ -32,10 +32,14 @@ This file is derivative of original ZynAddSubFX code.
 } {selected in_source in_header
 }
 
+decl {\#include <unistd.h>} {public local
+}
+
 decl {\#include <iostream>} {public local
 }
 
-decl {\#include <unistd.h>} {public local
+decl {\#include <string>
+    using std::string;} {public local
 }
 
 decl {\#include <FL/Fl_Button.H>} {public local
@@ -86,7 +90,7 @@ decl {using std::to_string;} {private global
 }
 
 class BankProcess_ {} {
-  Function {process(void)} {return_type {virtual void}
+  Function {process()} {return_type {virtual void}
   } {
     code {;} {}
   }
@@ -222,7 +226,7 @@ class BankSlot {: {public Fl_Button, BankProcess_}
 }
 
 class RootProcess_ {} {
-  Function {rootprocess(void)} {return_type {virtual void}
+  Function {rootprocess()} {return_type {virtual void}
   } {
     code {;} {}
   }
@@ -810,7 +814,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         callback {//
         if (selectedRootID >= 0)
         {
-            synth->getBankRef().removeRoot(selectedRootID);
+            synth->bank.removeRoot(selectedRootID);
             synth->saveBanks();
             readbankcfg();
         }
@@ -998,7 +1002,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
                 alert(synth, message);
             break;
         case BANK::control::renameInstrument:
-            if (message.find("FAILED") != std::string::npos)
+            if (message.find("FAILED") != string::npos)
             {
                 if (source == TOPLEVEL::action::fromGUI)
                     alert(synth, message);
@@ -1007,7 +1011,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
                 bs[insert]->copy_label(message.c_str());
             break;
         case BANK::control::saveInstrument:
-            if (message.find("FAILED") != std::string::npos)
+            if (message.find("FAILED") != string::npos)
             {
                 if (source == TOPLEVEL::action::fromGUI)
                     alert(synth, message);
@@ -1016,7 +1020,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
                 refreshinstrumentwindow();
             break;
         case BANK::control::deleteInstrument:
-            if (message.find("FAILED") != std::string::npos)
+            if (message.find("FAILED") != string::npos)
             {
                 if (source == TOPLEVEL::action::fromGUI)
                     alert(synth, message);
@@ -1028,7 +1032,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
             break;
         case BANK::control::selectSecondInstrumentAndSwap:
 
-            if (message.find("FAILED") != std::string::npos)
+            if (message.find("FAILED") != string::npos)
                 if (source == TOPLEVEL::action::fromGUI)
                     alert(synth, message);
             rescan_for_banks();
@@ -1038,13 +1042,13 @@ class BankUI {: {public BankProcess_, RootProcess_}
             rescan_for_banks();
             break;
         case BANK::control::renameBank:
-        if (message.find("FAILED") != std::string::npos)
+        if (message.find("FAILED") != string::npos)
                 if (source == TOPLEVEL::action::fromGUI)
                     alert(synth, message);
             rescan_for_banks();
             break;
         case BANK::control::createBank:
-            if (message.find("FAILED") != std::string::npos)
+            if (message.find("FAILED") != string::npos)
                 if (source == TOPLEVEL::action::fromGUI)
                     alert(synth, message);
             readbankcfg();
@@ -1054,7 +1058,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         case BANK::control::selectFirstBankToSwap:
             break;
         case BANK::control::selectSecondBankAndSwap:
-            if (message.find("FAILED") != std::string::npos)
+            if (message.find("FAILED") != string::npos)
                 if (source == TOPLEVEL::action::fromGUI)
                     alert(synth, message);
             rescan_for_banks();
@@ -1087,9 +1091,9 @@ class BankUI {: {public BankProcess_, RootProcess_}
     code {//
     synth = _synth;
     fnr = &RootProcess_::rootprocess;
-    root = synth->getBankPtr();
+    root = & synth->bank;
     fnc = &BankProcess_::process;
-    bank = synth->getBankPtr();
+    bank = & synth->bank;
     what = 0;
     nselected = -1;
     rselected = -1;
@@ -1773,7 +1777,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
     code {//
     string tmp;
     rootsbrowse->clear();
-    const RootEntryMap &roots = synth->getBankRef().getRoots();
+    const RootEntryMap &roots = synth->bank.getRoots();
     RootEntryMap::const_iterator it;
     for (it = roots.begin(); it != roots.end(); ++it)
     {

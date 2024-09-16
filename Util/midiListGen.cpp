@@ -26,17 +26,19 @@
 #include <cstring>
 #include <regex>
 
+using std::string;
 
-std::string asLongString(double n, size_t digits)
+
+string asLongString(double n, size_t digits)
 {
     std::ostringstream oss;
     oss.precision(digits);
     oss.width(digits);
     oss << n;
-    std::string value = oss.str();
+    string value = oss.str();
     value = std::regex_replace(value, std::regex("^ +"), "");
 
-    if (value.find('.') == std::string::npos)
+    if (value.find('.') == string::npos)
         value += '.';
     while (value.length() <= digits)
         value += '0';
@@ -54,16 +56,16 @@ int main(void)
     std::cout.precision(10);
     std::cout << "twelfth root of two = " << multiplier << std::endl;
 
-    static std::string names [] = {
+    static string names [] = {
     "A", "#", "B", "C", "#", "D", "#", "E", "F", "#", "G", "#"
     };
     int stringcount = 0;
     int octave = 0;
     double result = 27.5;
     int precision = 6;
-    std::string currentNote;
-    std::string fullString;
-    std::vector <std::string> ourlist;
+    string currentNote;
+    string fullString;
+    std::vector <string> ourlist;
     for (int i = 21; i < 109; ++i) // practical MIDI note range
     {
         currentNote = names[stringcount];
@@ -81,7 +83,7 @@ int main(void)
         result *= multiplier;
     }
     size_t idx = ourlist.size();
-    ofstream midiList;
+    std::ofstream midiList;
     midiList.open("midiList.txt");
     if (!midiList.is_open())
     {
@@ -91,7 +93,7 @@ int main(void)
     while (idx > 0)
     {
         --idx;
-        midiList << ourlist[idx] << endl;
+        midiList << ourlist[idx] << std::endl;
     }
     midiList.close();
     return 0;

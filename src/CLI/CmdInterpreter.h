@@ -22,7 +22,6 @@
 #define CMDINTERPRETER_H
 
 #include <string>
-#include <memory>
 #include <list>
 
 #include "Misc/SynthEngine.h"
@@ -125,9 +124,6 @@ class CmdInterpreter
     private:
         list<string>  instrumentGroup;
         TextMsgBuffer& textMsgBuffer;
-
-        std::unique_ptr<test::TestInvoker> testInvoker;
-        test::TestInvoker& getTestInvoker();
 
 
 

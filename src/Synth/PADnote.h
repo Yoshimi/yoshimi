@@ -58,12 +58,12 @@ class PADnote
         void legatoFadeIn(Note);
         void legatoFadeOut();
 
-        void noteout(float *outl,float *outr);
+        void noteout(float* outl, float* outr);
         bool finished() const { return noteStatus == NOTE_DISABLED; }
-        void releasekey(void);
+        void releasekey();
 
     private:
-        void fadein(float *smps);
+        void fadein(float* smps);
         bool isWavetableChanged(size_t tableNr);
         WaveInterpolator* buildInterpolator(size_t tableNr);
         WaveInterpolator* setupCrossFade(WaveInterpolator*);
@@ -95,10 +95,8 @@ class PADnote
 
         bool portamento;
 
-        int Compute_Linear(float *outl, float *outr, int freqhi,
-                           float freqlo);
-        int Compute_Cubic(float *outl, float *outr, int freqhi,
-                          float freqlo);
+        int Compute_Linear(float* outl, float* outr, int freqhi, float freqlo);
+        int Compute_Cubic (float* outl, float* outr, int freqhi, float freqlo);
 
 
         struct PADnoteGlobal {

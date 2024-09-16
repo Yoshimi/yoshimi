@@ -37,31 +37,32 @@ class SynthEngine;
 class Resonance : public ParamBase
 {
     public:
-        Resonance(SynthEngine *_synth);
-        ~Resonance() { }
-        void setpoint(int n, unsigned char p);
+        Resonance(SynthEngine&);
+
+        void defaults()  override;
+
+        void setpoint(int n, uchar p);
         void applyres(int n, fft::Spectrum& fftdata, float freq);
-        void smooth(void);
+        void smooth();
         void interpolatepeaks(int type);
         void randomize(int type);
 
         void add2XML(XMLwrapper& xml);
-        void defaults(void);
         void getfromXML(XMLwrapper& xml);
 
         float getfreqpos(float freq);
         float getfreqx(float x);
         float getfreqresponse(float freq);
-        float getcenterfreq(void);
-        float getoctavesfreq(void);
-        void sendcontroller(unsigned short int ctl, float par);
+        float getcenterfreq();
+        float getoctavesfreq();
+        void sendcontroller(ushort ctl, float par);
 
         // parameters
-        unsigned char Penabled;                 //if the resonance is enabled
-        unsigned char Prespoints[MAX_RESONANCE_POINTS]; // how many points define the resonance function
+        uchar Penabled;                         // if the resonance is enabled
+        uchar Prespoints[MAX_RESONANCE_POINTS]; // how many points define the resonance function
         float PmaxdB;                           // how many dB the signal may be amplified
         float Pcenterfreq,Poctavesfreq;         // the center frequency of the res. func., and the number of octaves
-        unsigned char Pprotectthefundamental;   // the fundamental (1-st harmonic) is not damped, even it resonance function is low
+        uchar Pprotectthefundamental;           // the fundamental (1-st harmonic) is not damped, even it resonance function is low
 
         // controllers
         float ctlcenter; // center frequency(relative)

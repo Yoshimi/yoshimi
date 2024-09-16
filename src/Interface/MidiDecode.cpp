@@ -27,7 +27,7 @@
 #include <string>
 #include <unistd.h>
 
-//#include <sys/time.h>
+#include <chrono>
 
 #include "Interface/MidiDecode.h"
 #include "Interface/InterChange.h"
@@ -38,24 +38,17 @@ using func::asString;
 using func::asHexString;
 
 
-MidiDecode::MidiDecode(SynthEngine *_synth) :
-    synth(_synth)
+MidiDecode::MidiDecode(SynthEngine *_synth) : synth(_synth){ }
+
+
+
+void MidiDecode::midiProcess(uchar par0, uchar par1, uchar par2, bool in_place, bool inSync)
 {
-}
-
-
-MidiDecode::~MidiDecode()
-{
-}
-
-
-void MidiDecode::midiProcess(unsigned char par0, unsigned char par1, unsigned char par2, bool in_place, bool inSync)
-{
-    bool a = inSync; inSync = a; // suppress warning (may need this later)
-    unsigned char channel; // , note, velocity;
+    (void)inSync;          // currently unused (may need this later)
+    uchar channel; // , note, velocity;
     int ctrltype, par;
     channel = par0 & 0x0F;
-    unsigned int ev = par0 & 0xF0;
+    uint ev = par0 & 0xF0;
     par = 0;
     switch (ev)
     {
@@ -97,7 +90,7 @@ void MidiDecode::midiProcess(unsigned char par0, unsigned char par1, unsigned ch
 }
 
 
-void MidiDecode::setMidiController(unsigned char ch, int ctrl, int param, bool in_place, bool inSync)
+void MidiDecode::setMidiController(uchar ch, int ctrl, int param, bool in_place, bool inSync)
 {
     if (synth->getRuntime().monitorCCin)
     {
@@ -156,13 +149,13 @@ void MidiDecode::setMidiController(unsigned char ch, int ctrl, int param, bool i
             return;
     }
 
-    unsigned char vecChan;
+    uchar vecChan;
     if (synth->getRuntime().channelSwitchType == 1)
         vecChan = synth->getRuntime().channelSwitchValue;
         // force vectors to obey channel switcher
     else
         vecChan = ch;
-    if (synth->getRuntime().vectordata.Enabled[vecChan] && synth->getRuntime().NumAvailableParts > NUM_MIDI_CHANNELS)
+    if (synth->getRuntime().vectordata.Enabled[vecChan] && synth->getRuntime().numAvailableParts > NUM_MIDI_CHANNELS)
     { // vector control is direct to parts
         if (nrpnRunVector(vecChan, ctrl, param, inSync))
             return;
@@ -185,22 +178,19 @@ void MidiDecode::setMidiController(unsigned char ch, int ctrl, int param, bool i
      * Some controller values are >= 640 so they will be ignored by
      * later calls, but are passed as 128+ for this call.
      */
-/*
-    struct timeval tv1, tv2;
-    gettimeofday(&tv1, NULL);
-*/
-    if (synth->midilearn.runMidiLearn(param, ctrl & 0xff, ch, in_place))
-        return; // blocking while learning
-/*
-    gettimeofday(&tv2, NULL);
-    if (tv1.tv_usec > tv2.tv_usec)
     {
-        tv2.tv_sec--;
-        tv2.tv_usec += 1000000;
-    }
-    int actual = (tv2.tv_sec - tv1.tv_sec) *1000000 + (tv2.tv_usec - tv1.tv_usec);
-    std::cout << "Delay " << std::to_string(actual) << "uS" << std::endl;
+/*
+        using std::chrono::steady_clock;
+        using Dur = std::chrono::duration<double, std::micro>;
+        auto start = steady_clock::now();
 */
+        if (synth->midilearn.runMidiLearn(param, ctrl & 0xff, ch, in_place))
+            return; // blocking while learning
+/*
+        Dur duration = steady_clock::now () - start;
+        std::cout << "MidiLearn: Δt = " << duration.count() << "µs" << std::endl;
+*/
+    }
 
     /*
     * This is done here instead of in 'setMidi' so MidiLearn
@@ -218,16 +208,14 @@ void MidiDecode::setMidiController(unsigned char ch, int ctrl, int param, bool i
 }
 
 
-void MidiDecode::sendMidiCC(bool inSync, unsigned char chan, int type, short int par)
+void MidiDecode::sendMidiCC(bool inSync, uchar chan, int type, short par)
 {
     if (inSync) // no CLI or GUI updates needed
     {
-        //std::cout << "CC inSync" << std::endl;
         synth->SetController(chan, type, par);
         return;
     }
 
-    //std::cout << "CC buffered" << std::endl;
     CommandBlock putData;
     memset(&putData, 0xff, sizeof(putData));
     putData.data.value = par;
@@ -237,7 +225,7 @@ void MidiDecode::sendMidiCC(bool inSync, unsigned char chan, int type, short int
     putData.data.part = TOPLEVEL::section::midiIn;
     putData.data.kit = chan;
     putData.data.engine = type;
-    synth->midilearn.writeMidi(&putData, false);
+    synth->midilearn.writeMidi(putData, false);
 }
 
 /*
@@ -248,7 +236,7 @@ void MidiDecode::sendMidiCC(bool inSync, unsigned char chan, int type, short int
  * buffered where needed.
  */
 
-bool MidiDecode::nrpnDecode(unsigned char ch, int ctrl, int param, bool in_place)
+bool MidiDecode::nrpnDecode(uchar ch, int ctrl, int param, bool in_place)
 {
     int nLow;
     int nHigh;
@@ -354,14 +342,14 @@ bool MidiDecode::nrpnDecode(unsigned char ch, int ctrl, int param, bool in_place
 }
 
 
-bool MidiDecode::nrpnRunVector(unsigned char ch, int ctrl, int param, bool inSync)
+bool MidiDecode::nrpnRunVector(uchar ch, int ctrl, int param, bool inSync)
 {
     int Xopps = synth->getRuntime().vectordata.Xfeatures[ch];
     int Yopps = synth->getRuntime().vectordata.Yfeatures[ch];
     int p_rev = 0x7f - param;
     int swap1;
     int swap2;
-    unsigned char type;
+    uchar type;
 
     if (ctrl == synth->getRuntime().vectordata.Xaxis[ch])
     {
@@ -433,22 +421,20 @@ bool MidiDecode::nrpnRunVector(unsigned char ch, int ctrl, int param, bool inSyn
 }
 
 
-void MidiDecode::nrpnProcessData(unsigned char chan, int type, int par, bool in_place)
+void MidiDecode::nrpnProcessData(uchar chan, int type, int par, bool in_place)
 {
-    int nHigh = synth->getRuntime().nrpnH;
-    int nLow = synth->getRuntime().nrpnL;
+    int  nHigh = synth->getRuntime().nrpnH;
+    int  nLow  = synth->getRuntime().nrpnL;
     bool noHigh = (synth->getRuntime().dataH > 0x7f);
     if (type == MIDI::CC::dataLSB)
     {
         synth->getRuntime().dataL = par;
-//        synth->getRuntime().Log("Data LSB    value " + asString(par));
         if (noHigh)
             return;
     }
     if (type == MIDI::CC::dataMSB)
     {
         synth->getRuntime().dataH = par;
-//        synth->getRuntime().Log("Data MSB    value " + asString(par));
         if (noHigh && synth->getRuntime().dataL <= 0x7f)
             par = synth->getRuntime().dataL;
         else
@@ -462,17 +448,8 @@ void MidiDecode::nrpnProcessData(unsigned char chan, int type, int par, bool in_
      */
     int dHigh = synth->getRuntime().dataH;
 
-    /*synth->getRuntime().Log("   nHigh " + asString((int)nHigh)
-                          + "   nLow " + asString((int)nLow)
-                          + "   dataH " + asString((int)synth->getRuntime().dataH)
-                          + "   dataL " + asString((int)synth->getRuntime().dataL)
-                          + "   chan " + asString((int)chan)
-                          + "   type "  + asString((int)type)
-                          + "   par " + asString((int)par));
-    */
-
     // For NRPNs midi learn must come before everything else
-   if (synth->midilearn.runMidiLearn(dHigh << 7 | par, MIDI::CC::identNRPN | (nHigh << 7) | nLow , chan, in_place))
+    if (synth->midilearn.runMidiLearn(dHigh << 7 | par, MIDI::CC::identNRPN | (nHigh << 7) | nLow , chan, in_place))
         return; // blocking while learning
 
     if (nLow < nHigh && (nHigh == 4 || nHigh == 8 ))
@@ -509,7 +486,7 @@ void MidiDecode::nrpnProcessData(unsigned char chan, int type, int par, bool in_
 }
 
 
-bool MidiDecode::nrpnProcessHistory(unsigned char nLow, unsigned char dHigh, unsigned char dLow, bool in_place)
+bool MidiDecode::nrpnProcessHistory(uchar nLow, uchar dHigh, uchar dLow, bool in_place)
 {
     if (nLow > TOPLEVEL::XML::MLearn)
         return false;
@@ -522,17 +499,17 @@ bool MidiDecode::nrpnProcessHistory(unsigned char nLow, unsigned char dHigh, uns
     }
     CommandBlock putData;
     memset(&putData, 0xff, sizeof(putData));
-    putData.data.type = TOPLEVEL::type::Integer;
-    putData.data.source = TOPLEVEL::action::fromMIDI;
+    putData.data.type    = TOPLEVEL::type::Integer;
+    putData.data.source  = TOPLEVEL::action::fromMIDI;
     putData.data.control = MAIN::control::loadFileFromList;
-    putData.data.part = TOPLEVEL::section::main;
-    putData.data.kit = nLow;
-    putData.data.engine = dLow;
+    putData.data.part    = TOPLEVEL::section::main;
+    putData.data.kit     = nLow;
+    putData.data.engine  = dLow;
     if (nLow == TOPLEVEL::XML::Vector && dHigh < NUM_MIDI_CHANNELS)
         putData.data.insert = dHigh; // otherwise set by file
     else if (nLow == TOPLEVEL::XML::Instrument)
     {
-        unsigned char tmp = synth->getRuntime().vectordata.Part;
+        uchar tmp = synth->getRuntime().vectordata.Part;
         if (dHigh >= NUM_MIDI_PARTS && tmp < NUM_MIDI_PARTS)
             putData.data.insert = tmp; // last seen by part NRPN
         else if (dHigh < NUM_MIDI_PARTS)
@@ -554,7 +531,7 @@ void MidiDecode::nrpnDirectPart(int dHigh, int par)
     switch (dHigh)
     {
         case 0: // set part number to use for later calls
-            if (par < synth->getRuntime().NumAvailableParts)
+            if (par < int(synth->getRuntime().numAvailableParts))
             {
                 synth->getRuntime().dataL = par;
                 synth->getRuntime().vectordata.Part = par;
@@ -576,13 +553,11 @@ void MidiDecode::nrpnDirectPart(int dHigh, int par)
             synth->getRuntime().vectordata.Controller = par;
             synth->getRuntime().dataL = par;
             partSet = true;
-            //std::cout << "cont no " << int(par) << std::endl;
             break;
 
         case 3: // Set controller value
             setMidiController(synth->getRuntime().vectordata.Part | 0x80, synth->getRuntime().vectordata.Controller, par, false);
             partSet = true;
-            //std::cout << "cont val " << int(par) << std::endl;
             break;
 
         case 4: // Set part's channel number
@@ -634,14 +609,13 @@ void MidiDecode::nrpnDirectPart(int dHigh, int par)
     if (!partSet)
         putData.data.part = synth->getRuntime().vectordata.Part;
 
-    //std::cout << "part " << int(putData.data.part) << "  Chan " << int(par) << std::endl;
     putData.data.type = TOPLEVEL::type::Write | TOPLEVEL::type::Integer;
     putData.data.source = TOPLEVEL::action::toAll;
-    synth->midilearn.writeMidi(&putData, false);
+    synth->midilearn.writeMidi(putData, false);
 }
 
 
-void MidiDecode:: nrpnSetVector(int dHigh, unsigned char chan,  int par)
+void MidiDecode:: nrpnSetVector(int dHigh, uchar chan,  int par)
 {
 
     if (synth->vectorInit(dHigh, chan, par))
@@ -679,7 +653,7 @@ void MidiDecode:: nrpnSetVector(int dHigh, unsigned char chan,  int par)
 
 //bank change and root dir change change share the same thread
 //to make changes consistent
-void MidiDecode::setMidiBankOrRootDir(unsigned int bank_or_root_num, bool in_place, bool setRootDir)
+void MidiDecode::setMidiBankOrRootDir(uint bank_or_root_num, bool in_place, bool setRootDir)
 {
     if (setRootDir)
     {
@@ -703,12 +677,12 @@ void MidiDecode::setMidiBankOrRootDir(unsigned int bank_or_root_num, bool in_pla
 
     CommandBlock putData;
     memset(&putData, 0xff, sizeof(putData));
-    putData.data.value = 0xff;
-    putData.data.type = TOPLEVEL::type::Write | TOPLEVEL::type::Integer;
-    putData.data.source = TOPLEVEL::action::toAll;
+    putData.data.value   = 0xff;
+    putData.data.type    = TOPLEVEL::type::Write | TOPLEVEL::type::Integer;
+    putData.data.source  = TOPLEVEL::action::toAll;
     putData.data.control = MIDI::control::bankChange;
-    putData.data.part = TOPLEVEL::section::midiIn;
-    putData.data.kit = 0;
+    putData.data.part    = TOPLEVEL::section::midiIn;
+    putData.data.kit     = 0;
     putData.data.parameter = 0xc0;
 
     if (setRootDir)
@@ -716,15 +690,15 @@ void MidiDecode::setMidiBankOrRootDir(unsigned int bank_or_root_num, bool in_pla
     else
         putData.data.engine = bank_or_root_num;
 
-    synth->midilearn.writeMidi(&putData, false);
+    synth->midilearn.writeMidi(putData, false);
 }
 
 
-void MidiDecode::setMidiProgram(unsigned char ch, int prg, bool in_place)
+void MidiDecode::setMidiProgram(uchar ch, int prg, bool in_place)
 {
-    if (!synth->getRuntime().EnableProgChange)
+    if (!synth->getRuntime().enableProgChange)
         return;
-    int maxparts = synth->getRuntime().NumAvailableParts;
+    uint maxparts = synth->getRuntime().numAvailableParts;
     if (ch >= maxparts)
         return;
 
@@ -747,7 +721,7 @@ void MidiDecode::setMidiProgram(unsigned char ch, int prg, bool in_place)
      */
     if (ch < NUM_MIDI_CHANNELS)
     {
-        for (int npart = 0; npart < maxparts; ++ npart)
+        for (uint npart = 0; npart < maxparts; ++ npart)
         {
             if (ch == synth->part[npart]->Prcvchn)
             {
@@ -755,11 +729,11 @@ void MidiDecode::setMidiProgram(unsigned char ch, int prg, bool in_place)
                 if (in_place)
                 {
                     synth->partonoffLock(npart, -1);
-                    synth->setProgramFromBank(&putData, false);
+                    synth->setProgramFromBank(putData, false);
                 }
                 else
                 {
-                    synth->midilearn.writeMidi(&putData, false);
+                    synth->midilearn.writeMidi(putData, false);
                 }
             }
         }
@@ -771,10 +745,10 @@ void MidiDecode::setMidiProgram(unsigned char ch, int prg, bool in_place)
         if (in_place)
         {
             synth->partonoffLock(ch, -1);
-            synth->setProgramFromBank(&putData, false);
+            synth->setProgramFromBank(putData, false);
         }
         else
-            synth->midilearn.writeMidi(&putData, false);
+            synth->midilearn.writeMidi(putData, false);
     }
 }
 

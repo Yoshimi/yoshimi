@@ -464,8 +464,8 @@ class Panellistitem {: {public Fl_Group}
     } {
       Fl_Group panellistitemgroup {
         xywh {0 -5 65 279} box PLASTIC_THIN_UP_BOX
-        code0 {if (!synth->partonoffRead(npart + *plgroup)) o->deactivate();}
-        code1 {if (synth->getRuntime().audioEngine != jack_audio && synth->getLV2PluginType() != LV2PluginTypeMulti) audiosend->deactivate();}
+        code0 {if (not synth->partonoffRead(npart + *plgroup)) o->deactivate();}
+        code1 {if (not synth->getRuntime().isMultiFeed) audiosend->deactivate();}
       } {
         Fl_Group {} {
           xywh {30 64 26 112} box ENGRAVED_FRAME

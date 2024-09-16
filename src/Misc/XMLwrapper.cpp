@@ -27,7 +27,6 @@
 #include <sys/types.h>
 #include <zlib.h>
 #include <sstream>
-#include <iostream>
 #include <string>
 
 #include "Misc/Config.h"
@@ -41,12 +40,15 @@ using file::loadGzipped;
 using file::saveGzipped;
 using file::findExtension;
 using func::string2int;
+using func::string2uint;
 using func::string2float;
 using func::asLongString;
 using func::asString;
 
+using std::string;
 
-const char *XMLwrapper_whitespace_callback(mxml_node_t *node, int where)
+
+const char *XMLwrapper_whitespace_callback(mxml_node_t* node, int where)
 {
     const char *name = mxmlGetElement(node);
 
@@ -61,13 +63,13 @@ const char *XMLwrapper_whitespace_callback(mxml_node_t *node, int where)
 }
 
 
-XMLwrapper::XMLwrapper(SynthEngine *_synth, bool _isYoshi, bool includeBase) :
+XMLwrapper::XMLwrapper(SynthEngine& _synth, bool _isYoshi, bool includeBase) :
     stackpos(0),
     xml_k(0),
     isYoshi(_isYoshi),
     synth(_synth)
 {
-    minimal = 1 - synth->getRuntime().xmlmax;
+    minimal = 1 - synth.getRuntime().xmlmax;
     information.PADsynth_used = 0;
     information.ADDsynth_used = 0;
     information.SUBsynth_used = 0;
@@ -80,14 +82,12 @@ XMLwrapper::XMLwrapper(SynthEngine *_synth, bool _isYoshi, bool includeBase) :
 
     if (isYoshi)
     {
-        //std::cout << "Our doctype" << std::endl;
         mxmlElementSetAttr(doctype, "Yoshimi-data", NULL);
         root = mxmlNewElement(tree, "Yoshimi-data");
         information.yoshiType = 1;
     }
     else
     {
-        //std::cout << "Zyn doctype" << std::endl;
         mxmlElementSetAttr(doctype, "ZynAddSubFX-data", NULL);
         root = mxmlNewElement(tree, "ZynAddSubFX-data");
         mxmlElementSetAttr(root, "version-major", "2");
@@ -99,14 +99,14 @@ XMLwrapper::XMLwrapper(SynthEngine *_synth, bool _isYoshi, bool includeBase) :
 
     node = root;
     mxmlElementSetAttr(root, "Yoshimi-author", "Alan Ernest Calvert");
-    std::string version = YOSHIMI_VERSION;
+    string version{YOSHIMI_VERSION};
     size_t pos = version.find(' ');
     if (pos != string::npos)
         version = version.substr(0, pos); // might be an rc or M version.
 
-    std::string major = "2";
-    std::string minor = "0";
-    std::string revision = "0";
+    string major    = "2";
+    string minor    = "0";
+    string revision = "0";
 
     pos = version.find('.');
     if (pos == string::npos)
@@ -138,26 +138,26 @@ XMLwrapper::XMLwrapper(SynthEngine *_synth, bool _isYoshi, bool includeBase) :
 
     info = addparams0("INFORMATION"); // specifications
 
-    if (synth->getRuntime().xmlType == TOPLEVEL::XML::MasterConfig)
+    if (synth.getRuntime().xmlType == TOPLEVEL::XML::MasterConfig)
     {
         beginbranch("BASE_PARAMETERS");
-            addparbool("enable_gui", synth->getRuntime().storedGui);
-            addparbool("enable_splash", synth->getRuntime().showSplash);
-            addparbool("enable_CLI", synth->getRuntime().storedCli);
-            addpar("show_CLI_context", synth->getRuntime().showCLIcontext);
-            addparbool("enable_single_master", synth->getRuntime().singlePath);
-            addparbool("enable_auto_instance", synth->getRuntime().autoInstance);
-            addparU("handle_padsynth_build", synth->getRuntime().handlePadSynthBuild);
-            addpar("gzip_compression", synth->getRuntime().GzipCompression);
-            addparbool("banks_checked", synth->getRuntime().banksChecked);
-            addparU("active_instances", synth->getRuntime().activeInstance);
-            addparstr("guide_version", synth->getRuntime().guideVersion);
-            addparstr("manual", synth->getRuntime().manualFile);
+            addparbool("enable_gui", synth.getRuntime().storedGui);
+            addparbool("enable_splash", synth.getRuntime().showSplash);
+            addparbool("enable_CLI", synth.getRuntime().storedCli);
+            addpar("show_CLI_context", synth.getRuntime().showCLIcontext);
+            addparbool("enable_single_master", synth.getRuntime().singlePath);
+            addparbool("enable_auto_instance", synth.getRuntime().autoInstance);
+            addparU("handle_padsynth_build", synth.getRuntime().handlePadSynthBuild);
+            addpar("gzip_compression", synth.getRuntime().gzipCompression);
+            addparbool("banks_checked", synth.getRuntime().banksChecked);
+            addparU("active_instances", synth.getRuntime().activeInstances.to_ulong());
+            addparstr("guide_version", synth.getRuntime().guideVersion);
+            addparstr("manual", synth.getRuntime().manualFile);
         endbranch();
         return;
     }
 
-    if (synth->getRuntime().xmlType <= TOPLEVEL::XML::Scale)
+    if (synth.getRuntime().xmlType <= TOPLEVEL::XML::Scale)
     {
             beginbranch("BASE_PARAMETERS");
                 addpar("max_midi_parts", NUM_MIDI_CHANNELS);
@@ -178,7 +178,7 @@ XMLwrapper::~XMLwrapper()
 }
 
 
-void XMLwrapper::checkfileinformation(const std::string& filename, unsigned int& names, int& type)
+void XMLwrapper::checkfileinformation(string const& filename, uint& names, int& type)
 {
     stackpos = 0; // we don't seem to be using any of this!
     memset(&parentstack, 0, sizeof(parentstack));
@@ -187,18 +187,18 @@ void XMLwrapper::checkfileinformation(const std::string& filename, unsigned int&
     tree = NULL;
 
 
-    std::string report = "";
+    string report;
     char *xmldata = loadGzipped(filename, &report);
-    if (report != "")
-        synth->getRuntime().Log(report, _SYS_::LogNotSerious);
+    if (not report.empty())
+        synth.getRuntime().Log(report, _SYS_::LogNotSerious);
     if (!xmldata)
         return;
-    char *first = strstr(xmldata, "<!DOCTYPE Yoshimi-data>");
+    char* first = strstr(xmldata, "<!DOCTYPE Yoshimi-data>");
     information.yoshiType = (first!= NULL);
-    char *start = strstr(xmldata, "<INFORMATION>");
-    char *end = strstr(xmldata, "</INFORMATION>");
-    char *idx = start;
-    unsigned int seen = 0;
+    char* start = strstr(xmldata, "<INFORMATION>");
+    char* end = strstr(xmldata, "</INFORMATION>");
+    char* idx = start;
+    uint seen = 0;
 
     if (start && end && start < end)
     {
@@ -207,8 +207,8 @@ void XMLwrapper::checkfileinformation(const std::string& filename, unsigned int&
 
         /*
          * the following could be in any order. We are checking for
-        * the actual existence of the fields as well as their value.
-        */
+         * the actual existence of the fields as well as their value.
+         */
         idx = strstr(start, "name=\"ADDsynth_used\"");
         if (idx != NULL)
         {
@@ -255,7 +255,7 @@ void XMLwrapper::slowinfosearch(char *idx)
     if (idx == NULL)
         return;
 
-    std::string mark;
+    string mark;
     int max = NUM_KIT_ITEMS;
     /*
      * The following *must* exist, otherwise the file is corrupted.
@@ -320,25 +320,25 @@ void XMLwrapper::slowinfosearch(char *idx)
 
 // SAVE XML members
 
-bool XMLwrapper::saveXMLfile(std::string _filename, bool useCompression)
+bool XMLwrapper::saveXMLfile(string _filename, bool useCompression)
 {
-    std::string filename = _filename;
-    char *xmldata = getXMLdata();
+    string filename{_filename};
+    char* xmldata = getXMLdata();
 
     if (!xmldata)
     {
-        synth->getRuntime().Log("XML: Failed to allocate xml data space");
+        synth.getRuntime().Log("XML: Failed to allocate xml data space");
         return false;
     }
 
-    unsigned int compression = 0;
+    uint compression = 0;
     if (useCompression)
-        compression = synth->getRuntime().GzipCompression;
+        compression = synth.getRuntime().gzipCompression;
     if (compression <= 0)
     {
         if (!saveText(xmldata, filename))
         {
-            synth->getRuntime().Log("XML: Failed to save xml file " + filename + " for save", _SYS_::LogNotSerious);
+            synth.getRuntime().Log("XML: Failed to save xml file " + filename + " for save", _SYS_::LogNotSerious);
             return false;
         }
     }
@@ -346,10 +346,10 @@ bool XMLwrapper::saveXMLfile(std::string _filename, bool useCompression)
     {
         if (compression > 9)
             compression = 9;
-        std::string result = saveGzipped(xmldata, filename, compression);
+        string result = saveGzipped(xmldata, filename, compression);
         if (result > "")
         {
-            synth->getRuntime().Log(result, _SYS_::LogNotSerious);
+            synth.getRuntime().Log(result, _SYS_::LogNotSerious);
             return false;
         }
     }
@@ -365,7 +365,7 @@ char *XMLwrapper::getXMLdata()
     mxml_node_t *oldnode=node;
     node = info;
 
-    switch (synth->getRuntime().xmlType)
+    switch (synth.getRuntime().xmlType)
     {
         case TOPLEVEL::XML::Instrument:
         {
@@ -410,7 +410,7 @@ char *XMLwrapper::getXMLdata()
         case TOPLEVEL::XML::Bank:
         {
             addparstr("XMLtype", "Roots and Banks");
-            addpar("Banks_Version", synth->bank.readVersion());
+            addpar("Banks_Version", synth.bank.readVersion());
             break;
         }
 
@@ -432,19 +432,19 @@ char *XMLwrapper::getXMLdata()
 }
 
 
-void XMLwrapper::addparU(const std::string& name, unsigned int val)
+void XMLwrapper::addparU(string const& name, uint val)
 {
     addparams2("parU", "name", name.c_str(), "value", asString(val));
 }
 
 
-void XMLwrapper::addpar(const std::string& name, int val)
+void XMLwrapper::addpar(string const& name, int val)
 {
     addparams2("par", "name", name.c_str(), "value", asString(val));
 }
 
 
-void XMLwrapper::addparcombi(const std::string& name, float val)
+void XMLwrapper::addparcombi(string const& name, float val)
 {
     union { float in; uint32_t out; } convert;
     char buf[11];
@@ -454,7 +454,7 @@ void XMLwrapper::addparcombi(const std::string& name, float val)
 }
 
 
-void XMLwrapper::addparreal(const std::string& name, float val)
+void XMLwrapper::addparreal(string const& name, float val)
 {
     union { float in; uint32_t out; } convert;
     char buf[11];
@@ -464,13 +464,13 @@ void XMLwrapper::addparreal(const std::string& name, float val)
 }
 
 
-void XMLwrapper::addpardouble(const std::string& name, double val)
+void XMLwrapper::addpardouble(string const& name, double val)
 {
     addparams2("par_real","name", name.c_str(), "value", asLongString(val));
 }
 
 
-void XMLwrapper::addparbool(const std::string& name, int val)
+void XMLwrapper::addparbool(string const& name, int val)
 {
     if (val != 0)
         addparams2("par_bool", "name", name.c_str(), "value", "yes");
@@ -479,7 +479,7 @@ void XMLwrapper::addparbool(const std::string& name, int val)
 }
 
 
-void XMLwrapper::addparstr(const std::string& name, const std::string& val)
+void XMLwrapper::addparstr(string const& name, string const& val)
 {
     mxml_node_t *element = mxmlNewElement(node, "string");
     mxmlElementSetAttr(element, "name", name.c_str());
@@ -487,14 +487,14 @@ void XMLwrapper::addparstr(const std::string& name, const std::string& val)
 }
 
 
-void XMLwrapper::beginbranch(const std::string& name)
+void XMLwrapper::beginbranch(string const& name)
 {
     push(node);
     node = addparams0(name.c_str());
 }
 
 
-void XMLwrapper::beginbranch(const std::string& name, int id)
+void XMLwrapper::beginbranch(string const& name, int id)
 {
     push(node);
     node = addparams1(name.c_str(), "id", asString(id));
@@ -507,7 +507,7 @@ void XMLwrapper::endbranch()
 }
 
 // LOAD XML members
-bool XMLwrapper::loadXMLfile(const std::string& filename)
+bool XMLwrapper::loadXMLfile(string const& filename)
 {
     bool zynfile = true;
     bool yoshitoo = false;
@@ -517,20 +517,20 @@ bool XMLwrapper::loadXMLfile(const std::string& filename)
     tree = NULL;
     memset(&parentstack, 0, sizeof(parentstack));
     stackpos = 0;
-    std::string report = "";
-    char *xmldata = loadGzipped(filename, &report);
+    string report = "";
+    char* xmldata = loadGzipped(filename, &report);
     if (report != "")
-        synth->getRuntime().Log(report, _SYS_::LogNotSerious);
+        synth.getRuntime().Log(report, _SYS_::LogNotSerious);
     if (xmldata == NULL)
     {
-        synth->getRuntime().Log("XML: Could not load xml file: " + filename, _SYS_::LogNotSerious);
+        synth.getRuntime().Log("XML: Could not load xml file: " + filename, _SYS_::LogNotSerious);
          return false;
     }
     root = tree = mxmlLoadString(NULL, removeBlanks(xmldata), MXML_OPAQUE_CALLBACK);
     delete [] xmldata;
     if (!tree)
     {
-        synth->getRuntime().Log("XML: File " + filename + " is not XML", _SYS_::LogNotSerious);
+        synth.getRuntime().Log("XML: File " + filename + " is not XML", _SYS_::LogNotSerious);
         return false;
     }
     root = mxmlFindElement(tree, tree, "ZynAddSubFX-data", NULL, NULL, MXML_DESCEND);
@@ -542,12 +542,12 @@ bool XMLwrapper::loadXMLfile(const std::string& filename)
 
     if (!root)
     {
-        synth->getRuntime().Log("XML: File " + filename + " doesn't contain valid data in this context", _SYS_::LogNotSerious);
+        synth.getRuntime().Log("XML: File " + filename + " doesn't contain valid data in this context", _SYS_::LogNotSerious);
         return false;
     }
     node = root;
     push(root);
-    synth->fileCompatible = true;
+    synth.fileCompatible = true;
     if (zynfile)
     {
         xml_version.major = string2int(mxmlElementGetAttr(root, "version-major"));
@@ -561,16 +561,13 @@ bool XMLwrapper::loadXMLfile(const std::string& filename)
     {
         xml_version.y_major = string2int(mxmlElementGetAttr(root, "Yoshimi-major"));
         yoshitoo = true;
-
-        //synth->getRuntime().Log("XML: Yoshimi " + asString(xml_version.y_major) + "  " + filename);
     }
     else
     {
-        synth->getRuntime().lastXMLmajor = 0;
+        synth.getRuntime().lastXMLmajor = 0;
         if (xml_version.major > 2)
-            synth->fileCompatible = false;
+            synth.fileCompatible = false;
     }
-// std::cout << "major " << int(xml_version.major) << "  Yosh " << int(synth->getRuntime().lastXMLmajor) << std::endl;
     if (mxmlElementGetAttr(root, "Yoshimi-minor"))
     {
         xml_version.y_minor = string2int(mxmlElementGetAttr(root, "Yoshimi-minor"));
@@ -578,16 +575,14 @@ bool XMLwrapper::loadXMLfile(const std::string& filename)
             xml_version.y_revision = string2int(mxmlElementGetAttr(root, "Yoshimi-revision"));
         else
             xml_version.y_revision = 0;
-
-//        synth->getRuntime().Log("XML: Yoshimi " + asString(xml_version.y_minor));
     }
     else
-        synth->getRuntime().lastXMLminor = 0;
+        synth.getRuntime().lastXMLminor = 0;
     string exten = findExtension(filename);
     if (exten.length() != 4 && exten != ".state")
         return true; // we don't want config stuff
 
-    if (synth->getRuntime().logXMLheaders)
+    if (synth.getRuntime().logXMLheaders)
     {
         if (yoshitoo && xml_version.major > 2)
         { // we were giving the wrong value :(
@@ -600,14 +595,14 @@ bool XMLwrapper::loadXMLfile(const std::string& filename)
             string text = "ZynAddSubFX version major " + asString(xml_version.major) + ", minor " + asString(xml_version.minor);
             if (xml_version.revision > 0)
                 text += (", revision " + asString(xml_version.revision));
-            synth->getRuntime().Log(text);
+            synth.getRuntime().Log(text);
         }
         if (yoshitoo)
         {
             string text = "Yoshimi version major " + asString(xml_version.y_major) + ", minor " + asString(xml_version.y_minor);
             if (xml_version.y_revision > 0)
                 text += (", revision " + asString(xml_version.y_revision));
-            synth->getRuntime().Log(text);
+            synth.getRuntime().Log(text);
         }
     }
     return true;
@@ -637,7 +632,7 @@ bool XMLwrapper::putXMLdata(const char *xmldata)
 }
 
 
-bool XMLwrapper::enterbranch(const std::string& name)
+bool XMLwrapper::enterbranch(string const& name)
 {
     node = mxmlFindElement(peek(), peek(), name.c_str(), NULL, NULL,
                            MXML_DESCEND_FIRST);
@@ -646,14 +641,14 @@ bool XMLwrapper::enterbranch(const std::string& name)
     push(node);
     if (name == "CONFIGURATION")
     {
-        synth->getRuntime().lastXMLmajor = xml_version.y_major;
-        synth->getRuntime().lastXMLminor = xml_version.y_minor;
+        synth.getRuntime().lastXMLmajor = xml_version.y_major;
+        synth.getRuntime().lastXMLminor = xml_version.y_minor;
     }
     return true;
 }
 
 
-bool XMLwrapper::enterbranch(const std::string& name, int id)
+bool XMLwrapper::enterbranch(string const& name, int id)
 {
     node = mxmlFindElement(peek(), peek(), name.c_str(), "id",
                            asString(id).c_str(), MXML_DESCEND_FIRST);
@@ -677,7 +672,7 @@ int XMLwrapper::getbranchid(int min, int max)
 }
 
 
-unsigned int XMLwrapper::getparU(const std::string& name, unsigned int defaultpar, unsigned int min, unsigned int max)
+uint XMLwrapper::getparU(string const& name, uint defaultpar, uint min, uint max)
 {
     node = mxmlFindElement(peek(), peek(), "parU", "name", name.c_str(), MXML_DESCEND_FIRST);
     if (!node)
@@ -685,7 +680,7 @@ unsigned int XMLwrapper::getparU(const std::string& name, unsigned int defaultpa
     const char *strval = mxmlElementGetAttr(node, "value");
     if (!strval)
         return defaultpar;
-    unsigned int val = string2int(strval);
+    uint val = string2uint(strval);
     if (val < min)
         val = min;
     else if (val > max)
@@ -694,7 +689,7 @@ unsigned int XMLwrapper::getparU(const std::string& name, unsigned int defaultpa
 }
 
 
-int XMLwrapper::getpar(const std::string& name, int defaultpar, int min, int max)
+int XMLwrapper::getpar(string const& name, int defaultpar, int min, int max)
 {
     node = mxmlFindElement(peek(), peek(), "par", "name", name.c_str(), MXML_DESCEND_FIRST);
     if (!node)
@@ -711,7 +706,7 @@ int XMLwrapper::getpar(const std::string& name, int defaultpar, int min, int max
 }
 
 
-float XMLwrapper::getparcombi(const std::string& name, float defaultpar, float min, float max)
+float XMLwrapper::getparcombi(string const& name, float defaultpar, float min, float max)
 {
     node = mxmlFindElement(peek(), peek(), "par", "name", name.c_str(), MXML_DESCEND_FIRST);
     if (!node)
@@ -729,7 +724,7 @@ float XMLwrapper::getparcombi(const std::string& name, float defaultpar, float m
         strval = mxmlElementGetAttr(node, "value");
         if (!strval)
         return defaultpar;
-        result = string2float(std::string(strval));
+        result = string2float(string(strval));
     }
     if (result < min)
         result = min;
@@ -739,19 +734,19 @@ float XMLwrapper::getparcombi(const std::string& name, float defaultpar, float m
 }
 
 
-int XMLwrapper::getpar127(const std::string& name, int defaultpar)
+int XMLwrapper::getpar127(string const& name, int defaultpar)
 {
     return(getpar(name, defaultpar, 0, 127));
 }
 
 
-int XMLwrapper::getpar255(const std::string& name, int defaultpar)
+int XMLwrapper::getpar255(string const& name, int defaultpar)
 {
     return(getpar(name, defaultpar, 0, 255));
 }
 
 
-int XMLwrapper::getparbool(const std::string& name, int defaultpar)
+int XMLwrapper::getparbool(string const& name, int defaultpar)
 {
     node = mxmlFindElement(peek(), peek(), "par_bool", "name", name.c_str(), MXML_DESCEND_FIRST);
     if (!node)
@@ -765,21 +760,21 @@ int XMLwrapper::getparbool(const std::string& name, int defaultpar)
 // case insensitive, anything other than '0', 'no', 'false' is treated as 'true'
 
 
-std::string XMLwrapper::getparstr(const std::string& name)
+string XMLwrapper::getparstr(string const& name)
 {
     node = mxmlFindElement(peek(), peek(), "string", "name", name.c_str(), MXML_DESCEND_FIRST);
     if (!node)
-        return std::string();
+        return string();
     mxml_node_t *child = mxmlGetFirstChild(node);
     if (!child)
-        return std::string();
+        return string();
     if (mxmlGetType(child) != MXML_OPAQUE)
-        return std::string();
-    return std::string(mxmlGetOpaque(child));
+        return string();
+    return string(mxmlGetOpaque(child));
 }
 
 
-float XMLwrapper::getparreal(const std::string& name, float defaultpar)
+float XMLwrapper::getparreal(string const& name, float defaultpar)
 {
     node = mxmlFindElement(peek(), peek(), "par_real", "name", name.c_str(),
                            MXML_DESCEND_FIRST);
@@ -797,11 +792,11 @@ float XMLwrapper::getparreal(const std::string& name, float defaultpar)
     strval = mxmlElementGetAttr(node, "value");
     if (!strval)
         return defaultpar;
-    return string2float(std::string(strval));
+    return string2float(string(strval));
 }
 
 
-float XMLwrapper::getparreal(const std::string& name, float defaultpar, float min, float max)
+float XMLwrapper::getparreal(string const& name, float defaultpar, float min, float max)
 {
     float result = getparreal(name, defaultpar);
     if (result < min)
@@ -814,14 +809,14 @@ float XMLwrapper::getparreal(const std::string& name, float defaultpar, float mi
 
 // Private parts
 
-mxml_node_t *XMLwrapper::addparams0(const std::string& name)
+mxml_node_t *XMLwrapper::addparams0(string const& name)
 {
     mxml_node_t *element = mxmlNewElement(node, name.c_str());
     return element;
 }
 
 
-mxml_node_t *XMLwrapper::addparams1(const std::string& name, const std::string& par1, const std::string& val1)
+mxml_node_t *XMLwrapper::addparams1(string const& name, string const& par1, string const& val1)
 {
     mxml_node_t *element = mxmlNewElement(node, name.c_str());
     mxmlElementSetAttr(element, par1.c_str(), val1.c_str());
@@ -829,8 +824,8 @@ mxml_node_t *XMLwrapper::addparams1(const std::string& name, const std::string& 
 }
 
 
-mxml_node_t *XMLwrapper::addparams2(const std::string& name, const std::string& par1, const std::string& val1,
-                                    const std::string& par2, const std::string& val2)
+mxml_node_t *XMLwrapper::addparams2(string const& name, string const& par1, string const& val1,
+                                    string const& par2, string const& val2)
 {
     mxml_node_t *element = mxmlNewElement(node, name.c_str());
     mxmlElementSetAttr(element, par1.c_str(), val1.c_str());
@@ -839,9 +834,9 @@ mxml_node_t *XMLwrapper::addparams2(const std::string& name, const std::string& 
 }
 
 
-mxml_node_t *XMLwrapper::addparams3(const std::string& name, const std::string& par1, const std::string& val1,
-                                    const std::string& par2, const std::string& val2,
-                                    const std::string& par3, const std::string& val3)
+mxml_node_t *XMLwrapper::addparams3(string const& name, string const& par1, string const& val1,
+                                    string const& par2, string const& val2,
+                                    string const& par3, string const& val3)
 {
     mxml_node_t *element = mxmlNewElement(node, name.c_str());
     mxmlElementSetAttr(element, par1.c_str(), val1.c_str());
@@ -855,7 +850,7 @@ void XMLwrapper::push(mxml_node_t *node)
 {
     if (stackpos >= STACKSIZE - 1)
     {
-        synth->getRuntime().Log("XML: Not good, XMLwrapper push on a full parentstack", _SYS_::LogNotSerious);
+        synth.getRuntime().Log("XML: Not good, XMLwrapper push on a full parentstack", _SYS_::LogNotSerious);
         return;
     }
     stackpos++;
@@ -863,11 +858,11 @@ void XMLwrapper::push(mxml_node_t *node)
 }
 
 
-mxml_node_t *XMLwrapper::pop(void)
+mxml_node_t *XMLwrapper::pop()
 {
     if (stackpos <= 0)
     {
-        synth->getRuntime().Log("XML: Not good, XMLwrapper pop on empty parentstack", _SYS_::LogNotSerious);
+        synth.getRuntime().Log("XML: Not good, XMLwrapper pop on empty parentstack", _SYS_::LogNotSerious);
         return root;
     }
     mxml_node_t *node = parentstack[stackpos];
@@ -877,11 +872,11 @@ mxml_node_t *XMLwrapper::pop(void)
 }
 
 
-mxml_node_t *XMLwrapper::peek(void)
+mxml_node_t *XMLwrapper::peek()
 {
     if (stackpos <= 0)
     {
-        synth->getRuntime().Log("XML: Not good, XMLwrapper peek on an empty parentstack", _SYS_::LogNotSerious);
+        synth.getRuntime().Log("XML: Not good, XMLwrapper peek on an empty parentstack", _SYS_::LogNotSerious);
         return root;
     }
     return parentstack[stackpos];

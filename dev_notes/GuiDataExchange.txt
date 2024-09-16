@@ -18,8 +18,8 @@ Thus a new communication scheme was established, based on a component **GuiDataE
 residing within the InterChange associated to each SynthEngine instance. While there is only a
 single instance of the FLTK-UI, Yoshimi is capable of running several instances of the SynthEngine,
 each performing within a separate thread and relying on a distinct InterChange instance. Only one
-of theses SynthInstances, the »master« or `firstSynth`, creates and operates an instance of
-the MasterUI, which is equivalent to the root of the FLTK window hierarchy.
+of theses Synth instances however, the »master« or `primarySynth`, loads global configuration
+and can cause shutdown of the application.
 
 
 Conceptual View
@@ -33,13 +33,13 @@ NOTE: a prototype / demo setup of this system can be found in GuiDataExchangeTes
 Each of these individual "virtual data channels" is represented by a connection object, which in fact
 is only a front-end handle. The connection is _templated_ to a specific data type an is only able to
 transport data of this type; data to be published must be trivially destructible and copy/assignable.
-We refer to such data records, which are only used to transport data from one subsystem to another
+We refer to such data records, which are used only to transport data from one subsystem to another
 as »Data Transfer Object« (DTO).
 
 Connections must be created from the GuiDataExchange and will automatically embed an opaque yet unique
-connection identifier, and another identifier to encode the data type that can be send over the connection.
+connection identifier, plus another identifier to encode the data type that can be sent over the connection.
 Actually, this bare bone ID of a connection is encapsulated as `GuiDataExchange::RoutingTag`. Given such
-a tag, together with a reference to the managing GuiDataExchange, allows to re-establish a connection.
+a tag, together with a reference to the managing GuiDataExchange, a connection can be (re-)established.
 
 The Connection handle (object) is the primary interface used by client code to publish data.
 It allows to `publish(DAT const&)` a copy of a given DTO into the virtual channel. On the other side
@@ -73,14 +73,14 @@ and placing the slot index number into the `offset` field of the `CommandBlock` 
 
 It is assumed that these notification messages will be received within another thread (the UI thread).
 Actually this is done in `GuiUpdates::decode_updates()` (see MiscGui.cpp). Next, a dispatch must be
-requested, by invoking `GuiDataExchange::dispatchUpdates(CommandBlock*)` in this other thread.
-The implementation will then do a lookup of _all subscribers currently enrolled for this channel;_
+requested, by invoking `GuiDataExchange::dispatchUpdates(CommandBlock*)` within this UI event thread.
+The implementation will then do a lookup of _all subscribers currently enrolled with this channel;_
 it will pick up the data from the designated buffer slot and directly place a copy of this data
 into the MirrorData block of each subscriber. Note however, since this dispatch on notification
 happens asynchronously and typically slightly delayed, there is no guarantee that the buffer slot
 is still valid; if too many push updates are sent before notifications are received and dispatched
 on the UI side, then data may be lost. In such a case, the number of buffer slots could be increased.
-There is a safeguard in place however, as the data type id of the data found in the designated slot
+There is a safeguard in place however, as the data type-id of the data found in the designated slot
 must match up with the data type expected by the Subscriber.
 
 
@@ -99,8 +99,8 @@ When the GUI starts up, a copy of the InterfaceAnchor is placed into a slot in G
 and the MasterUI object is initialised with the slot number, to establish the first connection.
 From this point on, updates to the InterfaceAnchor could be sent any time by regular push updates.
 Since all UI windows and relevant controls are more or less directly established going down from
-MasterUI, the suitable connection objects can be passed to the init() function of all UI components
-in need of direct data push updates. Thus MasterUI holds a MirrorData<InterfaceAnchor> in a
-public member field `GuiUpdates::anchor`, and all further parts of the UI can assume to find
+MasterUI, the suitable fitting connection objects can be passed directly to the init() function of
+all UI components in need of direct data push updates. Thus MasterUI holds a MirrorData<InterfaceAnchor>
+in a public member field `GuiUpdates::anchor`, and all further parts of the UI can assume to find
 valid connection objects ready to be picked up through `uiMaster.anchor.get()`
 

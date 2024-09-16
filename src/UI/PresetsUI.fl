@@ -243,7 +243,7 @@ Upastewin->hide();}
     else if (npart == TOPLEVEL::insertEffects)
         text = "insert";
     else
-        text = "part " + to_string(npart + 1);
+        text = "part " + std::to_string(npart + 1);
     return text;} {}
   }
   Function {Ucopy(int _npart, int _kititem, int _engine = UNUSED, int _insert =  UNUSED, int _parameter = UNUSED, int _offset = UNUSED)} {} {
@@ -347,13 +347,13 @@ Upastewin->hide();}
     putData.data.offset = offset;
     putData.data.miscmsg = UNUSED;
     //synth->CBtest(&putData);
-    int value = synth->interchange.readAllData(&putData);
+    int value = synth->interchange.readAllData(putData);
     if (sent == 2)
     {
         return textMsgBuffer.fetch(value);
     }
     putData.data.value = 1;
-    int Ugroup = synth->interchange.readAllData(&putData);
+    int Ugroup = synth->interchange.readAllData(putData);
     groupName = textMsgBuffer.fetch(Ugroup);
     //std::cout << "In GUI >" << groupName << std::endl;
     return textMsgBuffer.fetch(value);} {}

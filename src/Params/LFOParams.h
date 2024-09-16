@@ -41,49 +41,48 @@ class LFOParams : public ParamBase
 {
     public:
         LFOParams(float Pfreq_, float Pintensity_, float Pstartphase_,
-                  unsigned char PLFOtype_, float Prandomness_,
-                  float Pdelay_, unsigned char Pcontinous, int fel_, SynthEngine *_synth);
-        ~LFOParams() { }
+                  uchar PLFOtype_, float Prandomness_,
+                  float Pdelay_, uchar Pcontinous, int fel_, SynthEngine&);
+
+        void defaults() override;
 
         void add2XML(XMLwrapper& xml);
-        void defaults(void);
         void setPfreq(int32_t n);
         void getfromXML(XMLwrapper& xml);
         void setPintensity(float n) { Pintensity = n; paramsChanged(); }
-        void setPstartphase(float n) { Pstartphase = n; }
-        void setPLFOtype(unsigned char n) { PLFOtype = n; paramsChanged(); }
-        void setPrandomness(float n) { Prandomness = n; paramsChanged(); }
-        void setPfreqrand(float n) { Pfreqrand = n; paramsChanged(); }
-        void setPdelay(float n) { Pdelay = n; }
-        void setPbpm(unsigned char n) { Pbpm = n; }
-        void setPcontinous(unsigned char n) { Pcontinous = n; paramsChanged(); }
-        void setPstretch(float n) { Pstretch = n; paramsChanged(); }
+        void setPstartphase(float n){ Pstartphase = n; }
+        void setPLFOtype(uchar n)   { PLFOtype = n; paramsChanged(); }
+        void setPrandomness(float n){ Prandomness = n; paramsChanged(); }
+        void setPfreqrand(float n)  { Pfreqrand = n; paramsChanged(); }
+        void setPdelay(float n)     { Pdelay = n; }
+        void setPbpm(uchar n)       { Pbpm = n; }
+        void setPcontinous(uchar n) { Pcontinous = n; paramsChanged(); }
+        void setPstretch(float n)   { Pstretch = n; paramsChanged(); }
 
         // MIDI Parameters
         int32_t PfreqI;
         float Pfreq;
         float Pintensity;
         float Pstartphase;
-        unsigned char PLFOtype;
+        uchar PLFOtype;
         float Prandomness;
         float Pfreqrand;
         float Pdelay;
-        unsigned char Pbpm;
-        unsigned char Pcontinous;
+        uchar Pbpm;
+        uchar Pcontinous;
         float Pstretch;
 
-        int fel;         // kind of LFO - 0 frequency, 1 amplitude, 2 filter
-       // static int time; // used by Pcontinous - moved to SynthEngine to make it per-instance
+        int fel;     // kind of LFO - 0 frequency, 1 amplitude, 2 filter
 
     private:
         // Default parameters
-        unsigned char Dfreq;
-        unsigned char Dintensity;
-        unsigned char Dstartphase;
-        unsigned char DLFOtype;
-        unsigned char Drandomness;
-        unsigned char Ddelay;
-        unsigned char Dcontinous;
+        uchar Dfreq;
+        uchar Dintensity;
+        uchar Dstartphase;
+        uchar DLFOtype;
+        uchar Drandomness;
+        uchar Ddelay;
+        uchar Dcontinous;
 };
 
 class LFOlimit

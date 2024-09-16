@@ -35,7 +35,7 @@
 
 static const int alienPRESET_SIZE = 11;
 static const int alienNUM_PRESETS = 4;
-static const unsigned char alienPresets[alienNUM_PRESETS][alienPRESET_SIZE] = {
+static const uchar alienPresets[alienNUM_PRESETS][alienPRESET_SIZE] = {
         // AlienWah1
         { 127, 64, 70, 0, 0, 62, 60, 105, 25, 0, 64 },
         // AlienWah2
@@ -52,32 +52,32 @@ class SynthEngine;
 class Alienwah : public Effect
 {
     public:
-        Alienwah(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth);
-        ~Alienwah();
-        void out(float *smpsl, float *smpsr) override;
+        Alienwah(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine&);
+       ~Alienwah();
 
-        void setpreset(unsigned char npreset) override;
-        void changepar(int npar, unsigned char value) override;
-        unsigned char getpar(int npar)  const  override;
-        void cleanup(void) override;
+        void out(float* smpsl, float* smpsr)  override;
+        void setpreset(uchar npreset)         override;
+        void changepar(int npar, uchar value) override;
+        uchar getpar(int npar)         const  override;
+        void cleanup()                        override;
 
     private:
         // Alienwah Parameters
         bool Pchanged;
         EffectLFO lfo; // lfo-ul Alienwah
-        unsigned char Pvolume;
-        unsigned char Pdepth;   // the depth of the Alienwah
-        unsigned char Pfb;      // feedback
-        unsigned char Pdelay;
-        unsigned char Pphase;
+        uchar Pvolume;
+        uchar Pdepth;   // the depth of the Alienwah
+        uchar Pfb;      // feedback
+        uchar Pdelay;
+        uchar Pphase;
 
 
         // Control Parameters
-        void setvolume(unsigned char Pvolume_);
-        void setdepth(unsigned char Pdepth_);
-        void setfb(unsigned char Pfb_);
-        void setdelay(unsigned char Pdelay_);
-        void setphase(unsigned char Pphase_);
+        void setvolume(uchar Pvolume_);
+        void setdepth(uchar Pdepth_);
+        void setfb(uchar Pfb_);
+        void setdelay(uchar Pdelay_);
+        void setphase(uchar Pphase_);
 
         // Internal Values
         float fb, depth, phase;

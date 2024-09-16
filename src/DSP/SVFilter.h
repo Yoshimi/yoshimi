@@ -36,10 +36,11 @@ class SVFilter : public Filter_
 {
     public:
        ~SVFilter() = default;
-        SVFilter(unsigned char Ftype, float Ffreq, float Fq, unsigned char Fstages, SynthEngine *_synth);
-        SVFilter(const SVFilter &orig);
-        Filter_* clone() { return new SVFilter(*this); };
-        void filterout(float *smp);
+        SVFilter(SynthEngine* _synth, uchar Ftype, float Ffreq, float Fq, uchar Fstages);
+        SVFilter(SVFilter const& orig);
+        Filter_* clone() override { return new SVFilter(*this); };
+
+        void filterout(float* smp);
         void setfreq(float frequency);
         void setfreq_and_q(float frequency, float q_);
         void setq(float q_);
@@ -57,8 +58,8 @@ class SVFilter : public Filter_
             float f, q, q_sqrt;
         } par, ipar;
 
-        void singlefilterout(float *smp, fstage &x, parameters &par);
-        void computefiltercoefs(void);
+        void singlefilterout(float* smp, fstage& x, parameters& par);
+        void computefiltercoefs();
         int type;      // The type of the filter (LPF1,HPF1,LPF2,HPF2...)
         int stages;    // how many times the filter is applied (0->1,1->2,etc.)
         float freq; // Frequency given in Hz

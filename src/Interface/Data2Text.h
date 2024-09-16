@@ -34,7 +34,6 @@ class DataText
 {
 
     private:
-        SynthEngine *synth;
         bool showValue;
         bool yesno;
     protected:
@@ -42,28 +41,28 @@ class DataText
 
     public:
         DataText();
-        ~DataText(){ };
-        std::string resolveAll(SynthEngine *_synth, CommandBlock *getData, bool addValue);
+
+        std::string resolveAll(SynthEngine&, CommandBlock&, bool addValue);
     private:
-        std::string withValue(std::string resolved, unsigned char type, bool showValue, bool addValue, float value);
-        std::string resolveVector(CommandBlock *getData, bool addValue);
-        std::string resolveMicrotonal(CommandBlock *getData, bool addValue);
-        std::string resolveConfig(CommandBlock *getData, bool addValue);
-        std::string resolveBank(CommandBlock *getData, bool addValue);
-        std::string resolveMain(CommandBlock *getData, bool addValue);
+        std::string withValue(std::string resolved, uchar type, bool showValue, bool addValue, float value);
+        std::string resolveVector(CommandBlock&, bool addValue);
+        std::string resolveMicrotonal(CommandBlock&, bool addValue);
+        std::string resolveConfig(SynthEngine&, CommandBlock&, bool addValue);
+        std::string resolveBank(CommandBlock&, bool addValue);
+        std::string resolveMain(CommandBlock&, bool addValue);
         std::string resolveAftertouch(bool type, int value, bool addValue);
-        std::string resolvePart(CommandBlock *getData, bool addValue);
-        std::string resolveAdd(CommandBlock *getData, bool addValue);
-        std::string resolveAddVoice(CommandBlock *getData, bool addValue);
-        std::string resolveSub(CommandBlock *getData, bool addValue);
-        std::string resolvePad(SynthEngine*, CommandBlock *getData, bool addValue);
-        std::string resolveOscillator(SynthEngine*, CommandBlock *getData, bool addValue);
-        std::string resolveResonance(SynthEngine*, CommandBlock *getData, bool addValue);
-        std::string resolveLFO(CommandBlock *getData, bool addValue);
-        std::string resolveFilter(CommandBlock *getData, bool addValue);
-        std::string filterControl(CommandBlock *getData, bool addValue);
-        std::string resolveEnvelope(CommandBlock *getData, bool addValue);
-        std::string resolveEffects(CommandBlock *getData, bool addValue);
+        std::string resolvePart(CommandBlock&, bool addValue);
+        std::string resolveAdd(CommandBlock&, bool addValue);
+        std::string resolveAddVoice(CommandBlock&, bool addValue);
+        std::string resolveSub(CommandBlock&, bool addValue);
+        std::string resolvePad(SynthEngine&, CommandBlock&, bool addValue);
+        std::string resolveOscillator(SynthEngine&, CommandBlock&, bool addValue);
+        std::string resolveResonance(SynthEngine&, CommandBlock&, bool addValue);
+        std::string resolveLFO(CommandBlock&, bool addValue);
+        std::string resolveFilter(CommandBlock&, bool addValue);
+        std::string filterControl(CommandBlock&, bool addValue);
+        std::string resolveEnvelope(CommandBlock&, bool addValue);
+        std::string resolveEffects(CommandBlock&, bool addValue);
 
         int mapFromEffectNumber(int effectIndex, const int list []);
 };

@@ -28,52 +28,56 @@
 #include "Misc/Alloc.h"
 #include "Misc/SynthEngine.h"
 
+#include <mutex>
+#include <memory>
 #include <string>
 
+using std::unique_ptr;
+using std::shared_ptr;
+using std::string;
 
-class SynthEngine;
 class BeatTracker;
+
 
 class MusicIO
 {
     public:
         virtual ~MusicIO() = default;
 
-        MusicIO(SynthEngine *_synth, BeatTracker *_beatTracker);
+        MusicIO(SynthEngine&, shared_ptr<BeatTracker>&&);
         // shall not be copied or moved
         MusicIO(MusicIO&&)                 = delete;
         MusicIO(MusicIO const&)            = delete;
         MusicIO& operator=(MusicIO&&)      = delete;
         MusicIO& operator=(MusicIO const&) = delete;
 
-        virtual unsigned int getSamplerate(void) = 0;
-        virtual int getBuffersize(void) = 0;
-        virtual bool Start(void) = 0;
-        virtual void Close(void) = 0;
-        virtual bool openAudio(void) = 0;
-        virtual bool openMidi(void) = 0;
-        virtual std::string audioClientName(void) = 0;
-        virtual int audioClientId(void) = 0;
-        virtual std::string midiClientName(void) = 0;
-        virtual int midiClientId(void) = 0;
-        virtual void registerAudioPort(int) = 0;
+        virtual bool openAudio()               = 0;
+        virtual bool openMidi()                = 0;
+        virtual bool Start()                   = 0;
+        virtual void Close()                   = 0;
+        virtual void registerAudioPort(int)    = 0;
+
+        virtual uint getSamplerate()     const = 0;
+        virtual int getBuffersize()      const = 0;
+        virtual string audioClientName() const = 0;
+        virtual int audioClientId()      const = 0;
+        virtual string midiClientName()  const = 0;
+        virtual int midiClientId()       const = 0;
 
     protected:
-        bool prepBuffers(void);
-        void getAudio(void) { if (synth) synth->MasterAudio(zynLeft, zynRight); }
-        void setMidi(unsigned char par0, unsigned char par1, unsigned char par2, bool in_place = false);
+        bool prepBuffers();
+        void getAudio()    { synth.MasterAudio(zynLeft, zynRight); }
+        void handleMidi(uchar par0, uchar par1, uchar par2, bool in_place = false);
 
-        bool LV2_engine;
         Samples bufferAllocation;
         float*  zynLeft[NUM_MIDI_PARTS + 1];
         float* zynRight[NUM_MIDI_PARTS + 1];
 
-        std::unique_ptr<int[]> interleaved; // output buffer for 16bit interleaved audio
-
         // The engine which tracks song beats (MIDI driver).
-        BeatTracker *beatTracker;
+        shared_ptr<BeatTracker> beatTracker;
+        SynthEngine& synth;
 
-        SynthEngine *synth;
+        Config& runtime();
 };
 
 class BeatTracker
@@ -86,8 +90,9 @@ class BeatTracker
         };
 
     public:
+        virtual ~BeatTracker();  // this is an interface
+
         BeatTracker();
-        virtual ~BeatTracker();
 
         // The pair contains the song beat (relative to song beginning) and
         // monotonic beat (relative to time origin), respectively, and is used
@@ -105,7 +110,7 @@ class BeatTracker
         virtual BeatValues getRawBeatValues() = 0;
 
     protected:
-        void adjustMonotonicRounding(BeatValues *beats);
+        void adjustMonotonicRounding(BeatValues& beats);
 
     private:
         float songVsMonotonicBeatDiff;
@@ -115,25 +120,30 @@ class MultithreadedBeatTracker : public BeatTracker
 {
     public:
         MultithreadedBeatTracker();
-        ~MultithreadedBeatTracker();
+       ~MultithreadedBeatTracker() = default;
+        // shall not be copied or moved
+        MultithreadedBeatTracker(MultithreadedBeatTracker&&)                 = delete;
+        MultithreadedBeatTracker(MultithreadedBeatTracker const&)            = delete;
+        MultithreadedBeatTracker& operator=(MultithreadedBeatTracker&&)      = delete;
+        MultithreadedBeatTracker& operator=(MultithreadedBeatTracker const&) = delete;
 
         // These two functions are mutually thread safe, even though they
         // operate on the same data. The first is usually called from the MIDI
         // thread, the second from the audio thread.
-        BeatValues setBeatValues(BeatValues beats);
-        BeatValues getBeatValues();
-        BeatValues getRawBeatValues();
+        BeatValues setBeatValues(BeatValues beats) override;
+        BeatValues getBeatValues()                 override;
+        BeatValues getRawBeatValues()              override;
 
     private:
         // Current and last time and beats of the MIDI clock.
-        volatile uint64_t lastTimeUs;
-        volatile float    lastSongBeat;
-        volatile float    lastMonotonicBeat;
-        volatile uint64_t timeUs;
-        volatile float    songBeat;
-        volatile float    monotonicBeat;
-        volatile float    bpm;
-        pthread_mutex_t   mutex;
+        std::mutex mtx;
+        uint64_t lastTimeUs;
+        float    lastSongBeat;
+        float    lastMonotonicBeat;
+        uint64_t timeUs;
+        float    songBeat;
+        float    monotonicBeat;
+        float    bpm;
 };
 
 class SinglethreadedBeatTracker : public BeatTracker
@@ -141,12 +151,12 @@ class SinglethreadedBeatTracker : public BeatTracker
     public:
         SinglethreadedBeatTracker();
 
-        BeatValues setBeatValues(BeatValues beats);
-        BeatValues getBeatValues();
-        BeatValues getRawBeatValues();
+        BeatValues setBeatValues(BeatValues beats) override;
+        BeatValues getBeatValues()                 override;
+        BeatValues getRawBeatValues()              override;
 
     private:
         BeatValues beats;
 };
 
-#endif
+#endif /*MUSIC_IO_H*/

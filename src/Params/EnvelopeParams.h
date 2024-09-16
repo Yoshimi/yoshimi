@@ -36,31 +36,32 @@ class SynthEngine;
 class EnvelopeParams : public ParamBase
 {
     public:
-        EnvelopeParams(unsigned char Penvstretch_, unsigned char Pforcedrelease_, SynthEngine *_synth);
-        ~EnvelopeParams() { }
+        EnvelopeParams(uchar Penvstretch_, uchar Pforcedrelease_, SynthEngine&);
+
+        void defaults() override;
+
         void ADSRinit(float A_dt, float D_dt, float S_val, float R_dt);
         void ADSRinit_dB(float A_dt, float D_dt, float S_val, float R_dt);
         void ASRinit(float A_val, float A_dt, float R_val, float R_dt);
         void ADSRinit_filter(float A_val, float A_dt, float D_val, float D_dt,
                              float R_dt, float R_val);
         void ASRinit_bw(float A_val, float A_dt, float R_val, float R_dt);
-        void converttofree(void);
+        void converttofree();
 
         void add2XML(XMLwrapper& xml);
-        void defaults(void);
         void getfromXML(XMLwrapper& xml);
 
         float getdt(size_t i);
 
         // MIDI Parameters
-        unsigned char Pfreemode;       // 1 if it is in free mode or 0 if it is in ADSR or ASR mode (comment from original author)
+        uchar Pfreemode;               // 1 if it is in free mode or 0 if it is in ADSR or ASR mode (comment from original author)
         size_t Penvpoints;             // stays < MAX_ENVELOPE_POINTS
         size_t Penvsustain;            // 0 means disabled  -- see Envelope::envout()
         float Penvdt[MAX_ENVELOPE_POINTS];
         float Penvval[MAX_ENVELOPE_POINTS];
-        unsigned char Penvstretch;     // 64=normal stretch (piano-like), 0=no stretch
-        unsigned char Pforcedrelease;  // 0 - OFF, 1 - ON
-        unsigned char Plinearenvelope; // if the amplitude envelope is linear
+        uchar Penvstretch;             // 64=normal stretch (piano-like), 0=no stretch
+        uchar Pforcedrelease;          // 0 - OFF, 1 - ON
+        uchar Plinearenvelope;         // if the amplitude envelope is linear
 
         float PA_dt, PD_dt, PR_dt,
                       PA_val, PD_val, PS_val, PR_val;
@@ -72,12 +73,12 @@ class EnvelopeParams : public ParamBase
                      // 5 for ASR_bw parameters (bandwidth parameters)
 
     private:
-        void store2defaults(void);
+        void store2defaults();
 
         // Default parameters
-        unsigned char Denvstretch;
-        unsigned char Dforcedrelease;
-        unsigned char Dlinearenvelope;
+        uchar Denvstretch;
+        uchar Dforcedrelease;
+        uchar Dlinearenvelope;
         float DA_dt, DD_dt, DR_dt,
                       DA_val, DD_val, DS_val, DR_val;
 };

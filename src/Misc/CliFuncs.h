@@ -74,7 +74,6 @@ inline float readControl(SynthEngine *synth,
                          unsigned char offset = UNUSED,
                          unsigned char miscmsg = NO_MSG)
 {
-    float value;
     CommandBlock putData;
 
     putData.data.value = 0;
@@ -88,11 +87,7 @@ inline float readControl(SynthEngine *synth,
     putData.data.parameter = parameter;
     putData.data.offset = offset;
     putData.data.miscmsg = miscmsg;
-    value = synth->interchange.readAllData(&putData);
-    //if (putData.data.type & TOPLEVEL::type::Error)
-        //return 0xfffff;
-        //std::cout << "err" << std::endl;
-    return value;
+    return synth->interchange.readAllData(putData);
 }
 
 
@@ -118,7 +113,7 @@ inline string readControlText(SynthEngine *synth,
     putData.data.parameter = parameter;
     putData.data.offset = offset;
     putData.data.miscmsg = UNUSED;
-    value = synth->interchange.readAllData(&putData);
+    value = synth->interchange.readAllData(putData);
     return TextMsgBuffer::instance().fetch(value);
 }
 
@@ -140,7 +135,7 @@ inline void readLimits(SynthEngine *synth,
     putData.data.parameter = parameter;
     putData.data.miscmsg = miscmsg;
 
-    value = synth->interchange.readAllData(&putData);
+    value = synth->interchange.readAllData(putData);
     string name;
     switch (type & 3)
     {
@@ -207,8 +202,8 @@ inline int sendNormal(SynthEngine *synth,
     if (part != TOPLEVEL::section::midiLearn)
     {
         putData.data.type |= TOPLEVEL::type::Limits;
-        float newValue = synth->interchange.readAllData(&putData); // adjust within limits
-        type |= (putData.data.type & TOPLEVEL::type::Integer); // so everyone knows if it is!
+        float newValue = synth->interchange.readAllData(putData); // adjust within limits
+        type |= (putData.data.type & TOPLEVEL::type::Integer);   //  so everyone knows if it is!
         if (type & TOPLEVEL::type::LearnRequest)
         {
             if ((putData.data.type & TOPLEVEL::type::Learnable) == 0)
@@ -271,7 +266,7 @@ inline int sendDirect(SynthEngine *synth,
     if (type == TOPLEVEL::type::Default)
     {
         putData.data.type = TOPLEVEL::type::Limits;
-        synth->interchange.readAllData(&putData);
+        synth->interchange.readAllData(putData);
         if ((putData.data.type & TOPLEVEL::type::Learnable) == 0)
         {
             synth->getRuntime().Log("Can't learn this control");
@@ -291,7 +286,7 @@ inline int sendDirect(SynthEngine *synth,
     if (request < TOPLEVEL::type::Limits)
     {
         putData.data.type = request | TOPLEVEL::type::Limits;
-        value = synth->interchange.readAllData(&putData);
+        value = synth->interchange.readAllData(putData);
         string name;
         switch (request)
         {
@@ -350,7 +345,7 @@ inline int sendDirect(SynthEngine *synth,
                 name += "RMS ";
                 break;
             }
-            value = synth->interchange.readAllData(&putData);
+            value = synth->interchange.readAllData(putData);
             synth->getRuntime().Log(name + std::to_string(value));
         return 0;
     }

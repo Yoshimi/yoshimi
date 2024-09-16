@@ -59,7 +59,7 @@ PADnote::~PADnote() { }
 
 
 PADnote::PADnote(PADnoteParameters& parameters, Controller& ctl_, Note note_, bool portamento_)
-    : synth{*parameters.getSynthEngine()}
+    : synth{parameters.getSynthEngine()}
     , pars{parameters}
     , padSynthUpdate{parameters}
     , ctl{ctl_}
@@ -110,8 +110,8 @@ PADnote::PADnote(PADnoteParameters& parameters, Controller& ctl_, Note note_, bo
 
     noteGlobal.ampEnvelope->envout_dB(); // discard the first envelope output
 
-    noteGlobal.filterL.reset(new Filter{pars.GlobalFilter.get(), &synth});
-    noteGlobal.filterR.reset(new Filter{pars.GlobalFilter.get(), &synth});
+    noteGlobal.filterL.reset(new Filter{*pars.GlobalFilter.get(), synth});
+    noteGlobal.filterR.reset(new Filter{*pars.GlobalFilter.get(), synth});
 
     noteGlobal.filterEnvelope.reset(new Envelope{pars.FilterEnvelope.get(), note.freq, &synth});
     noteGlobal.filterLFO     .reset(new LFO{pars.FilterLfo.get(), note.freq, &synth});

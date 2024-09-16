@@ -24,9 +24,11 @@
 
 #include <string>
 #include <unistd.h>
-#include <iostream>
 #include <functional>
 #include <algorithm>
+#include <iostream>
+#include <fstream>
+#include <atomic>
 #include <vector>
 #include <memory>
 #include <cmath>
@@ -41,8 +43,6 @@
 
 namespace test {
 
-using std::cout;
-using std::endl;
 using std::clamp;
 using std::string;
 using std::function;
@@ -232,22 +232,32 @@ class TestInvoker
 
     enum ParamOp{SET,GET,MAX,MIN,DEFAULT};
 
+
+    TestInvoker() :
+        chan{1},
+        pitch{60},       // C4
+        velocity{64},
+        duration{1.0},   // 1sec
+        holdfraction{0.8},
+        repetitions{4},
+        scalestep{4},    // move major third upwards
+        aOffset{0.0},
+        aHold{0.0},
+        swapWave{0.0},
+        chunksize{0},    // 0 means: initialise to SynthEngine.buffersize
+        targetFilename{""},
+        smpCnt{0}
+    { }
+
     public:
-        TestInvoker() :
-            chan{1},
-            pitch{60},       // C4
-            velocity{64},
-            duration{1.0},   // 1sec
-            holdfraction{0.8},
-            repetitions{4},
-            scalestep{4},    // move major third upwards
-            aOffset{0.0},
-            aHold{0.0},
-            swapWave{0.0},
-            chunksize{0},    // 0 means: initialise to SynthEngine.buffersize
-            targetFilename{""},
-            smpCnt{0}
-        { }
+        static TestInvoker& access()
+        {// Meyer's Singleton
+            static TestInvoker instance{};
+            return instance;
+        }
+
+        std::atomic_bool activated{false};
+
 
         /* Delegate for the CLI-CmdInterpreter: handle the CLI instructions
          * to get and set parameter values for the SynthEngine test.

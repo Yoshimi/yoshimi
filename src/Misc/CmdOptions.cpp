@@ -21,169 +21,294 @@
 #include <list>
 #include <errno.h>
 #include <string>
+#include <cstring>
 #include <argp.h>
 
+#include "Misc/Config.h"
 #include "Misc/FileMgrFuncs.h"
 #include "Misc/CmdOptions.h"
+#include "Misc/FormatFuncs.h"
 
+using std::string;
 using file::setExtension;
+using func::string2int;
 
 namespace { // constants used in the implementation
-    char prog_doc[] =
-        "Yoshimi " YOSHIMI_VERSION ", a derivative of ZynAddSubFX - "
-        "Copyright 2002-2009 Nasca Octavian Paul and others, "
-        "Copyright 2009-2011 Alan Calvert, "
-        "Copyright 2012-2013 Jeremy Jongepier and others, "
-        "Copyright 2014-2023 Will Godfrey and others";
+    const char* PROG_DOC =
+        "Options:"
+        "\v"   // the following is printed below the options summary...
+        "\nYoshimi " YOSHIMI_VERSION ", a derivative of ZynAddSubFX\n"
+        "Copyright 2002-2009 Nasca Octavian Paul and others,\n"
+        "Copyright 2009-2011 Alan Calvert,\n"
+        "Copyright 2012-2013 Jeremy Jongepier and others,\n"
+        "Copyright 2014-2025 Will Godfrey and others";
 
     string stateText = "load saved state, defaults to '$HOME/" + EXTEN::config + "/yoshimi/yoshimi-0.state'";
 
-    static struct argp_option cmd_options[] = {
-        {"alsa-audio",        'A',  "<device>",   1,  "use alsa audio output", 0},
-        {"alsa-midi",         'a',  "<device>",   1,  "use alsa midi input", 0},
-        {"define-root",       'D',  "<path>",     0,  "define path to new bank root" , 0},
-        {"buffersize",        'b',  "<size>",     0,  "set internal buffer size", 0 },
-        {"no-gui",            'i',  NULL,         0,  "disable gui", 0},
-        {"gui",               'I',  NULL,         0,  "enable gui", 0},
-        {"no-cmdline",        'c',  NULL,         0,  "disable command line interface", 0},
-        {"cmdline",           'C',  NULL,         0,  "enable command line interface", 0},
-        {"jack-audio",        'J',  "<server>",   1,  "use jack audio output", 0},
-        {"jack-midi",         'j',  "<device>",   1,  "use jack midi input", 0},
-        {"autostart-jack",    'k',  NULL,         0,  "auto start jack server", 0},
-        {"auto-connect",      'K',  NULL,         0,  "auto connect jack audio", 0},
-        {"load",              'l',  "<file>",     0,  "load .xmz parameters file", 0},
-        {"load-instrument",   'L',  "<file>[@part]",     0,  "load .xiz instrument file(no space)@n to part 'n'", 0},
-        {"load-midilearn",    'M',  "<file>",     0,  "load .xly midi-learn file", 0},
-        {"name-tag",          'N',  "<tag>",      0,  "add tag to clientname", 0},
-        {"samplerate",        'R',  "<rate>",     0,  "set alsa audio sample rate", 0},
-        {"oscilsize",         'o',  "<size>",     0,  "set AddSynth oscillator size", 0},
-        {"state",             'S',  "<file>",     1,  "load .state complete machine setup file", 0},
-        {"load-guitheme",     'T',  "<file>",     0,  "load .clr GUI theme file", 0},
-        {"null",               13,  NULL,         0,  "use Null-backend without audio/midi", 0},
-        #if defined(JACK_SESSION)
-            {"jack-session-uuid", 'U',  "<uuid>",     0,  "jack session uuid", 0},
-            {"jack-session-file", 'u',  "<file>",     0,  "load named jack session file", 0},
-        #endif
+    const argp_option OPTION_SPEC[] = {
+        {"alsa-audio",        'A',  "<device>", OPTION_ARG_OPTIONAL, "use alsa audio output", 0},
+        {"alsa-midi",         'a',  "<device>", OPTION_ARG_OPTIONAL, "use alsa midi input",   0},
+        {"define-root",       'D',  "<path>",   0                  , "define path to new bank root", 2},
+        {"buffersize",        'b',  "<size>",   0                  , "set internal buffer size",     2},
+        {"no-gui",            'i',  NULL,       0                  , "disable gui", 1},
+        {"gui",               'I',  NULL,       0                  , "enable gui",  1},
+        {"no-cmdline",        'c',  NULL,       0                  , "disable command line interface", 1},
+        {"cmdline",           'C',  NULL,       0                  , "enable command line interface",  1},
+        {"jack-audio",        'J',  "<server>", OPTION_ARG_OPTIONAL,  "use jack audio output", 0},
+        {"jack-midi",         'j',  "<device>", OPTION_ARG_OPTIONAL,  "use jack midi input",   0},
+        {"autostart-jack",    'k',  NULL,       0                  , "auto start jack server", 0},
+        {"auto-connect",      'K',  NULL,       0                  , "auto connect jack audio",0},
+        {"load",              'l',  "<file>",   0                  , "load .xmz parameters file",    2},
+        {"load-instrument",   'L',  "<file>[@part]",0                , "load .xiz instrument file(no space)@n to part 'n'", 2},
+        {"load-midilearn",    'M',  "<file>",   0                  , "load .xly midi-learn file",    2},
+        {"name-tag",          'N',  "<tag>",    0                  , "add tag to clientname",        2},
+        {"samplerate",        'R',  "<rate>",   0                  , "set alsa audio sample rate",   1},
+        {"oscilsize",         'o',  "<size>",   0                  , "set AddSynth oscillator size", 1},
+        {"state",             'S',  "<file>",   0                  , "load .state complete machine setup file", 2},
+        {"load-guitheme",     'T',  "<file>",   0                  , "load .clr GUI theme file",                2},
+        {"null",               13,  NULL,       0                  , "use Null-backend without audio/midi",     0},
+#if defined(JACK_SESSION)
+        {"jack-session-uuid", 'U',  "<uuid>",   0                  , "jack session uuid",            2},
+        {"jack-session-file", 'u',  "<file>",   0                  , "load named jack session file", 2},
+#endif
         { 0, 0, 0, 0, 0, 0}
     };
-}
+
+    using Settings = CmdOptions::Settings;
 
 
-CmdOptions::CmdOptions(int argc, char **argv, std::list<string> &allArgs, int &guin, int &cmdn) :
-    gui(0),
-    cmd(0)
-{
-    loadCmdArgs(argc, argv);
-    allArgs = settings;
-    guin = gui;
-    cmdn = cmd;
-    return;
-}
-
-
-static error_t parse_cmds (int key, char *arg, struct argp_state *state)
-{
-    CmdOptions *base = (CmdOptions*)state->input;
-    if (arg && arg[0] == 0x3d)
-        ++ arg;
-    base->gui = base->cmd = 0;
-    switch (key)
+    error_t handleOption (int key, char *arg, struct argp_state *state)
     {
-        case 'N': base->settings.push_back("N:" + string(arg)); break;
-        case 'l': base->settings.push_back("l:" + string(arg)); break;
-        case 'L': base->settings.push_back("L:" + string(arg)); break;
-        case 'M': base->settings.push_back("M:" + string(arg)); break;
-        case 'T': base->settings.push_back("T:" + string(arg)); break;
-        case 'A':
-            if (arg)
-                base->settings.push_back("A:" + string(arg));
-            else
-                base->settings.push_back("A:");
-            break;
+        auto settings = [&]{ return static_cast<Settings*>(state->input); };
 
-        case 'a':
-            if (arg)
-                base->settings.push_back("a:" + string(arg));
-            else
-                base->settings.push_back("a:");
-            break;
+        auto recordToggle = [&]{ settings()->emplace_back(char(key), "");                  };
+        auto recordOption = [&]{ settings()->emplace_back(char(key), string{arg? arg:""}); };
 
-        case 'b': base->settings.push_back("b:" + string(arg)); break;
-        case 'c':
-            base->settings.push_back("c:");
-            base->cmd = -1;
-            break;
+        if (arg && arg[0] == '=')
+            ++ arg;
 
-        case 'C':
-            base->settings.push_back("C:");
-            base->cmd = 1;
-            break;
+        switch (key)
+        {
+            case 'A': recordOption(); break;     // ALSA audio
+            case 'a': recordOption(); break;     // ALSA MIDI
+            case 'b': recordOption(); break;     // buffer-size
+            case 'c': recordToggle(); break;     // disable CLI
+            case 'C': recordToggle(); break;     // enable CLIE
+            case 'D': recordOption(); break;     // define bank root
+            case 'i': recordToggle(); break;     // without GUI
+            case 'I': recordToggle(); break;     // with GUI
+            case 'J': recordOption(); break;     // Jack audio
+            case 'j': recordOption(); break;     // Jack MIDI
+            case 'k': recordToggle(); break;     // auto-start Jack
+            case 'K': recordToggle(); break;     // auto-connect to Jack
+            case 'l': recordOption(); break;     // load params file
+            case 'L': recordOption(); break;     // load instrument
+            case 'M': recordOption(); break;     // load MIDI-learn
+            case 'N': recordOption(); break;     // name-tag
+            case 'o': recordOption(); break;     // oscil-size
+            case 'T': recordOption(); break;     // load gui theme
+            case 'R': recordOption(); break;     // set ALSA sample rate
+            case 'S': recordOption(); break;     // load complete state file
 
-        case 'D':
-            if (arg)
-                base->settings.push_back("D:" + string(arg));
-            break;
-
-        case 'i':
-            base->settings.push_back("i:");
-            base->gui = -1;
-            break;
-
-        case 'I':
-            base->settings.push_back("I:");
-            base->gui = 1;
-            break;
-
-        case 'j':
-            if (arg)
-                base->settings.push_back("j:" + string(arg));
-            else
-                base->settings.push_back("j:");
-            break;
-
-        case 'J':
-            if (arg)
-                base->settings.push_back("J:" + string(arg));
-            else
-                base->settings.push_back("J:");
-            break;
-
-        case 'k': base->settings.push_back("k:"); break;
-        case 'K': base->settings.push_back("K:"); break;
-        case 'o': base->settings.push_back("o:" + string(arg)); break;
-        case 'R': base->settings.push_back("R:" + string(arg)); break;
-        case 'S':
-            if (arg)
-                base->settings.push_back("S:" + string(arg));
-            break;
-
-        case 13:base->settings.push_back("@:"); break;
+            case 13:  recordToggle(); break;     // NULL backend (no audio and MIDI)
 
 #if defined(JACK_SESSION)
-        case 'u':
-            if (arg)
-                base->settings.push_back("u:" + string(arg));
-            break;
-
-        case 'U':
-            if (arg)
-                base->settings.push_back("U:" + string(arg));
-            break;
+            case 'u': recordOption(); break;     // load Jack session file
+            case 'U': recordOption(); break;     // Jack session UUID
 #endif
-
-        case ARGP_KEY_ARG:
-        case ARGP_KEY_END:
-            break;
-        default:
-            return error_t(ARGP_ERR_UNKNOWN);
+            case ARGP_KEY_ARG:
+            case ARGP_KEY_END:
+                break;
+            default:
+                return error_t(ARGP_ERR_UNKNOWN);
+        }
+        return error_t(0);
     }
-    return error_t(0);
-}
 
 
-static struct argp cmd_argp = { cmd_options, parse_cmds, prog_doc, 0, 0, 0, 0};
+    const argp PARSER_SETUP = { OPTION_SPEC, handleOption, 0, PROG_DOC, 0, 0, 0};
 
-void CmdOptions::loadCmdArgs(int argc, char **argv)
+}//(End) local definitions for parser configuration
+
+
+CmdOptions::Settings CmdOptions::parseCmdline(int argc, char **argv)
 {
-    argp_parse(&cmd_argp, argc, argv, 0, 0, this);
+    Settings parsedOptions;
+    argp_parse(&PARSER_SETUP, argc, argv, 0, 0, &parsedOptions);
+    return parsedOptions;
 }
+
+
+void CmdOptions::applyTo (Config& config)  const
+{
+    for (auto const& [cmd, line] : settings)
+    {
+        switch (cmd)
+        {
+            case 'A':
+                config.engineChanged = true;
+                config.audioEngine = alsa_audio;
+                if (not line.empty())
+                    config.audioDevice = line;
+                else
+                    config.audioDevice = config.alsaAudioDevice;
+            break;
+
+            case 'a':
+                config.midiChanged = true;
+                config.midiEngine = alsa_midi;
+                if (not line.empty())
+                    config.midiDevice = line;
+                else
+                    config.midiDevice = string(config.alsaMidiDevice);
+                break;
+
+            case 'b':
+                config.configChanged = true;
+                config.bufferChanged = true;
+                config.buffersize = string2int(line);
+                break;
+
+            case 'c':
+                config.cliChanged = true;
+                config.showCli = false;
+                break;
+
+            case 'C':
+                config.cliChanged = true;
+                config.showCli = true;
+                break;
+
+            case 'D':
+                if (not line.empty())
+                    config.rootDefine = line;
+                break;
+
+            case 'i':
+                config.guiChanged = true;
+                config.showGui = false;
+                break;
+
+            case 'I':
+                config.guiChanged = true;
+                config.showGui = true;
+                break;
+
+            case 'J':
+                config.engineChanged = true;
+                config.audioEngine = jack_audio;
+                if (!line.empty())
+                    config.audioDevice = line;
+                break;
+
+            case 'j':
+                config.midiChanged = true;
+                config.midiEngine = jack_midi;
+                if (not line.empty())
+                    config.midiDevice = line;
+                else
+                    config.midiDevice = config.jackMidiDevice;
+                break;
+
+            case 'K':
+                config.connectJackChanged = true;
+                config.connectJackaudio = true;
+                break;
+
+            case 'k':
+                config.startJack = true;
+                break;
+
+            case 'l':
+                config.paramsLoad = line;
+                break;
+
+            case 'L':
+                {// Load instrument@part
+                    uint partLoad = 0;
+                    string spec(line);
+                    size_t pos = spec.rfind("@");
+                    if (pos != string::npos)
+                    {// this provides a way to specify which part to load to
+                        if (spec.length() - pos <= 3)
+                        {
+                            partLoad = (stoi("0" + spec.substr(pos + 1))) - 1;
+                        }
+                        if (partLoad >= 64)
+                            partLoad = 0;
+                        spec = spec.substr(0, pos);
+                    }
+                    config.load2part = partLoad;
+                    config.instrumentLoad = spec;
+                    config.configChanged = true;
+                }
+                break;
+
+            case 'M':
+                config.midiLearnLoad = line;
+                break;
+
+            case 'N':
+                config.nameTag = line;
+                break;
+
+            case 'o':
+                config.configChanged = true;
+                config.oscilChanged = true;
+                config.oscilsize = string2int(line);
+                break;
+
+            case 'R':
+                if (not line.empty())
+                {
+                    config.configChanged = true;
+                    config.rateChanged = true;
+                    int num = (string2int(line) / 48 ) * 48;
+                    if (num < 48000 || num > 192000)
+                        num = 44100; // play safe
+                    config.samplerate = num;
+                }
+                break;
+
+            case 'S':
+                config.sessionStage = _SYS_::type::StartupFirst;
+                config.configChanged = true;
+                config.stateFile = line;
+                break;
+
+            case 'T':
+                config.remoteGuiTheme = line;
+                break;
+
+            case 'u':
+                config.sessionStage = _SYS_::type::JackFirst;
+                config.configChanged = true;
+                config.stateFile = setExtension(line, EXTEN::state);
+                break;
+
+            case 'U':
+                Config::globalJackSessionUuid = line;
+                break;
+
+            case 13:
+                config.configChanged = true;
+                config.engineChanged = true;
+                config.midiChanged = true;
+                config.audioEngine = no_audio;
+                config.midiEngine  = no_midi;
+                break;
+        }
+    }
+    if (config.jackSessionUuid.size() and config.jackSessionFile.size())
+    {
+        config.restoreJackSession = true;
+        config.configChanged = true;
+    }
+}
+
+
+
+CmdOptions::CmdOptions(int argc, char **argv)
+    : settings{parseCmdline(argc,argv)}
+    { }
+

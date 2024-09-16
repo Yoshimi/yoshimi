@@ -74,10 +74,10 @@ class SynthEngine;
 class Reverb : public Effect
 {
     public:
-        Reverb(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth);
-        ~Reverb();
-        void out(float *rawL, float *rawR) override;
-        void cleanup(void) override;
+       ~Reverb();
+        Reverb(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine&);
+        void out(float* rawL, float* rawR) override;
+        void cleanup() override;
 
         void setpreset(uchar npreset) override;
         void changepar(int npar, uchar value) override;
@@ -87,7 +87,7 @@ class Reverb : public Effect
     private:
         static constexpr size_t NUM_TYPES = 3;
 
-        // Parametrii
+        // Parameters
         bool Pchanged;
         uchar Pvolume;
         uchar Ptime;

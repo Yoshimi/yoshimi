@@ -23,6 +23,8 @@
 #ifndef JACK_ENGINE_H
 #define JACK_ENGINE_H
 
+#include "Misc/Util.h"
+
 #include <string>
 #include <jack/jack.h>
 
@@ -32,49 +34,64 @@
 
 #include "MusicIO/MusicIO.h"
 
+using std::string;
+using util::unConst;
+
+
 class SynthEngine;
+
 
 class JackEngine : public MusicIO
 {
     public:
-        JackEngine(SynthEngine *_synth, BeatTracker *_beatTracker);
-        ~JackEngine() { Close(); }
-        bool isConnected(void) { return (NULL != jackClient); }
-        bool connectServer(std::string server);
-        bool openAudio(void);
-        bool openMidi(void);
-        bool Start(void);
-        void Close(void);
-        unsigned int getSamplerate(void) { return audio.jackSamplerate; }
-        int getBuffersize(void) { return audio.jackNframes; }
-        std::string clientName(void);
-        int clientId(void);
-        virtual std::string audioClientName(void) { return clientName(); }
-        virtual int audioClientId(void) { return clientId(); }
-        virtual std::string midiClientName(void) { return clientName(); }
-        virtual int midiClientId(void) { return clientId(); }
-        void registerAudioPort(int portnum);
+        // shall not be copied nor moved
+        JackEngine(JackEngine&&)                 = delete;
+        JackEngine(JackEngine const&)            = delete;
+        JackEngine& operator=(JackEngine&&)      = delete;
+        JackEngine& operator=(JackEngine const&) = delete;
+        JackEngine(SynthEngine&, shared_ptr<BeatTracker>);
+       ~JackEngine() { Close(); }
+
+        /* ====== MusicIO interface ======== */
+        bool openAudio()               override;
+        bool openMidi()                override;
+        bool Start()                   override;
+        void Close()                   override;
+        void registerAudioPort(int)    override;
+
+        uint   getSamplerate()   const override { return audio.jackSamplerate; }
+        int    getBuffersize()   const override { return audio.jackNframes; }
+        string audioClientName() const override { return unConst(this)->clientName(); }
+        int    audioClientId()   const override { return unConst(this)->clientId();   }
+        string midiClientName()  const override { return unConst(this)->clientName(); }
+        int    midiClientId()    const override { return unConst(this)->clientId();   }
+
+        bool isConnected()                      { return (NULL != jackClient); }
+        bool connectServer(string server);
+        string clientName();
+        int clientId();
+
 
     private:
-        bool openJackClient(std::string server);
-        bool connectJackPorts(void);
+        bool openJackClient(string server);
+        bool connectJackPorts();
         bool processAudio(jack_nframes_t nframes);
-        void sendAudio(int framesize, unsigned int offset);
+        void sendAudio(int framesize, uint offset);
         bool processMidi(jack_nframes_t nframes);
         void handleBeatValues(jack_nframes_t nframes);
-        bool latencyPrep(void);
+        bool latencyPrep();
         int processCallback(jack_nframes_t nframes);
-        static int _processCallback(jack_nframes_t nframes, void *arg);
-        static int _xrunCallback(void *arg);
+        static int _processCallback(jack_nframes_t nframes, void* arg);
+        static int _xrunCallback(void* arg);
 
 
 #if defined(JACK_SESSION)
-            static void _jsessionCallback(jack_session_event_t *event, void *arg);
-            void jsessionCallback(jack_session_event_t *event);
+            static void _jsessionCallback(jack_session_event_t* event, void* arg);
+            void jsessionCallback(jack_session_event_t* event);
 #endif
 
 #if defined(JACK_LATENCY)
-            static void _latencyCallback(jack_latency_callback_mode_t mode, void *arg);
+            static void _latencyCallback(jack_latency_callback_mode_t mode, void* arg);
             void latencyCallback(jack_latency_callback_mode_t mode);
 #endif
 

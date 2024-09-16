@@ -36,10 +36,10 @@ class SynthEngine;
 class LFO
 {
     public:
-        LFO(LFOParams *_lfopars, float basefreq, SynthEngine *_synth);
-        ~LFO() { };
-        float lfoout(void);
-        float amplfoout(void);
+       ~LFO() = default;
+        LFO(LFOParams* _lfopars, float basefreq, SynthEngine* _synth);
+        float lfoout();
+        float amplfoout();
     private:
         std::pair<float, float> getBpmFrac()
         {
@@ -48,9 +48,9 @@ class LFO
 
         LFOParams *lfopars;
         ParamBase::ParamsUpdate lfoUpdate;
-        void Recompute(void);
-        void RecomputeFreq(void);
-        void computenextincrnd(void);
+        void Recompute();
+        void RecomputeFreq();
+        void computenextincrnd();
         float x;
         float basefreq;
         float incx, incrnd, nextincrnd;

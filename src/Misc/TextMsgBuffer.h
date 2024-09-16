@@ -79,8 +79,8 @@ class TextMsgBuffer
 #ifdef MAX_MSG
     int count;
 #endif
-        void init(void);
-        void clear(void);
+        void init();
+        void clear();
         int push(std::string text);
         std::string fetch(int pos, bool remove = true);
 };
@@ -184,7 +184,7 @@ inline std::string TextMsgBuffer::fetch(int _pos, bool remove)
         ++ it;
         ++ idx;
     }
-    std::string result = "";
+    std::string result;
     if (idx == pos)
     {
         if (remove)

@@ -30,6 +30,7 @@
 #include <unistd.h>
 #include <thread>
 #include <memory>
+#include <string>
 #include <iostream>
 
 #include "Misc/XMLwrapper.h"
@@ -46,6 +47,7 @@
 #include "Params/PADnoteParameters.h"
 #include "Misc/WavFile.h"
 
+using std::string;
 using std::vector;
 using file::saveData;
 using func::setAllPan;
@@ -95,7 +97,7 @@ namespace{ // Implementation helpers...
 
 
 
-PADnoteParameters::PADnoteParameters(uchar pID, uchar kID, SynthEngine *_synth)
+PADnoteParameters::PADnoteParameters(uchar pID, uchar kID, SynthEngine& _synth)
     : ParamBase(_synth)
     , Pmode{0}
     , Pquality{}
@@ -112,10 +114,10 @@ PADnoteParameters::PADnoteParameters(uchar pID, uchar kID, SynthEngine *_synth)
     , PDetuneType{1}
 
     // base Waveform
-    , fft(synth->oscilsize)
+    , fft(synth.oscilsize)
     , POscil{new OscilParameters(fft, synth)}
     , resonance{new Resonance(synth)}
-    , oscilgen{new OscilGen(fft, resonance.get(), synth, POscil.get())}
+    , oscilgen{new OscilGen(fft, resonance.get(), &synth, POscil.get())}
     , FreqEnvelope{new EnvelopeParams(0, 0, synth)}
     , FreqLfo{new LFOParams(70, 0, 64, 0, 0, 0, 0, 0, synth)}
 
@@ -201,7 +203,7 @@ void PADnoteParameters::HarmonicPos::defaults()
     par3 = 0;
 }
 
-void PADnoteParameters::defaults(void)
+void PADnoteParameters::defaults()
 {
     Pmode = 0;
     Pquality.resetToDefaults();
@@ -237,7 +239,7 @@ void PADnoteParameters::defaults(void)
     // Amplitude Global Parameters
     PVolume = 90;
     PStereo = 1; // stereo
-    setPan(PPanning = 64, synth->getRuntime().panLaw); // center
+    setPan(PPanning = 64, synth.getRuntime().panLaw); // center
     PRandom = false;
     PWidth = 63;
     PAmpVelocityScaleFunction = 64;
@@ -265,7 +267,7 @@ void PADnoteParameters::defaults(void)
     PrandWalkProfileStretch = 0; randWalkProfileStretch.reset();
 
     // reseed OscilGen and wavetable phase randomisation
-    reseed(synth->randomINT());
+    reseed(synth.randomINT());
     sampleTime = 0;
 }
 
@@ -555,7 +557,7 @@ vector<float> PADnoteParameters::generateSpectrum_bandwidthMode(float basefreq, 
     for (size_t nh = 0; nh+1 < fft.spectrumSize(); ++nh)
     {   //for each harmonic
         float realfreq = calcHarmonicPositionFactor(nh) * basefreq;
-        if (realfreq > synth->samplerate_f * 0.49999f)
+        if (realfreq > synth.samplerate_f * 0.49999f)
             break;
         if (realfreq < 20.0f)
             break;
@@ -599,7 +601,7 @@ vector<float> PADnoteParameters::generateSpectrum_bandwidthMode(float basefreq, 
             break;
         }
         bw = bw * powf(realfreq / basefreq, power);
-        size_t ibw = 1 + size_t(bw / (synth->samplerate_f * 0.5f) * spectrumSize);
+        size_t ibw = 1 + size_t(bw / (synth.samplerate_f * 0.5f) * spectrumSize);
         float amp = harmonics[nh];
         if (resonance->Penabled)
             amp *= resonance->getfreqresponse(realfreq);
@@ -607,7 +609,7 @@ vector<float> PADnoteParameters::generateSpectrum_bandwidthMode(float basefreq, 
         if (ibw > profilesize)
         {   // if the bandwidth is larger than the profilesize
             float rap = sqrtf(float(profilesize) / float(ibw));
-            int cfreq = int(realfreq / (synth->halfsamplerate_f) * spectrumSize) - ibw / 2;
+            int cfreq = int(realfreq / (synth.halfsamplerate_f) * spectrumSize) - ibw / 2;
             for (size_t i = 0; i < ibw; ++i)
             {
                 int src = int(i * rap * rap);
@@ -622,7 +624,7 @@ vector<float> PADnoteParameters::generateSpectrum_bandwidthMode(float basefreq, 
         else
         {   // if the bandwidth is smaller than the profilesize
             float rap = sqrtf(float(ibw) / float(profilesize));
-            float ibasefreq = realfreq / (synth->halfsamplerate_f) * spectrumSize;
+            float ibasefreq = realfreq / (synth.halfsamplerate_f) * spectrumSize;
             for (size_t i = 0; i < profilesize; ++i)
             {
                 float idfreq = i / (float)profilesize - 0.5f;
@@ -659,7 +661,7 @@ vector<float> PADnoteParameters::generateSpectrum_otherModes(float basefreq, siz
         ///sa fac aici interpolarea si sa am grija daca frecv descresc
         //[Romanian, from original Author] "do the interpolation here and be careful if they decrease frequency"
 
-        if (realfreq > synth->samplerate_f * 0.49999f)
+        if (realfreq > synth.samplerate_f * 0.49999f)
             break;
         if (realfreq < 20.0f)
             break;
@@ -667,7 +669,7 @@ vector<float> PADnoteParameters::generateSpectrum_otherModes(float basefreq, siz
         float amp = harmonics[nh];
         if (resonance->Penabled)
             amp *= resonance->getfreqresponse(realfreq);
-        int cfreq = int(realfreq / (synth->halfsamplerate_f) * spectrumSize);
+        int cfreq = int(realfreq / (synth.halfsamplerate_f) * spectrumSize);
         spectrum[cfreq] = amp + 1e-9f;
     }
 
@@ -698,8 +700,8 @@ vector<float> PADnoteParameters::generateSpectrum_otherModes(float basefreq, siz
 
 void PADnoteParameters::buildNewWavetable(bool blocking)
 {
-    PADStatus::mark(PADStatus::DIRTY, synth->interchange, partID,kitID);
-    if (synth->getRuntime().useLegacyPadBuild())
+    PADStatus::mark(PADStatus::DIRTY, synth.interchange, partID,kitID);
+    if (synth.getRuntime().useLegacyPadBuild())
         mute_and_rebuild_synchronous();
     else
     if (not blocking)
@@ -732,7 +734,7 @@ optional<PADTables> PADnoteParameters::render_wavetable()
 {
     PADTables newTable(Pquality);
     const size_t spectrumSize = newTable.tableSize / 2;
-    PADStatus::mark(PADStatus::BUILDING, synth->interchange, partID,kitID);
+    PADStatus::mark(PADStatus::BUILDING, synth.interchange, partID,kitID);
 
     // prepare storage for a very large spectrum and FFT transformer
     fft::Calc fft{newTable.tableSize};
@@ -787,7 +789,7 @@ optional<PADTables> PADnoteParameters::render_wavetable()
         newsmp.fillInterpolationBuffer();
     }
 
-    PADStatus::mark(PADStatus::PENDING, synth->interchange, partID,kitID);
+    PADStatus::mark(PADStatus::PENDING, synth.interchange, partID,kitID);
     return newTable;
 }
 
@@ -806,7 +808,7 @@ void PADnoteParameters::activate_wavetable()
     if (futureBuild.isReady()
         and (PxFadeUpdate == 0 or xFade.startXFade(waveTable)))
     {                          // Note: don't pick up new waveTable while fading
-        PADStatus::mark(PADStatus::CLEAN, synth->interchange, partID,kitID);
+        PADStatus::mark(PADStatus::CLEAN, synth.interchange, partID,kitID);
         futureBuild.swap(waveTable);
         paramsChanged();
         sampleTime = 0;
@@ -822,12 +824,12 @@ void PADnoteParameters::activate_wavetable()
  */
 void PADnoteParameters::maybeRetrigger()
 {
-    if (PrebuildTrigger == 0 or synth->getRuntime().useLegacyPadBuild())
+    if (PrebuildTrigger == 0 or synth.getRuntime().useLegacyPadBuild())
         return; // this feature requires a background build of the wavetable.
 
     if (sampleTime < PrebuildTrigger)
     {
-        sampleTime += synth->buffersize_f / synth->samplerate_f * 1000;
+        sampleTime += synth.buffersize_f / synth.samplerate_f * 1000;
         return;
     }
     else if (not futureBuild.isUnderway())
@@ -859,7 +861,7 @@ void PADnoteParameters::mute_and_rebuild_synchronous()
 
 
 
-void PADnoteParameters::setPan(char pan, unsigned char panLaw)
+void PADnoteParameters::setPan(char pan, uchar panLaw)
 {
     PPanning = pan;
     if (!PRandom)
@@ -869,10 +871,10 @@ void PADnoteParameters::setPan(char pan, unsigned char panLaw)
 }
 
 
-bool PADnoteParameters::export2wav(std::string basefilename)
+bool PADnoteParameters::export2wav(string basefilename)
 {
     string type;
-    if (synth->getRuntime().isLittleEndian)
+    if (synth.getRuntime().isLittleEndian)
         type = "RIFF"; // default wave format
     else
         type = "RIFX";
@@ -884,10 +886,10 @@ bool PADnoteParameters::export2wav(std::string basefilename)
         char tmpstr[22];
         snprintf(tmpstr, 22, "-%02zu", tab + 1);
         string filename = basefilename + string(tmpstr) + EXTEN::MSwave;
-        unsigned int block;
-        unsigned short int sBlock;
-        unsigned int buffSize = 44 + sizeof(short int) * waveTable.tableSize; // total size
-        char *buffer = (char*) malloc (buffSize);
+        uint   block;
+        ushort sBlock;
+        uint  buffSize = 44 + sizeof(short int) * waveTable.tableSize; // total size
+        char* buffer = (char*) malloc (buffSize);
         strcpy(buffer, type.c_str());
         block = waveTable.tableSize * 4 + 36; // 2 channel shorts + part header
         buffer[4] = block & 0xff;
@@ -902,9 +904,9 @@ bool PADnoteParameters::export2wav(std::string basefilename)
         memcpy(buffer + 20, &sBlock, 2);
         sBlock = 1; // NumChannels mono
         memcpy(buffer + 22, &sBlock, 2);
-        block = synth->samplerate;
+        block = synth.samplerate;
         memcpy(buffer + 24, &block, 4);
-        block = synth->samplerate * 2; // ByteRate
+        block = synth.samplerate * 2; // ByteRate
                 // (SampleRate * NumChannels * BitsPerSample) / 8
         memcpy(buffer + 28, &block, 4);
         sBlock = 2; // BlockAlign
@@ -939,7 +941,7 @@ bool PADnoteParameters::export2wav(std::string basefilename)
 void PADnoteParameters::add2XML(XMLwrapper& xml)
 {
     // currently not used
-    // bool yoshiFormat = synth->usingYoshiType;
+    // bool yoshiFormat = synth.usingYoshiType;
     xml.information.PADsynth_used = 1;
 
     xml.addparbool("stereo", PStereo);
@@ -1121,12 +1123,12 @@ void PADnoteParameters::getfromXML(XMLwrapper& xml)
         if (test < 64) // new Yoshi type
         {
             PWidth = test;
-            setPan(xml.getpar127("pan_pos",PPanning), synth->getRuntime().panLaw);
+            setPan(xml.getpar127("pan_pos",PPanning), synth.getRuntime().panLaw);
             PRandom = xml.getparbool("random_pan", PRandom);
         }
         else // legacy
         {
-            setPan(xml.getpar127("panning",PPanning), synth->getRuntime().panLaw);
+            setPan(xml.getpar127("panning",PPanning), synth.getRuntime().panLaw);
             if (PPanning == 0)
             {
                 PPanning = 64;
@@ -1223,14 +1225,14 @@ float PADnoteParameters::getLimits(CommandBlock *getData)
     int request = int(getData->data.type & TOPLEVEL::type::Default);
     int control = getData->data.control;
 
-    unsigned char type = 0;
+    uchar type = 0;
 
     // padnote defaults
     int min = 0;
     int def = 64;
     int max = 127;
     type |= TOPLEVEL::type::Integer;
-    unsigned char learnable = TOPLEVEL::type::Learnable;
+    uchar learnable = TOPLEVEL::type::Learnable;
     switch (control)
     {
         case PADSYNTH::control::volume:

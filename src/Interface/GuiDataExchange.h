@@ -143,8 +143,8 @@ public:
     }
 
     /**
-     * Establish a connection tag matching a given connection
-     * used in a data slot currently present in the buffer.
+     * Establish a connection with a routing tag retrieved from
+     * a designated data slot currently present in the buffer.
      * Typically used to bootstrap a client-side end point.
      */
     template<typename DAT>
@@ -191,6 +191,9 @@ public:
         DetachHook detach;
     };
 
+
+    /** message describes a push update, corresponding to GuiDataExchange data? */
+    bool isValidPushMsg(CommandBlock const&);
 
     /**
      * Dispatch a notification regarding data updates -> GUI.

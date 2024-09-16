@@ -30,12 +30,11 @@
 #include "Misc/NumericFuncs.h"
 
 
-SVFilter::SVFilter(unsigned char Ftype, float Ffreq, float Fq,
-                   unsigned char Fstages, SynthEngine *_synth) :
-    type(Ftype),
+SVFilter::SVFilter(SynthEngine *_synth, uchar _type, float _freq, float _q, uchar Fstages) :
+    type(_type),
     stages(Fstages),
-    freq(Ffreq),
-    q(Fq),
+    freq(_freq),
+    q(_q),
     needsinterpolation(0),
     firsttime(1),
     tmpismp(_synth->buffersize),
@@ -45,7 +44,7 @@ SVFilter::SVFilter(unsigned char Ftype, float Ffreq, float Fq,
         stages = MAX_FILTER_STAGES;
     outgain = 1.0f;
     cleanup();
-    setfreq_and_q(Ffreq, Fq);
+    setfreq_and_q(_freq, _q);
 }
 
 
@@ -77,7 +76,7 @@ void SVFilter::cleanup()
 }
 
 
-void SVFilter::computefiltercoefs(void)
+void SVFilter::computefiltercoefs()
 {
     // calculations done in doubles for better portability of results
     par.f = double(freq) / synth->samplerate * 4.0;

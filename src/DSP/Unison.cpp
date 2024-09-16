@@ -36,19 +36,19 @@
 using func::power;
 
 
-Unison::Unison(int update_period_samples_, float max_delay_sec_, SynthEngine *_synth) :
-    unison_size(0),
-    base_freq(1.0f),
-    max_delay(std::max(10, int(_synth->samplerate_f * max_delay_sec_) + 1)),
-    delay_k(0),
-    first_time(false),
-    voice{},
-    delay_buffer{new float[max_delay]{0}}, // zero-init
-    update_period_samples(update_period_samples_),
-    update_period_sample_k(0),
-    unison_amplitude_samples(0.0f),
-    unison_bandwidth_cents(10.0f),
-    synth(_synth)
+Unison::Unison(int update_period_samples_, float max_delay_sec_, SynthEngine* _synth)
+    : unison_size{0}
+    , base_freq{1.0f}
+    , max_delay{std::max(10, int(_synth->samplerate_f * max_delay_sec_) + 1)}
+    , delay_k{0}
+    , first_time{false}
+    , voice{}
+    , delay_buffer{new float[max_delay]{0}}  // zero-init
+    , update_period_samples{update_period_samples_}
+    , update_period_sample_k{0}
+    , unison_amplitude_samples{0.0f}
+    , unison_bandwidth_cents{10.0f}
+    , synth{_synth}
 {
     setSize(1);
 }
@@ -83,20 +83,18 @@ void Unison::setBandwidth(float bandwidth)
         bandwidth = 0.0f;
     if (bandwidth > 1200.0f)
         bandwidth = 1200.0f;
-//    printf("band %f\n", bandwidth);
     //#warning
-    //    : todo: if bandwidth is too small the audio will be self canceled (because of the sign change of the outputs)
+    //    : todo: if bandwidth is too small the audio will be self cancelled (because of the sign change of the outputs)
     unison_bandwidth_cents = bandwidth;
     updateParameters();
 }
 
 
-void Unison::updateParameters(void)
+void Unison::updateParameters()
 {
     if (!voice)
         return;
-    float increments_per_second = synth->samplerate_f / (float)update_period_samples;
-//	printf("#%g, %g\n",increments_per_second,base_freq);
+    float increments_per_second = synth->samplerate_f / float(update_period_samples);
     for (int i = 0; i < unison_size; ++i)
     {
         float base = powf(UNISON_FREQ_SPAN, synth->numRandom() * 2.0f - 1.0f);
@@ -106,11 +104,9 @@ void Unison::updateParameters(void)
         if (synth->numRandom() < 0.5f)
             m = -m;
         voice[i].step = m;
-//		printf("%g %g\n",uv[i].relative_amplitude,period);
     }
 
     float max_speed = power<2>(unison_bandwidth_cents / 1200.0f);
-//    printf("speed %f\n", max_speed);
     unison_amplitude_samples = 0.125f * (max_speed - 1.0f) * synth->samplerate_f / base_freq;
 
     //#warning
@@ -121,7 +117,7 @@ void Unison::updateParameters(void)
 }
 
 
-void Unison::process(int bufsize, float *inbuf, float *outbuf)
+void Unison::process(int bufsize, float* inbuf, float* outbuf)
 {
     if (!voice)
         return;
@@ -130,7 +126,7 @@ void Unison::process(int bufsize, float *inbuf, float *outbuf)
 
     float volume = 1.0f / sqrtf(unison_size);
     float xpos_step = 1.0f / update_period_samples;
-    float xpos = (float)update_period_sample_k * xpos_step;
+    float xpos = float(update_period_sample_k) * xpos_step;
     for (int i = 0; i < bufsize; ++i)
     {
         if (update_period_sample_k++ >= update_period_samples)
@@ -146,7 +142,7 @@ void Unison::process(int bufsize, float *inbuf, float *outbuf)
         for (int k = 0; k < unison_size; ++k)
         {
             float vpos = voice[k].realpos1 * (1.0f - xpos) + voice[k].realpos2 * xpos;
-            float pos  = (float)(delay_k + max_delay) - vpos - 1.0f;
+            float pos  = float(delay_k + max_delay) - vpos - 1.0f;
             int posi = int(pos);
             int posi_next = posi + 1;
             if (posi >= max_delay)
@@ -158,10 +154,7 @@ void Unison::process(int bufsize, float *inbuf, float *outbuf)
             sign = -sign;
         }
         outbuf[i] = out * volume;
-//		printf("%d %g\n",i,outbuf[i]);
         delay_buffer[delay_k] = in;
-        //if ((++delay_k) >= max_delay)
-        //    delay_k = 0;
         delay_k = (++delay_k < max_delay) ? delay_k : 0;
     }
 }
@@ -175,7 +168,7 @@ void Unison::updateUnisonData()
     float newval;
     float pos;
     float step;
-    float vibratto_val;
+    float vibratoFactor;
     for (int k = 0; k < unison_size; ++k)
     {
         pos  = voice[k].position;
@@ -191,14 +184,14 @@ void Unison::updateUnisonData()
             pos  = 1.0f;
             step = -step;
         }
-        vibratto_val = (pos - 0.333333333f * pos * pos * pos) * 1.5f; //make the vibratto lfo smoother
+        vibratoFactor = (pos - 1/3.0f * pos*pos*pos) * 1.5f; //make the vibrato LFO smoother
 
         // #warning
         // I will use relative amplitude, so the delay might be bigger than the whole buffer
         // #warning
         // I have to enlarge (reallocate) the buffer to make place for the whole delay
 
-        newval = 1.0f + 0.5f * (vibratto_val + 1.0f) * unison_amplitude_samples * voice[k].relative_amplitude;
+        newval = 1.0f + 0.5f * (vibratoFactor + 1.0f) * unison_amplitude_samples * voice[k].relative_amplitude;
 
         if (first_time)
             voice[k].realpos1 = voice[k].realpos2 = newval;

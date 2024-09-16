@@ -121,9 +121,6 @@ decl {\#include "Interface/InterfaceAnchor.h"
 decl {\#include "MidiLearnUI.h"} {public local
 }
 
-decl {extern SynthEngine *firstSynth;} {public local
-}
-
 decl {\#include "Misc/FileMgrFuncs.h"
     using file::isRegularFile;
     using file::findLeafName;} {private local
@@ -418,7 +415,7 @@ class MasterUI {: {public GuiUpdates}
       panelType = 5;
       msgSeen = false;
       syseffSeen = false;
-      partmax = synth->getRuntime().NumAvailableParts;
+      partmax = synth->getRuntime().numAvailableParts;
       microtonalui = new MicrotonalUI(&synth->microtonal, synth);
       bankui = new BankUI(synth);
       virkeyboard = new VirKeyboard(synth);
@@ -440,7 +437,7 @@ class MasterUI {: {public GuiUpdates}
       //std::cout << "Found windows " << int(foundWindows) << std::endl;
       loadWindowData();
       string starterror = "";
-      if (synth->getIsLV2Plugin())
+      if (synth->getRuntime().isLV2)
       {
           masterwindow->label(synth->getWindowTitle().c_str());
       }
@@ -494,6 +491,14 @@ class MasterUI {: {public GuiUpdates}
 
     return (fetchO != 0);} {}
   }
+  Function {refreshInit()} {} {
+    code {// update to current state and refresh sub-UIs and config
+    refresh_master_ui(1);
+    resetPartsClip();
+    bankui->readbankcfg();
+    bankui->rescan_for_banks();
+    //} {}
+  }
   Function {make_window()} {} {
     Fl_Window masterwindow {
       label {Yoshimi meets ZynAddSubFX}
@@ -503,7 +508,7 @@ class MasterUI {: {public GuiUpdates}
             if (close)
             {
                 if (force)
-                    firstSynth->getRuntime().exitType = FORCED_EXIT;
+                    Config::primary().exitType = FORCED_EXIT;
                     /*
                     * The above line shouldn't be necessary!
                     * It works fine on jack but fails on ALSA.
@@ -513,7 +518,7 @@ class MasterUI {: {public GuiUpdates}
                     */
                     //send_data(0, TOPLEVEL::control::forceExit, 0, UNUSED);
 
-                synth->guiClosed(true);
+                synth->signalGuiWindowClosed();
             }}
       xywh {123 76 385 500} type Double labelfont 13 labelsize 12 hide resizable
       code0 {mainDW = 385; mainDH = 470;}
@@ -549,7 +554,7 @@ class MasterUI {: {public GuiUpdates}
             }
             break;
         case 2: // new instance
-            if (synth->getIsLV2Plugin())
+            if (synth->getRuntime().isLV2)
             {
                 query("", "", "", "Start new instances from host");
                 return;
@@ -914,23 +919,25 @@ class MasterUI {: {public GuiUpdates}
             callback {//
                 uchar effType = o->value();
                 uchar effNum = syseffectui->effNum();
-                send_data(TOPLEVEL::action::forceUpdate, EFFECT::sysIns::effectType, effType, TOPLEVEL::type::Integer, TOPLEVEL::section::systemEffects, effNum);}
+                send_data(TOPLEVEL::action::forceUpdate, EFFECT::sysIns::effectType, effType, TOPLEVEL::type::Integer, TOPLEVEL::section::systemEffects, effNum);
+                // update sys-effect enabled checkbox as immediate feedback
+                // the next push-update will then set it so to reflect the actual activation state in the core
+                SysEffOn->value(effType != 0);}
             xywh {120 156 96 20} down_box BORDER_BOX labeltype NO_LABEL labelsize 11 labelcolor 64 align 16 textfont 1 textsize 11 textcolor 64
             code0 {o->add("No Effect");o->add("Reverb");o->add("Echo");o->add("Chorus");o->add("Phaser");o->add("AlienWah");o->add("Distortion");o->add("EQ");o->add("DynFilter");}
-            code1 {o->value(0); // initially disabled}
+            code1 {o->value(0); // initially disabled -- enabled only when effect slot is occupied}
           } {}
           Fl_Check_Button SysEffOn {
             label On
             callback {//
                 if (o->value())
                 {
-                    sysefftype->activate();
                     sysCopy->activate();
                     sysPaste->activate();
                 }
                 else
                 {
-                    sysefftype->deactivate();
+                    // note: the effect-type select box remains enabled
                     sysCopy->deactivate();
                     sysPaste->deactivate();
                 }
@@ -978,11 +985,12 @@ class MasterUI {: {public GuiUpdates}
             callback {//
                 uchar effType = o->value();
                 uchar effNum = inseffectui->effNum();
-                send_data(TOPLEVEL::action::forceUpdate, EFFECT::sysIns::effectType, effType, TOPLEVEL::type::Integer, TOPLEVEL::section::insertEffects, effNum);}
+                send_data(TOPLEVEL::action::forceUpdate, EFFECT::sysIns::effectType, effType, TOPLEVEL::type::Integer, TOPLEVEL::section::insertEffects, effNum);
+                // note: when processing this in InterChange, an insertion destination is automatically pre-selected}
             xywh {120 156 96 20} down_box BORDER_BOX labeltype NO_LABEL labelsize 11 labelcolor 64 align 0 textfont 1 textsize 11 textcolor 64
             code0 {o->add("No Effect");o->add("Reverb");o->add("Echo");o->add("Chorus");o->add("Phaser");o->add("AlienWah");o->add("Distortion");o->add("EQ");o->add("DynFilter");}
             code1 {o->value(0);}
-            code2 {o->deactivate(); // initially deactivated}
+            code2 {o->activate(); // not disabled; user may activate this slot by picking some effect type}
           } {}
           Fl_Choice inseffpart {
             label {To }
@@ -3095,10 +3103,7 @@ Alan Calvert started the project}
                 syseffectui->refresh();
                 syseffectui->UpdatePresetColour(parameter, sysefftype->value());
                 SysEffOn->value(syseffectui->isEnabled());
-                if (SysEffOn->value())
-                    sysefftype->activate();
-                else
-                    sysefftype->deactivate();
+                // note: effect type selection not disabled/enabled
             }
             else if (control == EFFECT::sysIns::effectType)
             {
@@ -3148,11 +3153,9 @@ Alan Calvert started the project}
         else if (control == EFFECT::sysIns::effectDestination)
         {
             inseffpart->value(value_int + 2);
-            if (value_int == -1)
-                insefftype->deactivate();
-            else
+            if (value_int != -1)
             {
-                insefftype->activate();
+                // note: effect type selection is never disabled
                 refreshInsEffUI();
                 if (sysinsgroup->value() == InsertionEffectsGrp)
                     showInsEfxUI();
@@ -3936,7 +3939,7 @@ Alan Calvert started the project}
     code {//
     if (microtonalui) // not taking chances!
         delete microtonalui;
-    partmax = synth->getRuntime().NumAvailableParts;
+    partmax = synth->getRuntime().numAvailableParts;
     maxparts->value(partmax);
     checkmaxparts();
     panning_law->value(fetchData(0, MAIN::control::panLawType, TOPLEVEL::section::main));
@@ -3956,10 +3959,7 @@ Alan Calvert started the project}
 
     bool isDirty;
     SysEffOn->value(syseffectui->isEnabled());
-    if (SysEffOn->value())
-        sysefftype->activate();
-    else
-        sysefftype->deactivate();
+    // note: effect type selection is never disabled
     if (syseffectui->effType() > 0)
     {
         isDirty = syseffectui->isChanged();
@@ -4014,13 +4014,13 @@ Alan Calvert started the project}
     }
     return changed;} {}
   }
-  Function {strategicRetreat(void)} {} {
+  Function {strategicRetreat()} {} {
     code {query("", "", "", "Bad things happened,\\nYoshimi strategically retreats.");} {}
   }
   Function {Log(string msg)} {} {
     code {yoshiLog->log(msg);} {}
   }
-  Function {showSysEfxUI(void)} {private
+  Function {showSysEfxUI()} {private
   } {
     code {//
     inseffectui->hide();
@@ -4034,7 +4034,7 @@ Alan Calvert started the project}
     syseffectuigroup->show();
     lastmainW = 0;} {}
   }
-  Function {showInsEfxUI(void)} {private
+  Function {showInsEfxUI()} {private
   } {
     code {//
     syseffectui->hide();
@@ -4070,7 +4070,7 @@ Alan Calvert started the project}
     inseffpart->clear();
     inseffpart->add("Master Out"); // 0
     inseffpart->add("Off");        // 1
-    int size = synth->getRuntime().NumAvailableParts;
+    int size = synth->getRuntime().numAvailableParts;
     for (int i = 0; i < size; ++i)
     {
         string num = string("00") + asString(i + 1);
@@ -4104,13 +4104,12 @@ Alan Calvert started the project}
     inseffectui->refresh();
     if (routing != -1)
     {
-        insefftype->activate();
         inseffectui->activate();
         inseffectuigroup->activate();
     }
     else
     {
-        insefftype->deactivate();
+        // note: effect type selection is never disabled
         inseffectui->deactivate();
         inseffectuigroup->deactivate();
     }} {}
@@ -4275,14 +4274,14 @@ bpmfallback->format(format);} {}
     else
         partui->instrumenteditwindow->hide();} {}
   }
-  Function {checkBuffer(void)} {} {
+  Function {checkBuffer()} {} {
     code {//
             if (lastmainW < 0) // not ready yet!
                 return;
             read_updates(synth);
             wincheck();} {}
   }
-  Function {rescaleMain(void)} {} {
+  Function {rescaleMain()} {} {
     code {//
             if (lastmainW < 0) // not ready yet!
                 return;

@@ -29,6 +29,8 @@
 #include "Misc/Alloc.h"
 #include "globals.h"
 
+#include <array>
+
 
 class SynthEngine;
 
@@ -36,15 +38,21 @@ class AnalogFilter : public Filter_
 {
     public:
        ~AnalogFilter() = default;
-        AnalogFilter(unsigned char Ftype, float Ffreq, float Fq,
-                     unsigned char Fstages, SynthEngine *_synth);
-        AnalogFilter(const AnalogFilter &orig);
-        Filter_* clone() { return new AnalogFilter(*this); };
-        void filterout(float *smp);
-        void setfreq(float frequency);
+        AnalogFilter(SynthEngine&, uchar _type, float _freq, float _q, uchar _stages, float dBgain =1.0);
+        Filter_* clone() override { return new AnalogFilter(*this); };
+
+        // can be cloned and moved, but not assigned
+        AnalogFilter(AnalogFilter const&);
+        AnalogFilter(AnalogFilter&&)                 = default;
+        AnalogFilter& operator=(AnalogFilter&&)      = delete;
+        AnalogFilter& operator=(AnalogFilter const&) = delete;
+
+
+        void filterout(float* smp);
+        void setfreq(float);
         float getFreq();
         void setfreq_and_q(float frequency, float q_);
-        void setq(float q_);
+        void setq(float);
 
         void settype(int type_);
         void setgain(float dBgain);
@@ -54,37 +62,38 @@ class AnalogFilter : public Filter_
         void interpolatenextbuffer();
         void cleanup();
 
-        float H(float freq); // Obtains the response for a given frequency
+        float calcFilterResponse(float freq) const;
+
+        static constexpr uint MAX_TYPES = 1 + TOPLEVEL::filter::HighShelf2;  // NOTE: change this if adding new filter types
 
     private:
-        struct fstage {
-            float c1, c2;
-        } x[MAX_FILTER_STAGES + 1],
-          y[MAX_FILTER_STAGES + 1],
-          oldx[MAX_FILTER_STAGES + 1],
-          oldy[MAX_FILTER_STAGES + 1];
+        struct FStage {
+            float c1{0}, c2{0};
+        };
+        using FStages = std::array<FStage,MAX_FILTER_STAGES + 1>;
+        FStages x,y,oldx,oldy;
 
-        void singlefilterout(float *smp, fstage &x, fstage &y, float *c, float *d);
-        void computefiltercoefs(void);
-        int type;   // The type of the filter (LPF1,HPF1,LPF2,HPF2...)
-        int stages; // how many times the filter is applied (0->1,1->2,etc.)
-        float freq; // Frequency given in Hz
-        float q;    // Q factor (resonance or Q factor)
-        float gain; // the gain of the filter (if are shelf/peak) filters
+        uint type;          // The type of the filter (LPF1,HPF1,LPF2,HPF2...)
+        uint stages;        // how many times the filter is applied (0->1,1->2,etc.)
+        float freq;         // Frequency given in Hz
+        float q;            // Q factor (resonance or Q factor)
+        float gain;         // the gain of the filter (if are shelf/peak) filters
 
-        int order; // the order of the filter (number of poles)
+        uint order;         // the order of the filter (number of poles)
 
-        float c[3], d[3]; // coefficients
+        using Coeffs = std::array<float,3>;
+        Coeffs c, d;        // coefficients
+        Coeffs oldc, oldd;  // old coefficients (used to interpolate on fast changes)
 
-        float oldc[3], oldd[3]; // old coefficients(used only if some filter parameters changes very fast, and it needs interpolation)
-
-        float xd[3], yd[3]; // used if the filter is applied more times
         bool needsinterpolation, firsttime;
-        int abovenq;        // this is 1 if the frequency is above the nyquist
-        int oldabovenq;     // if the last time was above nyquist (used to see if it needs interpolation)
+        bool abovenq;       // if frequency is above the nyquist
+        bool oldabovenq;    // (last state to determine if it needs interpolation)
 
         Samples tmpismp;    // used if it needs interpolation in filterout()
-        SynthEngine *synth;
+        SynthEngine& synth;
+
+        void singlefilterout(float* smp, FStage& x, FStage& y, Coeffs const& c, Coeffs const& d);
+        void computefiltercoefs();
 };
 
-#endif
+#endif /*ANALOG_FILTER_H*/

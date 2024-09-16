@@ -1540,7 +1540,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
   Function {init(FilterParams *filterpars_,unsigned char *velsnsamp_,unsigned char *velsns_, int npart_, int kititem_, int engine_)} {} {
     code {//
     pars=filterpars_;
-    synth = pars->getSynthEngine();
+    synth = & pars->getSynthEngine();
     velsnsamp = velsnsamp_;
     velsns = velsns_;
     npart = npart_;

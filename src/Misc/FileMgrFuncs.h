@@ -29,7 +29,6 @@
 #include <string>
 #include <vector>
 #include <list>
-#include <iostream>
 #include <sstream>
 #include <fstream>
 #include <dirent.h>
@@ -124,7 +123,7 @@ inline void make_legit_pathname(string& fname)
  * tries to find build time doc directory
  * currently only used to find the latest user guide
  */
-inline string localPath(void)
+inline string localPath()
 {
     char *tmpath;
     tmpath = (char*) malloc(OUR_PATH_MAX);
@@ -143,7 +142,7 @@ inline string localPath(void)
  * this now returns the last modified time which can
  * never be zero so can represent 'true'
  */
-inline size_t isRegularFile(const string& chkpath)
+inline size_t isRegularFile(string const& chkpath)
 {
     struct stat st;
     if (!stat(chkpath.c_str(), &st))
@@ -157,7 +156,7 @@ inline size_t isRegularFile(const string& chkpath)
  * this now returns the last modified time which can
  * never be zero so can represent 'true'
 */
-inline size_t isDirectory(const string& chkpath)
+inline size_t isDirectory(string const& chkpath)
 {
     struct stat st;
     if (!stat(chkpath.c_str(), &st))
@@ -206,7 +205,7 @@ inline bool cmd2string(std::string cmd, string& result)
 /*
  * This performs the actual file operations for preset management
  */
-inline bool presetsList(string dirname, const string& type, std::vector<string>& presets)
+inline bool presetsList(string dirname, string const& type, std::vector<string>& presets)
 {
     int presetk = 0;
     string ftype = "." + type + EXTEN::presets;
@@ -245,7 +244,7 @@ inline bool presetsList(string dirname, const string& type, std::vector<string>&
  * and to known locations, so buffer size should be adequate
  * and it avoids dependency on unreliable macros.
  */
-inline string findFile(const string& path, const string& filename, string extension)
+inline string findFile(string const& path, string const& filename, string extension)
 {
     if (extension.at(0) != '.')
         extension = "." + extension;
@@ -269,7 +268,7 @@ inline string findFile(const string& path, const string& filename, string extens
     return "";
 }
 
-inline string findLeafName(const string& name)
+inline string findLeafName(string const& name)
 {
     unsigned int name_start;
     unsigned int name_end;
@@ -279,7 +278,7 @@ inline string findLeafName(const string& name)
     return name.substr(name_start + 1, name_end - name_start - 1);
 }
 
-inline string findExtension(const string& name)
+inline string findExtension(string const& name)
 {
     size_t point = name.rfind('.');
     if (point == string::npos)
@@ -292,7 +291,7 @@ inline string findExtension(const string& name)
 
 
 // adds or replaces wrong extension with the right one.
-inline string setExtension(const string& fname, string ext)
+inline string setExtension(string const& fname, string ext)
 {
     if (ext.at(0) != '.')
         ext = "." + ext;
@@ -337,7 +336,7 @@ inline string setExtension(const string& fname, string ext)
 }
 
 
-inline bool copyFile(const string& source, const string& destination, char option)
+inline bool copyFile(string const& source, string const& destination, char option)
 {
     // options
     // 0 = only write if not already present
@@ -346,20 +345,11 @@ inline bool copyFile(const string& source, const string& destination, char optio
 
     if (option == 0)
     {
-        if(isRegularFile(destination))
+        if (isRegularFile(destination))
         {
-            //std::cout << "Not writing " << destination << std::endl;
             return 0; // treated as a successful write when copying banks
         }
-        else
-        {
-            ;//std::cout << "Is writing " << destination << std::endl;
-        }
     }
-
-    if (false)//option != 0 && isRegularFile(destination))
-        std::cout << "Exists " << destination << std::endl;
-
 
     struct stat sourceInfo;
     stat(source.c_str(), &sourceInfo);
@@ -371,7 +361,6 @@ inline bool copyFile(const string& source, const string& destination, char optio
             stat(destination.c_str(), &destInfo);
             if (sourceInfo.st_mtime <= destInfo.st_mtime)
             {
-                //std::cout << source << " Not newer" << std::endl;
                 return 0; // it's already the newest
             }
         }
@@ -404,9 +393,8 @@ inline bool copyFile(const string& source, const string& destination, char optio
 }
 
 
-inline uint32_t copyDir(const string& source, const string& destination, char option)
+inline uint32_t copyDir(string const& source, string const& destination, char option)
 {
-    //std::cout << "source dir " << source << "  to " << destination << std::endl;
     DIR *dir = opendir(source.c_str());
     if (dir == NULL)
         return 0xffffffff;
@@ -416,7 +404,6 @@ inline uint32_t copyDir(const string& source, const string& destination, char op
     while ((fn = readdir(dir)))
     {
         string nextfile = string(fn->d_name);
-        //std::cout << "next file " << nextfile << std::endl;
         if (!isRegularFile(source + "/" + nextfile))
             continue;
         if (nextfile == "." || nextfile == "..")
@@ -434,7 +421,7 @@ inline uint32_t copyDir(const string& source, const string& destination, char op
  * this fills the given list with all contents removing the
  * directory management from the calling functions.
  */
-inline int listDir(std::list<string>* dirList, const string& dirName)
+inline int listDir(std::list<string>* dirList, string const& dirName)
 {
     DIR *dir = opendir(dirName.c_str());
     if (dir == NULL)
@@ -580,7 +567,7 @@ inline void dir2string(string &wanted, string currentDir, string exten, int opt 
 }
 
 
-inline string saveGzipped(char *data, const string& filename, int compression)
+inline string saveGzipped(char *data, string const& filename, int compression)
 {
     char options[10];
     snprintf(options, 10, "wb%d", compression);
@@ -595,14 +582,12 @@ inline string saveGzipped(char *data, const string& filename, int compression)
 }
 
 
-inline ssize_t saveData(char *buff, size_t bytes, const string& filename)
+inline ssize_t saveData(char *buff, size_t bytes, string const& filename)
 {
-    //std::cout << "filename " << filename << std::endl;
     int writefile = open(filename.c_str(), O_WRONLY | O_CREAT | O_TRUNC,
     S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
     if (writefile < 0)
     {
-        //std::cout << std::strerror(errno) << std::endl;
         return 0;
     }
     ssize_t written = write(writefile, buff, bytes);
@@ -611,7 +596,7 @@ inline ssize_t saveData(char *buff, size_t bytes, const string& filename)
 }
 
 
-inline bool saveText(const string& text, const string& filename)
+inline bool saveText(string const& text, string const& filename)
 {
     FILE *writefile = fopen(filename.c_str(), "w");
     if (!writefile)
@@ -623,7 +608,7 @@ inline bool saveText(const string& text, const string& filename)
 }
 
 
-inline char * loadGzipped(const string& _filename, string * report)
+inline char * loadGzipped(string const& _filename, string * report)
 {
     string filename = _filename;
     char *data = NULL;
@@ -680,7 +665,7 @@ inline char * loadGzipped(const string& _filename, string * report)
  * variations. Blank lines are removed, and a single newline character
  * is added to the end of each remaining line.
  */
-inline string loadText(const string& filename)
+inline string loadText(string const& filename)
 {
     FILE *readfile = fopen(filename.c_str(), "r");
     if (!readfile)
@@ -712,7 +697,7 @@ inline string loadText(const string& filename)
 }
 
 
-inline bool createEmptyFile(const string& filename)
+inline bool createEmptyFile(string const& filename)
 { // not currently used now
     std::fstream file;
     file.open(filename, std::ios::out);
@@ -723,7 +708,7 @@ inline bool createEmptyFile(const string& filename)
 }
 
 
-inline bool createDir(const string& dirname)
+inline bool createDir(string const& dirname)
 {
     if (isDirectory(dirname))
         return false; // don't waste time. it's already here!
@@ -754,14 +739,14 @@ inline bool createDir(const string& dirname)
  * linux but that may not always be true nor possibly other
  * OSs/filers, so you should always use the correct one.
  */
-inline bool deleteFile(const string& filename)
+inline bool deleteFile(string const& filename)
 {
     bool isOk = remove(filename.c_str()) == 0;
     return isOk;
 }
 
 
-inline bool deleteDir(const string& filename)
+inline bool deleteDir(string const& filename)
 {
     bool isOk = remove(filename.c_str()) == 0;
     return isOk;
@@ -773,14 +758,14 @@ inline bool deleteDir(const string& filename)
  * linux but that may not always be true nor possibly other
  * OSs/filers, so you should always use the correct one.
  */
-inline bool renameFile(const string& oldname, const string& newname)
+inline bool renameFile(string const& oldname, string const& newname)
 {
     bool isOk = rename(oldname.c_str(), newname.c_str()) == 0;
     return isOk;
 }
 
 
-inline bool renameDir(const string& oldname, const string& newname)
+inline bool renameDir(string const& oldname, string const& newname)
 {
     bool isOk = rename(oldname.c_str(), newname.c_str()) == 0;
     return isOk;
@@ -788,9 +773,9 @@ inline bool renameDir(const string& oldname, const string& newname)
 
 // replace build directory with a different
 // one in the compilation directory
-inline string extendLocalPath(const string& leaf)
+inline string extendLocalPath(string const& leaf)
 {
-    char *tmpath = getcwd (NULL, 0);
+    char* tmpath = getcwd (NULL, 0);
     if (tmpath == NULL)
        return "";
 
@@ -807,7 +792,7 @@ inline string extendLocalPath(const string& leaf)
     return path.substr(0, next) + leaf;
 }
 
-inline string userHome(void)
+inline string userHome()
 {
     string home = string(getenv("HOME"));
     if (home.empty() || !isDirectory(home))
@@ -815,7 +800,7 @@ inline string userHome(void)
 return home + '/';
 }
 
-inline string localDir(void)
+inline string localDir()
 {
     string local = userHome() + ".local/share/" + YOSHIMI;
     if (!isDirectory(local))
@@ -826,7 +811,7 @@ inline string localDir(void)
     return local;
 }
 
-inline string configDir(void)
+inline string configDir()
 {
     string config = userHome() + string(EXTEN::config) + "/" + YOSHIMI;
     if (!isDirectory(config))

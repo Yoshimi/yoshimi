@@ -372,7 +372,7 @@ void FutureBuild<TAB>::swap(TAB & dataToReplace)
     if (future)
     {
         using std::swap;
-        TAB newData{move(future->get())};  // may block until value is ready
+        TAB newData{future->get()};   // may block until value is ready
         swap(dataToReplace, newData);
         delete future;
     }

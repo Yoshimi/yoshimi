@@ -33,7 +33,7 @@ using func::power;
 using func::powFrac;
 using func::decibel;
 
-Distorsion::Distorsion(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth) :
+Distorsion::Distorsion(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine& _synth) :
     Effect(insertion_, efxoutl_, efxoutr_, NULL, 0, _synth),
     Pvolume(50),
     Pdrive(90),
@@ -44,15 +44,15 @@ Distorsion::Distorsion(bool insertion_, float *efxoutl_, float *efxoutr_, SynthE
     Phpf(0),
     Pstereo(1),
     Pprefiltering(0),
-    level(0, synth->samplerate),
-    lpffr(0, synth->samplerate),
-    hpffr(0, synth->samplerate)
+    level(0, synth.samplerate),
+    lpffr(0, synth.samplerate),
+    hpffr(0, synth.samplerate)
 {
     level.setTargetValue(Plevel / 127.0f);
-    lpfl = new AnalogFilter(TOPLEVEL::filter::Low2, 22000, 1, 0, synth);
-    lpfr = new AnalogFilter(TOPLEVEL::filter::Low2, 22000, 1, 0, synth);
-    hpfl = new AnalogFilter(TOPLEVEL::filter::High2, 20, 1, 0, synth);
-    hpfr = new AnalogFilter(TOPLEVEL::filter::High2, 20, 1, 0, synth);
+    lpfl = new AnalogFilter(synth, TOPLEVEL::filter::Low2, 22000, 1, 0);
+    lpfr = new AnalogFilter(synth, TOPLEVEL::filter::Low2, 22000, 1, 0);
+    hpfl = new AnalogFilter(synth, TOPLEVEL::filter::High2, 20, 1, 0);
+    hpfr = new AnalogFilter(synth, TOPLEVEL::filter::High2, 20, 1, 0);
     setpreset(Ppreset);
     changepar(2, 35);
     Pchanged = false;
@@ -70,7 +70,7 @@ Distorsion::~Distorsion()
 
 
 // Cleanup the effect
-void Distorsion::cleanup(void)
+void Distorsion::cleanup()
 {
     Effect::cleanup();
     level.pushToTarget();
@@ -89,7 +89,7 @@ void Distorsion::applyfilters(float *efxoutl, float *efxoutr)
     float fr;
 
     fr = lpffr.getValue();
-    lpffr.advanceValue(synth->sent_buffersize);
+    lpffr.advanceValue(synth.sent_buffersize);
     if (fr != lpffr.getValue())
     {
         lpfl->interpolatenextbuffer();
@@ -101,7 +101,7 @@ void Distorsion::applyfilters(float *efxoutl, float *efxoutr)
     lpfr->filterout(efxoutr);
 
     fr = hpffr.getValue();
-    hpffr.advanceValue(synth->sent_buffersize);
+    hpffr.advanceValue(synth.sent_buffersize);
     if (fr != hpffr.getValue())
     {
         hpfl->interpolatenextbuffer();
@@ -117,7 +117,7 @@ void Distorsion::applyfilters(float *efxoutl, float *efxoutr)
 // Effect output
 void Distorsion::out(float *smpsl, float *smpsr)
 {
-    outvolume.advanceValue(synth->sent_buffersize);
+    outvolume.advanceValue(synth.sent_buffersize);
 
     float inputdrive = power<5>((Pdrive - 32.0f) / 127.0f);
     if (Pnegate)
@@ -125,14 +125,14 @@ void Distorsion::out(float *smpsl, float *smpsr)
 
     if (Pstereo) // Stereo
     {
-        for (int i = 0; i < synth->sent_buffersize; ++i)
+        for (int i = 0; i < synth.sent_buffersize; ++i)
         {
             efxoutl[i] = smpsl[i] * inputdrive * pangainL.getAndAdvanceValue();
             efxoutr[i] = smpsr[i] * inputdrive * pangainR.getAndAdvanceValue();
         }
     }
     else // Mono
-        for (int i = 0; i < synth->sent_buffersize; ++i)
+        for (int i = 0; i < synth.sent_buffersize; ++i)
             efxoutl[i] = inputdrive * (smpsl[i] * pangainL.getAndAdvanceValue()
                                        + smpsr[i]* pangainR.getAndAdvanceValue())
                 * 0.7f;
@@ -140,16 +140,16 @@ void Distorsion::out(float *smpsl, float *smpsr)
     if (Pprefiltering)
         applyfilters(efxoutl, efxoutr);
 
-    waveShapeSmps(synth->sent_buffersize, efxoutl, Ptype + 1, Pdrive);
+    waveShapeSmps(synth.sent_buffersize, efxoutl, Ptype + 1, Pdrive);
     if (Pstereo)
-        waveShapeSmps(synth->sent_buffersize, efxoutr, Ptype + 1, Pdrive);
+        waveShapeSmps(synth.sent_buffersize, efxoutr, Ptype + 1, Pdrive);
 
     if (!Pprefiltering)
         applyfilters(efxoutl, efxoutr);
     if (!Pstereo)
-        memcpy(efxoutr, efxoutl, synth->sent_bufferbytes);
+        memcpy(efxoutr, efxoutl, synth.sent_bufferbytes);
 
-    for (int i = 0; i < synth->sent_buffersize; ++i)
+    for (int i = 0; i < synth.sent_buffersize; ++i)
     {
         float lvl = decibel<-40>(1.0f - 1.5f * level.getAndAdvanceValue());
         float lout = efxoutl[i];

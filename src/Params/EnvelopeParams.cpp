@@ -35,8 +35,7 @@
 using func::power;
 
 
-EnvelopeParams::EnvelopeParams(unsigned char Penvstretch_,
-                               unsigned char Pforcedrelease_, SynthEngine *_synth) :
+EnvelopeParams::EnvelopeParams(uchar Penvstretch_, uchar Pforcedrelease_, SynthEngine& _synth) :
     ParamBase(_synth),
     Pfreemode(1),
     Penvpoints(1),
@@ -142,7 +141,7 @@ void EnvelopeParams::ASRinit_bw(float A_val, float A_dt, float R_val, float R_dt
 
 
 // Convert the Envelope to freemode
-void EnvelopeParams::converttofree(void)
+void EnvelopeParams::converttofree()
 {
     switch (Envmode)
     {
@@ -266,7 +265,7 @@ void EnvelopeParams::getfromXML(XMLwrapper& xml)
 }
 
 
-void EnvelopeParams::defaults(void)
+void EnvelopeParams::defaults()
 {
     Penvstretch = Denvstretch;
     Pforcedrelease = Dforcedrelease;
@@ -283,7 +282,7 @@ void EnvelopeParams::defaults(void)
 }
 
 
-void EnvelopeParams::store2defaults(void)
+void EnvelopeParams::store2defaults()
 {
     Denvstretch = Penvstretch;
     Dforcedrelease = Pforcedrelease;

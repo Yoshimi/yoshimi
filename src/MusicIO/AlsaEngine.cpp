@@ -21,85 +21,81 @@
 
 #if defined(HAVE_ALSA)
 
+#include "Misc/Util.h"
 #include "Misc/Config.h"
 #include "Misc/SynthEngine.h"
 #include "Misc/FormatFuncs.h"
 #include "MusicIO/AlsaEngine.h"
+
 #include <iostream>
+#include <chrono>
+#include <string>
+
+using Mircos = std::chrono::duration<int64_t, std::micro>;
+using std::chrono::steady_clock;
+using std::chrono::floor;
+using std::string;
+using std::move;
 
 using func::asString;
+using util::unConst;
 
 // The number of nanoseconds before the MIDI clock is assumed missing.
 #define MIDI_CLOCK_TIMEOUT_US 1000000
 
 
-AlsaEngine::AlsaEngine(SynthEngine *_synth, BeatTracker *_beatTracker) :
-    MusicIO(_synth, _beatTracker)
+AlsaEngine::AlsaEngine(SynthEngine& _synth, shared_ptr<BeatTracker> beat)
+    : MusicIO{_synth, move(beat)}
+    , little_endian{runtime().isLittleEndian}
+    , card_endian{false}
+    , card_signed{true}
+    , card_chans{2}   // got to start somewhere}
+    , card_bits{0}
+    , pcmWrite{nullptr}
+    , interleaved{}
+    , audio{}
+    , midi{}
 {
-    audio.handle = NULL;
-    audio.period_count = 0; // re-used as number of periods
-    audio.samplerate = 0;
-    audio.buffer_size = 0;
-    audio.period_size = 0;
-    audio.buffer_size = 0;
-    audio.alsaId = -1;
-    audio.pThread = 0;
-
-    midi.handle = NULL;
-    midi.addr.client = 0;
-    midi.addr.port = 0;
-    midi.alsaId = -1;
-    midi.pThread = 0;
-    midi.lastDivSongBeat = 0;
-    midi.lastDivMonotonicBeat = 0;
-    midi.clockCount = 0;
-
     for (int i = 0; i < ALSA_MIDI_BPM_MEDIAN_WINDOW; i++)
         midi.prevBpms[i] = 120;
-    midi.prevBpmsPos = 0;
 
-    timespec time;
-    clock_gettime(CLOCK_MONOTONIC, &time);
-    midi.prevClockUs = time.tv_sec * 1000000 + time.tv_nsec / 1000;
-
-    little_endian = synth->getRuntime().isLittleEndian;
+    // monotonic time scale in microseconds as signed 64bit
+    auto now = steady_clock::now();
+    midi.prevClockUs = floor<Mircos>(now.time_since_epoch())
+                            .count();
 }
 
 
-bool AlsaEngine::openAudio(void)
+bool AlsaEngine::openAudio()
 {
-    audio.device = synth->getRuntime().audioDevice;
-    audio.samplerate = synth->getRuntime().Samplerate;
-    audio.period_size = synth->getRuntime().Buffersize;
+    audio.device = runtime().audioDevice;
+    audio.samplerate = runtime().samplerate;
+    audio.period_size = runtime().buffersize;
     audio.period_count = 2;
     audio.buffer_size = audio.period_size * audio.period_count;
-    if (alsaBad(snd_pcm_open(&audio.handle, audio.device.c_str(),
-                             SND_PCM_STREAM_PLAYBACK, SND_PCM_NO_AUTO_CHANNELS),
-            "failed to open alsa audio device:" + audio.device))
-        goto bail_out;
-
-    if (!alsaBad(snd_pcm_nonblock(audio.handle, 0), "set blocking failed"))
-    {
-        if (prepHwparams())
-        {
-            if (prepSwparams())
-            {
-                prepBuffers();
-                interleaved.reset(new int[getBuffersize() * card_chans]{0});
-            }
-        }
-    }
-    return true;
-bail_out:
+    if (not alsaBad(snd_pcm_open(&audio.handle, audio.device.c_str(),
+                                 SND_PCM_STREAM_PLAYBACK, SND_PCM_NO_AUTO_CHANNELS),
+                                 "failed to open alsa audio device:" + audio.device))
+        if (not alsaBad(snd_pcm_nonblock(audio.handle, 0), "set blocking failed"))
+            if (prepHwparams())
+                if (prepSwparams())
+                {
+                    prepBuffers();
+                    // Buffers for interleaved audio only used by AlsaEngine
+                    interleaved.reset(new int[getBuffersize() * card_chans]{0});
+                    return true;
+                }
+    // if anything did not go well...
     Close();
     return false;
 }
 
-std::string AlsaEngine::findMidiClients(snd_seq_t *seq)
+
+string AlsaEngine::findMidiClients(snd_seq_t* seq)
 {
-    string result = "";
-    snd_seq_client_info_t *cinfo;
-    snd_seq_port_info_t *pinfo;
+    string result;
+    snd_seq_client_info_t* cinfo;
+    snd_seq_port_info_t* pinfo;
 
     snd_seq_client_info_alloca(&cinfo);
     snd_seq_port_info_alloca(&pinfo);
@@ -123,7 +119,7 @@ std::string AlsaEngine::findMidiClients(snd_seq_t *seq)
                  & (SND_SEQ_PORT_CAP_READ | SND_SEQ_PORT_CAP_SUBS_READ))
                 != (SND_SEQ_PORT_CAP_READ | SND_SEQ_PORT_CAP_SUBS_READ))
                 continue;
-            if (std::string(snd_seq_client_info_get_name(cinfo)) == "Midi Through")
+            if (string{snd_seq_client_info_get_name(cinfo)} == "Midi Through")
                 continue; // don't want midi through
             result = result + snd_seq_client_info_get_name(cinfo) + ":" + std::to_string(snd_seq_port_info_get_port(pinfo)) + ", ";
         }
@@ -131,15 +127,15 @@ std::string AlsaEngine::findMidiClients(snd_seq_t *seq)
     return result;
 }
 
-bool AlsaEngine::openMidi(void)
+bool AlsaEngine::openMidi()
 {
-    synth->setBPMAccurate(false);
+    synth.setBPMAccurate(false);
 
     const char* port_name = "input";
     int port_num;
     if (snd_seq_open(&midi.handle, "default", SND_SEQ_OPEN_INPUT, SND_SEQ_NONBLOCK) != 0)
     {
-        synth->getRuntime().Log("Failed to open alsa midi");
+        runtime().Log("Failed to open alsa midi");
         Close();
         return false;
     }
@@ -163,7 +159,7 @@ bool AlsaEngine::openMidi(void)
     snd_seq_client_info_event_filter_add(seq_info, SND_SEQ_EVENT_PORT_SUBSCRIBED);
     snd_seq_client_info_event_filter_add(seq_info, SND_SEQ_EVENT_PORT_UNSUBSCRIBED);
     if (0 > snd_seq_set_client_info(midi.handle, seq_info))
-        synth->getRuntime().Log("Failed to set midi event filtering");
+        runtime().Log("Failed to set midi event filtering");
 
     snd_seq_set_client_name(midi.handle, midiClientName().c_str());
 
@@ -173,25 +169,25 @@ bool AlsaEngine::openMidi(void)
                                        SND_SEQ_PORT_TYPE_SYNTH);
     if (port_num < 0)
     {
-        synth->getRuntime().Log("Failed to acquire alsa midi port");
+        runtime().Log("Failed to acquire alsa midi port");
         Close();
         return false;
     }
 
-    std::string midilist;
-    switch(synth->getRuntime().alsaMidiType)
+    string midilist;
+    switch(runtime().alsaMidiType)
     {
         case 0:
-            midilist = synth->getRuntime().midiDevice;
+            midilist = runtime().midiDevice;
             break;
         case 1:
             midilist = findMidiClients(midi.handle);
             break;
         default:
-            synth->getRuntime().midiDevice = "";
+            runtime().midiDevice = "";
             return true;
     }
-    std::string found = "";
+    string found;
     if (midilist != "default")
     {
         while (!midilist.empty())
@@ -203,7 +199,7 @@ bool AlsaEngine::openMidi(void)
                 break;
 
             size_t pos = midilist.find(',');
-            if (pos == std::string::npos)
+            if (pos == string::npos)
             {
                 tmp = midilist;
                 midilist = "";
@@ -227,18 +223,18 @@ bool AlsaEngine::openMidi(void)
         }
     }
     if (found.substr(0, 2) == ", ")
-        synth->getRuntime().midiDevice = found.substr(2);
+        runtime().midiDevice = found.substr(2);
     else
-        synth->getRuntime().midiDevice = "No MIDI sources seen";
+        runtime().midiDevice = "No MIDI sources seen";
     return true;
 }
 
 
-void AlsaEngine::Close(void)
+void AlsaEngine::Close()
 {
-    if (synth->getRuntime().runSynth)
+    if (runtime().runSynth)
     {
-        synth->getRuntime().runSynth = false;
+        runtime().runSynth = false;
     }
 
     if (midi.pThread != 0) //wait for midi thread to finish
@@ -260,39 +256,41 @@ void AlsaEngine::Close(void)
     audio.handle = NULL;
     if (NULL != midi.handle)
         if (snd_seq_close(midi.handle) < 0)
-            synth->getRuntime().Log("Error closing Alsa midi connection");
+            runtime().Log("Error closing Alsa midi connection");
     midi.handle = NULL;
 }
 
 
-std::string AlsaEngine::audioClientName(void)
+string AlsaEngine::audioClientName()  const
 {
-    std::string name = "yoshimi";
-    if (!synth->getRuntime().nameTag.empty())
-        name += ("-" + synth->getRuntime().nameTag);
+    string name{"yoshimi"};
+    auto& rt = unConst(this)->runtime();
+    if (!rt.nameTag.empty())
+        name += ("-" + rt.nameTag);
     return name;
 }
 
-std::string AlsaEngine::midiClientName(void)
+string AlsaEngine::midiClientName()  const
 {
-    std::string name = "yoshimi";
-    if (!synth->getRuntime().nameTag.empty())
-        name += ("-" + synth->getRuntime().nameTag);
+    string name{"yoshimi"};
+    auto& rt = unConst(this)->runtime();
+    if (!rt.nameTag.empty())
+        name += ("-" + rt.nameTag);
     //Andrew Deryabin: for multi-instance support add unique id to
     //instances other then default (0)
-    unsigned int synthUniqueId = synth->getUniqueId();
+    uint synthUniqueId = synth.getUniqueId();
     if (synthUniqueId > 0)
     {
         char sUniqueId [256];
         memset(sUniqueId, 0, sizeof(sUniqueId));
         snprintf(sUniqueId, sizeof(sUniqueId), "%d", synthUniqueId);
-        name += ("-" + std::string(sUniqueId));
+        name += ("-" + string{sUniqueId});
     }
     return name;
 }
 
 
-bool AlsaEngine::prepHwparams(void)
+bool AlsaEngine::prepHwparams()
 {
     /*
      * thanks to the jack project for which formats to support and
@@ -316,8 +314,7 @@ bool AlsaEngine::prepHwparams(void)
         {SND_PCM_FORMAT_UNKNOWN, 0, false, true}
     };
     int formidx;
-    std::string formattxt = "";
-    card_chans = 2; // got to start somewhere
+    string formattxt;
 
     unsigned int ask_samplerate = audio.samplerate;
     unsigned int ask_buffersize = audio.period_size;
@@ -327,10 +324,10 @@ bool AlsaEngine::prepHwparams(void)
     snd_pcm_hw_params_alloca(&hwparams);
     if (alsaBad(snd_pcm_hw_params_any(audio.handle, hwparams),
                 "alsa audio no playback configurations available"))
-        goto bail_out;
+        return false;
     if (alsaBad(snd_pcm_hw_params_set_periods_integer(audio.handle, hwparams),
                 "alsa audio cannot restrict period size to integral value"))
-        goto bail_out;
+        return false;
     if (!alsaBad(snd_pcm_hw_params_set_access(audio.handle, hwparams, axs),
                  "alsa audio mmap not possible"))
         pcmWrite = &snd_pcm_mmap_writei;
@@ -339,7 +336,7 @@ bool AlsaEngine::prepHwparams(void)
         axs = SND_PCM_ACCESS_RW_INTERLEAVED;
         if (alsaBad(snd_pcm_hw_params_set_access(audio.handle, hwparams, axs),
                      "alsa audio failed to set access, both mmap and rw failed"))
-            goto bail_out;
+            return false;
         pcmWrite = &snd_pcm_writei;
     }
 
@@ -349,8 +346,8 @@ bool AlsaEngine::prepHwparams(void)
         ++formidx;
         if (card_formats[formidx].card_bits == 0)
         {
-            synth->getRuntime().Log("alsa audio failed to find matching format");
-            goto bail_out;
+            runtime().Log("alsa audio failed to find matching format");
+            return false;
         }
     }
     card_bits = card_formats[formidx].card_bits;
@@ -362,7 +359,7 @@ bool AlsaEngine::prepHwparams(void)
     else
         formattxt += "Big";
 
-    synth->getRuntime().Log("March is " + formattxt + " Endian", _SYS_::LogNotSerious);
+    runtime().Log("March is " + formattxt + " Endian", _SYS_::LogNotSerious);
 
     if (card_signed)
         formattxt = "Signed ";
@@ -381,68 +378,57 @@ bool AlsaEngine::prepHwparams(void)
                                                 &audio.samplerate, NULL),
                 "alsa audio failed to set sample rate (asked for "
                 + asString(ask_samplerate) + ")"))
-        goto bail_out;
+        return false;
     if (alsaBad(snd_pcm_hw_params_set_channels_near(audio.handle, hwparams, &card_chans),
                 "alsa audio failed to set requested channels"))
-        goto bail_out;
+        return false;
     if (alsaBad(snd_pcm_hw_params_set_period_size_near(audio.handle, hwparams, &audio.period_size, 0), "failed to set period size"))
-        goto bail_out;
+        return false;
     if (alsaBad(snd_pcm_hw_params_set_periods_near(audio.handle, hwparams, &audio.period_count, 0), "failed to set number of periods"))
-        goto bail_out;
+        return false;
     if (alsaBad(snd_pcm_hw_params_set_buffer_size_near(audio.handle, hwparams, &audio.buffer_size), "failed to set buffer size"))
-        goto bail_out;
+        return false;
     if (alsaBad(snd_pcm_hw_params (audio.handle, hwparams),
                 "alsa audio failed to set hardware parameters"))
-		goto bail_out;
+		return false;
     if (alsaBad(snd_pcm_hw_params_get_buffer_size(hwparams, &audio.buffer_size),
                 "alsa audio failed to get buffer size"))
-        goto bail_out;
+        return false;
     if (alsaBad(snd_pcm_hw_params_get_period_size(hwparams, &audio.period_size,
                 NULL), "failed to get period size"))
-        goto bail_out;
+        return false;
 
-    synth->getRuntime().Log("Card Format is " + formattxt + " Endian " + asString(card_bits) +" Bit " + asString(card_chans) + " Channel" , 2);
+    runtime().Log("Card Format is " + formattxt + " Endian " + asString(card_bits) +" Bit " + asString(card_chans) + " Channel" , 2);
     if (ask_buffersize != audio.period_size)
     {
-        synth->getRuntime().Log("Asked for buffersize " + asString(ask_buffersize, 2)
+        runtime().Log("Asked for buffersize " + asString(ask_buffersize, 2)
                     + ", Alsa dictates " + asString((unsigned int)audio.period_size), _SYS_::LogNotSerious);
-        synth->getRuntime().Buffersize = audio.period_size; // we shouldn't need to do this :(
+        runtime().buffersize = audio.period_size; // we shouldn't need to do this :(
     }
     return true;
-
-bail_out:
-    if (audio.handle != NULL)
-        Close();
-    return false;
 }
 
 
-bool AlsaEngine::prepSwparams(void)
+bool AlsaEngine::prepSwparams()
 {
     snd_pcm_sw_params_t *swparams;
-    snd_pcm_sw_params_alloca(&swparams);
+    snd_pcm_sw_params_alloca(&swparams); // allocated on stack and automatically freed when leaving this scope
 	snd_pcm_uframes_t boundary;
-    if (alsaBad(snd_pcm_sw_params_current(audio.handle, swparams),
-                 "alsa audio failed to get swparams"))
-        goto bail_out;
-    if (alsaBad(snd_pcm_sw_params_get_boundary(swparams, &boundary),
-                "alsa audio failed to get boundary"))
-        goto bail_out;
-    if (alsaBad(snd_pcm_sw_params_set_start_threshold(audio.handle, swparams,
-                                                      boundary + 1),
-                "failed to set start threshold")) // explicit start, not auto start
-        goto bail_out;
-    if (alsaBad(snd_pcm_sw_params_set_stop_threshold(audio.handle, swparams,
-                                                    boundary),
-               "alsa audio failed to set stop threshold"))
-        goto bail_out;
-    if (alsaBad(snd_pcm_sw_params(audio.handle, swparams),
-                "alsa audio failed to set software parameters"))
-        goto bail_out;
-    return true;
-
-bail_out:
-    return false;
+	return (not alsaBad(snd_pcm_sw_params_current(audio.handle, swparams),
+                        "alsa audio failed to get swparams"))
+       and (not alsaBad(snd_pcm_sw_params_get_boundary(swparams, &boundary),
+                        "alsa audio failed to get boundary"))
+       and (not alsaBad(snd_pcm_sw_params_set_start_threshold(audio.handle
+                                                             ,swparams
+                                                             ,boundary + 1)
+                       ,"failed to set start threshold"))  // explicit start, not auto start
+       and (not alsaBad(snd_pcm_sw_params_set_stop_threshold(audio.handle
+                                                            ,swparams
+                                                            ,boundary)
+                       ,"alsa audio failed to set stop threshold"))
+       and (not alsaBad(snd_pcm_sw_params(audio.handle, swparams)
+                       ,"alsa audio failed to set software parameters"))
+         ;
 }
 
 
@@ -450,10 +436,10 @@ void AlsaEngine::Interleave(int buffersize)
 {
     size_t idx = 0;
     bool byte_swap = (little_endian != card_endian);
-    unsigned short int tmp16a, tmp16b;
+    ushort tmp16a, tmp16b;
     size_t chans;
-    unsigned int tmp32a, tmp32b;
-    unsigned int shift = 0x78000000;
+    uint tmp32a, tmp32b;
+    uint shift = 0x78000000;
     if (card_bits == 24)
         shift = 0x780000;
 
@@ -462,14 +448,14 @@ void AlsaEngine::Interleave(int buffersize)
         chans = card_chans / 2; // because we're pairing them on a single integer
         for (int frame = 0; frame < buffersize; ++frame)
         {
-            tmp16a = (unsigned short int) (lrint(zynLeft[NUM_MIDI_PARTS][frame] * 0x7800));
-            tmp16b = (unsigned short int) (lrint(zynRight[NUM_MIDI_PARTS][frame] * 0x7800));
+            tmp16a = ushort(lrint( zynLeft[NUM_MIDI_PARTS][frame] * 0x7800));
+            tmp16b = ushort(lrint(zynRight[NUM_MIDI_PARTS][frame] * 0x7800));
             if (byte_swap)
             {
-                tmp16a = (short int) ((tmp16a >> 8) | (tmp16a << 8));
+                tmp16a = (short int) ((tmp16a >> 8) | (tmp16a << 8));        //TODO shouldn't that be a cast to unsigned short? IIRC, the assignment promotes to unsigned
                 tmp16b = ((tmp16b >> 8) | (tmp16b << 8));
             }
-            interleaved[idx] = tmp16a | (int) (tmp16b << 16);
+            interleaved[idx] = tmp16a | int(tmp16b << 16);
             idx += chans;
         }
     }
@@ -478,8 +464,8 @@ void AlsaEngine::Interleave(int buffersize)
         chans = card_chans;
         for (int frame = 0; frame < buffersize; ++frame)
         {
-            tmp32a = (unsigned int) (lrint(zynLeft[NUM_MIDI_PARTS][frame] * shift));
-            tmp32b = (unsigned int) (lrint(zynRight[NUM_MIDI_PARTS][frame] * shift));
+            tmp32a = uint(lrint( zynLeft[NUM_MIDI_PARTS][frame] * shift));
+            tmp32b = uint(lrint(zynRight[NUM_MIDI_PARTS][frame] * shift));
             // how should we do an endian swap for 24 bit, 3 byte?
             // is it really the same, just swapping the 'unused' byte?
             if (byte_swap)
@@ -487,27 +473,27 @@ void AlsaEngine::Interleave(int buffersize)
                 tmp32a = (tmp32a >> 24) | ((tmp32a << 8) & 0x00FF0000) | ((tmp32a >> 8) & 0x0000FF00) | (tmp32a << 24);
                 tmp32b = (tmp32b >> 24) | ((tmp32b << 8) & 0x00FF0000) | ((tmp32b >> 8) & 0x0000FF00) | (tmp32b << 24);
             }
-            interleaved[idx] = (int) tmp32a;
-            interleaved[idx + 1] = (int) tmp32b;
+            interleaved[idx] = int(tmp32a);
+            interleaved[idx + 1] = int(tmp32b);
             idx += chans;
         }
     }
 }
 
 
-void *AlsaEngine::_AudioThread(void *arg)
+void* AlsaEngine::_AudioThread(void* arg)
 {
     return static_cast<AlsaEngine*>(arg)->AudioThread();
 }
 
 
-void *AlsaEngine::AudioThread(void)
+void* AlsaEngine::AudioThread()
 {
     alsaBad(snd_pcm_start(audio.handle), "alsa audio pcm start failed");
-    while (synth->getRuntime().runSynth)
+    while (runtime().runSynth.load(std::memory_order_relaxed))  // read the atomic flag as we happen to see it, without forcing any sync
     {
         BeatTracker::BeatValues beats(beatTracker->getBeatValues());
-        synth->setBeatValues(beats.songBeat, beats.monotonicBeat, beats.bpm);
+        synth.setBeatValues(beats.songBeat, beats.monotonicBeat, beats.bpm);
 
         audio.pcm_state = snd_pcm_state(audio.handle);
         if (audio.pcm_state != SND_PCM_STATE_RUNNING)
@@ -530,8 +516,8 @@ void *AlsaEngine::AudioThread(void)
                     break;
 
                 default:
-                    synth->getRuntime().Log("Alsa AudioThread, weird SND_PCM_STATE: "
-                                + asString(audio.pcm_state));
+                    runtime().Log("Alsa AudioThread, weird SND_PCM_STATE: "
+                                 + asString(audio.pcm_state));
                     break;
             }
             audio.pcm_state = snd_pcm_state(audio.handle);
@@ -544,7 +530,7 @@ void *AlsaEngine::AudioThread(void)
             Write(alsa_buff);
         }
         else
-            synth->getRuntime().Log("Audio pcm still not running");
+            runtime().Log("Audio pcm still not running");
     }
     return NULL;
 }
@@ -624,7 +610,7 @@ bool AlsaEngine::Recover(int err)
 }
 
 
-bool AlsaEngine::xrunRecover(void)
+bool AlsaEngine::xrunRecover()
 {
     bool isgood = false;
     if (audio.handle != NULL)
@@ -632,32 +618,32 @@ bool AlsaEngine::xrunRecover(void)
         if (!alsaBad(snd_pcm_drop(audio.handle), "pcm drop failed"))
             if (!alsaBad(snd_pcm_prepare(audio.handle), "pcm prepare failed"))
                 isgood = true;
-        synth->getRuntime().Log("Alsa xrun recovery "
-                    + ((isgood) ? std::string("good") : std::string("not good")));
+        runtime().Log("Alsa xrun recovery "
+                     + (isgood? string{"good"} : string{"not good"}));
     }
     return isgood;
 }
 
 
-bool AlsaEngine::Start(void)
+bool AlsaEngine::Start()
 {
-    if (NULL != midi.handle && !synth->getRuntime().startThread(&midi.pThread, _MidiThread,
-                                                    this, true, 1, "Alsa midi"))
+    if (NULL != midi.handle && !runtime().startThread(&midi.pThread, _MidiThread,
+                                                      this, true, 1, "Alsa midi"))
     {
-        synth->getRuntime().Log("Failed to start Alsa midi thread");
+        runtime().Log("Failed to start Alsa midi thread");
         goto bail_out;
     }
-    if (NULL != audio.handle && !synth->getRuntime().startThread(&audio.pThread, _AudioThread,
-                                                     this, true, 0, "Alsa audio"))
+    if (NULL != audio.handle && !runtime().startThread(&audio.pThread, _AudioThread,
+                                                       this, true, 0, "Alsa audio"))
     {
-        synth->getRuntime().Log(" Failed to start Alsa audio thread");
+        runtime().Log(" Failed to start Alsa audio thread");
         goto bail_out;
     }
 
     return true;
 
 bail_out:
-    synth->getRuntime().Log("Bailing from AlsaEngine Start");
+    runtime().Log("Bailing from AlsaEngine Start");
     Close();
     return false;
 }
@@ -674,12 +660,12 @@ void *AlsaEngine::_MidiThread(void *arg)
  * to decode then re-encode the data in a different form
  */
 
-void *AlsaEngine::MidiThread(void)
+void* AlsaEngine::MidiThread()
 {
     unsigned int pollCount = snd_seq_poll_descriptors_count(midi.handle, POLLIN);
     struct pollfd pollfds[pollCount];
 
-    while (synth->getRuntime().runSynth)
+    while (runtime().runSynth.load(std::memory_order_relaxed))
     {
         snd_seq_poll_descriptors(midi.handle, pollfds, pollCount, POLLIN);
 
@@ -698,24 +684,23 @@ void *AlsaEngine::MidiThread(void)
                 snprintf(errMsg, sizeof(errMsg),
                     "Unable to handle error in MIDI thread: %s. Shutting down MIDI.",
                     strerror(errno));
-                synth->getRuntime().Log(errMsg);
+                runtime().Log(errMsg);
                 break;
             }
         }
 
-        timespec time;
-        clock_gettime(CLOCK_MONOTONIC, &time);
-        uint64_t clock = time.tv_sec * 1000000 + time.tv_nsec / 1000;
-
+        auto now = steady_clock::now();
+        auto clock = floor<Mircos>(now.time_since_epoch())
+                                 .count();
         if (pollResult > 0)
             handleMidiEvents(clock);
 
         if ((clock - midi.prevClockUs) >= MIDI_CLOCK_TIMEOUT_US)
             handleMidiClockSilence(clock);
     }
-
-    return NULL;
+    return nullptr;
 }
+
 
 void AlsaEngine::handleMidiEvents(uint64_t clock)
 {
@@ -780,10 +765,10 @@ void AlsaEngine::handleMidiEvents(uint64_t clock)
             case SND_SEQ_EVENT_NONREGPARAM:
                 par0 |= 0xb0; // splitting into separate CCs
                 par = event->data.control.param;
-                setMidi(par0, 99, par >> 7);
-                setMidi(par0, 99, par & 0x7f);
+                handleMidi(par0, 99, par >> 7);
+                handleMidi(par0, 99, par & 0x7f);
                 par = event->data.control.value;
-                setMidi(par0, 6, par >> 7);
+                handleMidi(par0, 6, par >> 7);
                 par1 = 38;
                 par2 = par & 0x7f; // let last one through
                 break;
@@ -793,12 +778,12 @@ void AlsaEngine::handleMidiEvents(uint64_t clock)
                 break;
 
             case SND_SEQ_EVENT_PORT_SUBSCRIBED: // ports connected
-                synth->getRuntime().Log("Alsa midi port connected");
+                runtime().Log("Alsa midi port connected");
                 sendit = false;
                 break;
 
             case SND_SEQ_EVENT_PORT_UNSUBSCRIBED: // ports disconnected
-                synth->getRuntime().Log("Alsa midi port disconnected");
+                runtime().Log("Alsa midi port disconnected");
                 sendit = false;
                 break;
 
@@ -815,12 +800,12 @@ void AlsaEngine::handleMidiEvents(uint64_t clock)
 
             default:
                 sendit = false;// commented out some progs spam us :(
-                /* synth->getRuntime().Log("Other non-handled midi event, type: "
+                /* runtime().Log("Other non-handled midi event, type: "
                             + asString((int)event->type));*/
                 break;
         }
         if (sendit)
-            setMidi(par0, par1, par2);
+            handleMidi(par0, par1, par2);
         snd_seq_free_event(event);
     }
 }
@@ -836,7 +821,7 @@ void AlsaEngine::handleMidiClockSilence(uint64_t clock)
     BeatTracker::BeatValues beats {
         midi.lastDivSongBeat,
         midi.lastDivMonotonicBeat,
-        synth->PbpmFallback,
+        synth.PbpmFallback,
     };
     float diff = (clock - midi.prevClockUs) * beats.bpm / (60.0f * 1000000.0f);
     beats.songBeat += diff;
@@ -848,18 +833,18 @@ void AlsaEngine::handleMidiClockSilence(uint64_t clock)
 }
 
 
-bool AlsaEngine::alsaBad(int op_result, std::string err_msg)
+bool AlsaEngine::alsaBad(int op_result, string err_msg)
 {
     bool isbad = (op_result < 0);
     if (isbad)
-        synth->getRuntime().Log("Error, alsa audio: " +err_msg + ": "
-                     + std::string(snd_strerror(op_result)));
+        runtime().Log("Error, alsa audio: " +err_msg + ": "
+                     + string{snd_strerror(op_result)});
     return isbad;
 }
 
 void AlsaEngine::handleSongPos(float beat)
 {
-    const float subDiv = 1.0f / (float)(MIDI_CLOCKS_PER_BEAT / MIDI_CLOCK_DIVISION);
+    const float subDiv = 1.0f / float(MIDI_CLOCKS_PER_BEAT / MIDI_CLOCK_DIVISION);
 
     // The next MIDI clock should trigger this beat.
     midi.lastDivSongBeat = beat - subDiv;
@@ -936,4 +921,4 @@ void AlsaEngine::handleMidiClock(uint64_t clock)
     }
 }
 
-#endif
+#endif /*defined(HAVE_ALSA)*/

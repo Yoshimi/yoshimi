@@ -33,11 +33,11 @@
 class OscilParameters : public ParamBase
 {
     public:
-        OscilParameters(fft::Calc const& fft, SynthEngine *_synth);
-        virtual ~OscilParameters() = default;
+        OscilParameters(fft::Calc const& fft, SynthEngine&);
+
+        void defaults()  override;
 
         void add2XML(XMLwrapper& xml);
-        void defaults(void);
         void getfromXML(XMLwrapper& xml);
         float getLimits(CommandBlock *getData);
 
@@ -49,47 +49,44 @@ class OscilParameters : public ParamBase
          * The hmag and hphase starts counting from 0, so the first harmonic(1) has the index 0,
          * 2-nd harmonic has index 1, ..the 128 harminic has index 127
          */
-        unsigned char Phmag[MAX_AD_HARMONICS], Phphase[MAX_AD_HARMONICS];
+        uchar Phmag[MAX_AD_HARMONICS], Phphase[MAX_AD_HARMONICS];
         // the MIDI parameters for mag. and phases
 
-        unsigned char Phmagtype; // 0 - Linear, 1 - dB scale (-40), 2 - dB scale (-60)
-                                 // 3 - dB scale (-80), 4 - dB scale (-100)
-        unsigned char Pcurrentbasefunc; // The base function used - 0=sin, 1=...
-        unsigned char Pbasefuncpar; // the parameter of the base function
+        uchar Phmagtype;                  // 0 - Linear, 1 - dB scale (-40), 2 - dB scale (-60)
+                                          // 3 - dB scale (-80), 4 - dB scale (-100)
+        uchar Pcurrentbasefunc;           // The base function used - 0=sin, 1=...
+        uchar Pbasefuncpar;               // the parameter of the base function
 
-        unsigned char Pbasefuncmodulation; // what modulation is applied to the
-                                           // basefunc
-        unsigned char Pbasefuncmodulationpar1,
-                      Pbasefuncmodulationpar2,
-                      Pbasefuncmodulationpar3; // the parameter of the base
-                                               // function modulation
+        uchar Pbasefuncmodulation;        // what modulation is applied to the
+                                          // basefunc
+        uchar Pbasefuncmodulationpar1;
+        uchar Pbasefuncmodulationpar2;
+        uchar Pbasefuncmodulationpar3;    // the parameter of the base
+                                          // function modulation
 
-        unsigned char Prand; // 64 = no randomness
-                             // 63..0 - block type randomness - 0 is maximum
-                             // 65..127 - each harmonic randomness - 127 is maximum
-        unsigned char Pwaveshaping, Pwaveshapingfunction;
-        unsigned char Pfiltertype, Pfilterpar1, Pfilterpar2;
-        unsigned char Pfilterbeforews;
-        unsigned char Psatype, Psapar; // spectrum adjust
+        uchar Prand;                      // 64 = no randomness
+                                          // 63..0 - block type randomness - 0 is maximum
+                                          // 65..127 - each harmonic randomness - 127 is maximum
+        uchar Pwaveshaping, Pwaveshapingfunction;
+        uchar Pfiltertype, Pfilterpar1, Pfilterpar2;
+        uchar Pfilterbeforews;
+        uchar Psatype, Psapar;            // spectrum adjust
 
-        unsigned char Pamprandpower, Pamprandtype; // amplitude randomness
-        int Pharmonicshift; // how the harmonics are shifted
-        int Pharmonicshiftfirst; // if the harmonic shift is done before
-                                 // waveshaping and filter
+        uchar Pamprandpower, Pamprandtype;// amplitude randomness
+        int Pharmonicshift;               // how the harmonics are shifted
+        int Pharmonicshiftfirst;          // if the harmonic shift is done before waveshaping and filter
 
-        unsigned char Padaptiveharmonics; // the adaptive harmonics status
+        uchar Padaptiveharmonics;         // the adaptive harmonics status
                                           // (off=0,on=1,etc..)
-        unsigned char Padaptiveharmonicsbasefreq; // the base frequency of the
-                                                  // adaptive harmonic (30..3000Hz)
-        unsigned char Padaptiveharmonicspower; // the strength of the effect
-                                               // (0=off,100=full)
-        unsigned char Padaptiveharmonicspar; // the parameters in 2,3,4.. modes
-                                             // of adaptive harmonics
+        uchar Padaptiveharmonicsbasefreq; // the base frequency of the
+                                          // adaptive harmonic (30..3000Hz)
+        uchar Padaptiveharmonicspower;    // the strength of the effect (0=off,100=full)
+        uchar Padaptiveharmonicspar;      // the parameters in 2,3,4.. modes of adaptive harmonics
 
-        unsigned char Pmodulation; // what modulation is applied to the oscil
-        unsigned char Pmodulationpar1,
-                      Pmodulationpar2,
-                      Pmodulationpar3; // the parameter of the parameters
+        uchar Pmodulation; // what modulation is applied to the oscil
+        uchar Pmodulationpar1;
+        uchar Pmodulationpar2;
+        uchar Pmodulationpar3; // the parameter of the parameters
 
     private:
         fft::Spectrum basefuncSpectrum; // Base Function Frequencies
