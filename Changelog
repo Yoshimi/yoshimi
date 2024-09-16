@@ -1,5 +1,13 @@
 yoshimi 2.3.2 M
 
+2024-9-16 Will
+bn 2354
+Added missing conversion for note time reporting
+    (only seen when activated at build time)
+    clarified Build time labels
+Removed System Effects C/P buttons de-activation
+Corrected history location comment in globals.h
+
 2024-9-15 Hermann
 bn 2353
 Rework main() to introduce an InstanceManager.

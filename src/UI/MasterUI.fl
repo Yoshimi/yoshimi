@@ -930,7 +930,7 @@ class MasterUI {: {public GuiUpdates}
           Fl_Check_Button SysEffOn {
             label On
             callback {//
-                if (o->value())
+                /*if (o->value())
                 {
                     sysCopy->activate();
                     sysPaste->activate();
@@ -940,7 +940,7 @@ class MasterUI {: {public GuiUpdates}
                     // note: the effect-type select box remains enabled
                     sysCopy->deactivate();
                     sysPaste->deactivate();
-                }
+                }*/
                 uchar effNum = syseffectui->effNum();
                 send_data(0, EFFECT::sysIns::effectEnable, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::systemEffects, effNum);}
             xywh {247 156 20 20} down_box DOWN_BOX value 1 selection_color 64 labelfont 3 labelcolor 226 align 4

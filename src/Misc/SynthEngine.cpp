@@ -686,9 +686,9 @@ void SynthEngine::NoteOn(uchar chan, uchar note, uchar velocity)
         Runtime.Log("Note on diff " + to_string(Runtime.noteOnSent - Runtime.noteOnSeen));
 #endif
 
-#ifdef REPORT_NOTEON
-    struct timeval tv1, tv2;
-    gettimeofday(&tv1, NULL);
+#ifdef REPORT_NOTE_ON_TIME
+    steady_clock::time_point noteTime;
+    noteTime = steady_clock::now();
 #endif
     for (uint npart = 0; npart < Runtime.numAvailableParts; ++npart)
     {
@@ -698,17 +698,12 @@ void SynthEngine::NoteOn(uchar chan, uchar note, uchar velocity)
                 part[npart]->NoteOn(note, velocity);
         }
     }
-#ifdef REPORT_NOTEON
+#ifdef REPORT_NOTE_ON_TIME
     if (Runtime.showTimes)
     {
-        gettimeofday(&tv2, NULL);
-        if (tv1.tv_usec > tv2.tv_usec)
-        {
-            tv2.tv_sec--;
-            tv2.tv_usec += 1000000;
-            }
-        int actual = (tv2.tv_sec - tv1.tv_sec) *1000000 + (tv2.tv_usec - tv1.tv_usec);
-        Runtime.Log("Note time " + to_string(actual) + "uS");
+        using Microsec = std::chrono::duration<int, std::micro>;
+        auto duration = duration_cast<Microsec>(steady_clock::now() - noteTime);
+        Runtime.Log("Note start time " + to_string(duration.count()) + "us");
     }
 #endif
 }

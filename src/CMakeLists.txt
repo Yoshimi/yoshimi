@@ -110,7 +110,7 @@ option (LV2Plugin "Build yoshimi lv2 plugin interface" ON)
 
 # developer info
 option (ShowNoteOnTimes "Report Note-On Times" OFF)
-option (ReportNoteEvents "Report Notes On/Off" OFF)
+option (ReportNoteEvents "Report Notes On/Off Count" OFF)
 
 
 set (BuildOptions_X86
@@ -405,7 +405,7 @@ add_definitions (
 add_definitions (-DYOSHIMI="yoshimi")
 
 if (ShowNoteOnTimes)
-    add_definitions (-DREPORT_NOTEON)
+    add_definitions (-DREPORT_NOTE_ON_TIME)
 endif ()
 
 if (ReportNoteEvents)
