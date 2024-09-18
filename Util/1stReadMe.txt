@@ -1,6 +1,6 @@
 The following are utility programs and files that are outside the main Yoshimi build but can be run from a terminal window to add to, or modify some features.
 
-The file 'ControlModel.svg' is the source file for the PDF version in dev_notes.
+The file 'ControlModel.svg' is the source file for the PDF version in dev_notes. It is somewhat out of date!
 
 MakeSplash.sh
 Command:
@@ -17,7 +17,17 @@ midiListgen.cpp
 This is a source file used to build a program that generates an HTML formatted list of MIDI note names, numbers and frequencies. It is highly accurate and was used to generate the list used in the guide.
 
 
-switch_time.cpp
-This is a source file used to test the behaviour of large switch statements. The difference is significant, and more noticeable on slower single core processors. Compiling with all optimisations on makes and even greater difference.
+incBuildNumber.py
+This is a python program that picks up the current build number, increments it and resaves it.
 
-Updated to suppress compiler warnings.
+
+updateGuideVersion.py
+Thi is a python program that reads the current Yoshimi version details and extracts just the number, discarding any suffix, then embeds it in the HTML user guide. It does this in a manner that doesn't change the file size.
+
+
+Three bash scripts in parent directory:
+    comp    enters the build directory, compiles the code, then returns to the project directory.
+
+    run     enters the build directory, runs the compiled code, then returns to the project directory.
+
+    set     enters the Util directory, runs updateGuideVersion.py, then runs incBuildNumber.py, then enters the build directory, compiles the code and remains in the build directory.

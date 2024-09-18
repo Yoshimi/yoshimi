@@ -1,5 +1,12 @@
 yoshimi 2.3.2 M
 
+2024-9-18 Will
+bn 2355
+Set version as 2.3.3 rc1
+Made corrections and updates to HTML user guide.
+Updated /Util/ programs and notes.
+Included BugFix from Hermann.
+
 2024-9-16 Will
 bn 2354
 Added missing conversion for note time reporting
