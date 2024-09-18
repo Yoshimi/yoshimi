@@ -391,16 +391,19 @@ YoshimiLV2Plugin::YoshimiLV2Plugin(SynthEngine& _synth
 /** create a new distinct Yoshimi plugin instance; `activate()` will be called prior to `run()`. */
 LV2_Handle YoshimiLV2Plugin::instantiate(LV2_Descriptor const* desc, double sample_rate, const char *bundle_path, LV2_Feature const *const *features)
 {
-    LV2_Handle pluginHandle{};
+    YoshimiLV2Plugin* instance;
     auto instantiatePlugin = [&](SynthEngine& synth) -> MusicIO*
                                 {
-                                    auto instance = new YoshimiLV2Plugin(synth, sample_rate, bundle_path, features, *desc);
-                                    pluginHandle = static_cast<LV2_Handle>(instance);
+                                    instance = new YoshimiLV2Plugin(synth, sample_rate, bundle_path, features, *desc);
                                     return instance;  // note: will be stored/managed in MusicClient
                                 };
 
     if (Config::instances().startPluginInstance(instantiatePlugin))
-        return pluginHandle;
+    {
+        assert(instance);
+        instance->isReady.store(true, std::memory_order_release); // after this point, GUI-plugin may attach
+        return static_cast<LV2_Handle>(instance);
+    }
     else
         return nullptr;
 }
@@ -408,7 +411,6 @@ LV2_Handle YoshimiLV2Plugin::instantiate(LV2_Descriptor const* desc, double samp
 /** Initialise the plugin instance and activate it for use. */
 void YoshimiLV2Plugin::activate(LV2_Handle h)
 {
-    self(h).isReady.store(true, std::memory_order_release);
     self(h).runtime().Log("Yoshimi LV2 plugin activated");
 }
 
