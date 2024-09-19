@@ -862,8 +862,9 @@ class MasterUI {: {public GuiUpdates}
           if(panelwindow->visible())
               return;
           panelType &= 3;
+          changepanelstyle(panelType);
           updatepanel();
-          panelwindow->show();}
+          ;}
           tooltip {Mixer Panel Window} xywh {83 30 106 24} box GTK_THIN_UP_BOX color 198 labelsize 11 labelcolor 64
         }
         Fl_Button mainmidilearn {
@@ -3631,26 +3632,26 @@ Alan Calvert started the project}
     if (type == 0)
         type = 1;
     panelwindow->hide();
-    if (type != panelType)
+    if (type == 1)
     {
-        if (type == 1)
-        {
-            panelwindow->size(PANEL_SINGLE_X, PANEL_SINGLE_Y);
-            panelwindow->size_range((PANEL_SINGLE_X * 9) / 10, (PANEL_SINGLE_Y * 9) / 10, 0, 0, 0, 0, 1);
-            towide->hide();
-            todeep->show();
-            Panelclose->position(975, 290);
-        }
-        else if (type == 2)
-        {
-            panelwindow->size(PANEL_DUAL_X, PANEL_DUAL_Y);
-            panelwindow->size_range((PANEL_DUAL_X * 4) / 5, (PANEL_DUAL_Y * 4) / 5, 0, 0, 0, 0, 1);
-            towide->show();
-            todeep->hide();
-        }
+        panelwindow->size(PANEL_SINGLE_X, PANEL_SINGLE_Y);
+        panelwindow->size_range((PANEL_SINGLE_X * 9) / 10, (PANEL_SINGLE_Y * 9) / 10, 0, 0, 0, 0, 1);
+        towide->hide();
+        todeep->show();
+        Panelclose->position(975, 290);
+    }
+    else if (type == 2)
+    {
+        panelwindow->size(PANEL_DUAL_X, PANEL_DUAL_Y);
+        panelwindow->size_range((PANEL_DUAL_X * 4) / 5, (PANEL_DUAL_Y * 4) / 5, 0, 0, 0, 0, 1);
+        towide->show();
+        todeep->hide();
     }
     panelwindow->show();
     panelType = type;
+    configui->PanelLayout->value(2 - type);
+    if (configui->configwindow->visible())
+        configui->configwindow->redraw();
     panelRtext();} {}
   }
   Function {Showpanel()} {} {
@@ -3678,26 +3679,15 @@ Alan Calvert started the project}
         defH = (PANEL_DUAL_Y * 9) / 10;
     }
 
-    if (tmp == 1)
-    {
-        towide->hide();
-        todeep->show();
-    }
-    else if (tmp == 2)
-    {
-        towide->show();
-        todeep->hide();
-    }
-
     panelwindow->size_range(defW, defH, 0, 0, 0, 0, 1);
     checkSane(fetchX, fetchY, fetchW, fetchH, defW, defH);
     panelwindow->resize(fetchX, fetchY, fetchW, fetchH);
 
     if (fetchO < 4)
     {
-        panelType = tmp;
-        panelwindow->show();
+        changepanelstyle(tmp);
         updatepanel();
+        configui->PanelLayout->value(2 - tmp);
     }
     else
     {
