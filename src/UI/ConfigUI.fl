@@ -264,8 +264,8 @@ fillThemes();
           Fl_Choice PanelLayout {
             label {Mixer Panel Layout}
             callback {//
-    int style = 2 - int(o->value());
-    synth->getGuiMaster()->changepanelstyle(style);}
+            int style = 2 - int(o->value());
+            synth->getGuiMaster()->changepanelstyle(style, true);}
             tooltip {Select single row or compact format} xywh {200 250 150 20} down_box BORDER_BOX labelsize 12 labelcolor 64 textfont 1 textsize 12 textcolor 64
             code0 {o->add("2 row x 8 entries");o->add("1 row x 16 entries");}
           } {}

@@ -1812,13 +1812,13 @@ Alan Calvert started the project}
       Fl_Button towide {
         label {Change to 1 x 16}
         callback {//
-        changepanelstyle(1);}
+        changepanelstyle(1, true);}
         xywh {360 290 130 25} box PLASTIC_THIN_UP_BOX color 228 labelcolor 64
       }
       Fl_Button todeep {
         label {Change to 2 x 8}
         callback {//
-        changepanelstyle(2);}
+        changepanelstyle(2, true);}
         xywh {831 290 120 25} box PLASTIC_THIN_UP_BOX color 228 labelcolor 64
       }
       Fl_Choice Panelgroups {
@@ -3627,22 +3627,25 @@ Alan Calvert started the project}
     int tmp = part % NUM_MIDI_CHANNELS;
     panellistitem[tmp]->refresh();} {}
   }
-  Function {changepanelstyle(int type)} {} {
+  Function {changepanelstyle(int type, bool force = false)} {} {
     code {//
     if (type == 0)
         type = 1;
     panelwindow->hide();
     if (type == 1)
     {
-        panelwindow->size(PANEL_SINGLE_X, PANEL_SINGLE_Y);
+        if (force)
+            panelwindow->size(PANEL_SINGLE_X, PANEL_SINGLE_Y);
         panelwindow->size_range((PANEL_SINGLE_X * 9) / 10, (PANEL_SINGLE_Y * 9) / 10, 0, 0, 0, 0, 1);
         towide->hide();
         todeep->show();
-        Panelclose->position(975, 290);
+        if (force)
+            Panelclose->position(975, 290);
     }
     else if (type == 2)
     {
-        panelwindow->size(PANEL_DUAL_X, PANEL_DUAL_Y);
+        if (force)
+            panelwindow->size(PANEL_DUAL_X, PANEL_DUAL_Y);
         panelwindow->size_range((PANEL_DUAL_X * 4) / 5, (PANEL_DUAL_Y * 4) / 5, 0, 0, 0, 0, 1);
         towide->show();
         todeep->hide();
@@ -3658,27 +3661,26 @@ Alan Calvert started the project}
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Mixer");
+    //std::cout << "fetch " << fetchO << std::endl;
     if (fetchO == 0)
         fetchO = 1; // it's never been seen so set the default
 
-    // assume default sizes
+    int tmp = fetchO & 3;
+    // find default sizes
     int defW = (PANEL_SINGLE_X * 9) / 10;
     int defH = (PANEL_SINGLE_Y * 9) / 10;
-
-    if (fetchW < (PANEL_DUAL_X * 9) / 10 || fetchH < defH)
-    {
-        fetchW = defW;
-        fetchH = defH;
-        fetchO = 1; // it's messed up so force default
-    }
-
-    int tmp = fetchO & 3;
     if (tmp == 2)
     {
-        defW = (PANEL_DUAL_X * 9) / 10;
-        defH = (PANEL_DUAL_Y * 9) / 10;
+        defW = (PANEL_DUAL_X * 4) / 5;
+        defH = (PANEL_DUAL_Y * 4) / 5;
     }
-
+    //std::cout << "W " << fetchW << " def " << defW << "  H " << fetchH << " def " << defH << std::endl;
+    if (fetchW < defW || fetchH < defH)
+    {
+        fetchW = defW; // it's messed up so force default
+        fetchH = defH;
+    }
+    configui->PanelLayout->value(2 - tmp);
     panelwindow->size_range(defW, defH, 0, 0, 0, 0, 1);
     checkSane(fetchX, fetchY, fetchW, fetchH, defW, defH);
     panelwindow->resize(fetchX, fetchY, fetchW, fetchH);
@@ -3687,7 +3689,6 @@ Alan Calvert started the project}
     {
         changepanelstyle(tmp);
         updatepanel();
-        configui->PanelLayout->value(2 - tmp);
     }
     else
     {

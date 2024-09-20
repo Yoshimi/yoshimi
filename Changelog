@@ -1,5 +1,11 @@
 yoshimi 2.3.2 M
 
+2024-9-20 Will
+bn 2357
+BugFix: Not honouring last seen mixer panel format.
+Further updates to mixer panel control.
+Set version as 2.3.3 rc2
+
 2024-9-19 Will
 bn 2356
 Revised panel window control, reinstating link between MasterUI
