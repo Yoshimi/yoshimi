@@ -304,26 +304,33 @@ bool InstanceManager::Instance::startUp(PluginCreator pluginCreator)
     if (isLV2)
     {
         runtime().Log("\n----Start-LV2-Plugin--ID("+asString(getID())+")----");
+        runtime().init();
         if (client->open(pluginCreator))
             runtime().runSynth = true;
     }
     else
+    {
+        auto configuredAudio = runtime().audioEngine;
+        auto configuredMidi  = runtime().midiEngine;
+
         for (auto [tryAudio,tryMidi] : drivers_to_probe(runtime()))
         {
             runtime().Log("\n-----Connect-attempt----("+display(tryAudio)+"/"+display(tryMidi)+")----");
+            runtime().audioEngine = tryAudio;
+            runtime().midiEngine = tryMidi;
+            runtime().init();
             if (client->open(tryAudio, tryMidi))
             {
-                if (tryAudio == runtime().audioEngine and
-                    tryMidi == runtime().midiEngine)
+                if (tryAudio == configuredAudio and
+                    tryMidi == configuredMidi)
                     runtime().configChanged = true;
-                runtime().audioEngine = tryAudio;
-                runtime().midiEngine = tryMidi;
                 runtime().runSynth = true;  // mark as active and enable background threads
                 runtime().Log("-----Connect-SUCCESS-------------------\n");
                 runtime().Log("Using "+display(tryAudio)+" for audio and "+display(tryMidi)+" for midi", _SYS_::LogError);
                 break;
             }
         }
+    }
     if (not runtime().runSynth)
         runtime().Log("Failed to instantiate MusicClient",_SYS_::LogError);
     else

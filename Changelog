@@ -1,5 +1,11 @@
 yoshimi 2.3.2 M
 
+2024-9-21 Will + Hermann
+bn 2358
+Initial preparations for release.
+BugFix: init audio/midi device names before opening the backend.
+Set version as 2.3.3 rc3
+
 2024-9-20 Will
 bn 2357
 BugFix: Not honouring last seen mixer panel format.
