@@ -37,11 +37,14 @@
     <p>
     Version 2.3.2 adds the ability to set different left/right repeat rates in the Echo effect.
     </p>
+    <p>
+    Version 2.3.3 has improved memory management, extension to keyboard shortcuts, better configurastion control, and expands theme colour control, and adds realtime theme editing.
+    </p>
   </description>
    <launchable type="desktop-id">yoshimi.desktop</launchable>
 
   <releases>
-      <release type="stable" version="2.3.2" date="2024-02-19" />
+      <release type="stable" version="2.3.3" date="2024-09-22" />
   </releases>
   <provides>
     <binary>yoshimi</binary>

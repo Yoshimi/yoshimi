@@ -55,7 +55,7 @@ add_definitions(-Wno-vla) # Nothing wrong with variable length arrays
 
 project (Yoshimi)
 
-set (YOSHIMI_VERSION "2.3.3 rc2")
+set (YOSHIMI_VERSION "2.3.3")
 
 add_definitions (-DMIN_CONFIG_MAJOR=2)
 add_definitions (-DMIN_CONFIG_MINOR=3)
@@ -325,7 +325,6 @@ set (Interface_Sources
 
 set (CLI_Sources
     CLI/CmdInterface.cpp
-    #CLI/ConfigCLI.cpp
     CLI/CmdInterpreter.cpp
 )
 
