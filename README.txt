@@ -1,15 +1,19 @@
-Version 2.3.2
+Version 2.3.3
 
-The Echo effect can now have separate left and right channel delay times.
+Configuration controls are better defined and saved ones isolated from CLI startup values.
 
-Optimisations giving smaller code size and better efficiency.
+Improved theme control. Changes are now auto-detected, and there is a Monochrome setting.
 
-Small corrections and updates in the User Guide.
+New instruments added to banks.
 
-Various bugfixes.
+Updates and improved descriptions in the User Guide.
+
+Further code improvements, particularly regarding memory safety.
+
+Various bugfixes - including a really obscure one!
 
 
-Full details are in /doc/Yoshimi_2.3.2_features.txt
+Full details are in /doc/Yoshimi_2.3.3_features.txt
 
 Yoshimi source code is available from either:
 https://sourceforge.net/projects/yoshimi

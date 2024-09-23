@@ -9,6 +9,6 @@ The themes are plain text files with a list of colour numbers and brief descript
 
 When creating a new theme you are strongly advised to set your greyscale first, as most of the other entries will be affected by this. You can reverse the grey values so that highlights become shadows and vice-versa, and entries with a grey element will also swap light to dark. The demo file sets this as 0,120, and changing it to 120,0, gives a very dark theme.
 
-To set up a theme quickly, load it into any text editor. Make you change and save the file, but keep it open. As you can just reselect the same theme, you can immediately test it, make further changes, save again and reselect.
+To set up a new theme quickly, load the default one into any text editor. Make your first changes and save the file to a new name in {user}/.local/share/yoshimi/themes, but keep it open. This will appear in the 'Themes@ window. On seeing the change Yoshimi will recognise it so you can select and immediately test it. When you make further changes the display will be immediately updated.
 
 Finally, the 'classic' file is a copy of the internally generated one and is never itself used. If it is missing it will be regenerated. Similarly the demo file is a copy of the one in Examples and will be re-copied if missing.

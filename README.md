@@ -4,14 +4,17 @@ Yoshimi is a software audio synthesizer, currently only available for Linux.
 
 ### Current version
 
-Version 2.3.2
+Version 2.3.3
 
-* The Echo effect can now have separate left and right channel delay times.
-* Optimisations giving smaller code size and better efficiency.
-* Small corrections and updates in the User Guide.
-* Various bugfixes.
 
-Full details are in [/doc/Yoshimi_2.3.2_features.txt](doc/Yoshimi_2.3.2_features.txt)
+* Configuration controls are better defined and saved ones isolated from CLI startup values.
+* Improved theme control. Changes are now auto-detected, and there is a Monochrome setting.
+* New instruments added to banks.
+* Updates and improved descriptions in the User Guide.
+* Further code improvements, particularly regarding memory safety.
+* Various bugfixes - including a really obscure one!
+
+Full details are in [/doc/Yoshimi_2.3.3_features.txt](doc/Yoshimi_2.3.3_features.txt)
 
 ### Building
 
@@ -32,4 +35,4 @@ To post, email to: yoshimi@freelists.org
 
 ### License
 
-GPLv2+ (see [COPYING](COPYING) for license details.
+GPLv2+ see [COPYING](COPYING) for license details.

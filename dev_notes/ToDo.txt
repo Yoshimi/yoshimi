@@ -1,6 +1,4 @@
 
-BUG! stand-alone GUI freezes and no further system changes if new instance started while instrument change in progress.
-
 BUG! Vector window instrument label colours not updated when engines are manually changed - it's OK when loading instruments etc.
 
 BUG! Loading a state file with an embedded MIDI-Learn window sometimes doesn't display the text of the first learned line.
