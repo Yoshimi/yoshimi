@@ -21,18 +21,9 @@
 #ifndef UTIL_H
 #define UTIL_H
 
+#include <set>
 #include <string>
-
-namespace std {// forward declarations to avoid pervasive includes
-
-  template<typename T>
-  class allocator;
-  template<typename K, typename CMP, class ALLO>
-  class set;
-
-  template<typename IT, typename V>
-  IT find (IT, IT, V const&);
-}
+#include <algorithm>
 
 
 namespace util {

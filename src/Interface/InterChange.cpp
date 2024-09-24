@@ -104,7 +104,11 @@ InterChange::InterChange(SynthEngine& synthInstance)
     fromMIDI(),
     returnsBuffer(),
     muteQueue(),
+#ifdef GUI_FLTK
     guiDataExchange{[this](CommandBlock const& block){ toGUI.write(block.bytes); }},
+#else
+    guiDataExchange{[](CommandBlock const&){ /* no communication GUI */ }},
+#endif
     syncWrite(false),
     lowPrioWrite(false),
     sortResultsThreadHandle(0),
