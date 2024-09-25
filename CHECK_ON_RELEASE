@@ -1,23 +1,28 @@
 
-Test headless build.
+***** VERY IMPORTANT *****
+    Test headless build.
+
+Test clean build with clang.
 
 Ensure all new files have been added to commit!!!
 
 Don't forget to create and push the tag on releases!
 
 Rebase yoshipi branch to release version.
-This is so that owners of this unit can upgrade to a stable version.
+    This is so that owners of newer this unit can upgrade
+    to a stable version.
 
-use /usr/bin/appstream-util validate {file} to check metadata
-get images from:
-https://yoshimi.sourceforge.io/docs/user-guide
+use /usr/bin/appstream-util validate {file} to check metadata.
+    Get images from:
+    https://yoshimi.sourceforge.io/docs/user-guide
 
 /src/CMakeLists.txt
     Ensure version number is correct.
     Disable extra compiler tests.
 
-Before the commit (but after build) run the python file /home/{user}/yoshimi-code/Util/update_guide_version.py
-This will ensure the guide has the correct version number.
+Before the commit (but after build) run the python file:
+    /home/{user}/yoshimi-code/Util/update_guide_version.py
+    This will ensure the guide has the correct version number.
 
 /desktop/yoshimi.1
     Ensure version number and dates are correct.
@@ -32,18 +37,19 @@ This will ensure the guide has the correct version number.
     Ensure these notes are up-to-date - especially ToDo.txt
 
 /doc
-    Ensure these are up-to-date - especially check yoshimi-user-manual is up to date and has correct version number.
+    Ensure these are up-to-date - especially check yoshimi-user-manual
+    is up to date and has the correct version number.
     Move Yoshimi_2.n.x_features.txt into doc/Histories and
     replace with new one for the current version.
 
 Changelog
-    Make sure top line is current release, not rc!
+    Make sure the top line is the current release, not rc!
 
 README.txt
     Update!
 
-set tag to release version
+set tag to release version.
 
 After commit
-    Update wikipedia entry
+    Update wikipedia entry.
     Tell everyone :)

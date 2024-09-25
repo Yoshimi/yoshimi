@@ -2,19 +2,19 @@ Version 2.3.3
 
 Configuration control has been improved - using start-up options no longer modifies the stored settings, but if you change a setting while running, just that configuration change is stored.
 
-There has been further work on GUI themes managment, along with unification and consolidation of some background colours. Added to this, there are improvements for those wanting to edit themes. Most notably, if you edit a theme currently being used, Yoshimi will automatically update the display as you make the changes. To avoid unnecessary processor use, this is only done while the themes window is open.
+There has been further work on GUI themes management, along with unification and consolidation of some background colours. Added to this, there are improvements for those wanting to edit themes. Most notably, if you edit a theme currently being used, Yoshimi will automatically update the display as you make the changes. To avoid unnecessary processor use, this is only done while the themes window is open.
 
 A new 'Monochrome' control has been added to themes that converts all window colours to grey scale values. This is to help theme creators ensure that the display will work well for colourblind users. It revealed that the default theme we've used for years behaves rather poorly, and work is under way to develop a high contrast alternative.
 
 The range of keyboard shortcuts has been extended (for the current window with focus).
 
-There are new instruments added to the supplied banks with particular attention the drum sounds.
+There are new instruments added to the supplied banks with particular attention to drum sounds.
 
-We've updated the built-in user guide and also made general doccumentation improvements.
+We've updated the built-in user guide and also made general documentation improvements.
 
 Some long-standing display issues have been resolved, in particular relating to graphs.
 
-There has been a major effort updating all the underlying code structure in keeping with modern memory-safe practices. In the process a few rather obscure bugs have been identifed and squashed.
+There has been a major effort updating all the underlying code structure in keeping with modern memory-safe practices. In the process a few rather obscure bugs have been identified and squashed.
 
 Yoshimi source code is available from either:
 https://sourceforge.net/projects/yoshimi
