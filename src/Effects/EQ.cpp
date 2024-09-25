@@ -178,10 +178,16 @@ void EQ::changepar(int npar, uchar value)
         return;
     int bp = npar % 5; // band parameter
 
-    float tmp;
+
+    // how to translate filter parameter into the internal value used for computation....
+    auto calcFreqVal = [](uchar par){ return 600.0f * power<30>((par - 64.0f) / 64.0f);  };
+    auto calcGainVal = [](uchar par){ return 30.0f * (par - 64.0f) / 64.0f;              };
+    auto calcQVal    = [](uchar par){ return power<30>((par - 64.0f) / 64.0f);           };
+
     switch (bp)
     {
         case 0:
+            // Change type of the filter band
             filter[nb].Ptype = value;
             if (value > AnalogFilter::MAX_TYPES)
                 filter[nb].Ptype = 0;
@@ -189,25 +195,28 @@ void EQ::changepar(int npar, uchar value)
             {
                 filter[nb].l->settype(value - 1);
                 filter[nb].r->settype(value - 1);
+                // need to re-sync the interpolated filter parameters
+                // to ensure a change is detected and the filter coefficients are recomputed.
+                // (without this the filter will sound neutral on very first usage of a EQ band)
+                filter[nb].freq.setTargetValue(calcFreqVal(filter[nb].Pfreq));
+                filter[nb].gain.setTargetValue(calcGainVal(filter[nb].Pgain));
+                filter[nb].q   .setTargetValue(calcQVal   (filter[nb].Pq   ));
             }
             break;
 
         case 1:
             filter[nb].Pfreq = value;
-            tmp = 600.0f * power<30>((value - 64.0f) / 64.0f);
-            filter[nb].freq.setTargetValue(tmp);
+            filter[nb].freq.setTargetValue(calcFreqVal(value));
             break;
 
         case 2:
             filter[nb].Pgain = value;
-            tmp = 30.0f * (value - 64.0f) / 64.0f;
-            filter[nb].gain.setTargetValue(tmp);
+            filter[nb].gain.setTargetValue(calcGainVal(value));
             break;
 
         case 3:
             filter[nb].Pq = value;
-            tmp = power<30>((value - 64.0f) / 64.0f);
-            filter[nb].q.setTargetValue(tmp);
+            filter[nb].q.setTargetValue(calcQVal(value));
             break;
 
         case 4:
