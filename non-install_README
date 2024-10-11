@@ -1,0 +1,6 @@
+Once complied, the Yoshimi image can be run from anywhere in the file system, but if not installed to the normal locations it will be unable to find the default banks, the user guide and other documents.
+
+These can be copied to suitable locations in .local by running:
+'sh copydocs.sh' from this directory.
+
+You can do this either before or after building, but should do so before first run of Yoshimi.

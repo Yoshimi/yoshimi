@@ -513,7 +513,10 @@ bool Config::initFromPersistentConfig()
         if (pos != string::npos)
             currentV = currentV.substr(0,pos);
         if (currentV == guideVersion && isRegularFile(manualFile))
+        {
             man_ok = true;
+            //std::cout << "Manual already seen" << std::endl;
+        }
 
         if (!man_ok)
         {
@@ -1450,15 +1453,21 @@ std::string Config::findHtmlManual()
 {
     string namelist = "";
     string tempnames = "";
-    if(file::cmd2string("find /usr/share/ -xdev -type f -name 'yoshimi_user_guide_version' 2>/dev/null", tempnames))
+    if(file::cmd2string("find /usr/share/doc/ -xdev -type f -name 'yoshimi_user_guide_version' 2>/dev/null", tempnames))
+    {
         namelist = tempnames;
+        tempnames = "";
+    }
 
-    if(file::cmd2string("find /usr/local/share/ -xdev -type f -name 'yoshimi_user_guide_version' 2>/dev/null", tempnames))
+    if(file::cmd2string("find /usr/local/share/doc/ -xdev -type f -name 'yoshimi_user_guide_version' 2>/dev/null", tempnames))
+    {
         namelist += tempnames;
+        tempnames = "";
+    }
 
-    //if(file::cmd2string("find /home/ -xdev -type f -name 'yoshimi_user_guide_version' 2>/dev/null", tempnames))
-        //namelist += tempnames;
-
+    if(file::cmd2string("find $HOME/.local/share/doc/yoshimi/ -xdev -type f -name 'yoshimi_user_guide_version' 2>/dev/null", tempnames))
+        namelist += tempnames;
+    //std::cout << "Manual lists\n" << namelist << std::endl;
     size_t next = 0;
     string lastversion = "";
     string found = "";

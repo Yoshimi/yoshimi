@@ -12,7 +12,7 @@ Pages are fixed width to keep the layout structure consistent and easy to mainta
 
 A fixed location footer duplicate of table headers is only used for tables long enough to need scrolling - it would look odd with short tables!
 
-To divide sections in long tables an 'empty' table row is used. In some cases this it followed by a table row with a single full width cell acting as a heading.
+To divide sections in long tables an 'empty' table row is used. In some cases this is followed by a table row with a single full width cell acting as a heading.
 
 When editing files, table cells are arranged vertically rather than as the line they represent. They're much easier to edit that way!
 
