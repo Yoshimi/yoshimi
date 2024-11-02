@@ -889,8 +889,8 @@ void SynthEngine::SetController(uchar chan, int CCtype, short int par)
 
 
     for (int npart = minPart; npart < maxPart; ++ npart)
-    {   // Send the controller to all part assigned to the channel
-        if (part[npart]->Prcvchn == chan)
+    {   // Send the controller to all enabled parts assigned to the channel
+        if (part[npart]->Prcvchn == chan && part[npart]->Penabled == 1)
         {
             if (CCtype == part[npart]->PbreathControl) // breath
             {

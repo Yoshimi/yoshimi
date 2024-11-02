@@ -1480,7 +1480,7 @@ std::string Config::findHtmlManual()
         {
             name = namelist.substr(0, next);
             current = loadText(name);
-            if (current > lastversion)
+            if (current >= lastversion)
             {
                 lastversion = current;
                 found = name;

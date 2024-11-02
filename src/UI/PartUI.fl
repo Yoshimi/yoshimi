@@ -2252,7 +2252,6 @@ class PartUI {: {public Fl_Group, PartUI_}
   }
   Function {showparameters(int kititem, int engine)} {} {
     code {//
-    string tname;
     kitname = part->kit[kititem].Pname;
     if (engine == -1)
     {   // this is used if I want to clear the engine from the part

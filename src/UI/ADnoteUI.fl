@@ -2996,7 +2996,6 @@ class ADnoteUI {: {public PresetsUI_}
     code {//
         int fetchW, fetchH, fetchX, fetchY, fetchO;
         loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "AddSynth");
-
         if (fetchW < addDW || fetchH < addDH)
         {
             fetchW = addDW;

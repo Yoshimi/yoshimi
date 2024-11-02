@@ -1,5 +1,14 @@
 yoshimi 2.3.3.1 M
 
+2024-11-2 Will
+bn 2363
+Parts only respond to MIDI CC input if enabled.
+    However the MIDI GUI may still respond as it is set at
+    channel level before part selection.
+Ensure manual search gets most recent version.
+Doc Updates
+
+
 2024-10-1 Will
 bn 2362
 Created 'non-install_README' and 'copydocs.sh' to give
