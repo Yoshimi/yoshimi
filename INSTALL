@@ -18,15 +18,15 @@ Working from a terminal window, extract source code archive:
 
     mkdir /home/user/software
     cd    /home/user/download
-    tar -jxvf /home/user/download/yoshimi-2.2.3.tar.bz2 -C/home/user/software
+    tar -jxvf /home/user/download/yoshimi-2.2.3.tar.bz2 -C/home/{user}/software
 
 Now there should be a directory:
 
-   /home/user/software/yoshimi-2.2.3
+   /home/{user}/software/yoshimi-2.2.3
 
 First move into this with:
 
-    cd /home/user/software/yoshimi-2.2.3
+    cd /home/{user}/software/yoshimi-2.2.3
 
 Now create a 'build' directory with:
 
@@ -36,8 +36,8 @@ and move into it with:
 
     cd build
 
-"/home/user/software/yoshimi-2.2.3/src" is the source code directory.
-"/home/user/software/yoshimi-2.2.3/build" is now the current working directory, and will have make-related files (when ccmake is done with configuring and generates the files).
+"/home/{user}/software/yoshimi-2.2.3/src" is the source code directory.
+"/home/{user}/software/yoshimi-2.2.3/build" is now the current working directory, and will have make-related files (when ccmake is done with configuring and generates the files).
 
 Run ccmake:
 
@@ -76,11 +76,11 @@ For more fine tuned building see INSTALL_CUSTOM
 
 ---- Build and command line options ----
 
-Yoshimi builds with both Jack and Alsa audio and midi options.  Alsa is the default for midi. Jack is default for audio,  however if this is not available Yoshimi will try for Also.  These, and other options can be nominated at runtime via command line parameters, and via the Graphical User Interface and Command Line Interface.
+Yoshimi builds with both Jack and Alsa audio and midi options.  Alsa is the default for midi. Jack is default for audio,  however if this is not available Yoshimi will try for Alsa.  These, and other options can be nominated at runtime via command line parameters, and via the Graphical User Interface and Command Line Interface.
 
 ---- Instrument banks ----
 
-Yoshimi installs its own copy of the instrument banks (installed by default in usr/local/share/yoshimi/banks/).  On first time startup, it also looks to the standard zynaddsubfx bank directories and includes any that may exist there.  You can tune your choice of bank directories via "Instruments" or "Paths".
+Yoshimi installs its own copy of the instrument banks (installed by default in usr/local/share/yoshimi/banks/).  On first time startup, it also looks for the standard zynaddsubfx bank directories and includes any that may exist there.  You can tune your choice of bank directories via "Instruments" or "Paths".
 
 ---- Help ----
 

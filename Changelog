@@ -1,5 +1,9 @@
 yoshimi 2.3.3.1 M
 
+2024-11-6 Will
+bn 2363
+Minor doc updates.
+
 2024-11-2 Will
 bn 2363
 Parts only respond to MIDI CC input if enabled.

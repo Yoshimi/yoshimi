@@ -9,8 +9,8 @@ Ensure all new files have been added to commit!!!
 Don't forget to create and push the tag on releases!
 
 Rebase yoshipi branch to release version.
-    This is so that owners of newer this unit can upgrade
-    to a stable version.
+    This is so that owners of newer versions of this unit
+    can upgrade to a stable version.
 
 use /usr/bin/appstream-util validate {file} to check metadata.
     Get images from:
@@ -45,7 +45,7 @@ Before the commit (but after build) run the python file:
 Changelog
     Make sure the top line is the current release, not rc!
 
-README.txt
+README.txt/README.md
     Update!
 
 set tag to release version.
