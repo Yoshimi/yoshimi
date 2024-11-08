@@ -72,8 +72,6 @@ class SynthEngine
         const uint uniqueId;
         Config Runtime;
 
-        GuiDataExchange::Connection<InterfaceAnchor> rootCon;
-
     public:
         Bank bank;
         InterChange interchange;
@@ -81,10 +79,13 @@ class SynthEngine
         MidiDecode mididecode;
         Vectors vectorcontrol;
 
+    private:
+        GuiDataExchange::Connection<InterfaceAnchor> rootCon;
+
+    public:
         Config& getRuntime()     {return Runtime;}
         uint getUniqueId() const {return uniqueId;}
 
-    public:
         SynthEngine(uint instanceID);
        ~SynthEngine();
         // shall not be copied nor moved

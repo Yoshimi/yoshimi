@@ -104,12 +104,12 @@ namespace { // Global implementation internal history data
 SynthEngine::SynthEngine(uint instanceID)
     : uniqueId{instanceID}
     , Runtime{*this}
-    , rootCon{interchange.guiDataExchange.createConnection<InterfaceAnchor>()}
     , bank{this}
     , interchange{*this}
     , midilearn{*this}
     , mididecode{this}
     , vectorcontrol{this}
+    , rootCon{interchange.guiDataExchange.createConnection<InterfaceAnchor>()}
     , audioOut{}
     , partlock{}
     , legatoPart{0}
