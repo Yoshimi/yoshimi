@@ -331,9 +331,6 @@ class BankUI {: {public BankProcess_, RootProcess_}
       Fl_Button B_search {
         label Search
         callback {//
-        if (!fetchData(0, PART::control::enable, synth->getGuiMaster()->activePart))
-            alert(synth, "Active part disabled");
-        else
             ShowSearch();}
         tooltip {Select instrument from list, by type} xywh {230 5 93 25} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 12 labelcolor 64 align 128
       }
@@ -545,10 +542,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         int root = string2int(line.substr(0, 3));
         int bank = string2int(line.substr(5, 3));
         int inst = (string2int(line.substr(10, 3))) - 1;
-        if (!fetchData(0, PART::control::enable, synth->getGuiMaster()->activePart))
-            alert(synth, "Active part disabled");
-        else
-            send_data(TOPLEVEL::action::forceUpdate, MAIN::control::loadInstrumentFromBank, inst, TOPLEVEL::type::Integer, TOPLEVEL::section::main, synth->getGuiMaster()->activePart, bank, root);}
+            send_data(TOPLEVEL::action::forceUpdate, MAIN::control::loadInstrumentFromBank, inst, TOPLEVEL::type::Integer, TOPLEVEL::section::main, synth->getGuiMaster()->npart, bank, root);}
         xywh {12 65 282 374} type Select labelsize 12 labelcolor 64 textsize 12 textcolor 64
       }
       Fl_Button searchClose {
@@ -1267,12 +1261,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         bool slotFilled = (thisname > "!");
         if ((what == 1 || what == 3) && mode == 1 && slotFilled)
         {
-            if (!fetchData(0, PART::control::enable, synth->getGuiMaster()->activePart))
-            {
-                alert(synth, "Active part disabled");
-                return;
-            }
-            send_data(TOPLEVEL::action::forceUpdate, MAIN::control::loadInstrumentFromBank, slot, TOPLEVEL::type::Integer, TOPLEVEL::section::main, synth->getGuiMaster()->activePart);
+            send_data(TOPLEVEL::action::forceUpdate, MAIN::control::loadInstrumentFromBank, slot, TOPLEVEL::type::Integer, TOPLEVEL::section::main, synth->getGuiMaster()->npart);
             // Reads from slot
             if (synth->getGuiMaster()->virkeyboard->virkeyboardwindow->visible())
                 synth->getGuiMaster()->virkeyboard->virkeys->take_focus();

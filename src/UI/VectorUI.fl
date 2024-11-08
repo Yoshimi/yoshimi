@@ -166,7 +166,6 @@ switch (res)
         Fl_Button XL {
           callback {//
           (void) o; // suppress warning
-          synth->getGuiMaster()->activePart = BaseChan;
           bankui->Show();}
           tooltip {Part corresponding to joystick 'left' position} xywh {20 53 160 20} box ENGRAVED_FRAME color 51 labelsize 12 align 64
         }
@@ -185,7 +184,6 @@ switch (res)
         Fl_Button XR {
           callback {//
           (void) o; // suppress warning
-          synth->getGuiMaster()->activePart = BaseChan + NUM_MIDI_CHANNELS;
           bankui->Show();}
           tooltip {Part corresponding to joystick 'right' position} xywh {20 115 160 20} box ENGRAVED_FRAME color 51 labelsize 12 labelcolor 64 align 64
         }
@@ -306,7 +304,6 @@ switch (res)
         Fl_Button YU {
           callback {//
           (void) o; // suppress warning
-          synth->getGuiMaster()->activePart = BaseChan + NUM_MIDI_CHANNELS * 2;
           bankui->Show();}
           tooltip {Part corresponding to joystick 'up' position} xywh {20 163 160 20} box ENGRAVED_FRAME color 51 labelsize 12 labelcolor 64 align 64
         }
@@ -325,7 +322,6 @@ switch (res)
         Fl_Button YD {
           callback {//
           (void) o; // suppress warning
-          synth->getGuiMaster()->activePart = BaseChan + NUM_MIDI_CHANNELS * 3;
           bankui->Show();}
           tooltip {Part corresponding to joystick 'down'position} xywh {20 225 160 20} box ENGRAVED_FRAME color 51 labelsize 12 labelcolor 64 align 64
         }

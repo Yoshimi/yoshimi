@@ -459,8 +459,8 @@ class Panellistitem {: {public Fl_Group}
 } {
   Function {make_window()} {} {
     Fl_Window panellistitem {
-      xywh {648 54 65 270} type Double
-      class Fl_Group visible
+      xywh {648 54 65 270} type Double hide
+      class Fl_Group
     } {
       Fl_Group panellistitemgroup {
         xywh {0 -5 65 279} box PLASTIC_THIN_UP_BOX
@@ -490,7 +490,6 @@ class Panellistitem {: {public Fl_Group}
           label Edit
           callback {//
               int newpart = npart | synth->getGuiMaster()->panelgroup;
-              synth->getGuiMaster()->activePart = npart + *plgroup;
               if (Fl::event() == FL_RELEASE && Fl::event_button() == FL_RIGHT_MOUSE)
                   synth->getGuiMaster()->partui->Showedit();
 
@@ -518,7 +517,6 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
         Fl_Button buttontop {
           label {  }
           callback {//
-    synth->getGuiMaster()->activePart = npart + *plgroup;
     bankui->cbwig->value(npart + 1 + *plgroup);
     bankui->cbwig->do_callback();
     bankui->Show();}
@@ -590,11 +588,7 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
       Fl_Check_Button partenabled {
         label 01
         callback {//
-        if (_SYS_::F2B(o->value()))
-            synth->getGuiMaster()->activePart = npart + *plgroup;
-        else
-            synth->getGuiMaster()->activePart = UNUSED;
-    send_data(TOPLEVEL::action::forceUpdate, PART::control::enable, o->value(), TOPLEVEL::type::Integer);}
+            send_data(TOPLEVEL::action::forceUpdate, PART::control::enable, o->value(), TOPLEVEL::type::Integer);}
         xywh {10 0 45 20} down_box DOWN_BOX selection_color 64 labeltype EMBOSSED_LABEL labelsize 15 labelcolor 64 align 24
         code0 {o->value(synth->partonoffRead(npart + *plgroup));}
         class Fl_Check_Button2

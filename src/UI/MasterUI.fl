@@ -325,7 +325,6 @@ class MasterUI {: {public GuiUpdates}
       paramsui = nullptr;
       syseffectui = nullptr;
       inseffectui = nullptr;
-      activePart = 0;
       yoshiLog = nullptr;
       queryDW = 0;
 
@@ -603,20 +602,20 @@ class MasterUI {: {public GuiUpdates}
             * to offer the INTERNAL name first rather than a possibly
             * confusing external filename.
             */
-            string newname = synth->part[activePart]->Pname;
+            string newname = synth->part[npart]->Pname;
             if (newname == DEFAULT_NAME)
             {
                 query("", "", "", "Nothing to save!");
                 return;
             }
-            if (synth->part[activePart]->info.Ptype == 0)
+            if (synth->part[npart]->info.Ptype == 0)
             {
                 if (choice(synth, "", "Save", "Cancel", "Please set instrument type before saving.\\nCopyright info also recommended.") != 2)
                     return;
             }
             string filename = setfiler("", newname, true, TOPLEVEL::XML::Instrument);
             if (!filename.empty())
-                send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedInstrument, activePart, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(string(filename)));
+                send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedInstrument, npart, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(string(filename)));
             }
             break;
         case 12: // recent
@@ -629,7 +628,7 @@ class MasterUI {: {public GuiUpdates}
             }
             break;
         case 13: // clear
-        if (!fetchData(0, PART::control::enable, activePart))
+        if (!fetchData(0, PART::control::enable, npart))
             {
                 alert(synth, "Active part disabled");
                 return;
@@ -637,7 +636,7 @@ class MasterUI {: {public GuiUpdates}
             partui->instrumentReset->do_callback();
             break;
         case 14: // search
-        if (!fetchData(0, PART::control::enable, activePart))
+        if (!fetchData(0, PART::control::enable, npart))
             {
                 alert(synth, "Active part disabled");
                 return;
@@ -1125,18 +1124,17 @@ class MasterUI {: {public GuiUpdates}
           int event = Fl::event_button();
           if (event == FL_LEFT_MOUSE)
           {
-              synth->getGuiMaster()->activePart = npart;
               bankui->Show();
           }
           else if (event == FL_RIGHT_MOUSE)
           {
-              string name = input_text(synth, "Instrument name:", synth->part[activePart]->Pname);
+              string name = input_text(synth, "Instrument name:", synth->part[npart]->Pname);
               if (name == DEFAULT_NAME)
                   alert(synth, "Can't use name of default sound");
-              else if (name != synth->part[activePart]->Pname)
+              else if (name != synth->part[npart]->Pname)
               {
                   unsigned char id = textMsgBuffer.push(name);
-                  send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, PART::control::instrumentName, 0, TOPLEVEL::type::Integer, activePart, UNUSED, UNUSED, UNUSED, id);
+                  send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, PART::control::instrumentName, 0, TOPLEVEL::type::Integer, npart, UNUSED, UNUSED, UNUSED, id);
               }
           }}
               tooltip {Left mouse button: choose/save/.. from/to bank, Right button: instrument name} xywh {136 291 195 25} box NO_BOX selection_color 64 labeltype NO_LABEL labelsize 12 labelcolor 64 align 16
@@ -1493,7 +1491,7 @@ class MasterUI {: {public GuiUpdates}
         label Part
         callback {//
         int nval = o->value() - 1;
-        activePart = nval;
+        npart = nval;
         send_data(TOPLEVEL::action::forceUpdate, MAIN::control::partNumber, nval, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
         xywh {36 292 40 20} labelsize 11 labelcolor 64 when 6 minimum 0 maximum 127 textsize 11 textcolor 64
         code0 {o->range(1.0, partmax);}
@@ -1824,8 +1822,7 @@ Alan Calvert started the project}
       Fl_Choice Panelgroups {
         label {Part Group}
         callback {//
-        int result = o->value();
-        panelgroup = result * NUM_MIDI_CHANNELS;
+        panelgroup = o->value() * NUM_MIDI_CHANNELS;
         for (int i = 0; i < NUM_MIDI_CHANNELS; ++i)
             panellistitem[i]->refresh();}
         xywh {5 300 86 18} down_box BORDER_BOX labelsize 12 labelcolor 64 align 1 textsize 12 textcolor 64
@@ -1840,7 +1837,7 @@ Alan Calvert started the project}
             panellistitem[i]->refresh();}
         xywh {5 300 86 18} down_box BORDER_BOX labelsize 12 labelcolor 64 align 1 textsize 12
         code0 {o->add("1 to 16");o->add("17 to 32");}
-        code1 {if (panelgroup ==  NUM_MIDI_CHANNELS) o->value(1); else o->value(0);}
+        code1 {o->value(panelgroup / NUM_MIDI_CHANNELS);}
       } {}
       Fl_Spinner CSspinner {
         label CC
@@ -2718,20 +2715,20 @@ Alan Calvert started the project}
     code {//
         float value = getData->data.value;
         unsigned char control = getData->data.control;
-        unsigned char newpart = getData->data.part;
+        unsigned char npart = getData->data.part;
         int value_int = lrint(value);
         bool value_bool = _SYS_::F2B(value);
         int panelpart = 0;
-        bool panelVisible = ((newpart / NUM_MIDI_CHANNELS) == (panelgroup / NUM_MIDI_CHANNELS));
+        bool panelVisible = ((npart / NUM_MIDI_CHANNELS) == (panelgroup / NUM_MIDI_CHANNELS));
         if (panelVisible)
-            panelpart = newpart % NUM_MIDI_CHANNELS;
+            panelpart = npart % NUM_MIDI_CHANNELS;
 
+        std::cout << "part " << npart << std::endl;
         bool seen = false;;
         switch (control)
         {
             case PART::control::enable:
             {
-                if (npart == newpart)
                 {
                     partEnable->value(value);
                     if (value)
@@ -2821,7 +2818,7 @@ Alan Calvert started the project}
 
             case PART::control::instrumentName:
                 partui->checkEngines();
-                synth->getGuiMaster()->instrumentlabel->copy_label(synth->part[newpart]->Pname.c_str());
+                synth->getGuiMaster()->instrumentlabel->copy_label(synth->part[npart]->Pname.c_str());
                 seen = true;
                 break;
 
@@ -3173,10 +3170,7 @@ Alan Calvert started the project}
             break;
 
         case MAIN::control::partNumber:
-            if ((getData->data.source & TOPLEVEL::action::noAction) != TOPLEVEL::action::fromGUI)
-                activePart = value_int;
-
-            partSwitch(activePart);
+            partSwitch(value_int);
             updatepanel();
             break;
 
@@ -3399,7 +3393,7 @@ Alan Calvert started the project}
             break;
         case MAIN::control::defaultPart:
         case MAIN::control::defaultInstrument:
-            partSwitch(activePart);
+            partSwitch(npart);
             updatepanel();
             break;
         case MAIN::control::masterReset:
@@ -3591,18 +3585,18 @@ Alan Calvert started the project}
 
     textwindow->size(W, H);
     textwindow->show();
-    string result;
+    string text;
     string oldline = textLine->value();
     size_t pos = 1;
     while (textwindow->shown())
     {
         textwindow->show(); // keep it on top
         textinRtext();
-        result = string(textLine->value());
+        text = string(textLine->value());
         Fl::wait();
-        pos = result.find_last_not_of(' ');
+        pos = text.find_last_not_of(' ');
         if (pos != string::npos)
-            pos -= result.find_first_not_of(' ');
+            pos -= text.find_first_not_of(' ');
         if (Fl::event_key() == FL_Enter)
         {
             if (pos == 0 || pos > 1)
@@ -3615,7 +3609,7 @@ Alan Calvert started the project}
     if (pos == 0 || pos == string::npos)
         return oldline;
 
-    return result;} {}
+    return text;} {}
   }
   Function {updatesendwindow()} {} {
     code {//
@@ -3698,28 +3692,36 @@ Alan Calvert started the project}
   }
   Function {updatepanel(bool full = false)} {} {
     code {//
-    for (int part = 0; part < partmax; ++part)
-    {
-        if (part < NUM_MIDI_CHANNELS) // will be orred with panel group
-            panellistitem[part]->refresh();
-        vectorui->setInstrumentLabel(part);
-    }
+    panelgroup = npart &0x30;
 
     if (partmax == (NUM_MIDI_CHANNELS * 4))
     {
-        Panelgroups->value(npart / NUM_MIDI_CHANNELS);
         Panelgroups->show();
+        Panelgroups->value(panelgroup / NUM_MIDI_CHANNELS);
     }
     else
         Panelgroups->hide();
 
     if (partmax == (NUM_MIDI_CHANNELS * 2))
     {
-        Panelsmallgroups->value(npart / NUM_MIDI_CHANNELS);
         Panelsmallgroups->show();
+        Panelsmallgroups->value(panelgroup / NUM_MIDI_CHANNELS);
     }
     else
         Panelsmallgroups->hide();
+
+    for (int part = 0; part < NUM_MIDI_CHANNELS; ++part)
+    {
+        panellistitem[part]->refresh();
+    }
+
+    if (vectorui->vectorwindow->visible()) // should this really be here?
+    {
+        for (int part = 0; part < partmax; ++part)
+        {
+            vectorui->setInstrumentLabel(part);
+        }
+    }
 
     int oldswitch = channelswitch->value();
     channelswitch->value(synth->getRuntime().channelSwitchType);
@@ -3761,7 +3763,6 @@ Alan Calvert started the project}
         npart = next;
     }
     updatelistitem(next); // select and/or modify
-    activePart = npart;
     partui->rebuild(npart);
 
     partEnable->value(synth->part[npart]->Penabled == 1);
@@ -3826,7 +3827,6 @@ Alan Calvert started the project}
     maxparts->value(partmax);
     maxparts->redraw();
     npartcounter->value(npart + 1);
-    activePart = npart;
     npartcounter->redraw();
     refreshControls(npart);} {}
   }
@@ -4000,7 +4000,6 @@ Alan Calvert started the project}
     if (npart >= partmax)
     {
         npartcounter->value(1);
-        activePart = 0;
         changed = true;
     }
     return changed;} {}
@@ -4819,8 +4818,6 @@ bpmfallback->format(format);} {}
   decl {bool themeTrigger;} {public local
   }
   decl {int npart;} {public local
-  }
-  decl {int activePart;} {public local
   }
   decl {int partmax;} {
     comment {This is only public for vector control} public local
