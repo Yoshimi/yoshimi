@@ -13,9 +13,9 @@
     a lv2:InstrumentPlugin, lv2:Plugin ;
     doap:name "Yoshimi-Multi" ;
     doap:maintainer [
-         foaf:name "Andrew Deryabin" ;
+         foaf:name "Yoshimi Team" ;
          foaf:homepage <http://yoshimi.sourceforge.net> ;
-         foaf:mbox <mailto:andrewderyabin@gmail.com> ;
+         foaf:mbox <mailto:yoshimi@freelists.org> ;
     ] ;
     doap:license <http://opensource.org/licenses/GPL-2.0> ;
     lv2:minorVersion 7;
@@ -281,9 +281,9 @@
     a lv2:InstrumentPlugin, lv2:Plugin ;
     doap:name "Yoshimi";
     doap:maintainer [
-         foaf:name "Andrew Deryabin";
+         foaf:name "Yoshimi Team";
          foaf:homepage <http://yoshimi.sourceforge.net> ;
-         foaf:mbox <mailto:andrewderyabin@gmail.com>;
+         foaf:mbox <mailto:yoshimi@freelists.org>;
     ] ;
     doap:license <http://opensource.org/licenses/GPL-2.0> ;
     lv2:minorVersion 7;
