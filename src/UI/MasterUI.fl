@@ -873,7 +873,7 @@ class MasterUI {: {public GuiUpdates}
           tooltip {Message Log} xywh {83 90 106 24} box GTK_THIN_UP_BOX color 198 labelsize 11 labelcolor 64
         }
         Fl_Button vectors {
-          label &Vectors
+          label {&Vectors}
           callback {//
           vectorui->Show(synth);}
           tooltip {Vector Setup Window} xywh {197 30 68 24} box GTK_THIN_UP_BOX color 198 labelsize 11 labelcolor 64
@@ -1490,9 +1490,8 @@ class MasterUI {: {public GuiUpdates}
       Fl_Spinner npartcounter {
         label Part
         callback {//
-        int nval = o->value() - 1;
-        npart = nval;
-        send_data(TOPLEVEL::action::forceUpdate, MAIN::control::partNumber, nval, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
+        npart =o->value() - 1;
+        send_data(TOPLEVEL::action::forceUpdate, MAIN::control::partNumber, npart, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
         xywh {36 292 40 20} labelsize 11 labelcolor 64 when 6 minimum 0 maximum 127 textsize 11 textcolor 64
         code0 {o->range(1.0, partmax);}
         code1 {o->value(synth->getRuntime().currentPart + 1);}
@@ -1887,7 +1886,7 @@ Alan Calvert started the project}
         code3 {CS_CC = o->value();}
       } {}
       Fl_Button Panelclose {
-        label &Close
+        label {&Close}
         callback {//
     panelType |= 4;
     saveWin(synth, panelwindow->w(), panelwindow->h(), panelwindow->x(), panelwindow->y(), panelType, "Mixer");
@@ -1941,14 +1940,14 @@ Alan Calvert started the project}
       code1 {o->size_range(queryDW, queryDH, 0, 0, 0, 0, 1);} modal
     } {
       Fl_Button yesQ {
-        label {Yes}
+        label Yes
         callback {//
     querywindow->hide();}
         xywh {205 80 60 20} box PLASTIC_THIN_UP_BOX color 228 labelcolor 64
         code0 {o->value(0);}
       }
       Fl_Button noQ {
-        label {No}
+        label No
         callback {//
     querywindow->hide();}
         xywh {276 80 60 20} box PLASTIC_THIN_UP_BOX color 228 labelcolor 64
@@ -2723,7 +2722,6 @@ Alan Calvert started the project}
         if (panelVisible)
             panelpart = npart % NUM_MIDI_CHANNELS;
 
-        std::cout << "part " << npart << std::endl;
         bool seen = false;;
         switch (control)
         {
@@ -3692,7 +3690,6 @@ Alan Calvert started the project}
   }
   Function {updatepanel(bool full = false)} {} {
     code {//
-    panelgroup = npart &0x30;
 
     if (partmax == (NUM_MIDI_CHANNELS * 4))
     {
@@ -3900,9 +3897,9 @@ Alan Calvert started the project}
   Function {do_load_instrument(string fname)} {} {
     code {//
     int npart = partui->npart;
-    if ((npart /  NUM_MIDI_CHANNELS) == (panelgroup  /  NUM_MIDI_CHANNELS))
+    if ((npart & 0x30) == (panelgroup & 0x30))
     {
-        int displaypart = npart % NUM_MIDI_CHANNELS;
+        int displaypart = npart & 0x0f;
         panellistitem[displaypart]->partenabled->value(0);
         panellistitem[displaypart]->panellistitemgroup->deactivate();
     }

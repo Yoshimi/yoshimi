@@ -1,5 +1,8 @@
 yoshimi 2.3.3.1 M
 
+
+Established full sync between Main window and Vectors.
+
 2024-11-8 Will
 bn 2364
 BugFix: Main and Panel windows getting out of sync.

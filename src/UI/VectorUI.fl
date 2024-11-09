@@ -166,6 +166,7 @@ switch (res)
         Fl_Button XL {
           callback {//
           (void) o; // suppress warning
+          synth->getGuiMaster()->partSwitch(BaseChan);
           bankui->Show();}
           tooltip {Part corresponding to joystick 'left' position} xywh {20 53 160 20} box ENGRAVED_FRAME color 51 labelsize 12 align 64
         }
@@ -184,6 +185,7 @@ switch (res)
         Fl_Button XR {
           callback {//
           (void) o; // suppress warning
+          synth->getGuiMaster()->partSwitch(BaseChan + NUM_MIDI_CHANNELS);
           bankui->Show();}
           tooltip {Part corresponding to joystick 'right' position} xywh {20 115 160 20} box ENGRAVED_FRAME color 51 labelsize 12 labelcolor 64 align 64
         }
@@ -304,6 +306,7 @@ switch (res)
         Fl_Button YU {
           callback {//
           (void) o; // suppress warning
+          synth->getGuiMaster()->partSwitch(BaseChan + (NUM_MIDI_CHANNELS * 2));
           bankui->Show();}
           tooltip {Part corresponding to joystick 'up' position} xywh {20 163 160 20} box ENGRAVED_FRAME color 51 labelsize 12 labelcolor 64 align 64
         }
@@ -322,6 +325,7 @@ switch (res)
         Fl_Button YD {
           callback {//
           (void) o; // suppress warning
+          synth->getGuiMaster()->partSwitch(BaseChan + (NUM_MIDI_CHANNELS * 3));
           bankui->Show();}
           tooltip {Part corresponding to joystick 'down'position} xywh {20 225 160 20} box ENGRAVED_FRAME color 51 labelsize 12 labelcolor 64 align 64
         }
@@ -426,11 +430,15 @@ switch (res)
   }
   Function {send_data(int action, int control, float value, int type, int part = TOPLEVEL::section::vector, int kit = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int miscmsg = UNUSED)} {} {
     code {//
-        if (control != 84 && control != 85 && control != VECTOR::control::erase)
+        if (control != MAIN::control::partNumber && control != MAIN::loadNamedVector && control != MAIN::saveNamedVector && control != VECTOR::control::erase)
         {
             parameter = BaseChan;
         }
         type |= TOPLEVEL::type::Write;
+        if (control == MAIN::control::partNumber)
+        {
+            std::cout << " val " << value << " act " << action << " typ " << type << " con " << control << " par " << part << " kit " << kit << std::endl;
+        }
         collect_writeData(synth, value, action, type, control, part, kit, engine, insert, parameter, UNUSED, miscmsg);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
