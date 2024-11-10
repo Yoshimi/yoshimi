@@ -85,7 +85,7 @@ class VectorUI {} {
         class WidgetSpinner
       }
       Fl_Menu_Button options {
-        label &Options
+        label {&Options}
         callback {int res = o->value();
 switch (res)
 {
@@ -113,7 +113,8 @@ switch (res)
                   size = NUM_MIDI_CHANNELS * 2;
               for (int i = 0; i < size; i += NUM_MIDI_CHANNELS)
               {
-                  if (synth->part[BaseChan + i]->Pname != DEFAULT_NAME)
+                  string partName = "";
+                  if (textMsgBuffer.fetch(collect_readData(synth, 0, PART::instrumentName, BaseChan + i)) != DEFAULT_NAME)
                       count += NUM_MIDI_CHANNELS;
               }
               if (count != size)
@@ -279,7 +280,7 @@ switch (res)
         class WidgetSpinner
       }
       Fl_Button Closevector {
-        label &Close
+        label {&Close}
         callback {//
             saveWin(synth, vectorwindow->w(), vectorwindow->h(), vectorwindow->x(), vectorwindow->y(), false, "Vector");
         vectorwindow->hide();
@@ -435,10 +436,10 @@ switch (res)
             parameter = BaseChan;
         }
         type |= TOPLEVEL::type::Write;
-        if (control == MAIN::control::partNumber)
+        /*if (control == MAIN::control::partNumber)
         {
             std::cout << " val " << value << " act " << action << " typ " << type << " con " << control << " par " << part << " kit " << kit << std::endl;
-        }
+        }*/
         collect_writeData(synth, value, action, type, control, part, kit, engine, insert, parameter, UNUSED, miscmsg);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
@@ -542,9 +543,7 @@ switch (res)
                 clearVector(parameter);
             break;
     };
-    vectorwindow->redraw();
-
-} {}
+    vectorwindow->redraw();} {}
   }
   Function {setRecent(bool active)} {} {
     code {//
@@ -609,14 +608,13 @@ switch (res)
         setInstrumentLabel(BaseChan + NUM_MIDI_CHANNELS * 2);
         setInstrumentLabel(BaseChan + NUM_MIDI_CHANNELS * 3);
         setbuttons();
-        loadlabel[BaseChan] = synth->getRuntime().vectordata.Name[BaseChan];
     }
     Loaded->copy_label(loadlabel[0].c_str());
     setbasechan->value(1);} {}
   }
   Function {setbuttons()} {} {
     code {//
-    Xcc = synth->getRuntime().vectordata.Xaxis[BaseChan];
+        Xcc = collect_readData(synth, 0, VECTOR::control::Xcontroller, TOPLEVEL::section::vector, UNUSED, UNUSED, UNUSED, BaseChan);
     if (Xcc > 119)
     {
         Xcc = 0;
@@ -630,7 +628,7 @@ switch (res)
     {
         Xf = synth->getRuntime().vectordata.Xfeatures[BaseChan];
         Xgroup->activate();
-        Ycc = synth->getRuntime().vectordata.Yaxis[BaseChan];
+        Ycc = collect_readData(synth, 0, VECTOR::control::Ycontroller, TOPLEVEL::section::vector, UNUSED, UNUSED, UNUSED, BaseChan);
         if (Ycc > 119)
         {
             Ycc = 0;
@@ -786,28 +784,28 @@ switch (res)
         AddBackL->color(addcol);
         SubBackL->color(subcol);
         PadBackL->color(padcol);
-        XinstL->copy_label(synth->part[npart]->Pname.c_str());
+        XinstL->copy_label(findnames(npart).c_str());
     }
     else if (npart == BaseChan + NUM_MIDI_CHANNELS)
     {
         AddBackR->color(addcol);
         SubBackR->color(subcol);
         PadBackR->color(padcol);
-        XinstR->copy_label(synth->part[npart]->Pname.c_str());
+        XinstR->copy_label(findnames(npart).c_str());
     }
     else if (npart == BaseChan + NUM_MIDI_CHANNELS * 2)
     {
         AddBackU->color(addcol);
         SubBackU->color(subcol);
         PadBackU->color(padcol);
-        YinstU->copy_label(synth->part[npart]->Pname.c_str());
+        YinstU->copy_label(findnames(npart).c_str());
     }
     else if (npart == BaseChan + NUM_MIDI_CHANNELS * 3)
     {
         AddBackD->color(addcol);
         SubBackD->color(subcol);
         PadBackD->color(padcol);
-        YinstD->copy_label(synth->part[npart]->Pname.c_str());
+        YinstD->copy_label(findnames(npart).c_str());
     }
     vectorwindow->redraw();
     Loaded->copy_label(loadlabel[BaseChan].c_str());} {}
@@ -819,21 +817,17 @@ switch (res)
     setbasechan->value(BaseChan + 1);
     updateAll(false);} {}
   }
+  Function {findnames(int npart)} {return_type {string}
+  } {
+    code {//
+        return textMsgBuffer.fetch(collect_readData(synth, 0, PART::control::instrumentName, npart, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, TOPLEVEL::action::lowPrio));
+        ;} {}
+  }
   Function {findengines(int npart)} {return_type {unsigned int}
   } {
     code {//
-    unsigned int engine = 0;
-
-    for (int i = 0; i < NUM_KIT_ITEMS; ++i)
-    {
-        if (synth->part[npart]->kit[i].Padenabled)
-            engine |= 1;
-        if (synth->part[npart]->kit[i].Psubenabled)
-            engine |= 2;
-        if (synth->part[npart]->kit[i].Ppadenabled)
-            engine |= 4;
-    }
-    return engine;} {}
+        return collect_readData(synth, 0, PART::control::instrumentEngines, npart);
+        ;} {}
   }
   Function {setcolors(int engine)} {return_type int
   } {

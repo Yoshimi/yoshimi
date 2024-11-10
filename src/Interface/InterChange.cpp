@@ -429,7 +429,7 @@ void InterChange::indirectTransfers(CommandBlock& cmd, bool noForward)
 
      // CLI message text has to be set here.
     if (!synth.fileCompatible)
-        text += "\nIncompatible file from ZynAddSubFX 3.x";
+        text += "\nPossibly incompatible file from ZynAddSubFX 3.x";
 
     if (newMsg)
         value = textMsgBuffer.push(text);
@@ -1500,6 +1500,7 @@ int InterChange::indirectPart(CommandBlock& cmd, uchar& newMsg, bool& guiTo, str
                 cmd.data.source &= ~TOPLEVEL::action::lowPrio;
             }
             break;
+
         case PART::control::instrumentCopyright:
             if (write)
             {
@@ -2580,12 +2581,16 @@ void InterChange::commandVector(CommandBlock& cmd)
             }
             else
             {
-                ;
+                value = synth.getRuntime().vectordata.Xaxis[chan];
             }
             break;
         case VECTOR::control::XleftInstrument:
             if (write)
                 synth.vectorSet(4, chan, value);
+            else
+            {
+                ;
+            }
             break;
         case VECTOR::control::XrightInstrument:
             if (write)
@@ -2668,7 +2673,7 @@ void InterChange::commandVector(CommandBlock& cmd)
             }
             else
             {
-                ;
+                value = synth.getRuntime().vectordata.Yaxis[chan];
             }
             break;
         case VECTOR::control::YupInstrument:
@@ -4235,6 +4240,28 @@ void InterChange::commandPart(CommandBlock& cmd)
             }
             else
                 value = part.Paudiodest;
+            break;
+
+        case PART::control::instrumentEngines: // read only
+            {
+                int engineCount = 0;
+                for (int i = 0; i < NUM_KIT_ITEMS; ++i)
+                {
+                    if (synth.part[npart]->kit[i].Penabled)
+                    { // nested so we don't access non existent kit items
+                        if (synth.part[npart]->kit[i].Pmuted == 0)
+                        {
+                            if (synth.part[npart]->kit[i].Padenabled)
+                                engineCount |= 1;
+                            if (synth.part[npart]->kit[i].Psubenabled)
+                                engineCount |= 2;
+                            if (synth.part[npart]->kit[i].Ppadenabled)
+                                engineCount |= 4;
+                        }
+                    }
+                }
+                value = engineCount;
+            }
             break;
 
         case PART::control::resetAllControllers:

@@ -696,8 +696,8 @@ namespace PART // usage PART::control::volume
         midiResonanceCenter,
         midiResonanceBandwidth,
     // end of midi controls
-
-        instrumentCopyright = 220,
+        instrumentEngines = 219,
+        instrumentCopyright,
         instrumentComments,
         instrumentName,
         instrumentType,

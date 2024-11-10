@@ -2236,18 +2236,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         padeditbutton->deactivate();
         padbox->color(FL_BACKGROUND_COLOR);
     }
-    for (int i = 1; i < NUM_KIT_ITEMS; ++i)
-    {
-        if (part->kit[i].Penabled)
-        { // nested so we don't access non existent
-            if (part->kit[i].Pmuted == 0)
-            {
-                engine |= part->kit[i].Padenabled;
-                engine |= (part->kit[i].Psubenabled << 1);
-                engine |= (part->kit[i].Ppadenabled << 2);
-            }
-        }
-    }
+    engine = collect_readData(synth, 0, PART::control::instrumentEngines, npart);
     synth->getGuiMaster()->updateEngines(engine, instrumentName);} {}
   }
   Function {showparameters(int kititem, int engine)} {} {

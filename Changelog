@@ -1,6 +1,13 @@
 yoshimi 2.3.3.1 M
 
 
+2024-11-10 Will
+bn 2365
+Implimented new part control to discover active engines.
+    Used by VectorUI, PartUI, Master()
+VectorUI no longer makes diect calls into the synth.
+Updated HTML Control Data
+
 Established full sync between Main window and Vectors.
 
 2024-11-8 Will
