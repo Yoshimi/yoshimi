@@ -2604,6 +2604,15 @@ void InterChange::commandVector(CommandBlock& cmd)
                 else
                     bitSet(features, 0);
             }
+            else // read all features for X or Y
+            {
+                if (control == VECTOR::control::Xfeature0)
+                {
+                    cmd.data.value = synth.getRuntime().vectordata.Xfeatures[chan];
+                }
+                else if (control == VECTOR::control::Yfeature0)
+                    cmd.data.value = synth.getRuntime().vectordata.Yfeatures[chan];
+            }
             break;
         case VECTOR::control::Xfeature1:
         case VECTOR::control::Yfeature1: // panning
@@ -3483,6 +3492,7 @@ void InterChange::commandMain(CommandBlock& cmd)
                 value = synth.getRuntime().channelSwitchType;
             }
             break;
+
         case MAIN::control::soloCC:
             if (write && synth.getRuntime().channelSwitchType > 0)
                 synth.getRuntime().channelSwitchCC = value_int;
@@ -3490,6 +3500,13 @@ void InterChange::commandMain(CommandBlock& cmd)
             {
                 write = false; // for an invalid write attempt
                 value = synth.getRuntime().channelSwitchCC;
+            }
+            break;
+
+        case MAIN::control::knownCCtest: // read only
+            {
+                string text = synth.getRuntime().masterCCtest(value_int);
+                cmd.data.miscmsg = textMsgBuffer.push(text);
             }
             break;
 

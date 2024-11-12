@@ -492,7 +492,7 @@ namespace MIDI // usage MIDI::control::noteOn
         pitchWheelAdjusted = 128,
         channelPressureAdjusted,
         keyPressureAdjusted,
-        soloType,
+        soloType, // also in MAIN section
         soloCC,
 
         // the following are generated internally for MIDI-learn and
@@ -572,7 +572,8 @@ namespace MAIN // usage MAIN::control::volume
         bpmFallback,
         reseed = 40,
         soloType = 48,
-        soloCC,
+        soloCC, // also in CC section
+        knownCCtest, // not just one number!
 
         exportBank = 60, // some of these should be in 'bank'
         importBank,

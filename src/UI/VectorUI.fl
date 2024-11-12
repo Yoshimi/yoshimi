@@ -265,7 +265,7 @@ switch (res)
             return;
         }
 
-        string name = synth->getRuntime().masterCCtest(tmp);
+        string name = textMsgBuffer.fetch(collect_readData(synth, 0, MAIN::knownCCtest, tmp));
         if (name != "")
         {
             errorlabel("CC " + to_string(tmp) +" in use for " + name);
@@ -405,7 +405,7 @@ switch (res)
             return;
         }
 
-        string name = synth->getRuntime().masterCCtest(tmp);
+        string name = textMsgBuffer.fetch(collect_readData(synth, 0, MAIN::knownCCtest, tmp));
         if (name != "")
         {
             errorlabel("CC " + to_string(tmp) +" in use for " + name);
@@ -436,10 +436,6 @@ switch (res)
             parameter = BaseChan;
         }
         type |= TOPLEVEL::type::Write;
-        /*if (control == MAIN::control::partNumber)
-        {
-            std::cout << " val " << value << " act " << action << " typ " << type << " con " << control << " par " << part << " kit " << kit << std::endl;
-        }*/
         collect_writeData(synth, value, action, type, control, part, kit, engine, insert, parameter, UNUSED, miscmsg);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
@@ -626,8 +622,9 @@ switch (res)
     }
     else
     {
-        Xf = synth->getRuntime().vectordata.Xfeatures[BaseChan];
+        Xf = collect_readData(synth, 0, VECTOR::control::Xfeature0, TOPLEVEL::section::vector, UNUSED, UNUSED, UNUSED, BaseChan);
         Xgroup->activate();
+
         Ycc = collect_readData(synth, 0, VECTOR::control::Ycontroller, TOPLEVEL::section::vector, UNUSED, UNUSED, UNUSED, BaseChan);
         if (Ycc > 119)
         {
@@ -636,7 +633,7 @@ switch (res)
         }
         else
         {
-            Yf = synth->getRuntime().vectordata.Yfeatures[BaseChan];
+            Yf = collect_readData(synth, 0, VECTOR::control::Yfeature0, TOPLEVEL::section::vector, UNUSED, UNUSED, UNUSED, BaseChan);
             Ygroup->activate();
         }
     }

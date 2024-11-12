@@ -2161,7 +2161,6 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
             break;
 
         case EFFECT::type::eq:
-            //synth->getRuntime().Log("EQ " + to_string(value_int) + "  " + to_string(int(control)));
             if (control == EFFECT::control::level)
             {
                 eqp0->value(value);
