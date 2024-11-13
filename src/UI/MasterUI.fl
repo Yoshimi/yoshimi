@@ -188,8 +188,8 @@ class FilerLine {: {public Fl_Group}
         xywh {25 0 415 21} box NO_BOX color 7 labelsize 12 labelcolor 64 align 20
       }
       Fl_Button nametop {
-        callback {//std::cout << "pressed " << n << std::endl;
-lineitem = n;}
+        callback {//
+            lineitem = n;}
         xywh {0 1 420 18} box NO_BOX labelcolor 64
       }
     }
@@ -414,7 +414,8 @@ class MasterUI {: {public GuiUpdates}
       panelType = 5;
       msgSeen = false;
       syseffSeen = false;
-      partmax = synth->getRuntime().numAvailableParts;
+      partmax = collect_readData(synth, 0, MAIN::control::availableParts, TOPLEVEL::main);
+      std::cout << "init " << partmax << std::endl;
       microtonalui = new MicrotonalUI(&synth->microtonal, synth);
       bankui = new BankUI(synth);
       virkeyboard = new VirKeyboard(synth);
@@ -1487,24 +1488,13 @@ class MasterUI {: {public GuiUpdates}
         code2 {setBpmFallbackValue(synth->PbpmFallback);}
         class WidgetSpinner
       }
-      Fl_Spinner npartcounter {
-        label Part
-        callback {//
-        npart =o->value() - 1;
-        send_data(TOPLEVEL::action::forceUpdate, MAIN::control::partNumber, npart, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
-        xywh {36 292 40 20} labelsize 11 labelcolor 64 when 6 minimum 0 maximum 127 textsize 11 textcolor 64
-        code0 {o->range(1.0, partmax);}
-        code1 {o->value(synth->getRuntime().currentPart + 1);}
-        code2 {bankui->init(o);}
-        class WidgetSpinner
-      }
       Fl_Spinner maxparts {
         label of
         callback {//
         int tmp = o->value();
-        if (tmp == 48)
+        if (tmp == 48) // must be 16,32,64
         {
-            if (partmax == 32)
+            if (partmax == 32) // rolling upwards
                 tmp = 64;
             else
                 tmp = 32;
@@ -1512,6 +1502,16 @@ class MasterUI {: {public GuiUpdates}
         send_data(TOPLEVEL::action::forceUpdate, MAIN::control::availableParts, tmp, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
         tooltip {Set the number of available parts} xywh {93 292 40 20} labelsize 11 labelcolor 64 minimum 16 maximum 64 step 16 value 16 textsize 11 textcolor 64
         code0 {o->value(partmax);}
+        class WidgetSpinner
+      }
+      Fl_Spinner npartcounter {
+        label Part
+        callback {//
+        npart = o->value() - 1;
+        send_data(TOPLEVEL::action::forceUpdate, MAIN::control::partNumber, npart, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
+        xywh {36 292 40 20} labelsize 11 labelcolor 64 when 6 minimum 0 maximum 64 textsize 11 textcolor 64
+        code0 {o->value(collect_readData(synth, 0, MAIN::control::partNumber, TOPLEVEL::main) + 1);}
+        code1 {bankui->init(o);}
         class WidgetSpinner
       }
       Fl_Choice panning_law {
@@ -1858,7 +1858,7 @@ Alan Calvert started the project}
             return;
         }
 
-        string name = synth->getRuntime().masterCCtest(candidate);
+        string name = textMsgBuffer.fetch(collect_readData(synth, candidate, MAIN::knownCCtest, TOPLEVEL::main));
         if (!name.empty())
         {
             query("", "", "", "In use for " + name);
@@ -3174,7 +3174,7 @@ Alan Calvert started the project}
 
         case MAIN::control::availableParts:
             partmax = value_int;
-            npartcounter->range(1, partmax);
+            std::cout << "available " << partmax << std::endl;
             updatepart();
             updatepanel();
             setinspartlist();
@@ -3820,7 +3820,6 @@ Alan Calvert started the project}
     }
 
     partEnable->value(synth->partonoffRead(npart));
-
     maxparts->value(partmax);
     maxparts->redraw();
     npartcounter->value(npart + 1);
@@ -3927,13 +3926,15 @@ Alan Calvert started the project}
     code {//
     if (microtonalui) // not taking chances!
         delete microtonalui;
-    partmax = synth->getRuntime().numAvailableParts;
+    partmax = collect_readData(synth, 0, MAIN::control::availableParts, TOPLEVEL::main);
     maxparts->value(partmax);
+    maxparts->redraw();
+    std::cout << "refresh " << partmax << std::endl;
     checkmaxparts();
     panning_law->value(fetchData(0, MAIN::control::panLawType, TOPLEVEL::section::main));
 
-    npartcounter->value((synth->getRuntime().currentPart) + 1);
-    int next = synth->getRuntime().currentPart;
+    int next = collect_readData(synth, 0, MAIN::control::partNumber, TOPLEVEL::main); // make sure it's the right one!
+    npartcounter->value(next + 1);
     partSwitch(next);
 
     // resync to effect data from last push-update
@@ -3993,8 +3994,8 @@ Alan Calvert started the project}
         Panelsmallgroups->value(0);
         changed = true;
     }
-    npartcounter->range(1, partmax);
-    if (npart >= partmax)
+    npartcounter->range(1, maxparts->value());
+    if (npart >= maxparts->value())
     {
         npartcounter->value(1);
         changed = true;
@@ -4057,14 +4058,13 @@ Alan Calvert started the project}
     inseffpart->clear();
     inseffpart->add("Master Out"); // 0
     inseffpart->add("Off");        // 1
-    int size = synth->getRuntime().numAvailableParts;
-    for (int i = 0; i < size; ++i)
+    for (int i = 0; i < partmax; ++i)
     {
         string num = string("00") + asString(i + 1);
         inseffpart->add((string("Part ") + asString(i + 1)).c_str());
     }
     int current = inseffectui? inseffectui->getInsertFxRouting() : 2;
-    assert(current < size);
+    assert(current < partmax);
     inseffpart->value(current + 2);} {}
   }
   Function {getPresetsUi()} {return_type {PresetsUI *}

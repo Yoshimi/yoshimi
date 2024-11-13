@@ -1,5 +1,10 @@
 yoshimi 2.3.3.1 M
 
+2024-11-13 Will
+bn 2367
+Further work on interaction between MasterUI and VectorUI.
+    Still a few anomalies regarding number of parts :(
+
 2024-11-12 Will
 bn 2366
 Added formal method of testing CCs against known ones.

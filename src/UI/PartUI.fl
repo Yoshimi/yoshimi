@@ -267,8 +267,10 @@ class PartKitItem {: {public Fl_Group}
   }
   Function {send_data(int action, int control, float value, int type, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int miscmsg = UNUSED)} {} {
     code {//
+        int partToUse = collect_readData(synth, 0, MAIN::control::partNumber, TOPLEVEL::main, kititem); // make sure it's the right one!
         type |= TOPLEVEL::type::Write;
-        collect_writeData(synth, value, action, type, control, synth->getRuntime().currentPart, kititem, engine, insert, parameter, UNUSED, miscmsg);} {}
+        collect_writeData(synth, value, action, type, control, partToUse, kititem, engine, insert, parameter, UNUSED, miscmsg);
+        ;} {}
   }
   Function {PartKitItem(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {//

@@ -1256,7 +1256,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
   } {
     code {//
         int slot = this->slot;
-        int curPart = synth->getRuntime().currentPart;
+        int curPart = collect_readData(synth, 0, MAIN::control::partNumber, TOPLEVEL::main); // make sure it's the right one!
         string thisname =  textMsgBuffer.fetch(fetchData(0, BANK::control::readInstrumentName, TOPLEVEL::section::bank, UNUSED, UNUSED, UNUSED, slot));
         bool slotFilled = (thisname > "!");
         if ((what == 1 || what == 3) && mode == 1 && slotFilled)

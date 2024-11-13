@@ -2571,17 +2571,21 @@ void InterChange::commandVector(CommandBlock& cmd)
         case VECTOR::control::Xcontroller: // also enable vector
             if (write)
             {
-                if (value >= 14)
+                if (value > 0)
                 {
                     if (!synth.vectorInit(0, chan, value))
+                    {
                         synth.vectorSet(0, chan, value);
+                        if (synth.getRuntime().numAvailableParts < (NUM_MIDI_CHANNELS * 2))
+                            synth.getRuntime().numAvailableParts = NUM_MIDI_CHANNELS * 2;
+                    }
                     else
                         cmd.data.value = 0;
                 }
             }
             else
             {
-                value = synth.getRuntime().vectordata.Xaxis[chan];
+                cmd.data.value = synth.getRuntime().vectordata.Xaxis[chan];
             }
             break;
         case VECTOR::control::XleftInstrument:
@@ -2672,17 +2676,21 @@ void InterChange::commandVector(CommandBlock& cmd)
         case VECTOR::control::Ycontroller: // also enable Y
             if (write)
             {
-                if (value >= 14)
+                if (value > 0)
                 {
                     if (!synth.vectorInit(1, chan, value))
+                    {
                         synth.vectorSet(1, chan, value);
+                        if (synth.getRuntime().numAvailableParts < (NUM_MIDI_CHANNELS * 4))
+                            synth.getRuntime().numAvailableParts = NUM_MIDI_CHANNELS * 4;
+                    }
                     else
                         cmd.data.value = 0;
                 }
             }
             else
             {
-                value = synth.getRuntime().vectordata.Yaxis[chan];
+                cmd.data.value = synth.getRuntime().vectordata.Yaxis[chan];
             }
             break;
         case VECTOR::control::YupInstrument:
@@ -3506,7 +3514,7 @@ void InterChange::commandMain(CommandBlock& cmd)
         case MAIN::control::knownCCtest: // read only
             {
                 string text = synth.getRuntime().masterCCtest(value_int);
-                cmd.data.miscmsg = textMsgBuffer.push(text);
+                value = textMsgBuffer.push(text);
             }
             break;
 
