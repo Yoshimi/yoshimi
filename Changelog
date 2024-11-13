@@ -1,5 +1,8 @@
 yoshimi 2.3.3.1 M
 
+
+Resolved further MasterUI/VectorUI inconsistencies.
+
 2024-11-13 Will
 bn 2367
 Further work on interaction between MasterUI and VectorUI.

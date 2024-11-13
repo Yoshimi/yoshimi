@@ -422,16 +422,16 @@ switch (res)
         callback {//
         int tmp = o->value();
 
-        if (tmp == 0)
+        if (tmp < 1)
         {
             Ycc = 0;
+            Ygroup->deactivate();
             send_data(0, VECTOR::control::Ycontroller, 0xff, TOPLEVEL::type::Integer);
             return;
         }
         if (tmp > 119)
         {
                 Ygroup->deactivate();
-                Ycontrol->deactivate();
                 errorlabel("CC must be less than 120");
                 Ycc = 0;
                 o->value(0);
@@ -445,6 +445,7 @@ switch (res)
         {
             errorlabel("CC " + to_string(tmp) +" in use for " + name);
             Ycc = 0;
+            Ygroup->deactivate();
             o->value(0);
             return;
         }
@@ -494,12 +495,6 @@ switch (res)
             break;
 
         case VECTOR::control::Xcontroller:
-            if (synth->getGuiMaster()->partmax < NUM_MIDI_CHANNELS * 2)
-            {
-                synth->getGuiMaster()->maxparts->value(NUM_MIDI_CHANNELS * 2);
-                synth->getGuiMaster()->maxparts->do_callback();
-                synth->getGuiMaster()->Panelsmallgroups->show();
-            }
             if (value_int > 119)
             {
                 Xcc = 0;
@@ -516,6 +511,13 @@ switch (res)
                 Xgroup->activate();
                 Xcontrol->value(value_int);
                 Ycontrol->activate();
+
+                if (synth->getGuiMaster()->partmax < NUM_MIDI_CHANNELS * 2)
+                {
+                    synth->getGuiMaster()->maxparts->value(NUM_MIDI_CHANNELS * 2);
+                    synth->getGuiMaster()->maxparts->do_callback();
+                    synth->getGuiMaster()->Panelsmallgroups->show();
+                }
             }
             break;
 
@@ -533,13 +535,6 @@ switch (res)
             break;
 
         case VECTOR::control::Ycontroller:
-            if (synth->getGuiMaster()->partmax < NUM_MIDI_CHANNELS * 4)
-            {
-                synth->getGuiMaster()->maxparts->value(NUM_MIDI_CHANNELS * 4);
-                synth->getGuiMaster()->maxparts->do_callback();
-                synth->getGuiMaster()->Panelsmallgroups->hide();
-                synth->getGuiMaster()->Panelgroups->show();
-            }
             if (value_int > 119)
             {
                 Ygroup->deactivate();
@@ -552,6 +547,14 @@ switch (res)
             {
                 Ygroup->activate();
                 Ycontrol->value(value_int);
+
+                if (synth->getGuiMaster()->partmax < NUM_MIDI_CHANNELS * 4)
+                {
+                    synth->getGuiMaster()->maxparts->value(NUM_MIDI_CHANNELS * 4);
+                    synth->getGuiMaster()->maxparts->do_callback();
+                    synth->getGuiMaster()->Panelsmallgroups->hide();
+                    synth->getGuiMaster()->Panelgroups->show();
+                }
             }
             break;
 

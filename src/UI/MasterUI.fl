@@ -415,7 +415,6 @@ class MasterUI {: {public GuiUpdates}
       msgSeen = false;
       syseffSeen = false;
       partmax = collect_readData(synth, 0, MAIN::control::availableParts, TOPLEVEL::main);
-      std::cout << "init " << partmax << std::endl;
       microtonalui = new MicrotonalUI(&synth->microtonal, synth);
       bankui = new BankUI(synth);
       virkeyboard = new VirKeyboard(synth);
@@ -434,7 +433,6 @@ class MasterUI {: {public GuiUpdates}
       bool foundWindows = Showmaster();
       if (current_ID > 0)
           foundWindows = true; //  not relevant for later windows
-      //std::cout << "Found windows " << int(foundWindows) << std::endl;
       loadWindowData();
       string starterror = "";
       if (synth->getRuntime().isLV2)
@@ -2509,7 +2507,8 @@ Alan Calvert started the project}
         filerscroll->end();
         filerscroll->scroll_to(-10,-10);
         filerRtext();
-        //std::cout << "list end " << lineno << std::endl;} {}
+        //std::cout << "list end " << lineno << std::endl;
+        ;} {}
   }
   Function {filerselect(int item)} {} {
     code {//
@@ -3174,7 +3173,6 @@ Alan Calvert started the project}
 
         case MAIN::control::availableParts:
             partmax = value_int;
-            std::cout << "available " << partmax << std::endl;
             updatepart();
             updatepanel();
             setinspartlist();
@@ -3666,7 +3664,6 @@ Alan Calvert started the project}
         defW = (PANEL_DUAL_X * 4) / 5;
         defH = (PANEL_DUAL_Y * 4) / 5;
     }
-    //std::cout << "W " << fetchW << " def " << defW << "  H " << fetchH << " def " << defH << std::endl;
     if (fetchW < defW || fetchH < defH)
     {
         fetchW = defW; // it's messed up so force default
@@ -3929,7 +3926,6 @@ Alan Calvert started the project}
     partmax = collect_readData(synth, 0, MAIN::control::availableParts, TOPLEVEL::main);
     maxparts->value(partmax);
     maxparts->redraw();
-    std::cout << "refresh " << partmax << std::endl;
     checkmaxparts();
     panning_law->value(fetchData(0, MAIN::control::panLawType, TOPLEVEL::section::main));
 
@@ -4301,7 +4297,8 @@ bpmfallback->format(format);} {}
             if ((y + h) > Fl::h())
                 y = Fl::h() - h;
             masterwindow->resize(x, y, w, h);
-            //std::cout << "Screen ratio " << ratio << std::endl;} {}
+            //std::cout << "Screen ratio " << ratio << std::endl;
+            ;} {}
   }
   Function {wincheck()} {} {
     code {//
