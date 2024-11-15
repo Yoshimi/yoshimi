@@ -1292,11 +1292,14 @@ int InterChange::indirectBank(CommandBlock& cmd, uchar& newMsg, bool& guiTo, str
             break;
 
         case BANK::control::refreshDefaults:
-            if (value)
-                synth.bank.checkLocalBanks();
-            synth.getRuntime().banksChecked = true;
-            synth.getRuntime().updateConfig(CONFIG::control::banksChecked, 1);
-        break;
+            if (write)
+            {
+                if (value)
+                    synth.bank.checkLocalBanks();
+                synth.getRuntime().banksChecked = true;
+                synth.getRuntime().updateConfig(CONFIG::control::banksChecked, 1);
+            }
+            break;
     }
     cmd.data.source &= ~TOPLEVEL::action::lowPrio;
     return value;
@@ -3737,6 +3740,14 @@ void InterChange::commandBank(CommandBlock& cmd)
         case BANK::control::selectRoot:
             value_int = synth.getRuntime().currentRoot; // currently read only
             break;
+
+        case BANK::control::refreshDefaults:
+            if (!write)
+            {
+                value_int = synth.getRuntime().banksChecked;
+            }
+            break;
+
         default:
             cmd.data.source = TOPLEVEL::action::noAction;
             break;

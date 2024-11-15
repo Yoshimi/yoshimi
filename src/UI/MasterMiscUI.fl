@@ -629,7 +629,7 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
     if (tmpch < NUM_MIDI_CHANNELS)
     {
         partrcv->value(tmpch);
-        int type = synth->getRuntime().channelSwitchType;
+        int type = collect_readData(synth, 0, MAIN::control::soloType, TOPLEVEL::section::main);
         if (type == MIDI::SoloType::Row || type == MIDI::SoloType::Loop  || type == MIDI::SoloType::TwoWay)
             partrcv->textcolor(solo_select);
         else

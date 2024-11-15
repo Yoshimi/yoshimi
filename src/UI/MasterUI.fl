@@ -465,10 +465,14 @@ class MasterUI {: {public GuiUpdates}
           msg = "Existing config older than V " + to_string(MIN_CONFIG_MAJOR) + "." + to_string(MIN_CONFIG_MINOR) + " \\nCheck settings.";
           setmessage(UNUSED, true, msg, "Close");
       }
-      else if (current_ID == 0 && synth->getRuntime().banksChecked == false)
+      else
       {
-          string msg = "Default banks have been copied to {user}.local/share/yoshimi/found \\nAdd these to the bank roots window?";
-          setmessage(TOPLEVEL::msgResponse::refreshBankDefaults, true, msg, "Ask Later", "No", "Yes");} {}} {}
+          if (current_ID == 0 && fetchData(0, BANK::control::refreshDefaults, TOPLEVEL::section::bank) == false)
+          {
+              string msg = "Default banks have been copied to {user}.local/share/yoshimi/found \\nAdd these to the bank roots window?";
+              setmessage(TOPLEVEL::msgResponse::refreshBankDefaults, true, msg, "Ask Later", "No", "Yes");
+          ;}
+      ;} {}} {}
   }
   Function {Showmaster()} {return_type bool
   } {
@@ -1841,14 +1845,14 @@ Alan Calvert started the project}
         callback {//
         CSpend->show();}
         xywh {209 300 50 18} labelsize 12 labelcolor 64 align 1 minimum 0 maximum 127 value 115 textsize 12 textcolor 64
-        code0 {CS_CC = synth->getRuntime().channelSwitchCC;}
+        code0 {CS_CC = collect_readData(synth, 0, MAIN::control::soloCC, TOPLEVEL::section::main);}
         code1 {if (CS_CC < 128) o->value(CS_CC); else o->value(115);}
         class WidgetSpinner
       }
       Fl_Button CSpend {
         label Pending
         callback {//
-        CS_CC = synth->getRuntime().channelSwitchCC;
+        CS_CC = collect_readData(synth, 0, MAIN::control::soloType, TOPLEVEL::section::main);
         int candidate = CSspinner->value();
         if (candidate == CS_CC)
         {
@@ -1879,7 +1883,7 @@ Alan Calvert started the project}
                 send_data(TOPLEVEL::action::forceUpdate, MAIN::control::soloType, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
         tooltip {Assign groups of parts to Ch 1, singly enabled by MIDI} xywh {114 300 74 18} down_box BORDER_BOX labelsize 12 labelcolor 64 align 1 textsize 12 textcolor 64
         code0 {o->add("Off");o->add("Row");o->add("Column");o->add("Loop");o->add("TwoWay");o->add("Channel");}
-        code1 {o->value(synth->getRuntime().channelSwitchType);}
+        code1 {o->value(collect_readData(synth, 0, MAIN::control::soloType, TOPLEVEL::section::main));}
         code2 {if (o->value() == 0) CSspinner->hide(); else CSspinner->show();}
         code3 {CS_CC = o->value();}
       } {}
@@ -2941,10 +2945,11 @@ Alan Calvert started the project}
             case MIDI::control::noteOff:
                 break;
             case MIDI::control::controller:
-                if (engine <= 119 && engine == synth->getRuntime().channelSwitchCC)
+                if (engine <= 119 && fetchData(0, MAIN::control::soloCC, TOPLEVEL::section::main))
                 { // it's a valid channel switch
                     int newch = partMidiCh->value() - 1;
-                    switch (synth->getRuntime().channelSwitchType)
+                    int switchType = collect_readData(synth, 0, MAIN::control::soloType, TOPLEVEL::section::main);
+                    switch (switchType)
                     {
                         case MIDI::SoloType::Row:
                             if (npart < NUM_MIDI_CHANNELS)
@@ -2967,7 +2972,7 @@ Alan Calvert started the project}
                         case MIDI::SoloType::TwoWay:
                             if (npart < NUM_MIDI_CHANNELS)
                             {
-                                if (npart == synth->getRuntime().channelSwitchValue)
+                                if (npart == collect_readData(synth, 0, MAIN::control::soloType, TOPLEVEL::section::main))
                                     newch = 0;
                                 else if (value_int > 0)
                                     newch = NUM_MIDI_CHANNELS;
@@ -3718,13 +3723,14 @@ Alan Calvert started the project}
     }
 
     int oldswitch = channelswitch->value();
-    channelswitch->value(synth->getRuntime().channelSwitchType);
+    int nextValue = collect_readData(synth, 0, MAIN::control::soloType, TOPLEVEL::section::main);
+    channelswitch->value(nextValue);
     if (full)
     {
         oldswitch = channelswitch->value(); // disables 'pending'
-        CS_CC = synth->getRuntime().channelSwitchCC;
+        CS_CC = nextValue;
     }
-    if (synth->getRuntime().channelSwitchType > MIDI::SoloType::Disabled)
+    if (nextValue > MIDI::SoloType::Disabled)
     {
         if (oldswitch == MIDI::SoloType::Disabled)
         {
@@ -3733,14 +3739,15 @@ Alan Calvert started the project}
         }
         else
         {
-            CSspinner->value(synth->getRuntime().channelSwitchCC);
+            CSspinner->value(fetchData(0, MAIN::control::soloCC, TOPLEVEL::section::main));
             CSpend->hide();
         }
         CSspinner->show();
     }
     else
     {
-        synth->getRuntime().channelSwitchCC = 128;
+        synth->getRuntime().channelSwitchCC = 128; // TODO why does the following fail?
+        //send_data(TOPLEVEL::action::forceUpdate, MAIN::control::soloCC, 128, TOPLEVEL::type::Integer, TOPLEVEL::section::main);
         CSspinner->hide();
         CSpend->hide();
     }

@@ -1,7 +1,10 @@
 yoshimi 2.3.3.1 M
 
-
+2024-11-15 Will
+bn 2368
 Resolved further MasterUI/VectorUI inconsistencies.
+Resolved more direct calls in MasterUI and MiscMasterUI.
+Updated HTML Control Data.
 
 2024-11-13 Will
 bn 2367
