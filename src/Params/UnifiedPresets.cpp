@@ -1,7 +1,7 @@
 /*
     UnifiedPresets.cpp - Presets and Clipboard management
 
-    Copyright 2018-2023 Will Godfrey
+    Copyright 2018-2024 Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -835,7 +835,10 @@ void UnifiedPresets::load()
     string filename = prefix + type + EXTEN::presets;
 
     if (file::isRegularFile(prefix + type + EXTEN::presets) == 0)
+    {
         synth.getRuntime().Log("Can't match " + filename + " here.");
+        return;
+    }
 
     xml->loadXMLfile(filename);
     accessXML(*xml, true);

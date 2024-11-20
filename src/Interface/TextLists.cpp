@@ -94,7 +94,7 @@ std::string toplist [] = {
     "  SOlo CC <n>",            "incoming 'solo' CC number (type must be set first)",
     "  CLear <n>",              "restore instrument on part n to default settings",
     "UNDo",                     "Revert last control change",
-    "REDo",                     "Revert last undo operation",
+    "REDo",                     "Re-apply last control change",
     "@end","@end"
 };
 

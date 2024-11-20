@@ -1,5 +1,11 @@
 yoshimi 2.3.3.1 M
 
+2024-11-20 Will
+bn 2369
+BugFix: Loading a preset via the CLI not checking file
+exists so might crash.
+Minor adjustment to TextLists.cpp
+
 2024-11-15 Will
 bn 2368
 Resolved further MasterUI/VectorUI inconsistencies.
