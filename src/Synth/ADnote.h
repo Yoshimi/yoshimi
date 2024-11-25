@@ -129,11 +129,12 @@ public:
 class ADnote
 {
         ADnote(ADnoteParameters& adpars_, Controller& ctl_, Note note_, bool portamento_
-              ,ADnote *topVoice_, int subVoiceNr, int phaseOffset, float *parentFMmod_, bool forFM_);
+              ,ADnote *topVoice_, int subVoiceNr, int phaseOffset, float *parentFMmod_
+              ,bool forFM_, size_t unison_total_size);
+        ADnote(ADnote *topVoice_, float freq_, int phase_offset_, int subVoiceNumber_,
+               float *parentFMmod_, bool forFM_, size_t unison_total_size);
     public:
         ADnote(ADnoteParameters& adpars_, Controller& ctl_, Note, bool portamento_);
-        ADnote(ADnote *topVoice_, float freq_, int phase_offset_, int subVoiceNumber_,
-               float *parentFMmod_, bool forFM_);
         ADnote(const ADnote &orig, ADnote *topVoice_ = NULL, float *parentFMmod_ = NULL);
        ~ADnote();
 
@@ -150,7 +151,7 @@ class ADnote
         void legatoFadeOut();
 
     private:
-        void construct();
+        void construct(size_t unison_total_size);
         void allocateUnison(size_t unisonCnt, size_t buffSize);
 
         void setfreq(int nvoice, float in_freq, float pitchdetune);
@@ -169,7 +170,7 @@ class ADnote
         void computePhaseOffsets(int nvoice);
         void computeFMPhaseOffsets(int nvoice);
         void initParameters();
-        void initSubVoices();
+        void initSubVoices(size_t unison_total_size);
         void killVoice(int nvoice);
         void killNote();
         float getVoiceBaseFreq(int nvoice);

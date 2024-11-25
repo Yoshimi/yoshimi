@@ -106,7 +106,8 @@ ADnote::~ADnote() { /* all clean-up done automatically */ }
 
 // Internal: this constructor does the actual initialisation....
 ADnote::ADnote(ADnoteParameters& adpars_, Controller& ctl_, Note note_, bool portamento_
-              ,ADnote* topVoice_, int subVoice_, int phaseOffset, float *parentFMmod_, bool forFM_)
+              ,ADnote* topVoice_, int subVoice_, int phaseOffset, float *parentFMmod_
+              , bool forFM_, size_t unison_total_size)
     : synth{adpars_.getSynthEngine()}
     , adpars{adpars_}
     , paramsUpdate{adpars}
@@ -157,7 +158,7 @@ ADnote::ADnote(ADnoteParameters& adpars_, Controller& ctl_, Note note_, bool por
         NoteVoicePar[nvoice].fmPhaseOffset = phase;
     }
 
-    construct();
+    construct(unison_total_size);
 }
 
 // Public Constructor for ordinary (top-level) voices
@@ -171,12 +172,14 @@ ADnote::ADnote(ADnoteParameters& adpars_, Controller& ctl_, Note note_, bool por
             , 0       // top voice starts without phaseOffset
             , nullptr // no parentFMmod
             , false   // not forFM_
+            , 1       // One single top level voice
             )
 { }
 
 // Public Constructor used to create "proxy notes" to attach to another voice within the same ADnote
 ADnote::ADnote(ADnote *topVoice_, float freq_,
-               int phase_offset_, int subVoiceNumber_, float *parentFMmod_, bool forFM_)
+               int phase_offset_, int subVoiceNumber_, float *parentFMmod_, bool forFM_,
+               size_t unison_total_size)
     : ADnote(topVoice_->adpars
             ,topVoice_->ctl
             ,topVoice_->note.withFreq(freq_)
@@ -185,7 +188,8 @@ ADnote::ADnote(ADnote *topVoice_, float freq_,
             ,subVoiceNumber_
             ,phase_offset_
             ,parentFMmod_
-            ,forFM_)
+            ,forFM_
+            ,unison_total_size)
 { }
 
 
@@ -416,7 +420,7 @@ ADnote::ADnote(ADnote const& orig, ADnote *topVoice_, float *parentFMmod_)
     }
 }
 
-void ADnote::construct()
+void ADnote::construct(size_t unison_total_size)
 {
     // Initialise some legato-specific vars
     legatoFade = 1.0f; // Full volume
@@ -487,6 +491,18 @@ void ADnote::construct()
             // This many is likely to sound like noise anyhow.
             if (unison > 64)
                 unison = 64;
+        }
+
+        if (subVoiceNr != -1)
+        {
+            // Prevent combinatorial explosion in sub voices: Limit unison count
+            // to stay under the MAX_UNISON limit.
+            if (unison * unison_total_size > MAX_UNISON)
+            {
+                unison = MAX_UNISON / unison_total_size;
+                if (unison < 1)
+                    unison = 1;
+            }
         }
 
         // compute unison
@@ -632,7 +648,7 @@ void ADnote::construct()
     allocateUnison(max_unison, synth.buffersize);
 
     initParameters();
-    initSubVoices();
+    initSubVoices(unison_total_size);
 
     globalnewamplitude = noteGlobal.volume
                          * noteGlobal.ampEnvelope->envout_dB()
@@ -650,7 +666,7 @@ void ADnote::allocateUnison(size_t unisonCnt, size_t buffSize)
     }
 }
 
-void ADnote::initSubVoices()
+void ADnote::initSubVoices(size_t unison_total_size)
 {
     for (int nvoice = 0; nvoice < NUM_VOICES; ++nvoice)
     {
@@ -669,7 +685,8 @@ void ADnote::initSubVoices()
                                                      getVoiceBaseFreq(nvoice),
                                                      oscposhi[nvoice][k],
                                                      NoteVoicePar[nvoice].voice,
-                                                     freqmod, forFM));
+                                                     freqmod, forFM,
+                                                     unison_size[nvoice] * unison_total_size));
             }
         }
 
@@ -685,7 +702,8 @@ void ADnote::initSubVoices()
                                                      getFMVoiceBaseFreq(nvoice),
                                                      oscposhiFM[nvoice][k],
                                                      NoteVoicePar[nvoice].fmVoice,
-                                                     parentFMmod, voiceForFM));
+                                                     parentFMmod, voiceForFM,
+                                                     unison_size[nvoice] * unison_total_size));
             }
         }
     }
