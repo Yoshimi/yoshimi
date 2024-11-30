@@ -921,8 +921,8 @@ void SynthEngine::SetZynControls(bool in_place)
      * NRPN LSB effect number
      * Data MSB param to change
      * if | 64 LSB sets eff type
-     * for insert effect only | 96 LSB sets destination
-     * for system only &3 sets destination LSB value
+     * for insert effect only, | 96 LSB sets destination
+     * for system only, &3 sets destination LSB value
      *
      * Data LSB param value
      */
@@ -1403,7 +1403,7 @@ bool SynthEngine::SingleVector(list<string>& msg_buf, int chan)
     if (Xfeatures == 0)
         Xtext = "No Features :(";
     else
-    {
+    { // build a text list of the enabled 'X' features
         if (Xfeatures & 1)
             Xtext += " 1";
         if (Xfeatures & 2)
@@ -1427,7 +1427,7 @@ bool SynthEngine::SingleVector(list<string>& msg_buf, int chan)
         if (Yfeatures == 0)
             Ytext = "No Features :(";
         else
-        {
+        { // build a text list of the enabled 'Y' features
             if (Yfeatures & 1)
                 Ytext += " 1";
             if (Yfeatures & 2)

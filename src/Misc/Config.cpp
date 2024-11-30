@@ -478,7 +478,12 @@ bool Config::initFromPersistentConfig()
         int currentVersion = lastXMLmajor * 10 + lastXMLminor;
         int storedVersion = MIN_CONFIG_MAJOR * 10 + MIN_CONFIG_MINOR;
         if (currentVersion < storedVersion)
+        {
             oldConfig = true;
+            saveInstanceConfig();
+            // Always resave to fix.
+            // User may wish to accept this unchanged.
+        }
         else
             oldConfig = false;
     }
