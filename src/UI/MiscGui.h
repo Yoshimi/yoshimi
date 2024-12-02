@@ -163,7 +163,7 @@ unsigned int logDial2millisec(int);
 class GuiUpdates
 {
 protected:
-    GuiUpdates(InterChange&, size_t);
+    GuiUpdates(InterChange&, InterfaceAnchor&&);
 
     // must not be copied nor moved
     GuiUpdates(GuiUpdates &&)                =delete;
@@ -175,18 +175,11 @@ protected:
 
 public:
     InterChange& interChange;
-    MirrorData<InterfaceAnchor> anchor;
+    InterfaceAnchor anchor;
 
-    auto connectSysEffect() { return GuiDataExchange::Connection<EffectDTO>(interChange.guiDataExchange, anchor.get().sysEffectParam); }
-    auto connectInsEffect() { return GuiDataExchange::Connection<EffectDTO>(interChange.guiDataExchange, anchor.get().insEffectParam); }
-    auto connectPartEffect(){ return GuiDataExchange::Connection<EffectDTO>(interChange.guiDataExchange, anchor.get().partEffectParam);}
-
-    template<class DAT>
-    GuiDataExchange::Connection<DAT> connectCore(GuiDataExchange::RoutingTag InterfaceAnchor::*tag)
-    {
-        (anchor.get().*tag).verifyType<DAT>();
-        return GuiDataExchange::Connection<DAT>(interChange.guiDataExchange, anchor.get().*tag);
-    }
+    auto connectSysEffect() { return GuiDataExchange::Connection<EffectDTO>(interChange.guiDataExchange, anchor.sysEffectParam); }
+    auto connectInsEffect() { return GuiDataExchange::Connection<EffectDTO>(interChange.guiDataExchange, anchor.insEffectParam); }
+    auto connectPartEffect(){ return GuiDataExchange::Connection<EffectDTO>(interChange.guiDataExchange, anchor.partEffectParam);}
 
 private:
     void decode_envelope(SynthEngine *synth, CommandBlock *getData);

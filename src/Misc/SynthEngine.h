@@ -79,9 +79,6 @@ class SynthEngine
         MidiDecode mididecode;
         Vectors vectorcontrol;
 
-    private:
-        GuiDataExchange::Connection<InterfaceAnchor> rootCon;
-
     public:
         Config& getRuntime()     {return Runtime;}
         uint getUniqueId() const {return uniqueId;}
@@ -95,7 +92,7 @@ class SynthEngine
         SynthEngine& operator=(SynthEngine const&) = delete;
 
         bool Init(uint audiosrate, int audiobufsize);
-        size_t publishGuiAnchor();
+        InterfaceAnchor buildGuiAnchor();
         void postBootHook(bool);
 
         bool savePatchesXML(string filename);

@@ -217,15 +217,6 @@ RoutingTag GuiDataExchange::fetchTag(size_t idx)
 }
 
 
-bool GuiDataExchange::isValidPushMsg(CommandBlock const& notification)
-{
-    size_t slotIDX = notification.data.offset;
-    return notification.data.control == TOPLEVEL::control::dataExchange
-       and notification.data.part    == TOPLEVEL::section::message
-       and isTimely(manager->storage.entryAge(slotIDX));
-}
-
-
 void GuiDataExchange::dispatchUpdates(CommandBlock const& notification)
 {
     if (notification.data.control != TOPLEVEL::control::dataExchange)

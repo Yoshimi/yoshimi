@@ -109,7 +109,6 @@ SynthEngine::SynthEngine(uint instanceID)
     , midilearn{*this}
     , mididecode{this}
     , vectorcontrol{this}
-    , rootCon{interchange.guiDataExchange.createConnection<InterfaceAnchor>()}
     , audioOut{}
     , partlock{}
     , legatoPart{0}
@@ -419,7 +418,7 @@ bail_out:
  * where it typically is the very first message, since this function is
  * invoked from SynthEngine::Init().
  */
-size_t SynthEngine::publishGuiAnchor()
+InterfaceAnchor SynthEngine::buildGuiAnchor()
 {
     InterfaceAnchor anchorRecord;
     anchorRecord.synth = this;
@@ -433,8 +432,7 @@ size_t SynthEngine::publishGuiAnchor()
     anchorRecord.partEffectParam = partEffectUiCon;
     anchorRecord.partEffectEQ    = partEqGraphUiCon;
 
-    // bootstrap message picked up when event-thread creates MasterUI
-    return rootCon.emplace(anchorRecord);
+    return anchorRecord;
 }
 
 

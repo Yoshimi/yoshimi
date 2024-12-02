@@ -159,10 +159,8 @@ bool InterChange::Init()
 #ifdef GUI_FLTK
 void InterChange::createGuiMaster()
 {
-    // allocate a data Slot in GuiDataExchange and emplace
-    // an InterfaceAnchor record with all connection IDs
-    size_t slotIDX = synth.publishGuiAnchor();
-    guiMaster.reset(new MasterUI(*this, slotIDX));
+    // provide InterfaceAnchor record with all connection IDs
+    guiMaster.reset(new MasterUI(*this, synth.buildGuiAnchor()));
     guiMaster->Init();
 }
 

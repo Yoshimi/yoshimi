@@ -192,9 +192,6 @@ public:
     };
 
 
-    /** message describes a push update, corresponding to GuiDataExchange data? */
-    bool isValidPushMsg(CommandBlock const&);
-
     /**
      * Dispatch a notification regarding data updates -> GUI.
      * The given CommandBlock contains a data handle(index); routing info an
@@ -289,7 +286,4 @@ inline bool GuiDataExchange::RoutingTag::operator!=(RoutingTag const& otag)  con
 }
 
 
-/////////////////////////////////////////////////////////////////////////////////////////////////WIP Prototype 1/24 - throw away when done!!!!!
-void run_GuiDataExchangeTest();
-/////////////////////////////////////////////////////////////////////////////////////////////////WIP Prototype 1/24 - throw away when done!!!!!
 #endif /*GUI_DATA_EXCHANGE_H*/
