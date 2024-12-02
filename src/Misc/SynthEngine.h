@@ -95,7 +95,7 @@ class SynthEngine
         SynthEngine& operator=(SynthEngine const&) = delete;
 
         bool Init(uint audiosrate, int audiobufsize);
-        void publishGuiAnchor();
+        size_t publishGuiAnchor();
         void postBootHook(bool);
 
         bool savePatchesXML(string filename);

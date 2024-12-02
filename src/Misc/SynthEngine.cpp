@@ -379,13 +379,6 @@ bool SynthEngine::Init(uint audiosrate, int audiobufsize)
         goto bail_out;
     }
 
-#ifdef GUI_FLTK
-    // Init the Gui-Data-Exchange
-    if (Runtime.showGui)
-        publishGuiAnchor();
-#endif
-
-
     // we seem to need this here only for first time startup :(
     bank.setCurrentBankID(Runtime.tempBank, false);
     return true;
@@ -426,7 +419,7 @@ bail_out:
  * where it typically is the very first message, since this function is
  * invoked from SynthEngine::Init().
  */
-void SynthEngine::publishGuiAnchor()
+size_t SynthEngine::publishGuiAnchor()
 {
     InterfaceAnchor anchorRecord;
     anchorRecord.synth = this;
@@ -441,7 +434,7 @@ void SynthEngine::publishGuiAnchor()
     anchorRecord.partEffectEQ    = partEqGraphUiCon;
 
     // bootstrap message picked up when event-thread creates MasterUI
-    rootCon.publish(anchorRecord);
+    return rootCon.emplace(anchorRecord);
 }
 
 
