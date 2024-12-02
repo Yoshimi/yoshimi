@@ -1,4 +1,8 @@
-yoshimi 2.3.3.1 M
+yoshimi 2.3.3.2 rc1
+
+2024-12-02 Will
+bn 2371
+BugFix: Startup fails on pristine installs.
 
 2024-11-30 Will
 bn 2370

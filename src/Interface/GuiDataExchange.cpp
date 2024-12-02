@@ -46,9 +46,16 @@ namespace {
 
     std::atomic_size_t dataExchangeID{1};
 
+    static int isStartup = 4; // could be 2 but given extra wiggle room
+
     /** when to consider an asynchronous data message still "on time" */
     inline bool isTimely(std::chrono::milliseconds millis)
     {
+        if (isStartup > 0)
+        {
+            isStartup -=1;
+            return 0ms <= millis and millis < 2000ms;
+        }
         return 0ms <= millis and millis < 500ms;
     }
 }
