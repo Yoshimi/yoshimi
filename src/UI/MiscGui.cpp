@@ -165,13 +165,10 @@ string input_text(SynthEngine *synth, string label, string text)
 }
 
 
-GuiUpdates::GuiUpdates(InterChange& _interChange, size_t slotIDX)
+GuiUpdates::GuiUpdates(InterChange& _interChange, InterfaceAnchor&& connectionData)
     : interChange{_interChange}
-    , anchor{interChange.guiDataExchange.bootstrapConnection<InterfaceAnchor>(slotIDX)}
-{
-    // cause update to be pushed into MirrorData buffer
-    interChange.guiDataExchange.pushUpdates(slotIDX);
-}
+    , anchor{std::move(connectionData)}
+{ }
 
 
 void GuiUpdates::read_updates(SynthEngine *synth)

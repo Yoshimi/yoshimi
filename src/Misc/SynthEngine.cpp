@@ -109,7 +109,6 @@ SynthEngine::SynthEngine(uint instanceID)
     , midilearn{*this}
     , mididecode{this}
     , vectorcontrol{this}
-    , rootCon{interchange.guiDataExchange.createConnection<InterfaceAnchor>()}
     , audioOut{}
     , partlock{}
     , legatoPart{0}
@@ -379,13 +378,6 @@ bool SynthEngine::Init(uint audiosrate, int audiobufsize)
         goto bail_out;
     }
 
-#ifdef GUI_FLTK
-    // Init the Gui-Data-Exchange
-    if (Runtime.showGui)
-        publishGuiAnchor();
-#endif
-
-
     // we seem to need this here only for first time startup :(
     bank.setCurrentBankID(Runtime.tempBank, false);
     return true;
@@ -426,7 +418,7 @@ bail_out:
  * where it typically is the very first message, since this function is
  * invoked from SynthEngine::Init().
  */
-void SynthEngine::publishGuiAnchor()
+InterfaceAnchor SynthEngine::buildGuiAnchor()
 {
     InterfaceAnchor anchorRecord;
     anchorRecord.synth = this;
@@ -440,8 +432,7 @@ void SynthEngine::publishGuiAnchor()
     anchorRecord.partEffectParam = partEffectUiCon;
     anchorRecord.partEffectEQ    = partEqGraphUiCon;
 
-    // bootstrap message picked up when event-thread creates MasterUI
-    rootCon.publish(anchorRecord);
+    return anchorRecord;
 }
 
 

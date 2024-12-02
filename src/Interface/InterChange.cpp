@@ -157,24 +157,11 @@ bool InterChange::Init()
 }
 
 #ifdef GUI_FLTK
-MasterUI& InterChange::createGuiMaster()
+void InterChange::createGuiMaster()
 {
-    CommandBlock bootstrapMsg;
-    while (toGUI.read(bootstrapMsg.bytes))
-        if (guiDataExchange.isValidPushMsg(bootstrapMsg))
-        {
-            size_t slotIDX = bootstrapMsg.data.offset;
-            guiMaster.reset(new MasterUI(*this, slotIDX));
-            assert(guiMaster);
-            return *guiMaster;
-        }
-    throw std::logic_error("Instance Lifecycle broken: expect bootstrap message.");
-    // Explanation: after a suitable MusicIO backend has been established, the SynthEngine::Init()
-    //              will initialise the InterChange for this Synth and then prime the toGUI ringbuffer
-    //              with a key for the GuiDataExchange to pass an InterfaceAnchor record up into the GUI.
-    //              See SynthEngine::publishGuiAnchor() and InstanceManager::SynthGroom::dutyCycle();
-    //              this bootstrap record provides connection IDs used by various UI components to
-    //              receive push-updates from the Core and is thus embedded directly into MasterUI.
+    // provide InterfaceAnchor record with all connection IDs
+    guiMaster.reset(new MasterUI(*this, synth.buildGuiAnchor()));
+    guiMaster->Init();
 }
 
 void InterChange::shutdownGui()

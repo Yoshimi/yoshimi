@@ -718,7 +718,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       } {
         Fl_Group inseffectui {
           xywh {5 38 379 95}
-          code0 {InterfaceAnchor& anchor = synth->getGuiMaster()->anchor.get();
+          code0 {InterfaceAnchor& anchor = synth->getGuiMaster()->anchor;
                  o->init(synth, anchor.partEffectParam, anchor.partEffectEQ, npart);}
           class EffUI
         } {}

@@ -150,11 +150,12 @@ class InstanceManager::Instance
 
         bool startUp(PluginCreator =PluginCreator());
         void shutDown();
-        void buildGuiMaster();
         void enterRunningState();
+        void startGUI_forApp();
 
         SynthEngine& getSynth()    { return *synth; }
         MusicClient& getClient()   { return *client; }
+        InterChange& interChange() { return synth->interchange; }
         Config& runtime()          { return synth->getRuntime(); }
         LifePhase getState() const { return state; }
         uint getID()         const { return synth->getUniqueId(); }
@@ -210,6 +211,7 @@ class InstanceManager::SynthGroom
         void shutdownRunningInstances();
         void persistRunningInstances();
         void discardInstance(uint);
+        void startGUI_forLV2(uint, string);
     private:
         void clearZombies();
         void handleStartRequest();
@@ -435,21 +437,6 @@ void InstanceManager::SynthGroom::discardInstance(uint synthID)
             clearZombies();
 }   }   }
 
-/**
- * Launch the GUI at any time on-demand while Synth is already running.
- * @note LV2 possibly re-creates the GUI-Plugin after it has been closed;
- *       for that reason, everything in this function must be idempotent.
- */
-void InstanceManager::launchGui_forPlugin(uint synthID, string windowTitle)
-{
-    auto& instance{groom->find(synthID)};
-    assert (instance.getID() == synthID);
-    instance.runtime().showGui = true;
-    instance.getSynth().setWindowTitle(windowTitle);
-    instance.getSynth().publishGuiAnchor();
-    instance.triggerPostBootHook();
-    instance.buildGuiMaster();
-}
 
 /**
  * Request to allocate a new SynthEngine instance.
@@ -535,7 +522,7 @@ void InstanceManager::SynthGroom::dutyCycle(function<void(SynthEngine&)>& handle
             case BOOTING:
                  // successfully booted, make ready for use
                 if (primary->runtime().showGui)
-                    instance.buildGuiMaster();
+                    instance.startGUI_forApp();
                 instance.enterRunningState();
             break;
             case RUNNING:
@@ -584,6 +571,43 @@ void InstanceManager::SynthGroom::clearZombies()
         else
             ++elm;
     }
+}
+
+/**
+ * Launch the GUI at any time on-demand while Synth is already running.
+ * @note LV2 possibly re-creates the GUI-Plugin after it has been closed;
+ *       for that reason, everything in this function must be idempotent.
+ */
+void InstanceManager::launchGui_forPlugin(uint synthID, string windowTitle)
+{
+    groom->startGUI_forLV2(synthID, windowTitle);
+}
+
+void InstanceManager::SynthGroom::startGUI_forLV2(uint synthID, string windowTitle)
+{
+#ifdef GUI_FLTK
+    // ensure data visibility since LV2 GUI-plugin can run in any thread and in any order
+    Guard lock(mtx);
+    auto& instance{find(synthID)};
+    assert (instance.getID() == synthID);
+
+    instance.runtime().showGui = true;
+    instance.triggerPostBootHook();  // trigger push-updates for UI state
+    instance.getSynth().setWindowTitle(windowTitle);
+    instance.interChange().createGuiMaster();
+#endif
+}
+
+void InstanceManager::Instance::startGUI_forApp()
+{
+#ifdef GUI_FLTK
+    interChange().createGuiMaster();
+
+    if (runtime().audioEngine < 1)
+        alert(synth.get(), "Yoshimi could not connect to any sound system. Running with no Audio.");
+    if (runtime().midiEngine < 1)
+        alert(synth.get(), "Yoshimi could not connect to any MIDI system. Running with no MIDI.");
+#endif
 }
 
 
@@ -668,22 +692,6 @@ uint InstanceManager::SynthGroom::allocateID(uint desiredID)
     return desiredID;
 }
 
-
-void InstanceManager::Instance::buildGuiMaster()
-{
-#ifdef GUI_FLTK
-    MasterUI& guiMaster = synth->interchange.createGuiMaster();
-    guiMaster.Init();
-
-    if (not runtime().isLV2)
-    {
-        if (runtime().audioEngine < 1)
-            alert(synth.get(), "Yoshimi could not connect to any sound system. Running with no Audio.");
-        if (runtime().midiEngine < 1)
-            alert(synth.get(), "Yoshimi could not connect to any MIDI system. Running with no MIDI.");
-    }
-#endif
-}
 
 void InstanceManager::Instance::enterRunningState()
 {

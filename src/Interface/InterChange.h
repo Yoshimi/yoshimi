@@ -85,7 +85,7 @@ class InterChange : private DataText
         bool Init();
 
 #ifdef GUI_FLTK
-        MasterUI& createGuiMaster();
+        void createGuiMaster();
         void shutdownGui();
 #endif
 

@@ -308,8 +308,8 @@ class KeyHandle {: {public Fl_Box}
 
 class MasterUI {: {public GuiUpdates}
 } {
-  Function {MasterUI(InterChange& _interChange, size_t slotIDX)
-	 : GuiUpdates{_interChange, slotIDX}} {} {
+  Function {MasterUI(InterChange& _interChange, InterfaceAnchor connectionData)
+	 : GuiUpdates{_interChange, std::move(connectionData)}} {} {
     code {//
       synth = nullptr;
       presetsui = nullptr;
@@ -407,8 +407,8 @@ class MasterUI {: {public GuiUpdates}
   }
   Function {Init()} {} {
     code {//
-      current_ID = anchor.get().synthID;
-      synth = anchor.get().synth;
+      current_ID = anchor.synthID;
+      synth = anchor.synth;
       assert(synth);
       file::createDir(file::configDir() + "/windows");
       panelType = 5;
@@ -1027,7 +1027,7 @@ class MasterUI {: {public GuiUpdates}
       } {
         Fl_Group syseffectui {
           xywh {3 188 379 95} labeltype NO_LABEL labelcolor 64
-          code0 {o->init(synth, anchor.get().sysEffectParam, anchor.get().sysEffectEQ, TOPLEVEL::section::systemEffects);
+          code0 {o->init(synth, anchor.sysEffectParam, anchor.sysEffectEQ, TOPLEVEL::section::systemEffects);
                  o->activate();
                  o->show();}
           class EffUI
@@ -1039,7 +1039,7 @@ class MasterUI {: {public GuiUpdates}
       } {
         Fl_Group inseffectui {
           xywh {3 188 379 95} color 52 labelcolor 64
-          code0 {o->init(synth, anchor.get().insEffectParam, anchor.get().insEffectEQ, TOPLEVEL::section::insertEffects);
+          code0 {o->init(synth, anchor.insEffectParam, anchor.insEffectEQ, TOPLEVEL::section::insertEffects);
                  o->hide();}
           code1 {o->deactivate(); // initially deactivated}
           class EffUI
