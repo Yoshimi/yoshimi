@@ -11,6 +11,6 @@ An unexpected twist to this, is that taking the combined voice envelope time aga
 
 With regard to the 'modulator' amplitude envelopes. They don't change the overall time, but if they are shorter than their voice length (or any voice that the modulator is slaved to) the modulation may end a bit strangely. If they are longer, then part of their action will be missed. Also, when using the 'Morph' type, you *must* have an envelope set, as this is what controls the way the sound morphs between the voice oscillator and the modulator one.
 
-Finally, there is what I believe to be a bug that goes back to Zyn 2.2.1 - original zyn :)
+Finally, there is what I believe to be a bug that goes back to Zyn 2.2.1 - original zyn!
 
 If an AddSynth voice is enabled, it's amplitude envelope time is active, even if the envelope is apparently deactivated and not editable. Oh, and by default all the voice times are quite long, so again you could be puzzled as to why a sound is longer than you expected. Because this has always been there I don't propose to change it. To do so would quite likely alter many existing instrument patches, but do keep it in mind.

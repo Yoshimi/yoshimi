@@ -44,7 +44,7 @@
    <launchable type="desktop-id">yoshimi.desktop</launchable>
 
   <releases>
-      <release type="stable" version="2.3.3" date="2024-09-23" />
+      <release type="stable" version="2.3.3.2" date="2024-12-03" />
   </releases>
   <provides>
     <binary>yoshimi</binary>
