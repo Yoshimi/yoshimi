@@ -668,7 +668,7 @@ YoshimiLV2PluginUI::~YoshimiLV2PluginUI()
 
 bool YoshimiLV2PluginUI::init()
 {
-    if (not (corePlugin and notify_on_GUI_close))
+    if (not corePlugin)
         return false;
 
     // LV2 hosts may load plugins concurrently, which in some corner cases
@@ -679,7 +679,8 @@ bool YoshimiLV2PluginUI::init()
     engine().installGuiClosedCallback([this]
                                         {// invoked by SynthEngine when FLTK GUI is closed explicitly...
                                             engine().shutdownGui();
-                                            notify_on_GUI_close();
+                                            if (notify_on_GUI_close)
+                                                notify_on_GUI_close();
                                         });
     return true;
 }
@@ -708,6 +709,27 @@ void YoshimiLV2PluginUI::cleanup(LV2UI_Handle ui)
     delete uiinst;
 }
 
+LV2UI_Show_Interface yoshimi_lv2ui_show_interface_desc =
+{
+    YoshimiLV2PluginUI::callback_ShowInterface,
+    YoshimiLV2PluginUI::callback_HideInterface,
+};
+
+LV2UI_Idle_Interface yoshimi_lv2ui_idle_interface_desc =
+{
+    YoshimiLV2PluginUI::callback_IdleInterface,
+};
+
+const void *YoshimiLV2PluginUI::extension_data(const char *uri)
+{
+    if (strcmp(uri, LV2_UI__showInterface) == 0) {
+        return &yoshimi_lv2ui_show_interface_desc;
+    } else if (strcmp(uri, LV2_UI__idleInterface) == 0) {
+        return &yoshimi_lv2ui_idle_interface_desc;
+    }
+    return nullptr;
+}
+
 /** recurring GUI event handling cycle*/
 void YoshimiLV2PluginUI::run()
 {
@@ -716,7 +738,7 @@ void YoshimiLV2PluginUI::run()
         masterUI().checkBuffer();
         Fl::check();
     }
-    else
+    else if (notify_on_GUI_close)
         notify_on_GUI_close();
 }
 
@@ -786,7 +808,7 @@ LV2UI_Descriptor yoshimi_lv2ui_desc =
     YoshimiLV2PluginUI::instantiate,
     YoshimiLV2PluginUI::cleanup,
     NULL,
-    NULL
+    YoshimiLV2PluginUI::extension_data
 };
 
 
