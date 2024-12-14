@@ -170,12 +170,16 @@ public:
     bool init();
     static LV2UI_Handle	instantiate(const LV2UI_Descriptor *descriptor, const char *plugin_uri, const char *bundle_path, LV2UI_Write_Function write_function, LV2UI_Controller controller, LV2UI_Widget *widget, const LV2_Feature *const *features);
     static void cleanup(LV2UI_Handle ui);
+    static const void *extension_data(const char *uri);
     void run();
     void show();
     void hide();
     static void callback_Run (LV2_External_UI_Widget* ui){ self(ui).run();  }
     static void callback_Show(LV2_External_UI_Widget* ui){ self(ui).show(); }
     static void callback_Hide(LV2_External_UI_Widget* ui){ self(ui).hide(); }
+    static int callback_IdleInterface(LV2_Handle ui){ self(ui).run(); return 0; }
+    static int callback_ShowInterface(LV2_Handle ui){ self(ui).show(); return 0; }
+    static int callback_HideInterface(LV2_Handle ui){ self(ui).hide(); return 0; }
 
 private:
     SynthEngine& engine() { return corePlugin->synth; } // use friend access
