@@ -1,4 +1,6 @@
 
+BUG! instrument swap partially fails when going across bank roots.
+
 BUG! Vector window instrument label colours not updated when engines are manually changed - it's OK when loading instruments etc.
 
 BUG! Loading a state file with an embedded MIDI-Learn window sometimes doesn't display the text of the first learned line.

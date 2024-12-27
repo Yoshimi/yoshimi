@@ -1,0 +1,6 @@
+This command is not documented in the User Guide as it is intended only for test purposes.
+Out of bounds values are trapped.
+
+It sets up a SubSynth engine in the designated part number in the range 1 to 16, ensuring that the part is enabled. If no part number is given it assumes part 1.
+
+It calls the same routine that the banks code uses to set up an instrument when it creates a new bank root, but returns as if a normal part change had been made.

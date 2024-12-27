@@ -397,6 +397,7 @@ namespace BANK // usage BANK::control::
         changeRootId, // change ID of current root
         addNamedRoot, // link or create if not already there
         deselectRoot, // remove reference, but don't touch contents
+        isOccupiedRoot,
         installBanks,
         refreshDefaults
     };
@@ -608,7 +609,9 @@ namespace MAIN // usage MAIN::control::volume
         stopSound = 128,
         readPartPeak = 200, // now does L/R
         readMainLRpeak,
-        readMainLRrms
+        readMainLRrms,
+        setTestInstrument,
+        testCommandEntry
     };
 
     enum panningType : uchar {

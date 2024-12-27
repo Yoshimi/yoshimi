@@ -247,6 +247,8 @@ inline int sendDirect(SynthEngine *synth,
                       unsigned char parameter = UNUSED,
                       unsigned char offset = UNUSED,
                       unsigned char miscmsg = NO_MSG,
+                      unsigned char spare1  = UNUSED,
+                      unsigned char spare0  = UNUSED,
                       unsigned char request = UNUSED)
 {
     if (action == TOPLEVEL::action::fromMIDI && part != TOPLEVEL::section::midiLearn)
@@ -262,6 +264,8 @@ inline int sendDirect(SynthEngine *synth,
     putData.data.parameter = parameter;
     putData.data.offset = offset;
     putData.data.miscmsg = miscmsg;
+    putData.data.spare1 = spare1;
+    putData.data.spare0 = spare0;
 
     if (type == TOPLEVEL::type::Default)
     {

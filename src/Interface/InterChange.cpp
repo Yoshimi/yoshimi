@@ -1853,6 +1853,8 @@ void InterChange::generateSpecialInstrument(int npart, string name)
     assert(npart < NUM_MIDI_PARTS);
     Part& part{*synth.part[npart]};
     part.Pname = name;
+    part.info.Ptype = 17; // Warm Pad
+    part.info.Pauthor = "Yoshimi Team\nGPL V2 or later";
     part.partefx[0]->changeeffect(1);
     part.kit[0].Padenabled = false;
     part.kit[0].Psubenabled = true;
@@ -1862,8 +1864,6 @@ void InterChange::generateSpecialInstrument(int npart, string name)
     pars.Phmag[2] = 40;
     pars.Pbandwidth = 60;
 }
-
-
 
 /**********************************************************************************//**
  * Core operation : retrieve, evaluate and forward command messages.
@@ -3633,7 +3633,18 @@ void InterChange::commandMain(CommandBlock& cmd)
                     value = synth.VUdata.values.vuRmsPeakL;
             }
             break;
-
+        case MAIN::control::setTestInstrument:
+            if (write)
+            {
+                generateSpecialInstrument(value_int, "test subsynth");
+                synth.getRuntime().currentPart = value;
+                 // make sure it's on
+                synth.partonoffWrite(value_int,1);
+                // fake a part number change to update GUI and CLI
+                cmd.data.control = MAIN::control::partNumber;
+                synth.pushEffectUpdate(value_int);
+            }
+            break;
         case TOPLEVEL::control::textMessage:
             cmd.data.source = TOPLEVEL::action::noAction;
             break;

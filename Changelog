@@ -1,5 +1,15 @@
 yoshimi 2.3.3.2
 
+2024-12-27 Will
+bn 2373
+Changed Main window instrument display format to Bold.
+Saving a Bank Root can now create a new directory on the fly.
+New CLI test entry 'zset' creates a SubSynth instrument.
+CLI test entry'zread' formalised.
+Updated min. cmake to 2.12
+Updated dev_notes.
+Updated HTML Control Data.
+
 2024-12-03 Will
 bn 2372
 Merged in further improvements from Hermamm.

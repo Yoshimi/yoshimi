@@ -7081,18 +7081,15 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
          * See dev_notes/CLI_zread
          */
         float value = 0;
-        unsigned char control, part;
+        unsigned char control = UNUSED;
+        unsigned char part = UNUSED;
         unsigned char kit = UNUSED;
         unsigned char engine = UNUSED;
         unsigned char insert = UNUSED;
         unsigned char parameter = UNUSED;
         unsigned char offset = UNUSED;
         unsigned char miscmsg = UNUSED;
-        int repeat = 0;
-        if (input.isAtEnd())
-            return REPLY::value_msg;
-        repeat = string2int(input);
-        input.skipChars();
+
         if (input.isAtEnd())
             return REPLY::value_msg;
         control = string2int(input);
@@ -7126,42 +7123,24 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
             }
         }
 
-        CommandBlock putData;
-        putData.data.value = value;
-        putData.data.control = control;
-        putData.data.part = part;
-        putData.data.kit = kit;
-        putData.data.engine = engine;
-        putData.data.insert = insert;
-        putData.data.parameter = parameter;
-        putData.data.offset = offset;
-        putData.data.miscmsg = miscmsg;
-        putData.data.type = 0;
-        putData.data.source = 0;
-        synth->CBtest(&putData);
+        sendDirect(synth, 0, value, TOPLEVEL::type::Adjust, control, part, kit, engine, insert, parameter, offset, miscmsg);
+        return REPLY::done_msg;
+    }
 
-        if (repeat == 0)
+    if (input.matchnMove(4, "zset"))
+    {
+        /*
+         * For testing only
+         * See dev_notes/CLI_zset
+         */
+        npart = 0;
+        if (input.isdigit())
         {
-            synth->interchange.fromCLI.write(putData.bytes);
+            npart = string2int(input) - 1;
+            if (npart < 0 || npart > 15)
+                npart = 0; // only test the 'standard' part numbers
         }
-        else
-        {
-            float value = 0;
-            struct timeval tv1, tv2;
-            gettimeofday(&tv1, NULL);
-            for (int i = 0; i < repeat; ++ i)
-                value = synth->interchange.readAllData(putData);
-            gettimeofday(&tv2, NULL);
-
-            if (tv1.tv_usec > tv2.tv_usec)
-            {
-                tv2.tv_sec--;
-                tv2.tv_usec += 1000000;
-            }
-            float actual = (tv2.tv_sec - tv1.tv_sec) *1000000 + (tv2.tv_usec - tv1.tv_usec);
-            cout << "\nLoops " << repeat << "  Total time " << actual << "uS" << "  average call time " << actual/repeat * 1000.0f << "nS" << endl;
-            cout << "\nValue " << value << endl << endl;
-        }
+        sendDirect(synth, 0, npart, TOPLEVEL::type::Write, MAIN::control::setTestInstrument, TOPLEVEL::section::main);
         return REPLY::done_msg;
     }
 

@@ -1012,6 +1012,27 @@ string Bank::swapbanks(unsigned int firstID, unsigned int secondID, size_t first
     return (" Moved " + firstname + " to " + type + to_string(destination));
 }
 
+
+bool Bank::isOccupiedRoot(string rootCandidate)
+{
+    if(rootCandidate.empty())
+        return false;
+    bool foundBank = false;
+    list<string> thisRoot;
+    uint32_t count = listDir(&thisRoot, rootCandidate);
+    if (count == 0)
+        return false;
+    list<string>::iterator it = thisRoot.begin();
+    while (foundBank == false && it != thisRoot.end())
+    {
+        std::cout << "bank " << *it << std::endl;
+        if (isValidBank(*it))
+            foundBank = true;
+        ++ it;
+    }
+    return foundBank;
+}
+
 // private affairs
 
 bool Bank::isValidBank(string chkdir)

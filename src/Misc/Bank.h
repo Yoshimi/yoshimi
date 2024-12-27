@@ -178,6 +178,7 @@ class Bank
              // returns true if the instrument was added
 
         void deletefrombank(size_t rootID, size_t bankID, unsigned int pos);
+        bool isOccupiedRoot(string rootCandidate);
         bool isValidBank(string chkdir);
 
         const string defaultinsname;

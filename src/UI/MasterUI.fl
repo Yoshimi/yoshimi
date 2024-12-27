@@ -1117,7 +1117,7 @@ class MasterUI {: {public GuiUpdates}
             }
             Fl_Box instrumentlabel {
               label {Simple Sound}
-              xywh {139 295 187 16} selection_color 64 labelsize 12 labelcolor 64 align 16
+              xywh {139 295 187 16} selection_color 64 labelfont 1 labelsize 12 labelcolor 64 align 16
             }
             Fl_Box instrumentFrame {
               xywh {140 296 187 15} box THIN_DOWN_FRAME labelcolor 49

@@ -793,7 +793,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         if (dirname.length() < 3)
             return;
         int newdef = UNUSED;
-        if (!file::isDirectory(dirname))
+        if (!collect_readData(synth, 0, BANK::isOccupiedRoot, TOPLEVEL::section::bank, 255, 255, 255, 255, 255, textMsgBuffer.push(dirname)))
         {
             if (choice(synth, "", "Yes", "No", "Directory is missing, or doesn't have at least \\n one bank with at least one instrument. \\nCreate missing entries?") != 2)
                 return;
