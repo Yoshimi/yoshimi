@@ -1,15 +1,23 @@
 
-The internal structure of this has changed so that you can set all three of these in a single call, always in the order; root, bank, program. However this full command is very pedantic and if either root or bank fault, program change will not be attempted. This is to protect against loading a same-name program from the wrong bank.
+The internal structure of this has changed so that you can set all three of these in
+a single call, always in the order; root, bank, program. However this full command
+is very pedantic and if either root or bank fault, program change will not be
+attempted. This is to protect against loading a same-name program from the wrong
+bank.
 
-You can set these all singly, or any logical combination. On error, the returned message will be the first failed one.
+You can set these all singly, or any logical combination. On error, the returned
+message will be the first failed one.
 
-You can also load a program from a file name by pushing it to the TextMsgBuffer and giving the returned ID to par2.
+You can also load a program from a file name by pushing it to the TextMsgBuffer and
+giving the returned ID to par2.
 
 All unused parameters should be set to UNUSED (currently 255).
 
-If you are setting just root and bank (and it succeeds) only the bank will be named, but the root ID will be shown.
+If you are setting just root and bank (and it succeeds) only the bank will be named,
+but the root ID will be shown.
 
 
 *** This has been changed yet again ***
 
-Program changes are now handled by a completely separate function, but bank and root are still combined.
+Program changes are now handled by a completely separate function, but bank and root
+are still combined.

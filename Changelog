@@ -1,5 +1,9 @@
 yoshimi 2.3.3.2
 
+2024-12-30 Will
+Minor code cleanups - removal of redundant code
+dev_notes updates and corrections.
+
 2024-12-27 Will
 bn 2373
 Changed Main window instrument display format to Bold.

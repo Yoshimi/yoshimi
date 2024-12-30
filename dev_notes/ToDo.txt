@@ -1,11 +1,15 @@
 
 BUG! instrument swap partially fails when going across bank roots.
+Only seems to affect non-writable areas (with no related warning)
 
-BUG! Vector window instrument label colours not updated when engines are manually changed - it's OK when loading instruments etc.
+BUG! Vector window instrument label colours not updated when engines are manually
+changed - it's OK when loading instruments etc.
 
-BUG! Loading a state file with an embedded MIDI-Learn window sometimes doesn't display the text of the first learned line.
+BUG! Loading a state file with an embedded MIDI-Learn window sometimes doesn't
+display the text of the first learned line.
 
-Minor bug Multi instances produce jack error reports when main instance closed, even if they have been closed first - been there since V 1.4.1 :(
+Minor bug Multi instances produce jack error reports when main instance closed, even
+if they have been closed first - been there since V 1.4.1 :(
 
 Add dynfilter filter types to CLI prompt.
 Never been done before :(

@@ -1,4 +1,5 @@
-This is not intended to be used within the realtime threads as both push and pop use a common semaphore. However, they are very fast so you'd probably get away with it :)
+This is not intended to be used within the realtime threads as both push and pop use
+a common semaphore. However, they are very fast so you'd probably get away with it :)
 
 There are three calls:
 
@@ -8,20 +9,34 @@ int TextMsgBuffer::push( string )
 
 string TextMsgBuffer::fetch( int )
 
-These calls are accessible to all parts of Yoshimi and provide a simple asynchronous means of passing text between threads and functions via just the integer ID.
+These calls are accessible to all parts of Yoshimi and provide a simple asynchronous
+means of passing text between threads and functions via just the integer ID.
 
-TextMsgBuffer::clear() is only intended to be used internally on major resets and just adds a bit of insurance that there are no orphaned messages.
+TextMsgBuffer::clear() is only intended to be used internally on major resets and
+just adds a bit of insurance that there are no orphaned messages.
 
-Pushing a message will return the first available ID and Popping a message makes its ID available again.
+Pushing a message will return the first available ID and Popping a message makes its
+ID available again.
 
-There is a maximum of 254 possible entries at any one time, but it's unlikely that limit will ever be reached.
+There is a maximum of 254 possible entries at any one time, but it's unlikely that
+limit will ever be reached.
 
-The ID 255 (which has the global ID of NO_MSG) is a 'do nothing' reserved for calls that might want to send a message... but then again might not :)
+The ID 255 (which has the global ID of NO_MSG) is a 'do nothing' reserved for calls
+that might want to send a message... but then again might not :)
 
-If you push an empty string you'll get back NO_MSG, and fetching NO_MSG will of course return an empty string.
+If you push an empty string you'll get back NO_MSG, and fetching NO_MSG will of
+course return an empty string.
 
 
 
 Remark by Ichthyo, 8/2019:
-In order to make MiscFuncs stateless, I have extracted these functions into a singleton TextMsgBuffer.
-Moreover, I renamed the "miscMsgPop" function into "fetch", since this obviously is not a stack, so the name "pop" might be misleading.
+In order to make MiscFuncs stateless, I have extracted these functions into a
+singleton TextMsgBuffer.
+Moreover, I renamed the "miscMsgPop" function into "fetch", since this obviously is
+not a stack, so the name "pop" might be misleading.
+
+Update by Will, ?/2023
+There is an extra parameter to decide whether or not to clear a message when it is
+fetched. This defaults to 'true' however there are times (especially in development)
+when you might want to look at a message without removing it, so setting this to
+false will show the message, but leave it in place.

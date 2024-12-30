@@ -57,7 +57,8 @@ At 18.12.21 12:12 Will Godfrey wrote:
 > Morph time could be made user variable, with the proviso that further
 > harmonics changes would be ignored during this time.
 >
-> 3 is really icing on the cake, and if it can be done would be something to shout about
+> 3 is really icing on the cake, and if it can be done would be something to
+  shout about
 
 To translate this feature description into a programming task....
 

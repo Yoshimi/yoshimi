@@ -1,4 +1,6 @@
-This is a list of the envelope inserts. There are 4 types of these, some only having a few of the controls. They are shown below with their controls. 'Par' is the parameter number that must be sent and 'Con' is the control number.
+This is a list of the envelope inserts. There are 4 types of these, some only having
+a few of the controls. They are shown below with their controls. 'Par' is the
+parameter number that must be sent and 'Con' is the control number.
 
 Par     Con
 0   Amplitude
@@ -46,12 +48,19 @@ For all of these the insert value is 2.
 
 Refer to "Yoshimi Control Numbers.ods" for more detailed control layout.
 
-Freemode behaves quite differently and when enabled, the following controls are used instead, and are the same for all envelopes (although 'Stretch', 'Forced Release' and 'Linear Envelope' are as before).
+Freemode behaves quite differently and when enabled, the following controls are used
+instead, and are the same for all envelopes (although 'Stretch', 'Forced Release'
+and 'Linear Envelope' are as before).
 
-There is additional control number 34 that returns the number of defined graph points in 'offset', and control number 35 that detirmines which point on the graph is the release point (and can only be in the currently defined range).
+There is additional control number 34 that returns the number of defined graph
+points in 'offset', and control number 35 that detirmines which point on the graph
+is the release point (and can only be in the currently defined range).
 
-The axis graph controls are 'Add point' and 'Delete Point' Both of which have Insert value 3. Also, 'Change Point' has Insert value 4.
+The axis graph controls are 'Add point' and 'Delete Point' Both of which have Insert
+value 3. Also, 'Change Point' has Insert value 4.
 
-All of these use 'Control' to define the graph point being accessed. For 'Add' and 'Change' 'offset' is the X axis increment and 'Value' is the Y axis value. When deleting a point 'offset' is 255.
+All of these use 'Control' to define the graph point being accessed. For 'Add' and
+'Change' 'offset' is the X axis increment and 'Value' is the Y axis value. When
+deleting a point 'offset' is 255.
 
 Out of range or errors usually return X and/or Y as 0xff.

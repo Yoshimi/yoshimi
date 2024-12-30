@@ -1,15 +1,20 @@
-Updated 04/12/23
+Updated 28/12/24
 
 Yes! We actually have Yoshimi code policies. Look how many there are :)
 
-If the version string contains a 4th number this will always be just a bugfix. Previously it was intended that it should not have features added since the main version, but this has proved to be impractical, so now we just won't tell anyone about them till the next release :P
+If the version string contains a 4th number this will always be just a bugfix.
+Previously it was intended that it should not have features added since the main
+version, but this has proved to be impractical, so now we just won't tell anyone
+about them till the next release :P
 
 e.g
 yoshimi-1.3.5   {main version}
 yoshimi-1.3.5.1 {first bugfix}
 yoshimi-1.3.5.2 {second bugfix} surely not!
 
-To avoid possible confusion, from now on 'master' will display the last released version number (including bugfix digits) with an 'M' suffix - unless it is a release candidate in which case the suffix will be rc{n}.
+To avoid possible confusion, from now on 'master' will display the last released
+version number (including bugfix digits) with an 'M' suffix - unless it is a release
+candidate in which case the suffix will be rc{n}.
 
 e.g.
 Release was yoshimi-1.3.5.2
@@ -21,18 +26,27 @@ Minor version   3
 Release version 5
 
 
-We now implement a build number. This is only bumped up when I push new commits to master (both github and sourceforge) so may represent several actual commits.
+We now implement a build number. This is only bumped up when I push new commits to
+master (both github and sourceforge) so may represent several actual commits.
 
 
 We won't normally accept fixes for spelling errors in the *code*
-For a start, from bitter experience it is fatally easy to change two variables to the same name! Also, there's no point, after all they are only a mnemonic for memory addresses etc. 'volume' and 'LFO' could just as well be 'bigerizer' and 'derfingwotwiggles'.
+For a start, from bitter experience it is fatally easy to change two variables to
+the same name! Also, there's no point, after all they are only a mnemonic for memory
+addresses etc. 'volume' and 'LFO' could just as well be 'bigerizer' and
+'derfingwotwiggles'.
 
-We do however accept some name changes where the original name is ambiguous or no longer appropriate.
+We do however accept some name changes where the original name is ambiguous or no
+longer appropriate.
 
-Some of these errors are in the identifier names in the saved XML files, and have been there since ZynAddSubFX Version 2.2.1 THESE MUST NEVER CHANGE. To change them would break all the instrument files that have been created since then.
+Some of these errors are in the identifier names in the saved XML files, and have
+been there since ZynAddSubFX Version 2.2.1 THESE MUST NEVER CHANGE. To change them
+would break all the instrument files that have been created since then.
 
 
-If using Fluid to edit GUI files, please close all windows and collapse all menus *before* the last save. I know it's tedious, but it avoids storms of spurious 'changes' that make genuine ones harder to see.
+If using Fluid to edit GUI files, please close all windows and collapse all menus
+*before* the last save. I know it's tedious, but it avoids storms of spurious
+'changes' that make genuine ones harder to see.
 
 
 Please follow the coding style throughout Yoshimi. In particular:
@@ -41,10 +55,13 @@ Please follow the coding style throughout Yoshimi. In particular:
 Also, try to avoid creating trailing whitespace.
 
 
-We used to adjust the "modified" date on file changes. This is no longer done as it can cause problems when multiple changes come from different developers. This date can no longer be relied on, and the information will be removed completely at some point. Change information is still available in the changelog, and also from the repository itself.
+Code change information is available in the changelog, and also from the repository
+itself.
 
 
-There seems to be no easy way to copy commit messages to the changelog, and people downloading releases won't see them, so please update this using the following as an example.
+There seems to be no easy way to copy commit messages to the changelog, and people
+downloading releases won't see them, so please update this using the following as an
+example.
 
 2017-8-30 Will
 BugFix: Disabling a part was resetting all controllers.
@@ -52,17 +69,26 @@ Doc updates.
 Sys/Ins effect controls now transferred to lock free.
   But could be improved.
 
-Indented lines are continuations/extra info keeping the line length short, and may be expanded on in commit messages.
+Indented lines are continuations/extra info keeping the line length short, and may
+be expanded on in commit messages.
 
 Alternatively, please send me a brief description to include when I next update.
 
 ACKNOWLEDGEMENTS
-The ones that appear in the GUI 'About->More' lists are those who have either made very significant improvements, or have consistently helped in various ways. Some them go back to the start of the Yoshimi fork.
+The ones that appear in the GUI 'About->More' lists are those who have either made
+very significant improvements, or have consistently helped in various ways. Some
+them go back to the start of the Yoshimi fork.
 
-The list in the 'Yoshimi_Helpers' file in 'docs' is of everyone I know about, some of which may only have made a few small suggestions or bug reports.
+The list in the 'Yoshimi_Helpers' file in 'docs' is of everyone I know about, some
+of which may only have made a few small suggestions or bug reports.
 
 FILE COPYRIGHTS
 Always a tricky one :(
-If you're the first person to make a contribution that year, then by all means add a new line (in the same style as the rest) with your name. If you're the second person, feel free to add yours. However once the list starts to extend I may make an 'executive' decision and change this to "{first name}, and others" but only after ensuring that all names are in 'Yoshimi_Helpers'. If you think you've been unfairly treated contact me and we'll discuss it.
+If you're the first person to make a contribution that year, then by all means add a
+new line (in the same style as the rest) with your name. If you're the second
+person, feel free to add yours. However once the list starts to extend I may make an
+'executive' decision and change this to "{first name}, and others" but only after
+ensuring that all names are in 'Yoshimi_Helpers'. If you think you've been unfairly
+treated contact me and we'll discuss it.
 
 willgodfrey@musically.me.uk

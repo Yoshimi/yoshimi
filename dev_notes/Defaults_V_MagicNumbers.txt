@@ -1,6 +1,10 @@
 A new system for defining and accessing default values is being developed.
-Initially it is being applied in parallel with the existing mixture of labels and numbers. When complete, all control labels and anonymous numbers will be replaced by this.
-These will be constant settings in the resepective header files and isolated with namespaces. They will be directly accessible from any file that includes that header.
+Initially it is being applied in parallel with the existing mixture of labels and
+numbers. When complete, all control labels and anonymous numbers will be replaced by
+this.
+These will be constant settings in the resepective header files and isolated with
+namespaces. They will be directly accessible from any file that includes that
+header.
 
 The data available will be:
 float min         minumum control value
@@ -9,8 +13,8 @@ float def         default control value
 bool learn        whether control is MIDI-learnable
 bool integer      whether control represents an integer value
 
-The first to get this treatment will be the rotary controls. Next will be the sliders.
-Then menus, followed by spin boxes and number rollers.
+The first to get this treatment will be the rotary controls. Next will be the
+sliders. Then menus, followed by spin boxes and number rollers.
 
 Finally, check boxes will have just:
 bool default

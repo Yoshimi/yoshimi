@@ -20,7 +20,8 @@ string          name - handled via simple message system.
 Elsewhere, unused chars are set to 0xff as a general test.
 
 e.g.
-If 'part' is 0xf0 (main) and 'kit' is 0xff you're there and it is main volume, key shift etc.
+If 'part' is 0xf0 (main) and 'kit' is 0xff you're there and it is main volume, key
+shift etc.
 
 If part is < 0x40 and kit is 0xff it's the general part level controls.
 
@@ -36,7 +37,11 @@ Vector Control
 This uses part number 0xc0
 
 Effects and effect sources.
-In 'part' we use 0xf1 for system effects and 0xf2 for insertion effects. For these and normal part effects, 'kit' ORed with 0x80 is used to denote the effect type (reverb echo etc.) and 'engine' is used to denote the number of the effect being worked on (the limit depends on the effect source). As 'kit' and 'engine' are not relevant for effects it is safe to use them here.
+In 'part' we use 0xf1 for system effects and 0xf2 for insertion effects. For these
+and normal part effects, 'kit' ORed with 0x10 is used to denote the effect type
+(reverb echo etc.) and 'engine' is used to denote the number of the effect being
+worked on (the limit depends on the effect source). As 'kit' and 'engine' are not
+relevant for effects it is safe to use them here.
 
 Effects 'kit' numbers offset by 0x10.
 

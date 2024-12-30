@@ -1,8 +1,11 @@
 Updated 29/7/2018
 
-This structure is intended to enable you to traverse the controls structure testing/adjusting at each level on the tree.
+This structure is intended to enable you to traverse the controls structure
+testing/adjusting at each level on the tree.
 
-The function is called via the new 'readAllData' function with a command block 'value' and 'type' and 'action' set appropriately - see 'Reading_Values'. It returns a float representing the wanted element.
+The function is called via the new 'readAllData' function with a command block
+'value' and 'type' and 'action' set appropriately - see 'Reading_Values'. It returns
+a float representing the wanted element.
 
 'type' is used to determine the operation.
 
@@ -30,7 +33,9 @@ This would return 127 - the input value adjusted to the maximum for master volum
 
 TODO - still not extended in 2022 :(
 
-If an out of range setting is found part way along a command chain. 'value' should be set to the byte number where the error was encountered and 'type' bit 4 should be set, otherwise it should be cleared.
+If an out of range setting is found part way along a command chain. 'value' should
+be set to the byte number where the error was encountered and 'type' bit 4 should be
+set, otherwise it should be cleared.
 
 Numbers are:
 1   control

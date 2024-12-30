@@ -2,13 +2,16 @@ voice aftertouch
 A0-AF
 becomes CC 642
 
-This is translated as CC 130 and implemented as key aftertouch and for MIDI learn. Note number is 'par' & 0xff. Pressure value is 'par' >> 8.
+This is translated as CC 130 and implemented as key aftertouch and for MIDI learn.
+Note number is 'par' & 0xff. Pressure value is 'par' >> 8.
 
 
 channel aftertouch
 D0 = DF
 becomes CC 641
 
-This is  translated as CC 129 and implemented as channel aftertouch and for MIDI learn. Pressure value is 'par'.
+This is  translated as CC 129 and implemented as channel aftertouch and for MIDI
+learn. Pressure value is 'par'.
 
-The reason for these conversions is so that the commands can be handled by the MIDI-learn parser, but are ignored by the normal MIDI decoder.
+The reason for these conversions is so that the commands can be handled by the
+MIDI-learn parser, but are ignored by the normal MIDI decoder.

@@ -2,7 +2,7 @@
 Intances of the Synth-Engine
 ----------------------------
 
-On a global level, Yoshimi has differnt modes of operation:
+On a global level, Yoshimi has different modes of operation:
 
 - when enable_single_master is **not** set (i.e. _false_) in the config,
   then there can be several independent Yoshimi processes running at the
@@ -18,10 +18,10 @@ On a global level, Yoshimi has differnt modes of operation:
   to access the engine from the plugin-instance (using a non-standard
   extension to the LV2 standard)
 
-The following discussions focus on the case of multiple "Instanecs"
+The following discussions focus on the case of multiple "Instances"
 within the same process, which can either be created by user request,
 by receiving a OS signal (in case of `enable_single_master==true`),
-or as consequence of loading furhter LV2 plugin instances into the
+or as consequence of loading further LV2 plugin instances into the
 same plugin host process.
 
 
@@ -42,8 +42,8 @@ The Primary Synth
 ~~~~~~~~~~~~~~~~~
 When Main starts, it always immediately creates a »primary Instance«.
 A reference to this `primarySynth` is maintained within the `InstanceManager`
-but not exposed globally, other than allowing to acces the configuration part
-through the function Config::instance().accessPrimaryConfig().
+but not exposed globally, other than allowing to access to the configuration
+part through the function Config::instance().accessPrimaryConfig().
 This special primary Synth-Engine instance...
 - is always marked with Synth-ID == 0
 - acts as a proxy for the _global application configuration_
@@ -79,11 +79,11 @@ An »Instance« within the Yoshimi-process comprises:
 - triggered from the »main thread« the Synth Engine also manages the "guiMaster"
   which is an instance of the FLTK generated MasterUI class.
 
-An new instance can be requested through InstanceManager::requestNewInstance(),
+A new instance can be requested through InstanceManager::requestNewInstance(),
 which first creates a new instance record internally and allocates the SynthEngine
 and MusicClient objects. Any such a new instance record is flagged with lifecycle
 state `PENDING` — a marker recognised by the repeatedly running »duty-cycle« as
-a request to walk this instance into the boot-up phase. This entails to determine
+a request to walk this instance into the boot-up phase. This entails determining
 a working audio / midi backend combination and then to start active processing.
 
 After successfully starting the processing backend, the new instance is placed into
@@ -97,11 +97,11 @@ widgets allocated after this point will be automatically associated with
 this top-level window and connected to UI event processing.
 
 For the Yoshimi UI, the actual code of MasterUI is FLTK generated and configured
-through the FLTK UI-Builder, but it inhertits the Command-system functionality from
+through the FLTK UI-Builder, but it inherits the Command-system functionality from
 its base class, which is class GuiUpdates (see MiscGui.h / cpp). Furthermore,
 after creating the MasterUI instance, the function `MasterUI::Init()` will be
 invoked, which is alltogether Yoshimi specific code. This Init() function creates
-and configures a lot of further UI window / pannel classes and finally delegates
+and configures a lot of further UI window / panel classes and finally delegates
 to `MasterUI::create_window()` (which is FLTK generated). Notably the MasterUI
 is outfitted with a direct back-reference to its associated InterChange instance
 and (as of 3/2024) unfortunately uses that instance to access the associated Synth
@@ -143,7 +143,7 @@ would be able to generate a generic UI), Yoshimi was only fitted superficially
 to the requirements of the LV2 standard. By relying on a non-standard extension
 and assuming that actually the audio processing and the UI presentation both
 hapen within the same OS process of the plug-in host, Yoshimi kind of sneaks
-it its special and very elaborate UI.
+in its special and very elaborate UI.
 
 Entrance-point: YoshimiLV2Plugin::instantiate()
 - invoked dirctly from the Plug-In descriptor
@@ -154,9 +154,10 @@ Entrance-point: YoshimiLV2Plugin::instantiate()
   ** invokes Init()
   ** loads Banks and History
 
-Before actual processing starts, the LV2 host will invoke the YoshimiLV2Plugin::activate
-callback and starts or connects to the worker processing threads. Either before or
-after activating, the Host attaches the LV2 ports and thereby provides the output buffers.
+Before actual processing starts, the LV2 host will invoke the
+YoshimiLV2Plugin::activate callback and starts or connects to the worker processing
+threads. Either before or after activating, the Host attaches the LV2 ports and
+thereby provides the output buffers.
 
 When Plug-In is in active processnig...
 - Host calls repeatedly YoshimiLV2Plugin::run(LV2_Handle instance, uint32_t sample_count)
@@ -166,11 +167,13 @@ When Plug-In is in active processnig...
      InterChange::mediate()
 
 GUI will only be launched on-demand
-- typically by "clicking", or "double clicking" or "editing" the Plug-in in the Host
-- often, already the YoshimiLV2PluginUI::instantiate() happens from some UI thread of
-  the Host, and not the audio thread...
-- `YoshimiLV2PluginUI::show()` is invoked, which delegates to the Yoshimi InstanceManager
-  to create the FLTK gui and to establish a connection between SynthEngine and GUI.
+- typically by "clicking", or "double clicking" or "editing" the Plug-in in the
+  Host
+- often, already the YoshimiLV2PluginUI::instantiate() happens from some UI thread
+   of the Host, and not the audio thread...
+- `YoshimiLV2PluginUI::show()` is invoked, which delegates to the Yoshimi
+   InstanceManager to create the FLTK gui and to establish a connection between
+   SynthEngine and GUI.
 
 While the Yoshimi UI is active...
 - the Host periodically invokes `YoshimiLV2PluginUI::run()`
@@ -180,7 +183,7 @@ While the Yoshimi UI is active...
 
 The UI can be deactivated or hidden by the host:
 - Callback externalUI.uiWIdget.hide = YoshimiLV2PluginUI::static_Hide
-- ⤷ YoshimiLV2PluginUI::hide()
+  YoshimiLV2PluginUI::hide()
 - hides the FLTK-Fenster windows
 - FLTK ceases to perform event-processing for hidden windows
 - typically the host does not invoke `YoshimiLV2PluginUI::run()` for a hidden UI

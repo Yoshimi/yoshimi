@@ -14,17 +14,27 @@ partonoffWrite((int npart, int what)
 
   -1 moves it toward off and 2 moves it towards on.
 
-  The rationale here is that if a part status is unknown to a function, but it wants to perform an operation that needs the part to be off, but then wants to restore it to its original condition, it first uses -1. If it was already off it makes no difference, but if it was on it is now turned off. Once the operation has been completed it uses 2 to restore the original state, so if it was off, it still is, but if it was on it is now on again.
+  The rationale here is that if a part status is unknown to a function, but it wants
+  to perform an operation that needs the part to be off, but then wants to restore
+  it to its original condition, it first uses -1. If it was already off it makes no
+  difference, but if it was on it is now turned off. Once the operation has been
+  completed it uses 2 to restore the original state, so if it was off, it still is,
+  but if it was on it is now on again.
 
-  The internal value will become progressively more negative as processes use -2 but will never become greater than +1 for 'on'
+  The internal value will become progressively more negative as processes use -2 but
+  will never become greater than +1 for 'on'
 
-  If you want to set its state regardless of the previous setting (such as switching by a user) you use 0 and 1.
+  If you want to set its state regardless of the previous setting (such as switching
+  by a user) you use 0 and 1.
 
 
 partonoffRead(int npart)
   This returns the part's current status as either 0 or 1.
 
-  Be aware that the audio loop takes a copy of each part's state at the beginning of a period, and then uses that for all operations within that period, so any changes to partonoff will be ignored until the next period. This ensures there can be no inconsistencies.
+  Be aware that the audio loop takes a copy of each part's state at the beginning of
+  a period, and then uses that for all operations within that period, so any changes
+  to partonoff will be ignored until the next period. This ensures there can be no
+  inconsistencies.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -41,4 +51,3 @@ muteState::Immediate
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-There is a pointer '*firstSynth' used in various places identifying the primary instance. It is written either by main, or the LV2 code at startup.

@@ -1,8 +1,10 @@
 This is a means of exposing various controls to NRPNs.
 
-All of the commands produce log output in a manner designed to be compatible with both the GUI reports window and with a CLI readline environment.
+All of the commands produce log output in a manner designed to be compatible with
+both the GUI reports window and with a CLI readline environment.
 
-To access these, set NRPN MSB (CC 99) to 64 and NRPN LSB (CC 98) to 2 (8130). After that send the following Data values.
+To access these, set NRPN MSB (CC 99) to 64 and NRPN LSB (CC 98) to 2 (8130). After
+that send the following Data values.
 
 
 Data MSB    Data LSB            Setting

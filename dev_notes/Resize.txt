@@ -1,19 +1,36 @@
-FLTK manages window resizes itself, but not text or some user drawn graphics. Our resize code fills in these elements.
+FLTK manages window resizes itself, but not text or some user drawn graphics. Our
+resize code fills in these elements.
 
-It closely follows the context idea that the rest of Yoshimi uses. The way this operates is as follows.
+It closely follows the context idea that the rest of Yoshimi uses. The way this
+operates is as follows.
 
-Triggering is derived from the 33mS FLTK wait(0.033333) call. This is passed to the normal update code in "MasterUI". This procedure ensures that there will usually be a steady 33mS between GUI actions, resize tests and redraws, thus reducing processor loading.
+Triggering is derived from the 33mS FLTK wait(0.033333) call. This is passed to the
+normal update code in "MasterUI". This procedure ensures that there will usually be
+a steady 33mS between GUI actions, resize tests and redraws, thus reducing processor
+loading.
 
-When "MasterUI" first gets the call it passes it on to all the other top level windows in sequence, but *only* if their size has actually changed. It then passes the call unconditionally to the other main areas, PartUI and BankUI, and finally runs through its own objects.
+When "MasterUI" first gets the call it passes it on to all the other top level
+windows in sequence, but *only* if their size has actually changed. It then passes
+the call unconditionally to the other main areas, PartUI and BankUI, and finally
+runs through its own objects.
 
-Part and Bank will themselves portion out calls to subsections depending on whether they can be dealt with directly, or have to be passed further down the stack. For an extreme example, the Amplitude Freemode window in Addsynth Voice has to unconditionally receive this call. It's complete route is:
+Part and Bank will themselves portion out calls to subsections depending on whether
+they can be dealt with directly, or have to be passed further down the stack. For an
+extreme example, the Amplitude Freemode window in Addsynth Voice has to
+unconditionally receive this call. It's complete route is:
 
 main->Master->Part->PartEdit->AddGlobal->AddVoice->AddEnvelope
 
-If a window is visible, and it's size has changed it will then perform the actual text font resizes, then mark itself as 'seen'. Font sizes are calculated from the ratio of the current window size against the window's default size, and the font itself multiplied by this scale factor. Fonts are defined as integers so will visibly step up and down in size. Other drawn elements will change smoothly.
+If a window is visible, and it's size has changed it will then perform the actual
+text font resizes, then mark itself as 'seen'. Font sizes are calculated from the
+ratio of the current window size against the window's default size, and the font
+itself multiplied by this scale factor. Fonts are defined as integers so will
+visibly step up and down in size. Other drawn elements will change smoothly.
 
-Usually only one window at a time will be changing, so apart from the tests made on the way, there is little extra work.
+Usually only one window at a time will be changing, so apart from the tests made on
+the way, there is little extra work.
 
-The FLTK file chooser proved intractable so has been replaced with our bespoke file chooser. This actually has other benefits, being tailored to our exact requirements.
+The FLTK file chooser proved intractable so has been replaced with our bespoke file
+chooser. This actually has other benefits, being tailored to our exact requirements.
 
 We have also implemented our own code for the 'Alert' and 'Choice' operations.

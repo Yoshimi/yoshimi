@@ -1,8 +1,15 @@
 
-When receiving either a normal CC or an NRPN, the first action is to convert this to a float in the range as close as possible to 0 - 127. The ratios are fiddled a bit as otherwise you either couldn't quite reach 127, so some controls missed out a bit on range, or you went slightly over which had odd results depending on the actual control.
+When receiving either a normal CC or an NRPN, the first action is to convert this to
+a float in the range as close as possible to 0 - 127. The ratios are fiddled a bit
+as otherwise you either couldn't quite reach 127, so some controls missed out a bit
+on range, or you went slightly over which had odd results depending on the actual
+control.
 
-Next, the value is compressed or limited, and/or inverted depending on the Min Max settings in the MIDI-learn window.
+Next, the value is compressed or limited, and/or inverted depending on the Min Max
+settings in the MIDI-learn window.
 
-Finally it is expanded to the actual range of the control that was learned, using the limits code. Controls that have a wider range than the incoming type will have an evenly spaced granularity.
+Finally it is expanded to the actual range of the control that was learned, using
+the limits code. Controls that have a wider range than the incoming type will have
+an evenly spaced granularity.
 
 

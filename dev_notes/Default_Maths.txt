@@ -1,5 +1,6 @@
 There are four significant constants set in globals.h
-At the time of writing there still is no standard consistent across platforms so please use these in all new calculations.
+At the time of writing there still is no standard consistent across platforms so
+please use these in all new calculations.
 
 #define PI 3.1415926536f
 #define LOG_2 0.693147181f
@@ -11,7 +12,8 @@ We've kept the values the same to ensure consistency.
 #define HALFPI 1.57079632679f
 
 These were introduced in Yoshimi 1.2.2
-Throughout Yoshimi these had been computed in different ways, and it was thought this, along with unknown compiler optimisations could give varying results.
+Throughout Yoshimi these had been computed in different ways, and it was thought
+this, along with unknown compiler optimisations could give varying results.
 Typically:
 2 * {some calculation} * PI
 {some calculation} * 2 * PI

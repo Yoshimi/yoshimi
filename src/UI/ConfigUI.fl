@@ -66,9 +66,6 @@ decl {\#include "Misc/TextMsgBuffer.h"
     }} {private local
 }
 
-decl {extern SynthEngine *firstSynth;} {private local
-}
-
 class ConfigUI {} {
   Function {isLV2()} {return_type bool} {
       code { return synth->getRuntime().isLV2; } {}

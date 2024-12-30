@@ -1,8 +1,11 @@
-The learn process comes after *recognised* NRPNs and vectors, but before all other controllers.
+The learn process comes after *recognised* NRPNs and vectors, but before all other
+controllers.
 
-To learn, hold CTRL while right-clicking on any GUI control then operate a physical control.
+To learn, hold CTRL while right-clicking on any GUI control then operate a physical
+control.
 
-Along with parameters, a text string is provided with precise details of this complete action.
+Along with parameters, a text string is provided with precise details of this
+complete action.
 
 Control capabilities:
 
@@ -24,11 +27,15 @@ Status bits:
 3   mark as an NRPN
 4   mark as 7 bit NRPN
 
-When sending internal control messages to the GUI (instead of passing on MIDI actions) the part number will be 216 (0xd8) - a value that is never used in the rest of the system.
+When sending internal control messages to the GUI (instead of passing on MIDI
+actions) the part number will be 216 (0xd8) - a value that is never used in the rest
+of the system.
 
-This is used for updating the list and filling in/altering line entries. The gui never does these directly, but requests them using the same part number.
+This is used for updating the list and filling in/altering line entries. The gui
+never does these directly, but requests them using the same part number.
 
-Name strings are passed across using the simple message system. These are not editable in the GUI.
+Name strings are passed across using the simple message system. These are not
+editable in the GUI.
 
 These transfers are done outside the RT threads.
 
@@ -46,9 +53,13 @@ insert      min_in
 parameter   max_in
 misMsg      text message number
 
-For NRPNs, CC has bit 16 set. This is so that even one with a current value less than 127 won't be mistaken for a normal CC when being matched.
+For NRPNs, CC has bit 16 set. This is so that even one with a current value less
+than 127 won't be mistaken for a normal CC when being matched.
 
-Currently there is a limit of 400 independent learned lines due to the use of miscMsg to update the GUI when loading complete learned lists. In the future, the GUI may be restricted to 'viewing groups' of 128 lines. This would allow a much greater number.
+Currently there is a limit of 400 independent learned lines due to the use of
+miscMsg to update the GUI when loading complete learned lists. In the future, the
+GUI may be restricted to 'viewing groups' of 128 lines. This would allow a much
+greater number.
 
 
 Control numbers:
@@ -75,7 +86,8 @@ These move a line, so a complete redraw is inititalsed.
 
 96  clear all
 
-The gui always does a redraw (except 20 & 21), but 0 to 7, 24 and 96 don't do a list re-order first.
+The gui always does a redraw (except 20 & 21), but 0 to 7, 24 and 96 don't do a
+list re-order first.
 
 
 0x80 load list
@@ -88,6 +100,12 @@ The gui always does a redraw (except 20 & 21), but 0 to 7, 24 and 96 don't do a 
 
 How Max MIDI-learn lines has been increased.
 
-This has been achieved by inserting a 10mS sleep every 32 lines while updating the GUI. This ensures the message buffer doesn't get overloaded. There was no other reason for the earlier limit. This still comes in at less that 1S for a full list load.
+This has been achieved by inserting a 10mS sleep every 32 lines while updating the
+GUI. This ensures the message buffer doesn't get overloaded. There was no other
+reason for the earlier limit. This still comes in at less that 1S for a full list
+load.
 
-Time to scan is very difficult to measure. Finding a bunch of  5 controls at the end of a list of 20 usually returned less than 3uS, and very occasionally one at around 8uS. The search is fairly straightforward so presumably ones right at the end of a full list would be worst case around 160uS
+Time to scan is very difficult to measure. Finding a bunch of  5 controls at the
+end of a list of 20 usually returned less than 3uS, and very occasionally one at
+around 8uS. The search is fairly straightforward so presumably ones right at the
+end of a full list would be worst case around 160uS

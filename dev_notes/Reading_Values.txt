@@ -1,8 +1,10 @@
 updated 5/7/2020
 
-Reads are made by direct calls (not buffered), but if dynamic values are being read and an actual write is taking place the reads are temporarily blocked.
+Reads are made by direct calls (not buffered), but if dynamic values are being read
+and an actual write is taking place the reads are temporarily blocked.
 
-If bit 2 of 'type' is set on entry then the command is passed on to the limits tests - see Limits.txt
+If bit 2 of 'type' is set on entry then the command is passed on to the limits tests
+- see Limits.txt
 
 In general it returns a float representing the wanted element.
 

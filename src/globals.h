@@ -610,8 +610,7 @@ namespace MAIN // usage MAIN::control::volume
         readPartPeak = 200, // now does L/R
         readMainLRpeak,
         readMainLRrms,
-        setTestInstrument,
-        testCommandEntry
+        setTestInstrument
     };
 
     enum panningType : uchar {

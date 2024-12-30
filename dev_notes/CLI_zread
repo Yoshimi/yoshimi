@@ -1,6 +1,12 @@
-This command is not documented in the User Guide as it is intended only for test purposes. It intentionally performs no error checks itself so it's possible to discover the response to values that should never normally be set. For this reason it is sent via sendDirect() so that no preliminary adjustments are made.
+This command is not documented in the User Guide as it is intended only for test
+purposes. It intentionally performs no error checks itself so it's possible to
+discover the response to values that should never normally be set. For this reason
+it is sent via sendDirect() so that no preliminary adjustments are made.
 
-It is used to populate a command block with raw byte values in the normal sequence starting from 'control' It simply performs a read of the given data reporting the results to either the GUI console window, or the CLI stdout, so reflects what a user would see.
+It is used to populate a command block with raw byte values in the normal sequence
+starting from 'control' It simply performs a read of the given data reporting the
+results to either the GUI console window, or the CLI stdout, so reflects what a user
+would see.
 
 Entries:
     repeat
