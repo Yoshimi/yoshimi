@@ -3,7 +3,7 @@ use  Hex value    Character represented
 \b      08      Backspace
 \e      1B      Escape character
 \f      0C      Formfeed Page Break
-\n      0A      Newline (Line Feed); see notes below
+\n      0A      Newline
 \r      0D      Carriage Return
 \t      09      Horizontal Tab
 \v      0B      Vertical Tab

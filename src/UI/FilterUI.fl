@@ -283,8 +283,16 @@ switch(event)
       }
 
       //Activate w. RMB, retain state when using MMB
-      qMode = Fl::event_button() == FL_RIGHT_MOUSE
-          || (Fl::event_button() == FL_MIDDLE_MOUSE && qMode);
+      /*
+       * right mouse button is now universally used for MIDI-learn
+       * so we use the shift key instead.
+       *
+       * qMode = Fl::event_button() == FL_RIGHT_MOUSE
+       *    || (Fl::event_button() == FL_MIDDLE_MOUSE && qMode);
+       */
+
+        qMode = Fl::event_key(FL_Shift_L)
+            || Fl::event_key(FL_Shift_R);
 
       update_refs();
 
@@ -327,11 +335,33 @@ switch(event)
       return 1;
   case FL_MOUSEWHEEL:
   {
+      /*
+       * These two had stopped working due to some unknown change
+       * elsewhere, hence the more convulated code.
+       * Original has been kept but commented out.
+       */
+      float tmp;
       int offset = Fl::event_dy() * (Fl::event_ctrl() ? 1 : 4);
       if (Fl::event_shift())
-          delegate(parent.cfknob, limit(pars->Pcenterfreq + offset, 0, 127));
+      {
+          tmp = (parent.cfknob->value() + offset) / 5;
+          if (tmp > 127)
+              tmp = 127;
+          else if (tmp < 0)
+              tmp = 0;
+          parent.send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::formantCenter, tmp, TOPLEVEL::type::Write);
+          //delegate(parent.cfknob, limit(pars->Pcenterfreq + offset, 0, 127));
+      }
       else
-          delegate(parent.octknob, limit(pars->Poctavesfreq + offset, 0, 127));
+      {
+          tmp = (parent.octknob->value() + offset) / 5;
+          if (tmp > 127)
+              tmp = 127;
+          else if (tmp < 0)
+              tmp = 0;
+          parent.send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::formantOctave, tmp, TOPLEVEL::type::Write);
+          //delegate(parent.octknob, limit(pars->Poctavesfreq + offset, 0, 127));
+      }
       return 1;
   }
   case FL_RELEASE:
