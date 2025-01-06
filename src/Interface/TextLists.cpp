@@ -239,7 +239,7 @@ std::string mcontrollist [] = {
     "PForm <s>",                "whether portamento is from or to (Start / End)",
     "PTime <n>",                "portamento sweep time",
     "PDownup <n>",              "portamento time stretch - down/up ratio",
-    "PProportional <s",         "enables/disables proportional portamento (ON {other})",
+    "PProportional <s>",         "enables/disables proportional portamento (ON {other})",
     "PExtent <n>",              "distance to double change",
     "PRange <n>",               "difference from non proportional",
     "CLear",                    "set all controllers to defaults",
@@ -247,8 +247,8 @@ std::string mcontrollist [] = {
     "E Modulation <n>",         "emulate modulation controller",
     "E Expression <n>",         "emulate expression controller",
     "E BReath <n>",             "emulate breath controller",
-    "E Cutoff <n>",             "emulate filter cutoff controller",
     "E Q <n>",                  "emulate filter Q controller",
+    "E Cutoff <n>",             "emulate filter cutoff controller",
     "E BAndwidth <n>",          "emulate bandwidth controller",
     "@end","@end"
 };
