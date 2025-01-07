@@ -388,7 +388,7 @@ std::string subsynthlist [] = {
 };
 
 std::string padsynthlist [] = {
-    "<ON/OFF>",                 "enables/disables the part",
+    "<ON/OFF>",                 "enables/disables the SubSynth engine",
     "Apply",                    "use on 1st entry & harmonic changes",
     "Volume <n>",               "volume",
     "Pan <n>",                  "panning position",
@@ -428,7 +428,7 @@ std::string padsynthlist [] = {
 
     "CEnter <n>",               "changes the central harmonic component width",
     "RELative <n>",             "changes central component relative amplitude",
-    "AUto <s>",                 "(ON {other})",
+    "AUto <s>",                 "autoscaling (ON {other})",
 
     "BASe <s>",                 "base profile distribution (C2, G2, C3, G3, C4, G4, C5, G5, G6)",
     "SAmples <n>",              "samples/octave (0.5, 1, 2, 3, 4, 6, 12)",
@@ -468,7 +468,7 @@ std::string  resonancelist [] = {
     "Smooth",              "reduce range and sharpness of peaks",
     "CLear",               "set all points to mid level",
     "POints [<n1> [n2]]",  "show all or set/read n1 to n2",
-    "APply",               "puts latest changes into the wavetable",
+    "APply",               "fix settings (only for PadSynth)",
     "@end","@end"
 };
 
@@ -490,6 +490,8 @@ std::string waveformlist [] = {
     "SPIke","",
     "CIRcle","",
     "HYPersec","",
+    "","",
+    "<s>",                      "set basic waveform by above list",
     "Harmonic <n1> Amp <n2>",   "harmonic n1 to n2 intensity",
     "Harmonic <n1> Phase <n2>", "harmonic n1 to n2 phase",
     "Harmonic Shift <n>",       "amount harmonics are moved",
