@@ -640,8 +640,8 @@ std::string envelopelist [] = {
 };
 
 std::string reverblist [] = {
-    "LEVel <n>",        "intensity",
-    "PANning <n>",      "L/R panning",
+    "LEVel <n>",        "amount applied",
+    "PANning <n>",      "left-right panning",
     "TIMe <n>",         "reverb time",
     "DELay <n>",        "initial delay",
     "FEEdback <n>",     "delay feedback",
@@ -670,8 +670,8 @@ int reverblistmap[] = {
 };
 
 std::string echolist [] = {
-    "LEVel <n>",        "intensity",
-    "PANning <n>",      "L/R panning",
+    "LEVel <n>",        "amount applied",
+    "PANning <n>",      "left-right panning",
     "DELay <n>",        "initial delay, left delay only if separate",
     "LRDelay <n>",      "left-right delay, right delay if separate",
     "CROssover <n>",    "left-right crossover",
@@ -696,16 +696,16 @@ int echolistmap[] = {
 };
 
 std::string choruslist [] = {
-    "LEVel <n>",        "intensity",
-    "PANning <n>",      "L/R panning",
+    "LEVel <n>",        "amount applied",
+    "PANning <n>",      "left-right panning",
     "FREquency <n>",    "LFO frequency",
     "RANdom <n>",       "LFO randomness",
     "WAVe <s>",         "LFO waveshape (sine, triangle)",
-    "SHIft <n>",        "L/R phase shift",
+    "SHIft <n>",        "left-right phase shift",
     "DEPth <n>",        "LFO depth",
     "DELay <n>",        "LFO delay",
     "FEEdback <n>",     "chorus feedback",
-    "CROssover <n>",    "L/R routing",
+    "CROssover <n>",    "left-right routing",
     "SUBtract <s>",     "invert output (ON {other})",
     "BPM <s>",          "LFO BPM sync (ON {other})",
     "STArt <n>",        "LFO BPM phase start",
@@ -731,16 +731,16 @@ int choruslistmap[] = {
 };
 
 std::string phaserlist [] = {
-    "LEVel <n>",        "intensity",
-    "PANning <n>",      "L/R panning",
+    "LEVel <n>",        "amount applied",
+    "PANning <n>",      "left-right panning",
     "FREquency <n>",    "LFO frequency",
     "RANdom <n>",       "LFO randomness",
     "WAVe <s>",         "LFO waveshape (sine, triangle)",
-    "SHIft <n>",        "L/R phase shift",
+    "SHIft <n>",        "left-right phase shift",
     "DEPth <n>",        "LFO depth",
     "FEEdback <n>",     "phaser feedback",
-    "STAges <n>",       "filter stages",
-    "CROssover <n>",    "L/R routing",
+    "STAges <n>",       "number of filter stages",
+    "CROssover <n>",    "left-right routing",
     "SUBtract <s>",     "invert output (ON {other})",
     "RELative <n>",     "relative phase",
     "HYPer <s>",        "hyper sine (ON {other})",
@@ -773,16 +773,16 @@ int phaserlistmap[] = {
 };
 
 std::string alienwahlist [] = {
-    "LEVel <n>",        "intensity",
-    "PANning <n>",      "L/R panning",
+    "LEVel <n>",        "amount applied",
+    "PANning <n>",      "left-right panning",
     "FREquency <n>",    "LFO frequency",
     "RANdom",           "LFO randomness",
     "WAVe <s>",         "LFO waveshape (sine, triangle)",
-    "SHIft <n>",        "L/R phase shift",
+    "SHIft <n>",        "left-right phase shift",
     "DEPth <n>",        "LFO depth",
     "FEEdback <n>",     "filter feedback",
     "DELay <n>",        "LFO delay",
-    "CROssover <n>",    "L/R routing",
+    "CROssover <n>",    "left-right routing",
     "RELative <n>",     "relative phase",
     "BPM <s>",          "LFO BPM sync (ON {other})",
     "STArt <n>",        "LFO BPM phase start",
@@ -807,14 +807,14 @@ int alienwahlistmap[] = {
 };
 
 std::string distortionlist [] = {
-    "LEVel <n>",        "intensity",
-    "PANning <n>",      "L/R panning",
-    "MIX <n>",          "L/R mix",
+    "LEVel <n>",        "amount applied",
+    "PANning <n>",      "left-right panning",
+    "MIX <n>",          "left-right mix",
     "DRIve <n>",        "input level",
     "OUTput <n>",       "output balance",
     "WAVe <s>",         "function waveshape",
     "-","(ATAn, ASYm1, POWer, SINe, QNTs, ZIGzag, LMT, ULMt, LLMt, ILMt, CLIp, AS2, PO2, SGM)",
-    "INVert <s>",       "subtracts from the main signal instead of adding  (ON {other})",
+    "INVert <s>",       "subtracts from the main signal, otherwise adds (ON {other})",
     "LOW <n>",          "low pass filter",
     "HIGh <n>",         "high pass filter",
     "STEreo <s>",       "stereo (ON {other})",
@@ -839,14 +839,14 @@ int distortionlistmap[] = {
 };
 
 std::string eqlist [] = {
-    "LEVel <n>",        "intensity",
+    "LEVel <n>",        "amount applied",
     "EQBand <n>",       "EQ band number for following controls",
     "FILter <s>",       "filter type",
     "-","(LP1, HP1, LP2, HP2, NOT, PEA, LOW, HIG)",
     "FREquency <n>",    "cutoff/band frequency",
     "GAIn <n>",         "makeup gain",
     "Q <n>",            "filter Q",
-    "STAges <n>",       "extra filter stages",
+    "STAges <n>",       "number of extra filter stages",
     "@end","@end"
 };
 
@@ -863,12 +863,12 @@ int eqlistmap[] = {
 };
 
 std::string dynfilterlist [] = {
-    "LEVel <n>",        "intensity",
-    "PANning <n>",      "L/R panning",
+    "LEVel <n>",        "amount applied",
+    "PANning <n>",      "left-right panning",
     "FREquency <n>",    "LFO frequency",
     "RANdom <n>",       "LFO randomness",
     "WAVe <s>",         "LFO waveshape (sine, triangle)",
-    "SHIft <n>",        "L/R phase shift",
+    "SHIft <n>",        "left-right phase shift",
     "DEPth <n>",        "LFO depth",
     "SENsitivity <n>",  "amount amplitude changes filter",
     "INVert <s>",       "reverse effect of sensitivity (ON {other})",
