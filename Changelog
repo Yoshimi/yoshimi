@@ -1,5 +1,15 @@
 yoshimi 2.3.3.2
 
+2025-1-14 Will
+bn 2376
+Installed placeholder for new Window Geometry code.
+Added new bank entries to Drums and Pads.
+Further adjustments to textlists.cpp
+
+2025-1-3 Will
+bn 2375
+Cleanups and consistency adjustments to textlists.cpp.
+
 2025-1-3 Will
 bn 2374
 Bugfix: formant filter graph - wrong response to R mouse click.

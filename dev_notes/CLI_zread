@@ -9,7 +9,6 @@ results to either the GUI console window, or the CLI stdout, so reflects what a 
 would see.
 
 Entries:
-    repeat
     control
     part
     kit

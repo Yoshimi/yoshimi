@@ -157,6 +157,7 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         part64 = 63, // between these two
 
         undoMark = 68, // 44
+        geometry = 100,
         vector = 192, // CO
         midiLearn = 216, // D8
         midiIn,
@@ -1135,6 +1136,16 @@ namespace EFFECT // usage EFFECT::control::level
         dynFilter,
         // any new effects should go here
         count, // this must be the last type!
+    };
+}
+namespace GEOMETRY  // usage GEOMETRY::control::hide
+{
+    enum control : char {
+        hide = 0,
+        show,
+        xposition,
+        yposition,
+        size
     };
 }
 

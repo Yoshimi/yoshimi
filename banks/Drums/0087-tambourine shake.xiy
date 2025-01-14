@@ -1,0 +1,380 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Yoshimi-data>
+<Yoshimi-data Yoshimi-author="Alan Ernest Calvert" Yoshimi-major="2"
+Yoshimi-minor="3" Yoshimi-revision="3">
+<INFORMATION>
+<par_bool name="ADDsynth_used" value="no" />
+<par_bool name="SUBsynth_used" value="no" />
+<par_bool name="PADsynth_used" value="yes" />
+</INFORMATION>
+<BASE_PARAMETERS>
+<par name="max_midi_parts" value="16" />
+<par name="max_kit_items_per_instrument" value="16" />
+<par name="max_system_effects" value="4" />
+<par name="max_insertion_effects" value="8" />
+<par name="max_instrument_effects" value="3" />
+<par name="max_addsynth_voices" value="8" />
+</BASE_PARAMETERS>
+<INSTRUMENT>
+<INFO>
+<string name="name">tambourine shake</string>
+<string name="author">Art Horan
+CC-BY-SA
+</string>
+<string name="comments">Approximation of a single shake of a tambourine</string>
+<par name="type" value="15" />
+<string name="file">tambourine shake</string>
+</INFO>
+<INSTRUMENT_KIT>
+<par name="kit_mode" value="0" />
+<par_bool name="kit_crossfade" value="no" />
+<par name="kit_fadetype" value="0" />
+<par_bool name="drum_mode" value="no" />
+<INSTRUMENT_KIT_ITEM id="0">
+<par_bool name="enabled" value="yes" />
+<string name="name"></string>
+<par_bool name="muted" value="no" />
+<par name="min_key" value="0" />
+<par name="max_key" value="127" />
+<par name="send_to_instrument_effect" value="0" />
+<par_bool name="add_enabled" value="no" />
+<par_bool name="sub_enabled" value="no" />
+<par_bool name="pad_enabled" value="yes" />
+<PAD_SYNTH_PARAMETERS>
+<par_bool name="stereo" value="yes" />
+<par name="mode" value="2" />
+<par name="bandwidth" value="500" />
+<par name="bandwidth_scale" value="0" />
+<parU name="xfade_update" value="200" />
+<HARMONIC_PROFILE>
+<par name="base_type" value="0" />
+<par name="base_par1" value="80" />
+<par name="frequency_multiplier" value="0" />
+<par name="modulator_par1" value="0" />
+<par name="modulator_frequency" value="30" />
+<par name="width" value="127" />
+<par name="amplitude_multiplier_type" value="0" />
+<par name="amplitude_multiplier_mode" value="0" />
+<par name="amplitude_multiplier_par1" value="80" />
+<par name="amplitude_multiplier_par2" value="64" />
+<par_bool name="autoscale" value="yes" />
+<par name="one_half" value="0" />
+</HARMONIC_PROFILE>
+<OSCIL>
+<par name="harmonic_mag_type" value="0" />
+<par name="base_function" value="1" />
+<par name="base_function_par" value="13" />
+<par name="base_function_modulation" value="0" />
+<par name="base_function_modulation_par1" value="64" />
+<par name="base_function_modulation_par2" value="64" />
+<par name="base_function_modulation_par3" value="32" />
+<par name="modulation" value="0" />
+<par name="modulation_par1" value="64" />
+<par name="modulation_par2" value="64" />
+<par name="modulation_par3" value="32" />
+<par name="wave_shaping" value="47" />
+<par name="wave_shaping_function" value="1" />
+<par name="filter_type" value="2" />
+<par name="filter_par1" value="103" />
+<par name="filter_par2" value="107" />
+<par name="filter_before_wave_shaping" value="0" />
+<par name="spectrum_adjust_type" value="0" />
+<par name="spectrum_adjust_par" value="68" />
+<par name="rand" value="127" />
+<par name="amp_rand_type" value="0" />
+<par name="amp_rand_power" value="64" />
+<par name="harmonic_shift" value="0" />
+<par_bool name="harmonic_shift_first" value="no" />
+<par name="adaptive_harmonics" value="0" />
+<par name="adaptive_harmonics_base_frequency" value="128" />
+<par name="adaptive_harmonics_power" value="100" />
+<par name="adaptive_harmonics_par" value="50" />
+<HARMONICS>
+<HARMONIC id="6">
+<par name="mag" value="96" />
+<par name="phase" value="64" />
+</HARMONIC>
+<HARMONIC id="7">
+<par name="mag" value="42" />
+<par name="phase" value="47" />
+</HARMONIC>
+<HARMONIC id="8">
+<par name="mag" value="82" />
+<par name="phase" value="64" />
+</HARMONIC>
+<HARMONIC id="10">
+<par name="mag" value="42" />
+<par name="phase" value="64" />
+</HARMONIC>
+</HARMONICS>
+</OSCIL>
+<RESONANCE>
+<par_bool name="enabled" value="no" />
+</RESONANCE>
+<HARMONIC_POSITION>
+<par name="type" value="3" />
+<par name="parameter1" value="193" />
+<par name="parameter2" value="255" />
+<par name="parameter3" value="128" />
+</HARMONIC_POSITION>
+<SAMPLE_QUALITY>
+<par name="samplesize" value="3" />
+<par name="basenote" value="2" />
+<par name="octaves" value="5" />
+<par name="samples_per_octave" value="2" />
+</SAMPLE_QUALITY>
+<AMPLITUDE_PARAMETERS>
+<par name="volume" value="92" />
+<par name="pan_pos" value="64" />
+<par_bool name="random_pan" value="no" />
+<par name="random_width" value="63" />
+<par name="panning" value="64" />
+<par name="velocity_sensing" value="64" />
+<par name="fadein_adjustment" value="42" />
+<par name="punch_strength" value="61" />
+<par name="punch_time" value="26" />
+<par name="punch_stretch" value="64" />
+<par name="punch_velocity_sensing" value="72" />
+<AMPLITUDE_ENVELOPE>
+<par_bool name="free_mode" value="yes" />
+<par name="env_points" value="6" />
+<par name="env_sustain" value="4" />
+<par name="env_stretch" value="5" />
+<par_bool name="forced_release" value="yes" />
+<par_bool name="linear_envelope" value="no" />
+<par name="A_dt" value="6" exact_value="0x40B6E148" />
+<par name="D_dt" value="58" exact_value="0x42665BA6" />
+<par name="R_dt" value="45" exact_value="0x4232BD71" />
+<par name="A_val" value="64" exact_value="0x42800000" />
+<par name="D_val" value="64" exact_value="0x42800000" />
+<par name="S_val" value="0" exact_value="0x       0" />
+<par name="R_val" value="64" exact_value="0x42800000" />
+<POINT id="0">
+<par name="val" value="0" exact_value="0x       0" />
+</POINT>
+<POINT id="1">
+<par name="dt" value="11" exact_value="0x41300000" />
+<par name="val" value="127" exact_value="0x42FE0000" />
+</POINT>
+<POINT id="2">
+<par name="dt" value="20" exact_value="0x41A00000" />
+<par name="val" value="89" exact_value="0x42B20000" />
+</POINT>
+<POINT id="3">
+<par name="dt" value="18" exact_value="0x41900000" />
+<par name="val" value="127" exact_value="0x42FE0000" />
+</POINT>
+<POINT id="4">
+<par name="dt" value="58" exact_value="0x42665BA6" />
+<par name="val" value="0" exact_value="0x       0" />
+</POINT>
+<POINT id="5">
+<par name="dt" value="45" exact_value="0x4232BD71" />
+<par name="val" value="0" exact_value="0x       0" />
+</POINT>
+</AMPLITUDE_ENVELOPE>
+<AMPLITUDE_LFO>
+<par name="freqI" value="671088640" />
+<par_real name="freq" value="    0.625" exact_value="0x3F200000" />
+<par name="intensity" value="0" exact_value="0x       0" />
+<par name="start_phase" value="64" exact_value="0x42800000" />
+<par name="lfo_type" value="0" />
+<par name="randomness_amplitude" value="0" exact_value="0x       0" />
+<par name="randomness_frequency" value="64" exact_value="0x4280451F" />
+<par name="delay" value="0" exact_value="0x       0" />
+<par name="stretch" value="64" exact_value="0x42800000" />
+<par_bool name="continous" value="no" />
+<par_bool name="bpm" value="no" />
+</AMPLITUDE_LFO>
+</AMPLITUDE_PARAMETERS>
+<FREQUENCY_PARAMETERS>
+<par name="fixed_freq" value="1" />
+<par name="fixed_freq_et" value="2" />
+<par name="bend_adjust" value="88" />
+<par name="offset_hz" value="64" />
+<par name="detune" value="7326" />
+<par name="coarse_detune" value="1021" />
+<par name="detune_type" value="1" />
+<FREQUENCY_ENVELOPE>
+<par_bool name="free_mode" value="no" />
+<par name="env_points" value="3" />
+<par name="env_sustain" value="1" />
+<par name="env_stretch" value="0" />
+<par_bool name="forced_release" value="no" />
+<par_bool name="linear_envelope" value="no" />
+<par name="A_dt" value="18" exact_value="0x41920000" />
+<par name="D_dt" value="10" exact_value="0x41200000" />
+<par name="R_dt" value="60" exact_value="0x42700000" />
+<par name="A_val" value="59" exact_value="0x426BAE16" />
+<par name="D_val" value="64" exact_value="0x42800000" />
+<par name="S_val" value="64" exact_value="0x42800000" />
+<par name="R_val" value="94" exact_value="0x42BCF5C2" />
+</FREQUENCY_ENVELOPE>
+<FREQUENCY_LFO>
+<par name="freqI" value="587202560" />
+<par_real name="freq" value=" 0.546875" exact_value="0x3F0C0000" />
+<par name="intensity" value="25" exact_value="0x41C49893" />
+<par name="start_phase" value="64" exact_value="0x42800000" />
+<par name="lfo_type" value="2" />
+<par name="randomness_amplitude" value="0" exact_value="0x       0" />
+<par name="randomness_frequency" value="88" exact_value="0x42B087AE" />
+<par name="delay" value="0" exact_value="0x       0" />
+<par name="stretch" value="64" exact_value="0x42800000" />
+<par_bool name="continous" value="no" />
+<par_bool name="bpm" value="no" />
+</FREQUENCY_LFO>
+</FREQUENCY_PARAMETERS>
+<FILTER_PARAMETERS>
+<par name="velocity_sensing_amplitude" value="20" />
+<par name="velocity_sensing" value="64" />
+<FILTER>
+<par name="category" value="0" />
+<par name="type" value="3" />
+<par name="freq" value="46" exact_value="0x42396B85" />
+<par name="q" value="44" exact_value="0x422F3D71" />
+<par name="stages" value="0" />
+<par name="freq_track" value="91" exact_value="0x42B69C29" />
+<par_bool name="freqtrackoffset" value="no" />
+<par name="gain" value="64" exact_value="0x42800000" />
+</FILTER>
+<FILTER_ENVELOPE>
+<par_bool name="free_mode" value="no" />
+<par name="env_points" value="4" />
+<par name="env_sustain" value="2" />
+<par name="env_stretch" value="0" />
+<par_bool name="forced_release" value="yes" />
+<par_bool name="linear_envelope" value="no" />
+<par name="A_dt" value="40" exact_value="0x42200000" />
+<par name="D_dt" value="70" exact_value="0x428C0000" />
+<par name="R_dt" value="60" exact_value="0x42700000" />
+<par name="A_val" value="64" exact_value="0x42800000" />
+<par name="D_val" value="64" exact_value="0x42800000" />
+<par name="S_val" value="64" exact_value="0x42800000" />
+<par name="R_val" value="64" exact_value="0x42800000" />
+</FILTER_ENVELOPE>
+<FILTER_LFO>
+<par name="freqI" value="671088640" />
+<par_real name="freq" value="    0.625" exact_value="0x3F200000" />
+<par name="intensity" value="0" exact_value="0x       0" />
+<par name="start_phase" value="64" exact_value="0x42800000" />
+<par name="lfo_type" value="0" />
+<par name="randomness_amplitude" value="0" exact_value="0x       0" />
+<par name="randomness_frequency" value="0" exact_value="0x       0" />
+<par name="delay" value="0" exact_value="0x       0" />
+<par name="stretch" value="64" exact_value="0x42800000" />
+<par_bool name="continous" value="no" />
+<par_bool name="bpm" value="no" />
+</FILTER_LFO>
+</FILTER_PARAMETERS>
+<RANDOM_WALK>
+<parU name="rebuild_trigger" value="0" />
+<par name="rand_detune" value="0" />
+<par name="rand_bandwidth" value="0" />
+<par name="rand_filter_freq" value="0" />
+<par name="rand_profile_width" value="0" />
+<par name="rand_profile_stretch" value="0" />
+</RANDOM_WALK>
+</PAD_SYNTH_PARAMETERS>
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="1">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="2">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="3">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="4">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="5">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="6">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="7">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="8">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="9">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="10">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="11">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="12">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="13">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="14">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="15">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+</INSTRUMENT_KIT>
+<INSTRUMENT_EFFECTS>
+<INSTRUMENT_EFFECT id="0">
+<EFFECT>
+<par name="type" value="0" />
+</EFFECT>
+<par name="route" value="0" />
+<par_bool name="bypass" value="no" />
+</INSTRUMENT_EFFECT>
+<INSTRUMENT_EFFECT id="1">
+<EFFECT>
+<par name="type" value="0" />
+</EFFECT>
+<par name="route" value="0" />
+<par_bool name="bypass" value="no" />
+</INSTRUMENT_EFFECT>
+<INSTRUMENT_EFFECT id="2">
+<EFFECT>
+<par name="type" value="0" />
+</EFFECT>
+<par name="route" value="0" />
+<par_bool name="bypass" value="no" />
+</INSTRUMENT_EFFECT>
+</INSTRUMENT_EFFECTS>
+<par name="key_mode" value="0" />
+<par name="channel_aftertouch" value="0" />
+<par name="key_aftertouch" value="0" />
+<par name="random_detune" value="0" />
+<par name="random_velocity" value="0" />
+<par_bool name="breath_disable" value="no" />
+</INSTRUMENT>
+<CONTROLLER>
+<par name="pitchwheel_bendrange" value="200" />
+<par_bool name="expression_receive" value="yes" />
+<par name="panning_depth" value="64" />
+<par name="filter_cutoff_depth" value="64" />
+<par name="filter_q_depth" value="64" />
+<par name="bandwidth_depth" value="64" />
+<par name="mod_wheel_depth" value="80" />
+<par_bool name="mod_wheel_exponential" value="no" />
+<par_bool name="fm_amp_receive" value="yes" />
+<par_bool name="volume_receive" value="yes" />
+<par name="volume_range" value="96" />
+<par_bool name="sustain_receive" value="yes" />
+<par_bool name="portamento_receive" value="yes" />
+<par name="portamento_time" value="64" />
+<par name="portamento_pitchthresh" value="3" />
+<par name="portamento_pitchthreshtype" value="1" />
+<par name="portamento_portamento" value="0" />
+<par name="portamento_updowntimestretch" value="64" />
+<par name="portamento_proportional" value="0" />
+<par name="portamento_proprate" value="80" />
+<par name="portamento_propdepth" value="90" />
+<par name="resonance_center_depth" value="64" />
+<par name="resonance_bandwidth_depth" value="64" />
+</CONTROLLER>
+</Yoshimi-data>
