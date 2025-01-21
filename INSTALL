@@ -12,13 +12,13 @@ It's a normal CMake build.
 
 This uses "yoshimi-2.2.3" as an example, and should work fine with all other versions. It is an easy way to build/compile using ccmake, in a separate build directory.  This way, changes to source code can be readily compared without combing through the build-related files.
 
-We will assume you have a home directory called 'user' and want Yoshimi to reside in a directory called 'software', but downloaded the archive to /home/user/download.
+We will assume you have a home directory called 'user' and want Yoshimi to reside in a directory called 'software', but downloaded the archive to /home/{user}/download.
 
-Working from a terminal window, extract source code archive:
+Working from a terminal window, extract the source code archive:
 
     mkdir /home/user/software
     cd    /home/user/download
-    tar -jxvf /home/user/download/yoshimi-2.2.3.tar.bz2 -C/home/{user}/software
+    tar -jxvf /home/user/download/yoshimi-2.2.3.tar.bz2 -C /home/{user}/software
 
 Now there should be a directory:
 

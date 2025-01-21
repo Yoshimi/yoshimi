@@ -1994,6 +1994,18 @@ void InterChange::returns(CommandBlock& cmd)
     if ((cmd.data.source & TOPLEVEL::action::noAction) == TOPLEVEL::action::noAction)
         return; // no further action
 
+    uchar npart = cmd.data.part;
+    if (npart == TOPLEVEL::section::display)
+    {
+        std::cout << "Found display control (not done yet)" << std::endl;
+        /*
+         * This will write directly into toGUI where the value in 'offset' will be
+         * used as the section number in place of 'display' so the correct section
+         * is identified for opening, closing, resizing etc.
+         */
+        return;
+    }
+
     if (cmd.data.source < TOPLEVEL::action::lowPrio)
     { // currently only used by gui. this may change!
 #ifdef GUI_FLTK
@@ -2044,13 +2056,16 @@ void InterChange::doClearPartInstrument(int npart)
 
 bool InterChange::commandSend(CommandBlock& cmd)
 {
+    uchar npart = cmd.data.part;
+    if (npart == TOPLEVEL::section::display)
+        return true; // no data change, just GUI display issues
+
     bool isChanged = commandSendReal(cmd);
     bool isWrite = (cmd.data.type & TOPLEVEL::type::Write) > 0;
     if (isWrite && isChanged) // write command
     {
         synth.setNeedsSaving(true);
         uchar control = cmd.data.control;
-        uchar npart   = cmd.data.part;
         uchar insert  = cmd.data.insert;
         if (npart < NUM_MIDI_PARTS && (insert != UNUSED || (control != PART::control::enable && control != PART::control::instrumentName)))
         {

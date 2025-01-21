@@ -157,7 +157,7 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         part64 = 63, // between these two
 
         undoMark = 68, // 44
-        geometry = 100,
+        display = 100, // visibility and themes
         vector = 192, // CO
         midiLearn = 216, // D8
         midiIn,
@@ -1138,14 +1138,21 @@ namespace EFFECT // usage EFFECT::control::level
         count, // this must be the last type!
     };
 }
-namespace GEOMETRY  // usage GEOMETRY::control::hide
+
+namespace DISPLAY  // usage DISPLAY::control::hide
 {
     enum control : char {
-        hide = 0,
+        hide = 0, // current window
         show,
         xposition,
         yposition,
-        size
+        size,
+        Select, // theme controls from here on
+        Copy,
+        Rename,
+        Delete,
+        Import,
+        Export
     };
 }
 

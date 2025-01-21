@@ -1,5 +1,13 @@
 yoshimi 2.3.3.2
 
+2025-1-21 Will
+bn 2377
+Renamed new Geometry section to Display.
+Added theme control placeholder values.
+Implemented mininum controls to report skeleton use
+    in interchange.cpp
+Partially updated Control Data entries.
+
 2025-1-14 Will
 bn 2376
 Installed placeholder for new Window Geometry code.
