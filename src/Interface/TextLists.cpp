@@ -2,7 +2,7 @@
     TextLists.h
 
     Copyright 2019-2023, Will Godfrey
-    Copyright 2024, Kristian Amlie, Will Godfrey
+    Copyright 2024-2025, Kristian Amlie, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -93,6 +93,18 @@ std::string toplist [] = {
     "  SOlo <s>",               "channel 'solo' switch type (ROw, COlumn, LOop, TWoway, CHannel {other} off)",
     "  SOlo CC <n>",            "incoming 'solo' CC number (type must be set first)",
     "  CLear <n>",              "restore instrument on part n to default settings",
+    "DISplay",                  "manage graphic display (if enabled)",
+    "  Hide",                   "current window",
+    "  View",                   "window (if enabled)",
+    "  Xposition",              "window (if visible)",
+    "  Yposition",              "window (if visible)",
+    "  SIze",                   "of window (if visible)",
+    "  SElect",                 "from theme list",
+    "  Copy",                   "selected theme",
+    "  Rename",                 "selected theme",
+    "  Delete",                 "selected theme",
+    "  Import",                 "external theme",
+    "  Export",                 "selected theme",
     "UNDo",                     "Revert last control change",
     "REDo",                     "Re-apply last control change",
     "@end","@end"

@@ -2,8 +2,8 @@
     InterChange.h - General communications
 
     Copyright 2016-2020 Will Godfrey
-    Copyright 2021,  Will Godfrey, Rainer Hans Liffers
-    Copyright 2022, Will Godfrey & others
+    Copyright 2021 Will Godfrey, Rainer Hans Liffers
+    Copyright 2022-2025, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -183,6 +183,7 @@ class InterChange : private DataText
         CommandBlock lastEntry;
         CommandBlock undoMarker;
         bool undoLoopBack;
+        void manageDisplay(CommandBlock& cmd);
         bool setUndo;
         bool setRedo;
         bool undoStart;
