@@ -579,7 +579,7 @@ bool XMLwrapper::loadXMLfile(string const& filename)
     else
         synth.getRuntime().lastXMLminor = 0;
     string exten = findExtension(filename);
-    if (exten.length() != 4 && exten != ".state")
+    if (exten.length() != 4 && exten != EXTEN::state)
         return true; // we don't want config stuff
 
     if (synth.getRuntime().logXMLheaders)

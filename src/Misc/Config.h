@@ -268,6 +268,7 @@ class Config
         pthread_t  findManual_Thread;
 
         void defaultPresets();
+        void buildConfigLocation();
         bool initFromPersistentConfig();
         bool extractBaseParameters(XMLwrapper& xml);
         bool extractConfigData(XMLwrapper& xml);

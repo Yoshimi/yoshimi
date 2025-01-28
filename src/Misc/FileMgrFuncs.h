@@ -85,6 +85,9 @@ namespace file {
 using std::string;
 using std::stringstream;
 
+// Marker used for instance config when started as LV2 plugin
+const string LV2_INSTANCE = "LV2";
+
 // make a filename legal
 inline void make_legit_filename(string& fname)
 {

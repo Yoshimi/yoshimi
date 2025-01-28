@@ -359,6 +359,21 @@ void Config::loadConfig()
     }
 }
 
+
+void Config::buildConfigLocation()
+{
+    string location = file::configDir();
+    string instanceID = isLV2? file::LV2_INSTANCE                 // LV2-plugin uses a fixed key for instance config
+                             : asString(synth.getUniqueId());     // standalone-instances are keyed by Synth-ID
+
+    defaultStateName = location + "/" + YOSHIMI;
+    baseConfig       = location + "/" + YOSHIMI                    + EXTEN::config;
+    configFile       = location + "/" + YOSHIMI + "-" + instanceID + EXTEN::instance;
+    defaultSession   = location + "/" + YOSHIMI + "-" + instanceID + EXTEN::state;
+
+    presetDir = file::localDir() + "/presets";
+}
+
 bool Config::initFromPersistentConfig()
 {
     if (file::userHome() == "/tmp")
@@ -368,29 +383,18 @@ bool Config::initFromPersistentConfig()
         Log("Failed to create local yoshimi directory.");
         return false;
     }
-    string foundConfig = file::configDir();
-    defaultStateName = foundConfig + "/yoshimi";
-
     if (file::configDir().empty())
     {
         Log("Failed to create config directory '" + file::userHome() + "'");
         return false;
     }
-    string yoshimi = "/" + string(YOSHIMI);
 
-    baseConfig = foundConfig + yoshimi + string(EXTEN::config);
+    buildConfigLocation();
 
-    int currentInstance = synth.getUniqueId();
-    defaultSession = defaultStateName + "-" + asString(currentInstance) + EXTEN::state;
-    yoshimi += ("-" + asString(currentInstance));
-
-    configFile = foundConfig + yoshimi + EXTEN::instance;
-
-    if (currentInstance == 0 && sessionStage != _SYS_::type::RestoreConf)
+    if (synth.getUniqueId() == 0 && sessionStage != _SYS_::type::RestoreConf)
     {
         TextMsgBuffer::instance().init(); // sneaked it in here so it's early
 
-        presetDir = file::localDir() + "/presets";
         if (!isDirectory(presetDir))
         { // only ever want to do this once
             if (createDir(presetDir))
@@ -416,15 +420,16 @@ bool Config::initFromPersistentConfig()
 
         // conversion for old location
         string newInstance0 = configFile;
+        string oldAllConfig = defaultStateName + EXTEN::state;
         if (isRegularFile(baseConfig) && !isRegularFile(newInstance0), 0)
         {
             file::copyFile(baseConfig, newInstance0, 0);
             Log("Reorganising config files.");
-            if (isRegularFile(defaultStateName + EXTEN::state))
+            if (isRegularFile(oldAllConfig))
             {
                 if (!isRegularFile(defaultSession))
                 {
-                    renameFile(defaultStateName + EXTEN::state, defaultSession);
+                    renameFile(oldAllConfig, defaultSession);
                     Log("Moving default state file.");
                 }
             }
@@ -473,7 +478,7 @@ bool Config::initFromPersistentConfig()
         else
             Log("loadConfig load instance failed");
     }
-    if (currentInstance == 0 && sessionStage != _SYS_::type::RestoreConf)
+    if (synth.getUniqueId() == 0 && sessionStage != _SYS_::type::RestoreConf)
     {
         int currentVersion = lastXMLmajor * 10 + lastXMLminor;
         int storedVersion = MIN_CONFIG_MAJOR * 10 + MIN_CONFIG_MINOR;
@@ -509,7 +514,7 @@ bool Config::initFromPersistentConfig()
     if (success)
         loadPresetsList();
 
-    if (success && currentInstance == 0)
+    if (success && synth.getUniqueId() == 0)
     {
         // find user guide
         bool man_ok = false;
@@ -551,6 +556,7 @@ bool Config::updateConfig(int control, int value)
      * in the correct range as they otherwise couldn't have been created.
      */
 
+    buildConfigLocation();
     bool success{false};
     if (control <= CONFIG::control::XMLcompressionLevel)
     {// handling base config
@@ -610,10 +616,8 @@ bool Config::updateConfig(int control, int value)
     {// handling current session config
         const int offset = CONFIG::control::defaultStateStart;
         const int arraySize = CONFIG::control::historyLock - offset;
-        const string instance = asString(synth.getUniqueId());
 
         xmlType = TOPLEVEL::XML::Config;
-        string configFile = file::configDir() + "/yoshimi-" + instance + string(EXTEN::instance);
         int configData[arraySize]; // historyLock is handled elsewhere
         auto xml{std::make_unique<XMLwrapper>(synth, true)};
         success = xml->loadXMLfile(configFile);
@@ -714,7 +718,7 @@ bool Config::updateConfig(int control, int value)
         }
         else
         {
-            Log("loadConfig load instance config" + instance + " failed");
+            Log("loadConfig load instance config" + configFile + " failed");
         }
     }
     return success;

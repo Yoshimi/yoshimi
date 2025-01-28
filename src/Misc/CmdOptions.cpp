@@ -43,7 +43,7 @@ namespace { // constants used in the implementation
         "Copyright 2012-2013 Jeremy Jongepier and others,\n"
         "Copyright 2014-2025 Will Godfrey and others";
 
-    string stateText = "load saved state, defaults to '$HOME/" + EXTEN::config + "/yoshimi/yoshimi-0.state'";
+    string stateText = "load saved state, defaults to '$HOME/" + EXTEN::config + "/yoshimi/yoshimi-0"+EXTEN::state+"'";
 
     const argp_option OPTION_SPEC[] = {
         {"alsa-audio",        'A',  "<device>", OPTION_ARG_OPTIONAL, "use alsa audio output", 0},

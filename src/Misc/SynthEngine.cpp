@@ -1992,8 +1992,8 @@ void SynthEngine::resetAll(bool andML)
     ClearNRPNs();
     if (Runtime.loadDefaultState)
     {
-        string filename = Runtime.defaultStateName + ("-" + to_string(this->getUniqueId()));
-        if (isRegularFile(filename + ".state"))
+        string filename = Runtime.defaultSession;
+        if (isRegularFile(filename))
         {
             Runtime.stateFile = filename;
             Runtime.restoreSessionData(Runtime.stateFile);
@@ -2773,7 +2773,7 @@ bool SynthEngine::loadHistory()
     string historyname = file::localDir()  + "/recent";
     if (!isRegularFile(historyname))
     {   // recover old version
-        historyname = file::configDir() + '/' + string(YOSHIMI) + ".history";
+        historyname = file::configDir() + '/' + YOSHIMI + ".history";
         if (!isRegularFile(historyname))
         {
             Runtime.Log("Missing recent history file");
