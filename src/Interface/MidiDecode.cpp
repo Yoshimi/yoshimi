@@ -669,9 +669,9 @@ void MidiDecode::setMidiBankOrRootDir(uint bank_or_root_num, bool in_place, bool
     if (in_place)
     {
         if (!setRootDir)
-            synth->setRootBank(UNUSED, bank_or_root_num, false);
+            synth->setRootBank(UNUSED, bank_or_root_num, true);
         else
-            synth->setRootBank(bank_or_root_num, UNUSED, false);
+            synth->setRootBank(bank_or_root_num, UNUSED, true);
         return;
     }
 
@@ -729,7 +729,7 @@ void MidiDecode::setMidiProgram(uchar ch, int prg, bool in_place)
                 if (in_place)
                 {
                     synth->partonoffLock(npart, -1);
-                    synth->setProgramFromBank(putData, false);
+                    synth->setProgramFromBank(putData, true);
                 }
                 else
                 {
@@ -745,7 +745,7 @@ void MidiDecode::setMidiProgram(uchar ch, int prg, bool in_place)
         if (in_place)
         {
             synth->partonoffLock(ch, -1);
-            synth->setProgramFromBank(putData, false);
+            synth->setProgramFromBank(putData, true);
         }
         else
             synth->midilearn.writeMidi(putData, false);
