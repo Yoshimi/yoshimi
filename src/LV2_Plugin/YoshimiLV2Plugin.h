@@ -133,36 +133,36 @@ public:
     string midiClientName()  const override { return "LV2 plugin"; }
     int midiClientId()       const override { return 0; }
 
-   //static LV2 callback functions
-   static LV2_Handle instantiate (const LV2_Descriptor*, double sample_rate, const char* bundle_path, LV2_Feature const* const* features);
-   static void connect_port(LV2_Handle instance, uint32_t port, void *data_location);
-   static void activate(LV2_Handle instance);
-   static void deactivate(LV2_Handle instance);
-   static void run(LV2_Handle instance, uint32_t sample_count);
-   static void cleanup(LV2_Handle instance);
-   static const void * extension_data(const char * uri);
+    //static LV2 callback functions
+    static LV2_Handle instantiate (const LV2_Descriptor*, double sample_rate, const char* bundle_path, LV2_Feature const* const* features);
+    static void connect_port(LV2_Handle instance, uint32_t port, void *data_location);
+    static void activate(LV2_Handle instance);
+    static void deactivate(LV2_Handle instance);
+    static void run(LV2_Handle instance, uint32_t sample_count);
+    static void cleanup(LV2_Handle instance);
+    static const void * extension_data(const char * uri);
 
 
-   static LV2_State_Status callback_stateSave(LV2_Handle instance, LV2_State_Store_Function store, LV2_State_Handle handle, uint32_t flags, LV2_Feature const* const* features);
-   static LV2_State_Status callback_stateRestore(LV2_Handle instance, LV2_State_Retrieve_Function retrieve, LV2_State_Handle handle, uint32_t flags, LV2_Feature const* const* features);
+    static LV2_State_Status callback_stateSave(LV2_Handle instance, LV2_State_Store_Function store, LV2_State_Handle handle, uint32_t flags, LV2_Feature const* const* features);
+    static LV2_State_Status callback_stateRestore(LV2_Handle instance, LV2_State_Retrieve_Function retrieve, LV2_State_Handle handle, uint32_t flags, LV2_Feature const* const* features);
 
-   static const LV2_Program_Descriptor * callback_getProgram(LV2_Handle handle, uint32_t index);
-   static void callback_selectProgramNew(LV2_Handle handle, unsigned char channel, uint32_t bank, uint32_t program);
-   static void callback_selectProgram(LV2_Handle handle, uint32_t bank, uint32_t program)
-   {
-       callback_selectProgramNew(handle, 0, bank, program);
-   }
+    static const LV2_Program_Descriptor * callback_getProgram(LV2_Handle handle, uint32_t index);
+    static void callback_selectProgramNew(LV2_Handle handle, unsigned char channel, uint32_t bank, uint32_t program);
+    static void callback_selectProgram(LV2_Handle handle, uint32_t bank, uint32_t program)
+    {
+        callback_selectProgramNew(handle, 0, bank, program);
+    }
 
 private:
-   void process(uint32_t sample_count);
-   void processMidiMessage(const uint8_t* msg);
-   LV2_State_Status stateSave(LV2_State_Store_Function store, LV2_State_Handle handle, uint32_t flags, LV2_Feature const* const* features);
-   LV2_State_Status stateRestore(LV2_State_Retrieve_Function retrieve, LV2_State_Handle handle, uint32_t flags, LV2_Feature const* const* features);
+    void process(uint32_t sample_count);
+    void processMidiMessage(const uint8_t* msg);
+    LV2_State_Status stateSave(LV2_State_Store_Function store, LV2_State_Handle handle, uint32_t flags, LV2_Feature const* const* features);
+    LV2_State_Status stateRestore(LV2_State_Retrieve_Function retrieve, LV2_State_Handle handle, uint32_t flags, LV2_Feature const* const* features);
 
-   LV2_Program_Descriptor const* getProgram(uint32_t index);
-   void selectProgramNew(uchar channel, uint32_t bank, uint32_t program);
+    LV2_Program_Descriptor const* getProgram(uint32_t index);
+    void selectProgramNew(uchar channel, uint32_t bank, uint32_t program);
 
-   friend class YoshimiLV2PluginUI;
+    friend class YoshimiLV2PluginUI;
 };
 
 
