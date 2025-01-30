@@ -93,7 +93,6 @@ Config::Config(SynthEngine& synthInstance)
     , build_ID{BUILD_NUMBER}
     , lastXMLmajor{0}
     , lastXMLminor{0}
-    , stateChanged{false}
     , oldConfig{false}
     , runSynth{false}          // will be set by Instance::startUp()
     , finishedCLI{true}
@@ -436,14 +435,24 @@ bool Config::initFromPersistentConfig()
         }
     }
 
+    bool success{true};
     if (!isRegularFile(baseConfig))
     {
         Log("Basic configuration " + baseConfig + " not found, will use default settings.");
         defaultPresets();
         saveMasterConfig(); // generates a pristine "yoshimi.config"
     }
+    else
+    {
+        // load baseConfig (always from the primary file)
+        auto xml{std::make_unique<XMLwrapper>(synth, true)};
+        success = xml->loadXMLfile(baseConfig);   // note: we want correct base values even in a secondary config instance
+        if (success)
+            success = extractBaseParameters(*xml);
+        else
+            Log("loadConfig load base failed");
+    }
 
-    bool success{false};
     if (!isRegularFile(configFile))
     {
         if (0 < synth.getUniqueId())
@@ -458,19 +467,9 @@ bool Config::initFromPersistentConfig()
         saveInstanceConfig(); // generates a new "yoshimi-#.instance"
     }
     else
-    {
-        // load baseConfig (always from the primary file)
-        auto xml{std::make_unique<XMLwrapper>(synth, true)};
-        success = xml->loadXMLfile(baseConfig);   // note: we want correct base values even in a secondary config instance
-        if (success)
-            success = extractBaseParameters(*xml);
-        else
-            Log("loadConfig load base failed");
-    }
-
     if (success)
     {
-        // the instance data
+        // load instance configuration values
         auto xml{std::make_unique<XMLwrapper>(synth, true)};
         success = xml->loadXMLfile(configFile);
         if (success)
@@ -478,6 +477,7 @@ bool Config::initFromPersistentConfig()
         else
             Log("loadConfig load instance failed");
     }
+
     if (synth.getUniqueId() == 0 && sessionStage != _SYS_::type::RestoreConf)
     {
         int currentVersion = lastXMLmajor * 10 + lastXMLminor;
@@ -981,57 +981,93 @@ void Config::addConfigXML(XMLwrapper& xml)
 }
 
 
-bool Config::saveSessionData(string savefile)
+/**
+ * Extract current instance config and complete patch state from the engine,
+ * encode it as XML and write to a _state file_
+ */
+bool Config::saveSessionData(string sessionfile)
 {
-    savefile = setExtension(savefile, EXTEN::state);
+    sessionfile = setExtension(sessionfile, EXTEN::state);
     xmlType = TOPLEVEL::XML::State;
     auto xml{std::make_unique<XMLwrapper>(synth, true)};
-    bool success{false};
-    addConfigXML(*xml);
-    synth.add2XML(*xml);
-    synth.midilearn.insertMidiListData(*xml);
-    if (xml->saveXMLfile(savefile))
-    {
-        Log("Session data saved to " + savefile, _SYS_::LogNotSerious);
-        success = true;
-    }
-    else
-        Log("Failed to save session data to " + savefile, _SYS_::LogNotSerious);
 
+    capturePatchState(*xml);
+
+    bool success = xml->saveXMLfile(sessionfile);
+    if (success)
+        Log("Session data saved to " + sessionfile, _SYS_::LogNotSerious);
+    else
+        Log("Failed to save session data to " + sessionfile, _SYS_::LogNotSerious);
     return success;
 }
 
+/** Variation to extract config and patch state for LV2 */
+int Config::saveSessionData(char** dataBuffer)
+{
+    xmlType = TOPLEVEL::XML::State;
+    auto xml{std::make_unique<XMLwrapper>(synth, true)};
 
+    capturePatchState(*xml);
+
+    *dataBuffer = xml->getXMLdata();
+    return strlen(*dataBuffer) + 1;
+}
+
+void Config::capturePatchState(XMLwrapper& xml)
+{
+    addConfigXML(xml);
+    synth.add2XML(xml);
+    synth.midilearn.insertMidiListData(xml);
+}
+
+
+/**
+ * Read configuration and patch state from XML state file
+ * and overwrite config and engine settings with these values.
+ */
 bool Config::restoreSessionData(string sessionfile)
 {
-    bool success{false};
-
     if (sessionfile.size() && !isRegularFile(sessionfile))
         sessionfile = setExtension(sessionfile, EXTEN::state);
     if (!sessionfile.size() || !isRegularFile(sessionfile))
-    {
         Log("Session file " + sessionfile + " not available", _SYS_::LogNotSerious);
-        return false;
-    }
-    auto xml{std::make_unique<XMLwrapper>(synth, true)};
-    if (!xml->loadXMLfile(sessionfile))
+    else
     {
-        Log("Failed to load xml file " + sessionfile, _SYS_::LogNotSerious);
-        return false;
+        auto xml{std::make_unique<XMLwrapper>(synth, true)};
+        if (!xml->loadXMLfile(sessionfile))
+            Log("Failed to load xml file " + sessionfile, _SYS_::LogNotSerious);
+        else
+            return restorePatchState(*xml);
     }
+    return false;
+}
 
+/** Variation to retrieve patch state and config from the LV2 host */
+bool Config::restoreSessionData(const char* dataBuffer, int size)
+{
+    (void)size; // currently unused
 
-    success = extractConfigData(*xml);
+    while (isspace(*dataBuffer))
+        ++dataBuffer;
+    auto xml{std::make_unique<XMLwrapper>(synth, true)};
+    if (!xml->putXMLdata(dataBuffer))
+        Log("SynthEngine: putXMLdata failed");
+    else
+        return restorePatchState(*xml);
+
+    return false;
+}
+
+bool Config::restorePatchState(XMLwrapper& xml)
+{
+    bool success = extractConfigData(xml);
     if (success)
     {
-        // mark as soon as anything changes
-        this->stateChanged = true;
-
         synth.defaults();
-        success = synth.getfromXML(*xml);
+        success = synth.getfromXML(xml);
         if (success)
             synth.setAllPartMaps();
-        bool oklearn = synth.midilearn.extractMidiListData(false, *xml);
+        bool oklearn = synth.midilearn.extractMidiListData(false, xml);
         if (oklearn)
             synth.midilearn.updateGui(MIDILEARN::control::hideGUI);
             // handles possibly undefined window

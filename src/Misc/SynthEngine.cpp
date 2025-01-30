@@ -114,7 +114,6 @@ SynthEngine::SynthEngine(uint instanceID)
     , legatoPart{0}
     , masterMono{false}
     , fileCompatible{true}
-    , usingYoshiType{false}
     // part[]
     , fadeAll{0}
     , fadeStep{0}
@@ -525,7 +524,6 @@ void SynthEngine::defaults()
     }
     masterMono = false;
     fileCompatible = true;
-    usingYoshiType = false;
 
     // System Effects init
     syseffnum = 0;
@@ -2598,7 +2596,6 @@ bool SynthEngine::loadStateAndUpdate(string const& filename)
 {
     interchange.undoRedoClear();
     Runtime.sessionStage = _SYS_::type::InProgram;
-    Runtime.stateChanged = true;
     bool success = Runtime.restoreSessionData(filename);
     if (!success)
         defaults();
@@ -3027,52 +3024,14 @@ void SynthEngine::add2XML(XMLwrapper& xml)
     xml.endbranch(); // MASTER
 }
 
-/*
- * the following two functions are only used by LV2
- */
-
-int SynthEngine::getalldata(char **data) // to state from instance
-{
-    bool oldFormat = usingYoshiType;
-    usingYoshiType = true; // make sure everything is saved
-    getRuntime().xmlType = TOPLEVEL::XML::State;
-    auto xml{std::make_unique<XMLwrapper>(*this, true)};
-    add2XML(*xml);
-    midilearn.insertMidiListData(*xml);
-    *data = xml->getXMLdata();
-    usingYoshiType = oldFormat;
-    return strlen(*data) + 1;
-}
-
-
-void SynthEngine::putalldata(const char *data, int size) // to instance from state
-{
-    while (isspace(*data))
-        ++data;
-    int a = size; size = a; // suppress warning (may be used later)
-    auto xml{std::make_unique<XMLwrapper>(*this, true)};
-    if (!xml->putXMLdata(data))
-    {
-        Runtime.Log("SynthEngine: putXMLdata failed");
-        return;
-    }
-    defaults();
-    getfromXML(*xml);
-    midilearn.extractMidiListData(false, *xml);
-    setAllPartMaps(); // TODO this seems to be a duplicate - already done in defaults()
-}
-
 
 bool SynthEngine::savePatchesXML(string filename)
 {
-    bool oldFormat = usingYoshiType;
-    usingYoshiType = true; // make sure everything is saved
     filename = setExtension(filename, EXTEN::patchset);
     Runtime.xmlType = TOPLEVEL::XML::Patch;
     auto xml{std::make_unique<XMLwrapper>(*this, true)};
     add2XML(*xml);
     bool succes = xml->saveXMLfile(filename);
-    usingYoshiType = oldFormat;
     return succes;
 }
 
