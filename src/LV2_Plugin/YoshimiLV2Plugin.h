@@ -87,6 +87,17 @@ private:
     };
 
     struct LV2Bank : LV2_Program_Descriptor{
+        LV2Bank() = default;
+        LV2Bank(LV2Bank &&orig)
+            : LV2_Program_Descriptor(std::move(orig)) {
+            display = std::move(orig.display);
+            name = display.c_str();
+        }
+        LV2Bank(const LV2Bank &orig)
+            : LV2_Program_Descriptor(orig) {
+            display = orig.display;
+            name = display.c_str();
+        }
         string display;
     };
     std::vector<LV2Bank> flatbankprgs;
