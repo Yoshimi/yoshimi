@@ -584,7 +584,7 @@ LV2_Program_Descriptor const * YoshimiLV2Plugin::getProgram(uint32_t index)
                         entry.program = instrumentID;
                         entry.display = bank.dirname + " -> " + instrument.name;
                         entry.name    = entry.display.c_str();
-                        flatbankprgs.push_back(entry);
+                        flatbankprgs.push_back(std::move(entry));
                     }
     }
     return index < flatbankprgs.size()? &flatbankprgs [index]
