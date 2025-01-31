@@ -585,6 +585,7 @@ namespace MAIN // usage MAIN::control::volume
         deleteBank,
 
         loadInstrumentFromBank = 76,
+        refreshInstrumentUI,
         loadInstrumentByName,
         saveNamedInstrument,
         loadNamedPatchset,

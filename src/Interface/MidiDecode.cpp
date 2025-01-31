@@ -706,9 +706,18 @@ void MidiDecode::setMidiProgram(uchar ch, int prg, bool in_place)
     memset(&putData, 0xff, sizeof(putData));
     putData.data.value = prg;
     putData.data.type = TOPLEVEL::type::Write | TOPLEVEL::type::Integer;
-    putData.data.source = TOPLEVEL::action::toAll;
-    putData.data.control = MIDI::control::instrument;
-    putData.data.part = TOPLEVEL::section::midiIn;
+    if (in_place)
+    {
+        putData.data.source = TOPLEVEL::action::lowPrio;
+        putData.data.control = MAIN::control::refreshInstrumentUI;
+        putData.data.part = TOPLEVEL::section::main;
+    }
+    else
+    {
+        putData.data.source = TOPLEVEL::action::toAll;
+        putData.data.control = MIDI::control::instrument;
+        putData.data.part = TOPLEVEL::section::midiIn;
+    }
     //putData.data.parameter = 0xc0;
 
     /*
@@ -730,6 +739,7 @@ void MidiDecode::setMidiProgram(uchar ch, int prg, bool in_place)
                 {
                     synth->partonoffLock(npart, -1);
                     synth->setProgramFromBank(putData, true);
+                    synth->interchange.decodeLoopback.write(putData.bytes);
                 }
                 else
                 {
@@ -746,6 +756,7 @@ void MidiDecode::setMidiProgram(uchar ch, int prg, bool in_place)
         {
             synth->partonoffLock(ch, -1);
             synth->setProgramFromBank(putData, true);
+            synth->interchange.decodeLoopback.write(putData.bytes);
         }
         else
             synth->midilearn.writeMidi(putData, false);

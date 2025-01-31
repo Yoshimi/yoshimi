@@ -3268,6 +3268,7 @@ Alan Calvert started the project}
             break;
 
         case MAIN::control::loadInstrumentFromBank:
+        case MAIN::control::refreshInstrumentUI:
             bankui->refreshinstrumentwindow();
             updatepartprogram(kititem);
             break;
