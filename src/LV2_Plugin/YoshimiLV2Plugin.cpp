@@ -542,7 +542,7 @@ LV2_State_Status YoshimiLV2Plugin::stateSave(LV2_State_Store_Function store, LV2
     // suppress warnings - may use later
 
     char *data = NULL;
-    int sz = synth.getalldata(&data);
+    int sz = runtime().saveSessionData(&data);
 
     store(handle, _yoshimi_state_id, data, sz, _atom_string_id, LV2_STATE_IS_POD | LV2_STATE_IS_PORTABLE);
     free(data);
@@ -564,7 +564,7 @@ LV2_State_Status YoshimiLV2Plugin::stateRestore(LV2_State_Retrieve_Function retr
     const char *data = (const char *)retrieve(handle, _yoshimi_state_id, &sz, &type, &new_flags);
 
     if (sz > 0)
-        synth.putalldata(data, sz);
+        runtime().restoreSessionData(data, sz);
     return LV2_STATE_SUCCESS;
 }
 

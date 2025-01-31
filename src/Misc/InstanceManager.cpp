@@ -300,8 +300,9 @@ bool InstanceManager::Instance::startUp(PluginCreator pluginCreator)
 {
     cout << "\nStart-up Synth-Instance("<< getID() << ")..."<< endl;
     state = BOOTING;
-    runtime().loadConfig();
     bool isLV2 = bool(pluginCreator);
+    runtime().isLV2 = isLV2;
+    runtime().loadConfig();
     assert (not runtime().runSynth);
     if (isLV2)
     {

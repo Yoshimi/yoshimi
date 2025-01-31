@@ -117,9 +117,6 @@ class SynthEngine
 
         bool getfromXML(XMLwrapper& xml);
 
-        int getalldata(char **data);
-        void putalldata(const char *data, int size);
-
         void NoteOn(uchar chan, uchar note, uchar velocity);
         void NoteOff(uchar chan, uchar note);
         int RunChannelSwitch(uchar chan, int value);
@@ -164,7 +161,6 @@ class SynthEngine
 
         bool masterMono;
         bool fileCompatible;
-        bool usingYoshiType;
 
         float getLimits(CommandBlock *getData);
         float getVectorLimits(CommandBlock *getData);

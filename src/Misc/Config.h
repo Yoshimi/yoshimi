@@ -82,8 +82,10 @@ class Config
         bool saveInstanceConfig();
         void loadConfig();
         bool updateConfig(int control, int value);
-        bool saveSessionData(string savefile);
+        bool saveSessionData(string sessionfile);
+        int  saveSessionData(char** dataBuffer);
         bool restoreSessionData(string sessionfile);
+        bool restoreSessionData(const char* dataBuffer, int size);
         bool restoreJsession();
         void setJackSessionSave(int event_type, string const& session_file);
         float getConfigLimits(CommandBlock*);
@@ -106,7 +108,6 @@ class Config
         uint    build_ID;
         int     lastXMLmajor;
         int     lastXMLminor;
-        bool    stateChanged;
         bool    oldConfig;
 
         static bool        showSplash;
@@ -268,9 +269,12 @@ class Config
         pthread_t  findManual_Thread;
 
         void defaultPresets();
+        void buildConfigLocation();
         bool initFromPersistentConfig();
         bool extractBaseParameters(XMLwrapper& xml);
         bool extractConfigData(XMLwrapper& xml);
+        void capturePatchState(XMLwrapper& xml);
+        bool restorePatchState(XMLwrapper& xml);
         void addConfigXML(XMLwrapper& xml);
         void saveJackSession();
 

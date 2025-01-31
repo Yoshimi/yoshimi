@@ -719,10 +719,8 @@ class MasterUI {: {public GuiUpdates}
             break;
         case 29: // default
             {
-            string name = synth->getRuntime().defaultStateName;
-            name += ("-" + to_string(current_ID));
-            send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedState, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(name + ".state"));
-
+                string name = synth->getRuntime().defaultSession;
+                send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedState, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(name));
             }
             break;
         case 30: // recent

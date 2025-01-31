@@ -861,10 +861,8 @@ int InterChange::indirectMain(CommandBlock& cmd, uchar &newMsg, bool &guiTo, str
             if (synth.loadStateAndUpdate(text))
             {
                 text = setExtension(text, EXTEN::state);
-                string name = file::configDir() + string(YOSHIMI);
-                name += ("-" + to_string(synth.getUniqueId()));
-                name += ".state";
-                if ((text != name)) // never include default state
+                string defaultName = synth.getRuntime().defaultSession;
+                if ((text != defaultName)) // never include default state
                     synth.addHistory(text, TOPLEVEL::XML::State);
                 text = "ed " + text;
             }
@@ -878,10 +876,8 @@ int InterChange::indirectMain(CommandBlock& cmd, uchar &newMsg, bool &guiTo, str
             string filename = setExtension(text, EXTEN::state);
             if (synth.saveState(filename))
             {
-                string name = file::configDir() + string(YOSHIMI);
-                name += ("-" + to_string(synth.getUniqueId()));
-                name += ".state";
-                if ((text != name)) // never include default state
+                string defaultName = synth.getRuntime().defaultSession;
+                if ((text != defaultName)) // never include default state
                     synth.addHistory(filename, TOPLEVEL::XML::State);
                 text = "d " + text;
             }

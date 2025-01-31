@@ -1372,7 +1372,6 @@ void Part::add2XML(XMLwrapper& xml, bool subset)
 
 bool Part::saveXML(string filename, bool yoshiFormat)
 {
-    synth->usingYoshiType = yoshiFormat;
     synth->getRuntime().xmlType = TOPLEVEL::XML::Instrument;
     auto xml{std::make_unique<XMLwrapper>(*synth, yoshiFormat)};
 
