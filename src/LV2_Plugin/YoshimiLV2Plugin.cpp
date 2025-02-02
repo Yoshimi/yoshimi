@@ -626,14 +626,14 @@ void YoshimiLV2Plugin::selectProgramNew(unsigned char channel, uint32_t bank, ui
         and runtime().midi_bank_root != runtime().midi_bank_C)
     {
         short banknum = (runtime().midi_bank_root == 32) ? (bank & 127) : (bank >> 7);
-        synth.mididecode.setMidiBankOrRootDir(banknum, isFreeWheel(), true);
+        synth.mididecode.setMidiBankOrRootDir(banknum, true, true);
     }
     if (runtime().midi_bank_C != 128)
     {
         short banknum = (runtime().midi_bank_C == 0) ? (bank >> 7) : (bank & 127);
-        synth.mididecode.setMidiBankOrRootDir(banknum, isFreeWheel(), false);
+        synth.mididecode.setMidiBankOrRootDir(banknum, true, false);
     }
-    synth.mididecode.setMidiProgram(channel, program, isFreeWheel());
+    synth.mididecode.setMidiProgram(channel, program, true);
 }
 
 
