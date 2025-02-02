@@ -1,5 +1,10 @@
 yoshimi 2.3.3.2
 
+bn 2379
+2025-2-2 Will
+Display labels defined in TextLists, global.h and
+    described in Control Data
+
 2025-1-23 Will
 bn 2378
 Further work on new Display controls

@@ -1146,7 +1146,8 @@ namespace DISPLAY  // usage DISPLAY::control::hide
         show,
         xposition,
         yposition,
-        size,
+        width, // if either of these two are set,
+        height, // the other will be scaled accordingly
         Select, // theme controls from here on
         Copy,
         Rename,

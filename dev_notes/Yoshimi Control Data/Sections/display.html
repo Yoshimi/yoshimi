@@ -76,7 +76,7 @@
         <td>Window vertical position<br>0 to max height - window height</td>
       </tr>
       <tr>
-        <td>size</td>
+        <td>width</td>
         <td>~ ~</td>
         <td>4</td>
         <td>all</td>
@@ -86,25 +86,25 @@
         <td>255</td>
         <td>255</td>
         <td>255</td>
-        <td>Window size (whichever is greater)<br>max width - xposition - min window width<br>max height - yposition - min window height</td>
+        <td>Window width (will rescale height)<br>max width - xposition - min window width<br>max height - yposition - min window height</td>
       </tr>
       <tr>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td>Select</td>
+        <td>height</td>
         <td>~ ~</td>
         <td>5</td>
+        <td>all</td>
+        <td>0~15</td>
+        <td>all</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Window height (will rescale width)<br>max width - xposition - min window width<br>max height - yposition - min window height</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td></td>
+        <td></td>
         <td></td>
         <td></td>
         <td></td>
@@ -115,7 +115,7 @@
         <td></td>
       </tr>
       <tr>
-        <td>Copy</td>
+        <td>select</td>
         <td>~ ~</td>
         <td>6</td>
         <td></td>
@@ -125,10 +125,10 @@
         <td></td>
         <td></td>
         <td></td>
-        <td></td>
+        <td>Make list selection the current theme</td>
       </tr>
       <tr>
-        <td>Rename</td>
+        <td>copy</td>
         <td>~ ~</td>
         <td>7</td>
         <td></td>
@@ -138,10 +138,10 @@
         <td></td>
         <td></td>
         <td></td>
-        <td></td>
+        <td>Copy the selected them to one with a different name</td>
       </tr>
       <tr>
-        <td>Delete</td>
+        <td>rename</td>
         <td>~ ~</td>
         <td>8</td>
         <td></td>
@@ -151,10 +151,10 @@
         <td></td>
         <td></td>
         <td></td>
-        <td></td>
+        <td>Rename the selected theme</td>
       </tr>
       <tr>
-        <td>Import</td>
+        <td>delete</td>
         <td>~ ~</td>
         <td>9</td>
         <td></td>
@@ -164,10 +164,10 @@
         <td></td>
         <td></td>
         <td></td>
-        <td></td>
+        <td>remove the selected theme from the list</td>
       </tr>
       <tr>
-        <td>Export</td>
+        <td>import</td>
         <td>~ ~</td>
         <td>10</td>
         <td></td>
@@ -177,7 +177,20 @@
         <td></td>
         <td></td>
         <td></td>
+        <td>Import an external them file</td>
+      </tr>
+      <tr>
+        <td>export</td>
+        <td>~ ~</td>
+        <td>11</td>
         <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td>Export the selected theme to an external file</td>
       </tr>
     </tbody>
   </table>

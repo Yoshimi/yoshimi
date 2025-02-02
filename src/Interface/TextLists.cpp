@@ -170,6 +170,22 @@ std::string banklist [] = {
     "@end","@end"
 };
 
+std::string displaylist [] = {
+    "Hide",         "",
+    "Show",         "",
+    "Xposition",    "horizintal position in pixels",
+    "Yposition",    "vertical position in pixels",
+    "Width",        "width in pixels",
+    "HEight",       "height in pixels",
+    "SElect",       "set the selection as the theme", // theme entries
+    "Copy",         "copy the selection to one with a new name",
+    "Rename",       "change the name of the selection",
+    "Delete",       "remove the selection from the list",
+    "Import",       "import an external theme file",
+    "Export",       "export the selection to an external theme file",
+    "@end","@end"
+};
+
 std::string partlist [] = {
     "<n>",                 "select part number",
     "<ON/OFF>",            "enables/disables the part",
