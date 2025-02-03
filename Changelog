@@ -1,7 +1,12 @@
 yoshimi 2.3.3.2
 
-bn 2379
+2025-2-3 Will
+bn 2380
+Merged in LV2 updates from Kristian
+BugFix: Reports destination changes not being saved.
+
 2025-2-2 Will
+bn 2379
 Display labels defined in TextLists, global.h and
     described in Control Data
 

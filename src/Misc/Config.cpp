@@ -572,6 +572,7 @@ bool Config::updateConfig(int control, int value)
             baseData[CONFIG::control::enableGUI] = xml->getparbool("enable_gui",true);
             baseData[CONFIG::control::showSplash] = xml->getparbool("enable_splash",true);
             baseData[CONFIG::control::enableCLI] = xml->getparbool("enable_cli",true);
+            baseData[CONFIG::control::reportsDestination] = xml->getparbool("reports_destination",true);
             baseData[CONFIG::control::exposeStatus] = xml->getpar("show_cli_context",3,0,3);
             baseData[CONFIG::control::enableSinglePath] = xml->getparbool("enable_single_master",false);
             baseData[CONFIG::control::enableAutoInstance] = xml->getparbool("enable_auto_instance",false);
@@ -589,6 +590,7 @@ bool Config::updateConfig(int control, int value)
             xml->addparbool("enable_gui",baseData[CONFIG::control::enableGUI]);
             xml->addparbool("enable_splash",baseData[CONFIG::control::showSplash]);
             xml->addparbool("enable_cli",baseData[CONFIG::control::enableCLI]);
+            xml->addparbool("reports_destination",baseData[CONFIG::control::reportsDestination]);
             xml->addpar("show_cli_context",baseData[CONFIG::control::exposeStatus]);
             xml->addparbool("enable_single_master",baseData[CONFIG::control::enableSinglePath]);
             xml->addparbool("enable_auto_instance",baseData[CONFIG::control::enableAutoInstance]);
