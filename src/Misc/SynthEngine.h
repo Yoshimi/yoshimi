@@ -122,9 +122,9 @@ class SynthEngine
         int RunChannelSwitch(uchar chan, int value);
         void SetController(uchar chan, int CCtype, short int par);
         void SetZynControls(bool in_place);
-        int setRootBank(int root, int bank, bool notinplace = true);
+        int setRootBank(int root, int bank, bool inplace = false);
         int setProgramByName(CommandBlock&);
-        int setProgramFromBank(CommandBlock&, bool notinplace = true);
+        int setProgramFromBank(CommandBlock&, bool inplace = false);
         bool setProgram(string const& fname, int npart);
         int ReadBankRoot();
         int ReadBank();

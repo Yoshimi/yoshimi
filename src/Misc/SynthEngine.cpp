@@ -969,7 +969,7 @@ void SynthEngine::SetZynControls(bool in_place)
 }
 
 
-int SynthEngine::setRootBank(int root, int banknum, bool notinplace)
+int SynthEngine::setRootBank(int root, int banknum, bool inplace)
 {
     string name = "";
     int foundRoot;
@@ -996,7 +996,7 @@ int SynthEngine::setRootBank(int root, int banknum, bool notinplace)
             if (root != foundRoot)
             {
                 ok = false;
-                if (notinplace)
+                if (not inplace)
                     name = "Cant find ID " + asString(root) + ". Current root is " + name;
             }
             else
@@ -1007,7 +1007,7 @@ int SynthEngine::setRootBank(int root, int banknum, bool notinplace)
         else
         {
             ok = false;
-            if (notinplace)
+            if (not inplace)
                 name = "No match for root ID " + asString(root);
         }
     }
@@ -1016,7 +1016,7 @@ int SynthEngine::setRootBank(int root, int banknum, bool notinplace)
     {
         if (bank.setCurrentBankID(banknum))
         {
-            if (notinplace)
+            if (not inplace)
             {
                 if (root < UNUSED)
                     name = "Root " + to_string(root) + ". ";
@@ -1028,7 +1028,7 @@ int SynthEngine::setRootBank(int root, int banknum, bool notinplace)
         {
             ok = false;
             bank.setCurrentBankID(originalBank);
-            if (notinplace)
+            if (not inplace)
             {
                 name = "No bank " + asString(banknum);
                 if (root < UNUSED)
@@ -1041,7 +1041,7 @@ int SynthEngine::setRootBank(int root, int banknum, bool notinplace)
     }
 
     int msgID = NO_MSG;
-    if (notinplace)
+    if (not inplace)
         msgID = textMsgBuffer.push(name);
     if (!ok)
         msgID |= 0xFF0000;
@@ -1103,10 +1103,10 @@ int SynthEngine::setProgramByName(CommandBlock& cmd)
 }
 
 
-int SynthEngine::setProgramFromBank(CommandBlock& cmd, bool notinplace)
+int SynthEngine::setProgramFromBank(CommandBlock& cmd, bool inplace)
 {
     steady_clock::time_point startTime;
-    if (notinplace and Runtime.showTimes)
+    if (not inplace and Runtime.showTimes)
         startTime = steady_clock::now();
 
     int instrument = int(cmd.data.value);
@@ -1125,13 +1125,13 @@ int SynthEngine::setProgramFromBank(CommandBlock& cmd, bool notinplace)
     if (name < "!")
     {
         ok = false;
-        if (notinplace)
+        if (not inplace)
             name = "No instrument at " + to_string(instrument + 1) + " in this bank";
     }
     else
     {
         ok = setProgram(fname, npart);
-        if (notinplace)
+        if (not inplace)
         {
             if (not ok)
                 name = "Instrument " + name + " missing or corrupted";
@@ -1139,7 +1139,7 @@ int SynthEngine::setProgramFromBank(CommandBlock& cmd, bool notinplace)
     }
 
     int msgID = NO_MSG;
-    if (notinplace)
+    if (not inplace)
     {
         if (ok and Runtime.showTimes)
         {

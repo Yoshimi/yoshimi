@@ -571,46 +571,27 @@ LV2_State_Status YoshimiLV2Plugin::stateRestore(LV2_State_Retrieve_Function retr
 
 LV2_Program_Descriptor const * YoshimiLV2Plugin::getProgram(uint32_t index)
 {
-    if (runtime().enableProgChange and flatbankprgs.empty())
+    if (flatbankprgs.empty())
     {
-        int rootCC = runtime().midi_bank_root;
-        int bankCC = runtime().midi_bank_C;
-        // If both are set to the same CC, just ignore root.
-        if (rootCC != 128 and rootCC == bankCC)
-            rootCC = 128;
         for (auto& [rootID, root] : synth.bank.getRoots())
         {
-            if (rootCC == 128 and rootID != runtime().currentRoot)
-                continue;
             BankEntryMap const& banks{synth.bank.getBanks(rootID)};
             for (auto& [bankID,bank] : banks)
             {
-                if (bankCC == 128 and bankID != runtime().currentBank)
+                if (bankID >= 128 or bank.dirname.empty())
                     continue;
-                if (bankID < 128 and not bank.dirname.empty())
-                {
-                    for (auto& [instrumentID,instrument] : bank.instruments)
-                    {
-                        if (not instrument.name.empty())
-                        {
-                            uint32_t banknum {0};
-                            if (rootCC == 0)
-                                banknum |= rootID << 7;
-                            else if (rootCC == 32)
-                                banknum |= rootID;
-                            if (bankCC == 0)
-                                banknum |= bankID << 7;
-                            else if (bankCC == 32)
-                                banknum |= bankID;
 
-                            LV2Bank entry;
-                            entry.bank    = banknum;
-                            entry.program = instrumentID;
-                            entry.display = bank.dirname + " -> " + instrument.name;
-                            entry.name    = entry.display.c_str();
-                            flatbankprgs.push_back(std::move(entry));
-                        }
-                    }
+                for (auto& [instrumentID,instrument] : bank.instruments)
+                {
+                    if (instrument.name.empty())
+                        continue;
+
+                    LV2Bank entry;
+                    entry.bank    = (rootID << 7) | bankID;
+                    entry.program = instrumentID;
+                    entry.display = bank.dirname + " -> " + instrument.name;
+                    entry.name    = entry.display.c_str();
+                    flatbankprgs.push_back(std::move(entry));
                 }
             }
         }
@@ -622,18 +603,27 @@ LV2_Program_Descriptor const * YoshimiLV2Plugin::getProgram(uint32_t index)
 
 void YoshimiLV2Plugin::selectProgramNew(unsigned char channel, uint32_t bank, uint32_t program)
 {
-    if (runtime().midi_bank_root != 128
-        and runtime().midi_bank_root != runtime().midi_bank_C)
+    auto rootnum = bank >> 7;
+    auto banknum = bank & 127;
+
+    if (runtime().midi_bank_root != 128)
+        synth.mididecode.setMidiBankOrRootDir(rootnum, true, true);
+    else
     {
-        short banknum = (runtime().midi_bank_root == 32) ? (bank & 127) : (bank >> 7);
-        synth.mididecode.setMidiBankOrRootDir(banknum, isFreeWheel(), true);
+        if (runtime().currentRoot != rootnum)
+            return;
     }
+
     if (runtime().midi_bank_C != 128)
+        synth.mididecode.setMidiBankOrRootDir(banknum, true, false);
+    else
     {
-        short banknum = (runtime().midi_bank_C == 0) ? (bank >> 7) : (bank & 127);
-        synth.mididecode.setMidiBankOrRootDir(banknum, isFreeWheel(), false);
+        if (runtime().currentBank != banknum)
+            return;
     }
-    synth.mididecode.setMidiProgram(channel, program, isFreeWheel());
+
+    if (runtime().enableProgChange)
+        synth.mididecode.setMidiProgram(channel, program, true);
 }
 
 
