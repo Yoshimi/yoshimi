@@ -612,7 +612,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
                             alert(synth, "In use for " + name);
                         }
                         send_data(0, CONFIG::control::bankRootCC, candidate, TOPLEVEL::type::Integer);}
-            tooltip {CC0 = msb, CC32 = lsb. If using LV2, the plugin needs to be reloaded in order to reflect the change in the MIDI program list.} xywh {234 57 53 18} down_box BORDER_BOX labelsize 12 labelcolor 64 align 132 textfont 1 textsize 12 textcolor 64
+            tooltip {CC0 = msb, CC32 = lsb} xywh {234 57 53 18} down_box BORDER_BOX labelsize 12 labelcolor 64 align 132 textfont 1 textsize 12 textcolor 64
             code0 {o->add("LSB");o->add("MSB");o->add("Off");}
             code1 {int bankRoot = synth->getRuntime().midi_bank_root;}
             code2 {if (bankRoot == 32) o->value(0); else if (bankRoot == 0) o->value(1); else o->value(2);}
@@ -654,7 +654,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
                             alert(synth, "In use for " + name);
                         }
                         send_data(0, CONFIG::control::bankCC, candidate, TOPLEVEL::type::Integer);}
-            tooltip {CC0 = msb, CC32 = lsb. If using LV2, the plugin needs to be reloaded in order to reflect the change in the MIDI program list.} xywh {235 80 53 18} down_box BORDER_BOX labelsize 12 labelcolor 64 align 132 textfont 1 textsize 12 textcolor 64
+            tooltip {CC0 = msb, CC32 = lsb} xywh {235 80 53 18} down_box BORDER_BOX labelsize 12 labelcolor 64 align 132 textfont 1 textsize 12 textcolor 64
             code0 {o->add("LSB");o->add("MSB");o->add("Off");}
             code1 {if (synth->getRuntime().midi_bank_C == 32) o->value(0); else if (synth->getRuntime().midi_bank_C == 0) o->value(1); else o->value(2);}
             code2 {oldBank = o->value();}
@@ -663,7 +663,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
             label {Enable Program Change}
             callback {//
                         send_data(0, CONFIG::control::enableProgramChange, o->value(), TOPLEVEL::type::Integer);}
-            tooltip {MIDI program change enable/disable. If using LV2, the plugin needs to be reloaded in order to reflect the change in the MIDI program list.} xywh {234 110 18 18} down_box DOWN_BOX value 1 selection_color 64 labelsize 12 labelcolor 64 align 4
+            tooltip {MIDI program change enable/disable.} xywh {234 110 18 18} down_box DOWN_BOX value 1 selection_color 64 labelsize 12 labelcolor 64 align 4
             code0 {o->value(synth->getRuntime().enableProgChange);}
             class Fl_Check_Button2
           }
