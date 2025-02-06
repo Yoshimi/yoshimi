@@ -77,13 +77,13 @@ This would corrupt the colour map.
 118,159,118, Resonance graph line
 255,255,30, Yoshimi instrument type
 10,10,10, Instrument info background
-255,9,25, RESERVED
+255,9,25, Instrument background
 128,128,128, AddVoice tab off
 0,80,50, AddSynth background
 96,32,112, External voice
 112,64,32, External oscillator
 141,80,80, SubSynth background
-20,20,20, PadSynth background
+20,20,120, PadSynth background
 10,10,10, Padsynth harmonics background
 30,30,30, PadSynth profile equivalent background
 75,75,75, Padsynth profile grid
