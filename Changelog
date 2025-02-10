@@ -1,5 +1,9 @@
 yoshimi 2.3.3.2
 
+2025-2-7 Will
+bn 2381
+BugFix: Cmake failing on Suse building.
+
 2025-2-3 Will
 bn 2380
 Merged in LV2 updates from Kristian
