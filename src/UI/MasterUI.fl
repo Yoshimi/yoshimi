@@ -522,9 +522,9 @@ class MasterUI {: {public GuiUpdates}
 
                 synth->signalGuiWindowClosed();
             }}
-      xywh {123 76 385 500} type Double labelfont 13 labelsize 12 hide resizable
+      xywh {9 24 385 500} type Double labelfont 13 labelsize 12 resizable
       code0 {mainDW = 385; mainDH = 470;}
-      code1 {masterwindow->size_range(394, 500, 0, 0, 0, 0, 1);}
+      code1 {masterwindow->size_range(394, 500, 0, 0, 0, 0, 1);} visible
     } {
       Fl_Box keyHandle {
         label keyhandler
@@ -771,7 +771,7 @@ class MasterUI {: {public GuiUpdates}
             }
             break;
       }}
-        xywh {-7 0 395 25} labelsize 12 labelcolor 64 textsize 12 textcolor 64
+        tooltip {Click to open menus} xywh {-7 0 395 25} labelsize 12 labelcolor 64 textsize 12 textcolor 64
         code0 {//
         o->add("&Yoshimi  /&About...");
         o->add("&Yoshimi  /&New Instance");

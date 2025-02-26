@@ -1836,7 +1836,10 @@ void InterChange::resolveReplies(CommandBlock& cmd)
     }
 
     if (source != TOPLEVEL::action::fromMIDI && !setUndo)
+    {
+        //synth.getRuntime().Log(resolveAll(synth, cmd, _SYS_::LogNotSerious) + ": Ctl " + to_string(int(cmd.data.control)));
         synth.getRuntime().Log(resolveAll(synth, cmd, _SYS_::LogNotSerious));
+    }
 
     if (source == TOPLEVEL::action::fromCLI)
         synth.getRuntime().finishedCLI = true;

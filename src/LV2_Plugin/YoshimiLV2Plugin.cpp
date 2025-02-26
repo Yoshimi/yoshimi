@@ -290,6 +290,13 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
 
 void YoshimiLV2Plugin::processMidiMessage(const uint8_t * msg)
 {
+    /*if ((msg[0] & 0xf0) == 0xC0)
+    {
+        int chan = (msg[0] & 15);
+        int prog = msg[1];
+        std::cout << "ProgMsg " << int(prog) << "  Chan " << int(chan) << std::endl;
+    }*/
+
     bool in_place = isFreeWheel();
     handleMidi(msg[0], msg[1], msg[2], in_place);
 }
@@ -623,7 +630,10 @@ void YoshimiLV2Plugin::selectProgramNew(unsigned char channel, uint32_t bank, ui
     }
 
     if (runtime().enableProgChange)
+    {
+        //std::cout << "Prog " << int(program) << "  Chan " << int(channel) << std::endl;
         synth.mididecode.setMidiProgram(channel, program, true);
+    }
 }
 
 
