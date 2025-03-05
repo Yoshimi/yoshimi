@@ -78,6 +78,7 @@ Part::Part(uchar id, Microtonal* microtonal_, fft::Calc& fft_, SynthEngine& _syn
     oldVolumeState{-1},
     oldVolumeAdjust{-1},
     oldModulationState{-1},
+    omniByCC{false},
     synth(&_synth)
 {
 
@@ -168,6 +169,7 @@ void Part::defaults(int npart)
     defaultsinstrument();
     ctl->resetall();
     Prcvchn = npart % NUM_MIDI_CHANNELS;
+    Pomni = false;
     setNoteMap(0);
 }
 
@@ -1338,6 +1340,7 @@ void Part::add2XML(XMLwrapper& xml, bool subset)
         xml.addpar("max_key", Pmaxkey);
         xml.addpar("key_shift", Pkeyshift);
         xml.addpar("rcv_chn", Prcvchn);
+        xml.addparbool("omni", Pomni);
 
         xml.addpar("velocity_sensing", Pvelsns);
         xml.addpar("velocity_offset", Pveloffs);
@@ -1586,6 +1589,7 @@ void Part::getfromXML(XMLwrapper& xml)
     Pkeyshift = xml.getpar("key_shift", Pkeyshift, MIN_KEY_SHIFT + 64, MAX_KEY_SHIFT + 64);
 
     Prcvchn = xml.getpar127("rcv_chn", Prcvchn);
+    Pomni = xml.getparbool("omni", Pomni);
 
     Pvelsns = xml.getpar127("velocity_sensing", Pvelsns);
     Pveloffs = xml.getpar127("velocity_offset", Pveloffs);
@@ -1702,6 +1706,12 @@ float Part::getLimits(CommandBlock *getData)
              * 16 - 31 note off only
              * 32 - 47 disabled
              */
+            break;
+
+        case PART::control::omni:
+            min = 0;
+            def = 0;
+            max = 1;
             break;
 
         case PART::control::channelATset:

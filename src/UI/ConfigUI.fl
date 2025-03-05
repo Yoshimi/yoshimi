@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0308
+version 1.0304
 header_name {.h}
 code_name {.cpp}
 decl {\#include <cmath>} {public local
@@ -26,7 +26,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include <iostream>} {public local
@@ -66,19 +66,22 @@ decl {\#include "Misc/TextMsgBuffer.h"
     }} {private local
 }
 
-class ConfigUI {} {
-  Function {isLV2()} {return_type bool} {
-      code { return synth->getRuntime().isLV2; } {}
+class ConfigUI {open
+} {
+  Function {isLV2()} {return_type bool
+  } {
+    code {return synth->getRuntime().isLV2;} {}
   }
-  Function {make_window()} {} {
+  Function {make_window()} {open
+  } {
     Fl_Window configwindow {
       label {Yoshimi Settings}
-      callback {close->do_callback();}
-      xywh {905 61 390 330} type Double hide resizable
+      callback {close->do_callback();} open
+      xywh {905 61 390 330} type Double resizable
       code0 {o->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("Settings"), UNUSED, TOPLEVEL::windowTitle)).c_str());}
       code1 {if (isLV2()){jackTab->deactivate();alsaTab->deactivate();}}
       code2 {confDW = o->w();confDH = o->h();}
-      code3 {o->size_range(confDW, confDH, 0, 0, 0, 0, 1);}
+      code3 {o->size_range(confDW, confDH, 0, 0, 0, 0, 1);} visible
     } {
       Fl_Button Tab1 {
         label {&Main Settings}
@@ -178,7 +181,7 @@ fillThemes();
 ;}
         xywh {305 5 58 22} box THIN_UP_FRAME selection_color 47 labelsize 12 labelcolor 64
       }
-      Fl_Group configTabs {
+      Fl_Group configTabs {open
         xywh {5 5 385 298} labelcolor 64
       } {
         Fl_Group mainTab {
@@ -571,7 +574,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
                         {
                             BankRoot->value(BankRootvalue);
                             BankRoot->activate();
-                        }*/}
+                        }*/} open
           tooltip {MIDI CC preferences} xywh {5 25 382 277} box THIN_UP_BOX labelsize 12 hide
           code0 {EPCvalue = synth->getRuntime().midi_upper_voice_C;}
           code1 {BankRootvalue = synth->getRuntime().midi_bank_root;}
@@ -671,7 +674,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
             label {Extended Program Change CC}
             callback {//
                         Epend->show();}
-            xywh {235 180 50 18} labelsize 12 labelcolor 64 minimum 0 maximum 119 value 110 textfont 1 textsize 12 textcolor 64
+            xywh {235 150 50 18} labelsize 12 labelcolor 64 minimum 0 maximum 119 value 110 textfont 1 textsize 12 textcolor 64
             code0 {EPCvalue = synth->getRuntime().midi_upper_voice_C;}
             code1 {if (EPCvalue < 128) o->value(EPCvalue); else o->value(110);}
             class WidgetSpinner
@@ -699,7 +702,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
                         EPCvalue = candidate;
                         o->hide();
                         send_data(0, CONFIG::control::extendedProgramChangeCC, EPCvalue, TOPLEVEL::type::Integer);}
-            tooltip {Click to set} xywh {300 180 70 20} box PLASTIC_UP_BOX color 90 labelsize 12 labelcolor 64 hide
+            tooltip {Click to set} xywh {300 150 70 20} box PLASTIC_UP_BOX color 90 labelsize 12 labelcolor 64 hide
           }
           Fl_Check_Button Epcheck {
             label {Enable Extended Program Change}
@@ -718,10 +721,18 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
                             EPCspinner->value(110);
                             EPCvalue = 128;
                         }
-                        EPCspinner->redraw();}
-            xywh {234 160 18 18} down_box DOWN_BOX selection_color 64 labelsize 12 labelcolor 64 align 4
+                        EPCspinner->redraw();} selected
+            xywh {234 130 18 18} down_box DOWN_BOX selection_color 64 labelsize 12 labelcolor 64 align 4
             code0 {o->value((synth->getRuntime().midi_upper_voice_C < 128));}
             code1 {if (o->value() == 0) EPCspinner->deactivate();}
+            class Fl_Check_Button2
+          }
+          Fl_Check_Button enableOmniChange {
+            label {Enable Omni Mode Change}
+            callback {//
+                        send_data(0, CONFIG::control::enableOmni, o->value(), TOPLEVEL::type::Integer);}
+            tooltip {Enable receipt of Omni Mode change messages on CC 124 (Off) and CC 125 (On).} xywh {234 180 18 18} down_box DOWN_BOX selection_color 64 labelsize 12 labelcolor 64 align 4
+            code0 {o->value(synth->getRuntime().enableOmni);}
             class Fl_Check_Button2
           }
           Fl_Check_Button enableNRPN {
@@ -900,7 +911,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
                 synth->getGuiMaster()->themeTrigger = true;
                 ;}
             xywh {256 250 102 20} down_box DOWN_BOX selection_color 64 labelsize 12 labelcolor 64
-                code0 {o->value(0);}
+            code0 {o->value(0);}
           }
         }
         Fl_Box patch1 {
@@ -934,7 +945,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
     Fl_Window presets {
       label Presets
       callback {pClose->do_callback();}
-      xywh {5 437 460 270} type Double hide resizable
+      xywh {6 437 460 270} type Double hide resizable
       code0 {o->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("Presets"), UNUSED, TOPLEVEL::windowTitle)).c_str());}
       code1 {preDW = o->w();preDH = o->h();}
       code2 {o->size_range(preDW, preDH, 0, 0, 0, 0, 1);}
@@ -1226,6 +1237,9 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
                     break;
                 case CONFIG::control::showLearnEditor:
                     midiLearned->value(value_bool);
+                    break;
+                case CONFIG::control::enableOmni:
+                    enableOmniChange->value(value_bool);
                     break;
                 case CONFIG::control::enableNRPNs:
                     enableNRPN->value(value_bool);
@@ -2033,6 +2047,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
                         Epcheck->value(1);
                     }
                     Epend->hide();
+                    enableOmniChange->value(synth->getRuntime().enableOmni);
                     enableNRPN->value(synth->getRuntime().enable_NRPN);
                     ignoreReset->value(synth->getRuntime().ignoreResetCCs);
                     midiMon->value(synth->getRuntime().monitorCCin);
@@ -2198,6 +2213,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
         EPCspinner->textsize(size);
     Epend->labelsize(size);
     Epcheck->labelsize(size);
+    enableOmniChange->labelsize(size);
     enableNRPN->labelsize(size);
     ignoreReset->labelsize(size);
     midiMon->labelsize(size);

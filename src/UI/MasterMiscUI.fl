@@ -566,6 +566,7 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
       int tmp = o->value() & 0xf;
       o->textcolor(gen_text);
 
+      // TODO Mixer?
       send_data(TOPLEVEL::action::forceUpdate, PART::control::midiChannel, tmp, TOPLEVEL::type::Integer);}
           tooltip {receive from MIDI channel} xywh {8 210 50 15} down_box BORDER_BOX selection_color 64 labelsize 10 labelcolor 64 align 5 textfont 9 textsize 10 textcolor 64
           code0 {for (int i = 0; i < NUM_MIDI_CHANNELS; i++)
