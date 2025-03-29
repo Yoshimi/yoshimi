@@ -183,7 +183,6 @@ class InterChange : private DataText
         CommandBlock lastEntry;
         CommandBlock undoMarker;
         bool undoLoopBack;
-        void manageDisplay(CommandBlock& cmd);
         bool setUndo;
         bool setRedo;
         bool undoStart;
