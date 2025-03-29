@@ -2020,11 +2020,11 @@ void InterChange::returns(CommandBlock& cmd)
     if (npart == TOPLEVEL::section::display)
     {
         /*
-         * This will write directly into toGUI where the value in 'offset' will be
-         * used as the section number in place of 'display' so the correct section
-         * is identified for opening, closing, resizing etc.
+         * This will write directly into toGUI
          */
-        manageDisplay(cmd);
+#ifdef GUI_FLTK
+            toGUI.write(cmd.bytes);
+#endif
         return;
     }
 #endif
@@ -7615,34 +7615,6 @@ void InterChange::undoLast(CommandBlock& candidate)
         setRedo = false;
         source->pop_back();
     }
-}
-
-
-void InterChange::manageDisplay(CommandBlock& cmd)
-{
-    if (!synth.getRuntime().showGui)
-    {
-        synth.getRuntime().Log("Graphic display not enabled");
-        return;
-    }
-    int section = cmd.data.offset;
-    synth.CBtest(&cmd);
-    synth.getRuntime().Log("Found display control (in progress)");
-    if (section <= TOPLEVEL::section::part64)
-    {
-        if (!synth.partonoffRead(section))
-            synth.getRuntime().Log("Current part disabled");
-        else
-        {
-            synth.getRuntime().Log("Seen part "+to_string(section));
-        }
-
-    }
-    else
-    {
-        synth.getRuntime().Log("Unrecognised section");
-    }
-    return;
 }
 
 

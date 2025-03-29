@@ -264,8 +264,14 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
         else if (npart == TOPLEVEL::section::main)
         {// Global refresh when SynthEngine becomes ready
             synth->getGuiMaster()->refreshInit();
-    }   }
+        }
+    }
 
+    if (npart == TOPLEVEL::section::display)
+    {
+        synth->getRuntime().Log("Found display control GUI link");
+        return;
+    }
     if (control == TOPLEVEL::control::copyPaste)
     {
         if (getData->data.type == TOPLEVEL::type::Adjust)
