@@ -93,6 +93,7 @@ class CmdInterpreter
         string historySelect(int listnum, size_t selection);
         void historyList(int listnum);
         void listCurrentParts(Parser& input, list<string>& msg_buf);
+        void manageDisplay(Parser& input);
         int effectsList(Parser& input, bool presets = false);
         int effects(Parser& input, unsigned char controlType);
         int midiControllers(Parser& input, unsigned char controlType);

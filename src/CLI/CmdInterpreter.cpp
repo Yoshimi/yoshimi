@@ -2600,6 +2600,13 @@ int CmdInterpreter::commandList(Parser& input)
 }
 
 
+void CmdInterpreter::manageDisplay(Parser& input)
+{
+    std::cout << "got here" << std::endl;
+    return;
+}
+
+
 void CmdInterpreter::listCurrentParts(Parser& input, list<string>& msg_buf)
 {
     int dest;
@@ -6561,6 +6568,12 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
         }
         if (input.isAtEnd())
             return Reply::DONE;
+
+        if (bitFindHigh(context) < LEVEL::Part)
+        {
+            context = 0; // return to top level
+            return Reply::DONE;
+        }
     }
 
     if (helpList(input, context))
@@ -7166,6 +7179,12 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
             return sendNormal(synth, 0, 0, TOPLEVEL::type::Write,  MAIN::control::undo, TOPLEVEL::section::undoMark);
     if (input.matchnMove(3, "redo"))
         return sendNormal(synth, 0, 0, TOPLEVEL::type::Write, MAIN::control::redo, TOPLEVEL::section::undoMark);
+
+    if (input.matchnMove(3, "display"))
+    {
+        manageDisplay(input);
+        return Reply::DONE;
+    }
 
     if (input.matchnMove(2, "zread"))
     {
