@@ -159,6 +159,7 @@ Config::Config(SynthEngine& synthInstance)
     , midi_bank_root{0}        // 128 is used as 'disabled'
     , midi_bank_C{32}          // 128 is used as 'disabled'
     , midi_upper_voice_C{128}  // disabled
+    , enableOmni{true}
     , enable_NRPN{true}
     , ignoreResetCCs{false}
     , monitorCCin{false}
@@ -304,6 +305,7 @@ void Config::populateFromPrimary()
     midi_bank_root      = primary.midi_bank_root;
     midi_bank_C         = primary.midi_bank_C;
     midi_upper_voice_C  = primary.midi_upper_voice_C;
+    enableOmni          = primary.enableOmni;
     enable_NRPN         = primary.enable_NRPN;
     ignoreResetCCs      = primary.ignoreResetCCs;
     monitorCCin         = primary.monitorCCin;
@@ -660,6 +662,7 @@ bool Config::updateConfig(int control, int value)
             configData[CONFIG::control::ignoreResetAllCCs - offset] = xml->getpar("ignore_reset_all_CCs",0,0, 1);
             configData[CONFIG::control::logIncomingCCs - offset] = xml->getparbool("monitor-incoming_CCs", monitorCCin);
             configData[CONFIG::control::showLearnEditor - offset] = xml->getparbool("open_editor_on_learned_CC", showLearnedCC);
+            configData[CONFIG::control::enableOmni - offset] = xml->getparbool("enable_omni_change", enableOmni);
             configData[CONFIG::control::enableNRPNs - offset] = xml->getparbool("enable_incoming_NRPNs", enable_NRPN);
             //configData[CONFIG::control::saveCurrentConfig - offset] = // return string (dummy)
 
@@ -703,6 +706,7 @@ bool Config::updateConfig(int control, int value)
                 xml->addpar("midi_upper_voice_C", configData[CONFIG::control::extendedProgramChangeCC - offset]);
                 xml->addpar("ignore_program_change", (1 - configData[CONFIG::control::enableProgramChange - offset]));
                 xml->addpar("enable_part_on_voice_load", 1); // for backward compatibility
+                xml->addparbool("enable_omni_change", configData[CONFIG::control::enableOmni - offset]);
                 xml->addparbool("enable_incoming_NRPNs", configData[CONFIG::control::enableNRPNs - offset]);
                 xml->addpar("ignore_reset_all_CCs",configData[CONFIG::control::ignoreResetAllCCs - offset]);
                 xml->addparbool("monitor-incoming_CCs", configData[CONFIG::control::logIncomingCCs - offset]);
@@ -890,6 +894,7 @@ bool Config::extractConfigData(XMLwrapper& xml)
         midi_upper_voice_C = xml.getpar("midi_upper_voice_C", midi_upper_voice_C, 0, 128);
         enableProgChange = 1 - xml.getpar("ignore_program_change", enableProgChange, 0, 1); // inverted for Zyn compatibility
         instrumentFormat = xml.getpar("saved_instrument_format",instrumentFormat, 1, 3);
+        enableOmni = xml.getparbool("enable_omni_change", enableOmni);
         enable_NRPN = xml.getparbool("enable_incoming_NRPNs", enable_NRPN);
         ignoreResetCCs = xml.getpar("ignore_reset_all_CCs",ignoreResetCCs,0, 1);
         monitorCCin = xml.getparbool("monitor-incoming_CCs", monitorCCin);
@@ -973,6 +978,7 @@ void Config::addConfigXML(XMLwrapper& xml)
     xml.addpar("midi_upper_voice_C", midi_upper_voice_C);
     xml.addpar("ignore_program_change", (1 - enableProgChange));
     xml.addpar("enable_part_on_voice_load", 1); // for backward compatibility
+    xml.addparbool("enable_omni_change", enableOmni);
     xml.addparbool("enable_incoming_NRPNs", enable_NRPN);
     xml.addpar("ignore_reset_all_CCs",ignoreResetCCs);
     xml.addparbool("monitor-incoming_CCs", monitorCCin);
@@ -1669,6 +1675,8 @@ float Config::getConfigLimits(CommandBlock* getData)
             break;
         case CONFIG::control::showLearnEditor:
             def = 1;
+            break;
+        case CONFIG::control::enableOmni:
             break;
         case CONFIG::control::enableNRPNs:
             def = 1;
