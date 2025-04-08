@@ -150,7 +150,7 @@ std::string configlist [] = {
     "PRogram [s]",         "program change (ON, {other})",
     "EXTended [n]",        "CC value for extended program change >= 120 is off",
     "Quiet [s]",           "ignore 'reset all controllers' (ON, {other})",
-    "OMni [s]",            "enable omni mode change (OFF, {other})",
+    "OMni [s]",            "enable omni mode change (ON, {other})",
     "Nrpn [s]",            "incoming NRPN (ON, {other})",
     "Log [s]",             "incoming MIDI CCs (ON, {other})",
     "SHow [s]",            "GUI MIDI learn editor (ON, {other})",
