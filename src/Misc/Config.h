@@ -198,6 +198,7 @@ class Config
         int   midi_bank_root;
         int   midi_bank_C;
         int   midi_upper_voice_C;
+        bool  enableOmni;
         bool  enable_NRPN;
         bool  ignoreResetCCs;
         bool  monitorCCin;
