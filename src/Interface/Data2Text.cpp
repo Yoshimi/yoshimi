@@ -1502,6 +1502,7 @@ string DataText::resolvePart(CommandBlock& cmd, bool addValue)
             break;
         case PART::control::omni:
             contstr = "Omni Mode";
+            yesno = true;
             break;
         case PART::control::keyMode:
             showValue = false;
