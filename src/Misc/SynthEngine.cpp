@@ -681,7 +681,7 @@ void SynthEngine::NoteOn(uchar chan, uchar note, uchar velocity)
 #endif
     for (uint npart = 0; npart < Runtime.numAvailableParts; ++npart)
     {
-        if (chan == part[npart]->Prcvchn)
+        if (chan == part[npart]->Prcvchn or part[npart]->isOmni())
         {
             if (partonoffRead(npart))
                 part[npart]->NoteOn(note, velocity);
@@ -710,7 +710,7 @@ void SynthEngine::NoteOff(uchar chan, uchar note)
     for (uint npart = 0; npart < Runtime.numAvailableParts; ++npart)
     {
         // mask values 16 - 31 to still allow a note off
-        if (chan == (part[npart]->Prcvchn & 0xef) && partonoffRead(npart))
+        if ((chan == (part[npart]->Prcvchn & 0xef) or part[npart]->isOmni()) and partonoffRead(npart))
             part[npart]->NoteOff(note);
     }
 }
@@ -835,6 +835,14 @@ int SynthEngine::RunChannelSwitch(uchar chan, int value)
 }
 
 
+static inline bool isOmniCC(uchar CCtype)
+{
+    // This works specifically for omni messages 124 and 125 by exploiting that
+    // they differ only in the last bit.
+    static_assert(MIDI::CC::omniOff == 124 and MIDI::CC::omniOn == 125);
+    return (CCtype & 126) == 124;
+}
+
 // Controllers
 void SynthEngine::SetController(uchar chan, int CCtype, short int par)
 {
@@ -878,8 +886,12 @@ void SynthEngine::SetController(uchar chan, int CCtype, short int par)
 
 
     for (int npart = minPart; npart < maxPart; ++ npart)
-    {   // Send the controller to all enabled parts assigned to the channel
-        if (part[npart]->Prcvchn == chan && part[npart]->Penabled == 1)
+    {
+        // Send the controller to all enabled parts assigned to the channel, or
+        // that have omni enabled. If the message is itself an omni message, it
+        // only goes to the former.
+        if ((part[npart]->Prcvchn == chan or (part[npart]->isOmni() and
+            not isOmniCC(CCtype))) and part[npart]->Penabled == 1)
         {
             if (CCtype == part[npart]->PbreathControl) // breath
             {
@@ -1185,7 +1197,7 @@ int SynthEngine::ReadBank()
 
 
 // Set part's channel number
-void SynthEngine::SetPartChan(uchar npart, uchar nchan)
+void SynthEngine::SetPartChanForVector(uchar npart, uchar nchan)
 {
     if (npart < Runtime.numAvailableParts)
     {
@@ -1197,6 +1209,8 @@ void SynthEngine::SetPartChan(uchar npart, uchar nchan)
          * as will using the GUI controls.
          */
         part[npart]->Prcvchn =  nchan;
+        // Disable Omni by default for newly initialized Vectors.
+        part[npart]->Pomni = false;
     }
 }
 
@@ -1623,7 +1637,7 @@ int SynthEngine::SetSystemValue(int type, int value)
 
                 for (uint i = 0; i < Runtime.numAvailableParts; ++ i)
                 {
-                    if (partonoffRead(i) && part[i]->Prcvchn == (type - 64))
+                    if (partonoffRead(i) and (part[i]->Prcvchn == (type - 64) or part[i]->isOmni()))
                     {
                         putData.data.part = i;
                         int tries = 0;
@@ -1857,8 +1871,8 @@ void SynthEngine::vectorSet(int dHigh, uchar chan, int par)
                 Runtime.Log("Vector control enabled");
                 // enabling is only done with a valid X CC
             }
-            SetPartChan(chan, chan);
-            SetPartChan(chan | 16, chan);
+            SetPartChanForVector(chan, chan);
+            SetPartChanForVector(chan | 16, chan);
             Runtime.vectordata.Xcc2[chan] = MIDI::CC::panning;
             Runtime.vectordata.Xcc4[chan] = MIDI::CC::filterCutoff;
             Runtime.vectordata.Xcc8[chan] = MIDI::CC::modulation;
@@ -1869,8 +1883,8 @@ void SynthEngine::vectorSet(int dHigh, uchar chan, int par)
                 Runtime.Log("Vector X axis must be set before Y");
             else
             {
-                SetPartChan(chan | 32, chan);
-                SetPartChan(chan | 48, chan);
+                SetPartChanForVector(chan | 32, chan);
+                SetPartChanForVector(chan | 48, chan);
                 Runtime.vectordata.Yaxis[chan] = par;
                 Runtime.vectordata.Ycc2[chan] = MIDI::CC::panning;
                 Runtime.vectordata.Ycc4[chan] = MIDI::CC::filterCutoff;

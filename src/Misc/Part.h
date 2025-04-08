@@ -56,6 +56,13 @@ class Part
     public:
         enum NoteStatus { KEY_OFF, KEY_PLAYING, KEY_RELEASED_AND_SUSTAINED, KEY_RELEASED };
 
+        enum class Omni
+        {
+            NotSet,
+            Enabled,
+            Disabled,
+        };
+
        ~Part();
         Part(uchar id, Microtonal*, fft::Calc&, SynthEngine&);
 
@@ -83,6 +90,11 @@ class Part
         void ReleaseSustainedKeys();
         void ReleaseAllKeys();
         void ComputePartSmps();
+        void resetOmniCC() { omniByCC = Omni::NotSet; }
+        bool isOmni()
+        {
+            return omniByCC == Omni::Enabled or (omniByCC == Omni::NotSet and Pomni);
+        }
 
         bool saveXML(string filename, bool yoshiFormat); // result true for load ok, otherwise false
         int  loadXMLinstrument(string filename);
@@ -131,6 +143,7 @@ class Part
         uchar  Pmaxkey;
         uchar  Pkeyshift;
         uchar  Prcvchn;
+        bool   Pomni;
         uchar  Pvelsns;        // velocity sensing (amplitude velocity scale)
         uchar  Pveloffs;       // velocity offset
         uchar  Pkitmode;       // Part uses kit mode: 0 == off, 1 == on, 2 == "Single": only first applicable kit item can play
@@ -237,6 +250,8 @@ class Part
                            // is used in conjunction with the list to store the velocity value of a given note
                            // (the list only store note values). For example:
                            // 'monoNote[note].velocity' would be the velocity value of the note 'note'.
+
+        Omni omniByCC;
 
         SynthEngine* synth;
 };

@@ -192,6 +192,11 @@ void MidiDecode::setMidiController(uchar ch, int ctrl, int param, bool in_place,
 */
     }
 
+    if ((ctrl == MIDI::CC::omniOn or ctrl == MIDI::CC::omniOff) and not synth->getRuntime().enableOmni)
+    {
+        return;
+    }
+
     /*
     * This is done here instead of in 'setMidi' so MidiLearn
     * handles all 14 bit values the same.
@@ -732,7 +737,7 @@ void MidiDecode::setMidiProgram(uchar ch, int prg, bool in_place)
     {
         for (uint npart = 0; npart < maxparts; ++ npart)
         {
-            if (ch == synth->part[npart]->Prcvchn)
+            if (ch == synth->part[npart]->Prcvchn or synth->part[npart]->isOmni())
             {
                 putData.data.kit = npart;
                 if (in_place)

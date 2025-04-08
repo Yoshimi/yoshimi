@@ -942,6 +942,11 @@ string DataText::resolveConfig(SynthEngine& synth, CommandBlock& cmd, bool addVa
             yesno = true;
             break;
 
+        case CONFIG::control::enableOmni:
+            contstr += "Enable Omni Mode Change";
+            yesno = true;
+            break;
+
         case CONFIG::control::enableNRPNs:
             contstr += "Enable NRPN";
             yesno = true;
@@ -1494,6 +1499,9 @@ string DataText::resolvePart(CommandBlock& cmd, bool addValue)
                 else if (value_int >= NUM_MIDI_CHANNELS)
                     contstr = contstr + " Note off only from CH " + to_string(value_int + 1 - NUM_MIDI_CHANNELS);
             }
+            break;
+        case PART::control::omni:
+            contstr = "Omni Mode";
             break;
         case PART::control::keyMode:
             showValue = false;

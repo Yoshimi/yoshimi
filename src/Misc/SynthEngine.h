@@ -128,7 +128,7 @@ class SynthEngine
         bool setProgram(string const& fname, int npart);
         int ReadBankRoot();
         int ReadBank();
-        void SetPartChan(uchar npart, uchar nchan);
+        void SetPartChanForVector(uchar npart, uchar nchan);
         void SetPartPortamento(int npart, bool state);
         bool ReadPartPortamento(int npart);
         void SetPartKeyMode(int npart, int mode);

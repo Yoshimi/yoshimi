@@ -2690,7 +2690,8 @@ void CmdInterpreter::listCurrentParts(Parser& input, list<string>& msg_buf)
                     name += " Part";
                 else
                     name += " Both";
-                name += "  Chan ";
+                bool omni = bool(readControl(synth, 0, PART::control::omni, TOPLEVEL::section::part1 + partno) + 1);
+                name += omni ? "  Omni " : "  Chan ";
                 int ch = int(readControl(synth, 0, PART::control::midiChannel, TOPLEVEL::section::part1 + partno) + 1);
                 if (ch < 10)
                     name += " ";
@@ -3466,6 +3467,11 @@ int CmdInterpreter::commandConfig(Parser& input, unsigned char controlType)
     else if (input.matchnMove(2, "show"))
     {
         command = CONFIG::control::showLearnEditor;
+        value = (input.toggle() == 1);
+    }
+    else if (input.matchnMove(2, "omni"))
+    {
+        command = CONFIG::control::enableOmni;
         value = (input.toggle() == 1);
     }
     else if (input.matchnMove(1, "nrpn"))
@@ -5717,6 +5723,10 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
             return REPLY::value_msg;
         tmp -= 1;
         return sendNormal(synth, 0, tmp, controlType, PART::control::midiChannel, npart);
+    }
+    if (input.matchnMove(2, "omni"))
+    {
+        return sendNormal(synth, 0, (input.toggle() == 1), controlType, PART::control::omni, npart);
     }
     if (input.matchnMove(2, "aftertouch"))
     {

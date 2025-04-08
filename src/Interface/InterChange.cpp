@@ -3358,6 +3358,15 @@ void InterChange::commandConfig(CommandBlock& cmd)
             else
                 value = synth.getRuntime().showLearnedCC;
             break;
+        case CONFIG::control::enableOmni:
+            if (write)
+            {
+                synth.getRuntime().enableOmni = value_bool;
+                synth.getRuntime().updateConfig(control, value_int);
+            }
+            else
+                value = synth.getRuntime().enableOmni;
+            break;
         case CONFIG::control::enableNRPNs:
             if (write)
             {
@@ -3951,6 +3960,16 @@ void InterChange::commandPart(CommandBlock& cmd)
                 part.Prcvchn = value_int;
             else
                 value = part.Prcvchn;
+            break;
+        case PART::control::omni:
+            if (write)
+            {
+                part.Pomni = static_cast<bool>(value_int);
+                // Reset state set by MIDI CC when receiving explicit toggle.
+                part.resetOmniCC();
+            }
+            else
+                value = static_cast<float>(part.Pomni);
             break;
         case PART::control::keyMode:
             if (write)

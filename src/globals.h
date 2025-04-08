@@ -360,6 +360,7 @@ namespace CONFIG // usage CONFIG::control::oscillatorSize
         ignoreResetAllCCs,
         logIncomingCCs,
         showLearnEditor,
+        enableOmni,
         enableNRPNs,
         saveCurrentConfig,
         changeRoot, // dummy command - always save current root
@@ -493,6 +494,8 @@ namespace MIDI // usage MIDI::control::noteOn
         allSoundOff = 120,
         resetAllControllers,
         allNotesOff = 123,
+        omniOff = 124,
+        omniOn = 125,
 
         pitchWheelAdjusted = 128,
         channelPressureAdjusted,
@@ -636,6 +639,7 @@ namespace PART // usage PART::control::volume
         panning,
         velocityOffset,
         midiChannel,
+        omni,
         keyMode,
         channelATset,
         keyATset,
