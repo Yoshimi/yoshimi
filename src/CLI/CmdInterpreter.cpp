@@ -2602,7 +2602,8 @@ int CmdInterpreter::commandList(Parser& input)
 
 void CmdInterpreter::manageDisplay(Parser& input)
 {
-    std::cout << "got here" << std::endl;
+    //std::cout << "got here" << std::endl;
+    sendDirect(synth, TOPLEVEL::action::fromCLI, 0, TOPLEVEL::type::Write, DISPLAY::show, TOPLEVEL::section::display, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, NO_MSG);
     return;
 }
 
