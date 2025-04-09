@@ -40,7 +40,7 @@
         <td>enableAdd</td>
         <td>0,1</td>
         <td>1</td>
-        <td>0~15</td>
+        <td>0~63</td>
         <td>255</td>
         <td>32,255</td>
         <td>255</td>
@@ -53,7 +53,7 @@
         <td>enableSub</td>
         <td>0,1</td>
         <td>2</td>
-        <td>0~15</td>
+        <td>0~63</td>
         <td>255</td>
         <td>32,255</td>
         <td>255</td>
@@ -66,7 +66,7 @@
         <td>enablePad</td>
         <td>0,1</td>
         <td>3</td>
-        <td>0~15</td>
+        <td>0~63</td>
         <td>255</td>
         <td>32,255</td>
         <td>255</td>
@@ -141,9 +141,22 @@
         <td>Incoming MIDI channel</td>
       </tr>
       <tr>
+        <td>omni</td>
+        <td>0,1</td>
+        <td>10</td>
+        <td>0~63</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Enable Omni mode</td>
+      </tr>
+      <tr>
         <td>keyMode</td>
         <td>0~2</td>
-        <td>10</td>
+        <td>11</td>
         <td>0~63</td>
         <td>255</td>
         <td>255</td>
@@ -156,7 +169,7 @@
       <tr>
         <td>channelATset</td>
         <td>0~127</td>
-        <td>11</td>
+        <td>12</td>
         <td>0~63</td>
         <td>255</td>
         <td>255</td>
@@ -169,7 +182,7 @@
       <tr>
         <td>keyATset</td>
         <td>0,127</td>
-        <td>12</td>
+        <td>13</td>
         <td>0~63</td>
         <td>255</td>
         <td>255</td>
@@ -182,7 +195,7 @@
       <tr>
         <td>portamento</td>
         <td>0,1</td>
-        <td>13</td>
+        <td>14</td>
         <td>0~63</td>
         <td>255</td>
         <td>255</td>
@@ -193,9 +206,22 @@
         <td>Portamento</td>
       </tr>
       <tr>
+        <td>kitItemMute</td>
+        <td>0,1</td>
+        <td>15</td>
+        <td>0~63</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Silence this kit item</td>
+      </tr>
+      <tr>
         <td>minNote</td>
         <td>0~126</td>
-        <td>15</td>
+        <td>16</td>
         <td>0~63</td>
         <td>255</td>
         <td>255</td>
@@ -208,7 +234,7 @@
       <tr>
         <td>maxNote</td>
         <td>1~127</td>
-        <td>16</td>
+        <td>17</td>
         <td>0~63</td>
         <td>255</td>
         <td>255</td>
@@ -221,7 +247,7 @@
       <tr>
         <td>minToLast</td>
         <td>~ ~</td>
-        <td>17</td>
+        <td>18</td>
         <td>0~63</td>
         <td>255</td>
         <td>255</td>
@@ -234,7 +260,7 @@
       <tr>
         <td>maxToLast</td>
         <td>~ ~</td>
-        <td>18</td>
+        <td>19</td>
         <td>0~63</td>
         <td>255</td>
         <td>255</td>
@@ -245,9 +271,9 @@
         <td>Set maximum to last key press</td>
       </tr>
       <tr>
-        <td>resetMinMax</td>
+        <td>resetMinMaxKey</td>
         <td>~ ~</td>
-        <td>19</td>
+        <td>20</td>
         <td>0~63</td>
         <td>255</td>
         <td>255</td>
@@ -362,7 +388,7 @@
         <td>Small frequency randmisation</td>
       </tr>
       <tr>
-        <td>humanisVelocity</td>
+        <td>humanvelocity</td>
         <td>0~50</td>
         <td>49</td>
         <td>0~63</td>
