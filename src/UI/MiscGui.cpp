@@ -269,6 +269,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
     if (npart == TOPLEVEL::section::display)
     {
         synth->getRuntime().Log("Found display control GUI link");
+        synth->CBtest(getData);
         return;
     }
     if (control == TOPLEVEL::control::copyPaste)

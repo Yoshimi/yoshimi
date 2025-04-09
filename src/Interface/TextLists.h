@@ -30,7 +30,7 @@
  * is set so you can then step back up the level tree.
  * It is also possible to zero it so that you immediately go to
  * the top level. Therefore, the sequence is important.
- * 31 bits are currently defined out of a possible 32.
+ * 21 bits are currently defined out of a possible 32.
  *
  * Top, AllFX and InsFX MUST be the first three
  */
@@ -40,17 +40,7 @@ namespace LEVEL{
         Top = 0, // always set directly to zero as an integer to clear down
         AllFX = 1, // bits from here on
         InsFX,
-        About,
-        Settings,
-        Reports,
-        Recent, // instruments patches etc.
-        Scales,
-        Mixer,
-        Controllers,
-        MidiCCs,
-        Part, // edit window
-        //Kit, temporarily disabled till we work out how to manage this.
-        Aftertouch,
+        Part,
         Bank,
         Config,
         Vector,
