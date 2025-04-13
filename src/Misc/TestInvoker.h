@@ -39,6 +39,9 @@
 #include "Misc/CliFuncs.h"
 #include "Misc/Alloc.h"
 #include "CLI/Parser.h"
+/////////////////////////////////////////////////////////////////////////////////////////////////WIP Prototype 4/25 - throw away when done!!!!!
+#include "Misc/XMLStore.h"
+/////////////////////////////////////////////////////////////////////////////////////////////////WIP Prototype 4/25 - throw away when done!!!!!
 
 
 namespace test {
@@ -337,6 +340,10 @@ class TestInvoker
             synth.setReproducibleState(0);
 
             synth.getRuntime().Log("TEST::Launch");
+/////////////////////////////////////////////////////////////////////////////////////////////////WIP Prototype 4/25 - throw away when done!!!!!
+            run_XMLStoreTest(synth);
+            return;
+/////////////////////////////////////////////////////////////////////////////////////////////////WIP Prototype 4/25 - throw away when done!!!!!
             smpCnt = 0;
             StopWatch timer;
             pullSound(synth, buffer, output, timer);

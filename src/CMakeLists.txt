@@ -306,6 +306,9 @@ set (Misc_sources
     Misc/Bank.cpp  Misc/BuildScheduler.cpp  Misc/CmdOptions.cpp
     Misc/Config.cpp  Misc/InstanceManager.cpp  Misc/Microtonal.cpp  Misc/Part.cpp
     Misc/SynthEngine.cpp  Misc/WavFile.cpp  Misc/XMLStore.cpp  Misc/XMLwrapper.cpp
+##///////////////////////////////////////////////////////////////////////////////////////////////WIP Prototype 4/25 - throw away when done!!!!!
+    Misc/XMLStoreTest.cpp
+##///////////////////////////////////////////////////////////////////////////////////////////////WIP Prototype 4/25 - throw away when done!!!!!
 )
 
 set (Interface_Sources

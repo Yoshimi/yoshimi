@@ -54,9 +54,9 @@ const char *XMLStore_whitespace_callback(mxml_node_t* node, int where)
 {
     const char *name = mxmlGetElement(node);
 
-    if (where == MXML_WS_BEFORE_OPEN && !strncmp(name, "?xml", 4))
+    if (where == MXML_WS_BEFORE_OPEN && name && !strncmp(name, "?xml", 4))
         return NULL;
-    if (where == MXML_WS_BEFORE_CLOSE && !strncmp(name, "string", 6))
+    if (where == MXML_WS_BEFORE_CLOSE && name && !strncmp(name, "string", 6))
         return NULL;
 
     if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
@@ -517,6 +517,8 @@ bool XMLStore::loadXMLfile(string const& filename)
     if (tree)
         mxmlDelete(tree);
     tree = NULL;
+    node = NULL;
+    info = NULL;
     memset(&parentstack, 0, sizeof(parentstack));
     stackpos = 0;
     string report = "";
@@ -549,6 +551,10 @@ bool XMLStore::loadXMLfile(string const& filename)
     }
     node = root;
     push(root);
+    info = mxmlFindElement(root, root, "INFORMATION", NULL, NULL, MXML_DESCEND_FIRST);
+    if (!info)  // container to hold meta-information (xml type)
+        info = addparams0("INFORMATION");
+
     synth.fileCompatible = true;
     if (zynfile)
     {
