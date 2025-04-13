@@ -305,7 +305,7 @@ set (Effects_sources
 set (Misc_sources
     Misc/Bank.cpp  Misc/BuildScheduler.cpp  Misc/CmdOptions.cpp
     Misc/Config.cpp  Misc/InstanceManager.cpp  Misc/Microtonal.cpp  Misc/Part.cpp
-    Misc/SynthEngine.cpp  Misc/WavFile.cpp  Misc/XMLwrapper.cpp
+    Misc/SynthEngine.cpp  Misc/WavFile.cpp  Misc/XMLStore.cpp  Misc/XMLwrapper.cpp
 )
 
 set (Interface_Sources

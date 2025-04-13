@@ -1,10 +1,11 @@
 /*
-    XMLwrapper.cpp - XML wrapper
+    XMLStore.cpp - Store structured data in XML
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2024, Will Godfrey
+    Copyright 2014-2025, Will Godfrey
+    Copyright 2025,      Ichthyostega
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -24,7 +25,6 @@
 
 */
 
-/* !!!!!!!!!!!!!!!!!!! to be reworked for MXML-4 compatibility !!!!!!!!!!!!!!!!!!! */
 
 #include <sys/types.h>
 #include <zlib.h>
@@ -32,7 +32,7 @@
 #include <string>
 
 #include "Misc/Config.h"
-#include "Misc/XMLwrapper.h"
+#include "Misc/XMLStore.h"
 #include "Misc/SynthEngine.h"
 #include "Misc/FileMgrFuncs.h"
 #include "Misc/FormatFuncs.h"
@@ -50,7 +50,7 @@ using func::asString;
 using std::string;
 
 
-const char *XMLwrapper_whitespace_callback(mxml_node_t* node, int where)
+const char *XMLStore_whitespace_callback(mxml_node_t* node, int where)
 {
     const char *name = mxmlGetElement(node);
 
@@ -65,7 +65,7 @@ const char *XMLwrapper_whitespace_callback(mxml_node_t* node, int where)
 }
 
 
-XMLwrapper::XMLwrapper(SynthEngine& _synth, bool _isYoshi, bool includeBase) :
+XMLStore::XMLStore(SynthEngine& _synth, bool _isYoshi, bool includeBase) :
     stackpos(0),
     xml_k(0),
     isYoshi(_isYoshi),
@@ -173,14 +173,14 @@ XMLwrapper::XMLwrapper(SynthEngine& _synth, bool _isYoshi, bool includeBase) :
 }
 
 
-XMLwrapper::~XMLwrapper()
+XMLStore::~XMLStore()
 {
     if (tree)
         mxmlDelete(tree);
 }
 
 
-void XMLwrapper::checkfileinformation(string const& filename, uint& names, int& type)
+void XMLStore::checkfileinformation(string const& filename, uint& names, int& type)
 {
     stackpos = 0; // we don't seem to be using any of this!
     memset(&parentstack, 0, sizeof(parentstack));
@@ -251,7 +251,7 @@ void XMLwrapper::checkfileinformation(string const& filename, uint& names, int& 
 }
 
 
-void XMLwrapper::slowinfosearch(char *idx)
+void XMLStore::slowinfosearch(char *idx)
 {
     idx = strstr(idx, "<INSTRUMENT_KIT>");
     if (idx == NULL)
@@ -322,7 +322,7 @@ void XMLwrapper::slowinfosearch(char *idx)
 
 // SAVE XML members
 
-bool XMLwrapper::saveXMLfile(string _filename, bool useCompression)
+bool XMLStore::saveXMLfile(string _filename, bool useCompression)
 {
     string filename{_filename};
     char* xmldata = getXMLdata();
@@ -360,7 +360,7 @@ bool XMLwrapper::saveXMLfile(string _filename, bool useCompression)
 }
 
 
-char *XMLwrapper::getXMLdata()
+char *XMLStore::getXMLdata()
 {
     xml_k = 0;
     memset(tabs, 0, STACKSIZE + 2);
@@ -429,24 +429,24 @@ char *XMLwrapper::getXMLdata()
             break;
     }
     node = oldnode;
-    char *xmldata = mxmlSaveAllocString(tree, XMLwrapper_whitespace_callback);
+    char *xmldata = mxmlSaveAllocString(tree, XMLStore_whitespace_callback);
     return xmldata;
 }
 
 
-void XMLwrapper::addparU(string const& name, uint val)
+void XMLStore::addparU(string const& name, uint val)
 {
     addparams2("parU", "name", name.c_str(), "value", asString(val));
 }
 
 
-void XMLwrapper::addpar(string const& name, int val)
+void XMLStore::addpar(string const& name, int val)
 {
     addparams2("par", "name", name.c_str(), "value", asString(val));
 }
 
 
-void XMLwrapper::addparcombi(string const& name, float val)
+void XMLStore::addparcombi(string const& name, float val)
 {
     union { float in; uint32_t out; } convert;
     char buf[11];
@@ -456,7 +456,7 @@ void XMLwrapper::addparcombi(string const& name, float val)
 }
 
 
-void XMLwrapper::addparreal(string const& name, float val)
+void XMLStore::addparreal(string const& name, float val)
 {
     union { float in; uint32_t out; } convert;
     char buf[11];
@@ -466,13 +466,13 @@ void XMLwrapper::addparreal(string const& name, float val)
 }
 
 
-void XMLwrapper::addpardouble(string const& name, double val)
+void XMLStore::addpardouble(string const& name, double val)
 {
     addparams2("par_real","name", name.c_str(), "value", asLongString(val));
 }
 
 
-void XMLwrapper::addparbool(string const& name, int val)
+void XMLStore::addparbool(string const& name, int val)
 {
     if (val != 0)
         addparams2("par_bool", "name", name.c_str(), "value", "yes");
@@ -481,7 +481,7 @@ void XMLwrapper::addparbool(string const& name, int val)
 }
 
 
-void XMLwrapper::addparstr(string const& name, string const& val)
+void XMLStore::addparstr(string const& name, string const& val)
 {
     mxml_node_t *element = mxmlNewElement(node, "string");
     mxmlElementSetAttr(element, "name", name.c_str());
@@ -489,27 +489,27 @@ void XMLwrapper::addparstr(string const& name, string const& val)
 }
 
 
-void XMLwrapper::beginbranch(string const& name)
+void XMLStore::beginbranch(string const& name)
 {
     push(node);
     node = addparams0(name.c_str());
 }
 
 
-void XMLwrapper::beginbranch(string const& name, int id)
+void XMLStore::beginbranch(string const& name, int id)
 {
     push(node);
     node = addparams1(name.c_str(), "id", asString(id));
 }
 
 
-void XMLwrapper::endbranch()
+void XMLStore::endbranch()
 {
     node = pop();
 }
 
 // LOAD XML members
-bool XMLwrapper::loadXMLfile(string const& filename)
+bool XMLStore::loadXMLfile(string const& filename)
 {
     bool zynfile = true;
     bool yoshitoo = false;
@@ -611,7 +611,7 @@ bool XMLwrapper::loadXMLfile(string const& filename)
 }
 
 
-bool XMLwrapper::putXMLdata(const char *xmldata)
+bool XMLStore::putXMLdata(const char *xmldata)
 {
     if (tree)
         mxmlDelete(tree);
@@ -634,7 +634,7 @@ bool XMLwrapper::putXMLdata(const char *xmldata)
 }
 
 
-bool XMLwrapper::enterbranch(string const& name)
+bool XMLStore::enterbranch(string const& name)
 {
     node = mxmlFindElement(peek(), peek(), name.c_str(), NULL, NULL,
                            MXML_DESCEND_FIRST);
@@ -650,7 +650,7 @@ bool XMLwrapper::enterbranch(string const& name)
 }
 
 
-bool XMLwrapper::enterbranch(string const& name, int id)
+bool XMLStore::enterbranch(string const& name, int id)
 {
     node = mxmlFindElement(peek(), peek(), name.c_str(), "id",
                            asString(id).c_str(), MXML_DESCEND_FIRST);
@@ -661,7 +661,7 @@ bool XMLwrapper::enterbranch(string const& name, int id)
 }
 
 
-int XMLwrapper::getbranchid(int min, int max)
+int XMLStore::getbranchid(int min, int max)
 {
     int id = string2int(mxmlElementGetAttr(node, "id"));
     if (min == 0 && max == 0)
@@ -674,7 +674,7 @@ int XMLwrapper::getbranchid(int min, int max)
 }
 
 
-uint XMLwrapper::getparU(string const& name, uint defaultpar, uint min, uint max)
+uint XMLStore::getparU(string const& name, uint defaultpar, uint min, uint max)
 {
     node = mxmlFindElement(peek(), peek(), "parU", "name", name.c_str(), MXML_DESCEND_FIRST);
     if (!node)
@@ -691,7 +691,7 @@ uint XMLwrapper::getparU(string const& name, uint defaultpar, uint min, uint max
 }
 
 
-int XMLwrapper::getpar(string const& name, int defaultpar, int min, int max)
+int XMLStore::getpar(string const& name, int defaultpar, int min, int max)
 {
     node = mxmlFindElement(peek(), peek(), "par", "name", name.c_str(), MXML_DESCEND_FIRST);
     if (!node)
@@ -708,7 +708,7 @@ int XMLwrapper::getpar(string const& name, int defaultpar, int min, int max)
 }
 
 
-float XMLwrapper::getparcombi(string const& name, float defaultpar, float min, float max)
+float XMLStore::getparcombi(string const& name, float defaultpar, float min, float max)
 {
     node = mxmlFindElement(peek(), peek(), "par", "name", name.c_str(), MXML_DESCEND_FIRST);
     if (!node)
@@ -736,19 +736,19 @@ float XMLwrapper::getparcombi(string const& name, float defaultpar, float min, f
 }
 
 
-int XMLwrapper::getpar127(string const& name, int defaultpar)
+int XMLStore::getpar127(string const& name, int defaultpar)
 {
     return(getpar(name, defaultpar, 0, 127));
 }
 
 
-int XMLwrapper::getpar255(string const& name, int defaultpar)
+int XMLStore::getpar255(string const& name, int defaultpar)
 {
     return(getpar(name, defaultpar, 0, 255));
 }
 
 
-int XMLwrapper::getparbool(string const& name, int defaultpar)
+int XMLStore::getparbool(string const& name, int defaultpar)
 {
     node = mxmlFindElement(peek(), peek(), "par_bool", "name", name.c_str(), MXML_DESCEND_FIRST);
     if (!node)
@@ -762,7 +762,7 @@ int XMLwrapper::getparbool(string const& name, int defaultpar)
 // case insensitive, anything other than '0', 'no', 'false' is treated as 'true'
 
 
-string XMLwrapper::getparstr(string const& name)
+string XMLStore::getparstr(string const& name)
 {
     node = mxmlFindElement(peek(), peek(), "string", "name", name.c_str(), MXML_DESCEND_FIRST);
     if (!node)
@@ -776,7 +776,7 @@ string XMLwrapper::getparstr(string const& name)
 }
 
 
-float XMLwrapper::getparreal(string const& name, float defaultpar)
+float XMLStore::getparreal(string const& name, float defaultpar)
 {
     node = mxmlFindElement(peek(), peek(), "par_real", "name", name.c_str(),
                            MXML_DESCEND_FIRST);
@@ -798,7 +798,7 @@ float XMLwrapper::getparreal(string const& name, float defaultpar)
 }
 
 
-float XMLwrapper::getparreal(string const& name, float defaultpar, float min, float max)
+float XMLStore::getparreal(string const& name, float defaultpar, float min, float max)
 {
     float result = getparreal(name, defaultpar);
     if (result < min)
@@ -811,14 +811,14 @@ float XMLwrapper::getparreal(string const& name, float defaultpar, float min, fl
 
 // Private parts
 
-mxml_node_t *XMLwrapper::addparams0(string const& name)
+mxml_node_t *XMLStore::addparams0(string const& name)
 {
     mxml_node_t *element = mxmlNewElement(node, name.c_str());
     return element;
 }
 
 
-mxml_node_t *XMLwrapper::addparams1(string const& name, string const& par1, string const& val1)
+mxml_node_t *XMLStore::addparams1(string const& name, string const& par1, string const& val1)
 {
     mxml_node_t *element = mxmlNewElement(node, name.c_str());
     mxmlElementSetAttr(element, par1.c_str(), val1.c_str());
@@ -826,7 +826,7 @@ mxml_node_t *XMLwrapper::addparams1(string const& name, string const& par1, stri
 }
 
 
-mxml_node_t *XMLwrapper::addparams2(string const& name, string const& par1, string const& val1,
+mxml_node_t *XMLStore::addparams2(string const& name, string const& par1, string const& val1,
                                     string const& par2, string const& val2)
 {
     mxml_node_t *element = mxmlNewElement(node, name.c_str());
@@ -836,7 +836,7 @@ mxml_node_t *XMLwrapper::addparams2(string const& name, string const& par1, stri
 }
 
 
-mxml_node_t *XMLwrapper::addparams3(string const& name, string const& par1, string const& val1,
+mxml_node_t *XMLStore::addparams3(string const& name, string const& par1, string const& val1,
                                     string const& par2, string const& val2,
                                     string const& par3, string const& val3)
 {
@@ -848,7 +848,7 @@ mxml_node_t *XMLwrapper::addparams3(string const& name, string const& par1, stri
 }
 
 
-void XMLwrapper::push(mxml_node_t *node)
+void XMLStore::push(mxml_node_t *node)
 {
     if (stackpos >= STACKSIZE - 1)
     {
@@ -860,7 +860,7 @@ void XMLwrapper::push(mxml_node_t *node)
 }
 
 
-mxml_node_t *XMLwrapper::pop()
+mxml_node_t *XMLStore::pop()
 {
     if (stackpos <= 0)
     {
@@ -874,7 +874,7 @@ mxml_node_t *XMLwrapper::pop()
 }
 
 
-mxml_node_t *XMLwrapper::peek()
+mxml_node_t *XMLStore::peek()
 {
     if (stackpos <= 0)
     {

@@ -1,10 +1,11 @@
 /*
-    XML.h - XML wrapper
+    XMLStore.h - Store structured data in XML
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2024, Will Godfrey
+    Copyright 2014-2025, Will Godfrey
+    Copyright 2025,      Ichthyostega
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -24,10 +25,9 @@
 
 */
 
-/* !!!!!!!!!!!!!!!!!!! to be reworked for MXML-4 compatibility !!!!!!!!!!!!!!!!!!! */
 
-#ifndef XML_WRAPPER_H
-#define XML_WRAPPER_H
+#ifndef XML_STORE_H
+#define XML_STORE_H
 
 #include "globals.h"
 
@@ -40,17 +40,17 @@
 
 class SynthEngine;
 
-/** @deprecated about to be replaced by XMLStore to abstract from XML backend library */
-class XMLwrapper
+/** Maintain tree structured data, which can be stored and retrieved from XML */
+class XMLStore
 {
     public:
-       ~XMLwrapper();
-        XMLwrapper(SynthEngine& _synth, bool _isYoshi = false, bool includeBase = true);
+       ~XMLStore();
+        XMLStore(SynthEngine& _synth, bool _isYoshi = false, bool includeBase = true);
         // shall not be copied nor moved
-        XMLwrapper(XMLwrapper&&)                 = delete;
-        XMLwrapper(XMLwrapper const&)            = delete;
-        XMLwrapper& operator=(XMLwrapper&&)      = delete;
-        XMLwrapper& operator=(XMLwrapper const&) = delete;
+        XMLStore(XMLStore&&)                 = delete;
+        XMLStore(XMLStore const&)            = delete;
+        XMLStore& operator=(XMLStore&&)      = delete;
+        XMLStore& operator=(XMLStore const&) = delete;
 
         // SAVE to XML
         bool saveXMLfile(std::string _filename, bool useCompression = true); // return true if ok, false otherwise
@@ -193,4 +193,4 @@ class XMLwrapper
         SynthEngine& synth;
 };
 
-#endif
+#endif /*XML_STORE_H*/
