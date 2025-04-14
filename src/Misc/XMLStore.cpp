@@ -26,16 +26,18 @@
 */
 
 
-#include <sys/types.h>
+#include "Misc/Config.h"
+#include "Misc/XMLStore.h"
+#include "Misc/SynthEngine.h"                  //////////////////////////////////////////////////////////////TODO 4/25 : why?? should never be linked to Yoshimi core logic
+#include "Misc/FileMgrFuncs.h"
+#include "Misc/FormatFuncs.h"
+
+#include <sys/types.h>                  ///////////////////////////////////////TODO 4/25 : why?
+#include <cassert>
+#include <mxml.h>
 #include <zlib.h>
 #include <sstream>
 #include <string>
-
-#include "Misc/Config.h"
-#include "Misc/XMLStore.h"
-#include "Misc/SynthEngine.h"
-#include "Misc/FileMgrFuncs.h"
-#include "Misc/FormatFuncs.h"
 
 using file::saveText;
 using file::loadGzipped;
@@ -48,6 +50,77 @@ using func::asLongString;
 using func::asString;
 
 using std::string;
+
+
+namespace { // internal details of MXML integration
+
+    struct Policy
+        {
+            mxml_node_t* mxmlElm()
+            {
+                return reinterpret_cast<mxml_node_t*>(this);
+            }
+        };
+}
+
+struct XMLtree::Node
+    : Policy
+    {
+        static Node* asNode(mxml_node_t* mxmlElm)
+        {
+            assert(mxmlElm);
+            return reinterpret_cast<Node*>(mxmlElm);
+        }
+
+        static Node* buildYoshimiXML()
+        {
+            ///////////////////////////////////////////////OOO build a MXML root element properly outfitted with the basic structure for yoshimi
+            mxml_node_t* root = mxmlNewElement(MXML_NO_PARENT, "?xml version=\"1.0\" encoding=\"UTF-8\"?");
+            mxml_node_t* doctype = mxmlNewElement(root, "!DOCTYPE");
+
+            return asNode(root);
+        }
+
+        void addRef()
+        {
+            uint refCnt = mxmlRetain(mxmlElm());
+            assert(refCnt > 1);
+        }
+
+        void unref()
+        {   // decrement refcount -- possibly delete
+            mxmlRelease(mxmlElm());
+        }
+    };
+
+
+/* ===== XMLtree implementation backend ===== */
+
+XMLtree::~XMLtree()
+{
+    if (node_)
+        node_->unref();
+}
+
+XMLtree::XMLtree(Node* treeLocation)
+    : node_{treeLocation}
+{
+    assert(node_);
+    node_->addRef();
+}
+
+XMLtree::XMLtree()
+    : XMLtree{Node::buildYoshimiXML()}
+    { }
+
+XMLtree::XMLtree(XMLtree&& ref)
+    : node_{nullptr}
+{
+    std::swap(node_, ref.node_);
+}
+
+
+
 
 
 const char *XMLStore_whitespace_callback(mxml_node_t* node, int where)

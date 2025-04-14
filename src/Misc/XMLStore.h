@@ -31,14 +31,35 @@
 
 #include "globals.h"
 
-#include <mxml.h>
+#include <mxml.h>                      ////////////////////////////////////////TODO 4/25 : remove from front-end
 #include <string>
 #include <limits>
 
 // max tree depth
-#define STACKSIZE 128
+#define STACKSIZE 128                  ////////////////////////////////////////TODO 4/25 : becomes obsolete
+
 
 class SynthEngine;
+
+/** Structured data subtree, which can be loaded and stored as XML */
+class XMLtree
+{
+    struct Node;
+    Node* node_;
+
+        XMLtree(Node*);
+
+    public:
+       ~XMLtree();
+        XMLtree();
+        // shall only be moved
+        XMLtree(XMLtree&&);
+        XMLtree(XMLtree const&)            = delete;
+        XMLtree& operator=(XMLtree&&)      = delete;
+        XMLtree& operator=(XMLtree const&) = delete;
+};
+
+
 
 /** Maintain tree structured data, which can be stored and retrieved from XML */
 class XMLStore
@@ -60,17 +81,17 @@ class XMLStore
         char* getXMLdata();
 
 
-        void addparU(std::string const& name, uint val); // add unsigned uinteger parameter: name, value
+        void addparU(std::string const& name, uint val); // add unsigned integer parameter: name, value
 
         void addpar(std::string const& name, int val); // add simple parameter: name, value
 
-        void addparcombi(std::string const& name, float val); // add hybrid float/int parameter: name, value
+        void addparcombi(std::string const& name, float val); // add float parameter persisted as fixed bitstring: name, value
 
         void addparreal(std::string const& name, float val);
 
         void addpardouble(std::string const& name, double val);
 
-        void addparbool(std::string const& name, int val); // 1 => "yes", else "no"
+        void addparbool(std::string const& name, int val); // 1 => "yes", else "no"         /////////////////TODO 4/25 : change to bool
 
         // add string parameter (name and string)
         void addparstr(std::string const& name, std::string const& val);
