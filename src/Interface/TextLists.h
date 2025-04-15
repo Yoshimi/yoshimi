@@ -255,4 +255,10 @@ extern std::string subMagType [];
 extern std::string subPadPosition [];
 extern std::string unisonPhase [];
 
+extern std::string displaySingle [];
+extern std::string displayRoot [];
+extern std::string displayBranch [];
+extern std::string displayLeaf [];
+
+
 #endif
