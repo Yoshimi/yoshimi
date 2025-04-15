@@ -271,6 +271,33 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
     {
         synth->getRuntime().Log("Found display control GUI link");
         synth->CBtest(getData);
+        //synth->getGuiMaster()->partui->instrumenteditwindow->show();
+        //synth->getGuiMaster()->partui->subnoteui->Showsub();
+        //synth->getGuiMaster()->partui->subnoteui->bandwidthsettingsui->show();
+        //MasterUI *link = synth->getGuiMaster();
+        /*int tyr = 1;
+        switch (tyr)
+        {
+            case 0:
+                ;
+                break;
+            case 1:
+               synth->getGuiMaster()->partui->adnoteui->ShowGlobal();
+               break;
+            case 2:
+                synth->getGuiMaster()->partui->subnoteui->Showsub();
+                break;
+            case 3:
+                synth->getGuiMaster()->partui->padnoteui->Showpad();
+                break;
+            default:
+                return;
+        }*/
+        int pointer = 0;
+        while (displaySingle[pointer] != "@end"){
+            std::cout << displaySingle[pointer] << std::endl;
+            ++pointer;
+        }
         return;
     }
     if (control == TOPLEVEL::control::copyPaste)

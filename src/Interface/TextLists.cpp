@@ -1199,3 +1199,12 @@ std::string historyGroup [] = {"IN", "PA", "SC", "ST", "VE", "ML"};
 std::string subMagType [] = {"Linear", "40dB", "60dB", "80dB", "100dB"};
 std::string subPadPosition [] = {"harmonic", "ushift", "lshift", "upower", "lpower", "sine", "power", "shift"};
 std::string unisonPhase [] = {"none", "random", "half", "third", "quarter", "fifth"};
+
+// CLI display controls
+std::string displaySingle [] = {"MAin", "ABout", "COnfig", "PResets", "REPorts", "FOLder", "Query", "NAme", "RECent", "PATh", "ROot", "BAnk", "SEarch", "SCales", "MIXer", "VEctor", "LEarn", "KEyboard", "MIDi", "COntrollers", "EDit", "KIt", "AFtertouch", "LIst", "RETrigger", "@end"};
+
+std::string displayRoot [] = {"SYstem", "INsert", "EFfects", "SUBsynth", "PADsynth", "ADDsynth", "VOice", "MOdulator", "@end"};
+
+std::string displayBranch [] = {"WAveform", "RESonance", "AMlitude", "FRequency", "FIlter", "@end"};
+
+std::string displayLeaf []= {"FORmant", "ENvelope", "@end"};
