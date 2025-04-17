@@ -810,7 +810,6 @@ void UnifiedPresets::load()
 {
     synth.getRuntime().xmlType = TOPLEVEL::XML::Presets;
     string type{findPresetType()};
-    auto xml{std::make_unique<XMLwrapper>(synth, false)};
     string name = synth.textMsgBuffer.fetch(cmd.data.miscmsg);
     string dirname;
     string prefix;
@@ -840,6 +839,7 @@ void UnifiedPresets::load()
         return;
     }
 
+    auto xml{std::make_unique<XMLwrapper>(synth, false)};
     xml->loadXMLfile(filename);
     accessXML(*xml, true);
 }

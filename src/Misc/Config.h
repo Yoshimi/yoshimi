@@ -47,7 +47,8 @@ using std::bitset;
 using std::string;
 using std::list;
 
-class XMLwrapper;
+class XMLStore;
+class XMLwrapper;   /////////////////////////////////////////////////////////////////////////////TODO 4/25 : switch to XMLstore
 class SynthEngine;
 
 class Config
@@ -83,6 +84,7 @@ class Config
         bool saveMasterConfig();
         bool saveInstanceConfig();
         void loadConfig();
+        void initData(XMLStore&);
         bool updateConfig(int control, int value);
         bool saveSessionData(string sessionfile);
         int  saveSessionData(char** dataBuffer);

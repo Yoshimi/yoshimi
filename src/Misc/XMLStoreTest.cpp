@@ -60,29 +60,30 @@ void run_XMLStoreTest(SynthEngine& synth)
 
     synth.getRuntime().xmlType = TOPLEVEL::XML::MasterConfig;
 
-    auto xml{std::make_unique<XMLStore>(synth, true)};
-    bool success = xml->loadXMLfile(baseConfig);
+    XMLStore xml{TOPLEVEL::XML::MasterConfig, synth, true};    //////////////////OOO should define other ctor to load file directly!
+    synth.getRuntime().initData(xml);
+    bool success = xml.loadXMLfile(baseConfig);
     CHECK(success);
 
-    char* xmldata = xml->getXMLdata();
+    char* xmldata = xml.getXMLdata();
     cout << "Loaded XML-Tree:\n"<<string{xmldata}<<endl;
     free(xmldata);
 
-    CHECK(xml->enterbranch("BASE_PARAMETERS"));
-    bool guiParam = xml->getparbool("enable_gui", true);
-    uint compParam = xml->getpar("gzip_compression", 5, 0, 9);
-    string guideVersion{xml->getparstr("guide_version")};
+    CHECK(xml.enterbranch("BASE_PARAMETERS"));
+    bool guiParam = xml.getparbool("enable_gui", true);
+    uint compParam = xml.getpar("gzip_compression", 5, 0, 9);
+    string guideVersion{xml.getparstr("guide_version")};
 
     cout << "enable_gui:"<<guiParam
          << "\ngzip_compression:"<<compParam
          << "\nguide_version:"<<guideVersion
          << endl;
 
-    xml->endbranch();
-    xml->addparreal("Heffalump", (1+sqrtf(5))/2);
+    xml.endbranch();
+    xml.addparreal("Heffalump", (1+sqrtf(5))/2);
 
     const string TESTFILE{"heffalump.xml"};
-    CHECK(xml->saveXMLfile(TESTFILE, false))
+    CHECK(xml.saveXMLfile(TESTFILE, false))
 
     cout << "Bye Cruel World..." <<endl;
 }

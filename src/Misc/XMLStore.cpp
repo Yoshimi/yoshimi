@@ -72,15 +72,6 @@ struct XMLtree::Node
             return reinterpret_cast<Node*>(mxmlElm);
         }
 
-        static Node* buildYoshimiXML()
-        {
-            ///////////////////////////////////////////////OOO build a MXML root element properly outfitted with the basic structure for yoshimi
-            mxml_node_t* root = mxmlNewElement(MXML_NO_PARENT, "?xml version=\"1.0\" encoding=\"UTF-8\"?");
-            mxml_node_t* doctype = mxmlNewElement(root, "!DOCTYPE");
-
-            return asNode(root);
-        }
-
         void addRef()
         {
             uint refCnt = mxmlRetain(mxmlElm());
@@ -102,16 +93,12 @@ XMLtree::~XMLtree()
         node_->unref();
 }
 
-XMLtree::XMLtree(Node* treeLocation)
+XMLtree::XMLtree(Node* treeLocation)     ////////////////////OOO unclear if we need this private constructor...
     : node_{treeLocation}
 {
     assert(node_);
     node_->addRef();
 }
-
-XMLtree::XMLtree()
-    : XMLtree{Node::buildYoshimiXML()}
-    { }
 
 XMLtree::XMLtree(XMLtree&& ref)
     : node_{nullptr}
@@ -138,42 +125,52 @@ const char *XMLStore_whitespace_callback(mxml_node_t* node, int where)
 }
 
 
-XMLStore::XMLStore(SynthEngine& _synth, bool _isYoshi, bool includeBase) :
+XMLStore::XMLStore(TOPLEVEL::XML type, SynthEngine& _synth, bool yoshiFormat):
     stackpos(0),
     xml_k(0),
-    isYoshi(_isYoshi),
+    isYoshi(yoshiFormat),
     synth(_synth)
 {
-    minimal = 1 - synth.getRuntime().xmlmax;
+    minimal = not synth.getRuntime().xmlmax;
     information.PADsynth_used = 0;
     information.ADDsynth_used = 0;
     information.SUBsynth_used = 0;
+    information.yoshiType = true;
+    information.type = type;
     memset(&parentstack, 0, sizeof(parentstack));
-    tree = mxmlNewElement(MXML_NO_PARENT, "?xml version=\"1.0\" encoding=\"UTF-8\"?");
-    mxml_node_t *doctype = mxmlNewElement(tree, "!DOCTYPE");
 
-    if (!includeBase)
-        return;
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////OOO : stateful tree position logic broken. MUST GET RID of this "current position"
+    treeX = nullptr;  // boom
+    rootX = nullptr;  // BOOOOM
+    nodeX = nullptr;  // BOOOOOOM
+    infoX = nullptr;  // BOOOOOOOOOM
+}
 
+
+void XMLStore::buildXMLroot()
+{
+    treeX = mxmlNewElement(MXML_NO_PARENT, "?xml version=\"1.0\" encoding=\"UTF-8\"?");
+    mxml_node_t *doctype = mxmlNewElement(treeX, "!DOCTYPE");
+    
     if (isYoshi)
     {
         mxmlElementSetAttr(doctype, "Yoshimi-data", NULL);
-        root = mxmlNewElement(tree, "Yoshimi-data");
+        rootX = mxmlNewElement(treeX, "Yoshimi-data");
         information.yoshiType = 1;
     }
     else
     {
         mxmlElementSetAttr(doctype, "ZynAddSubFX-data", NULL);
-        root = mxmlNewElement(tree, "ZynAddSubFX-data");
-        mxmlElementSetAttr(root, "version-major", "2");
-        mxmlElementSetAttr(root, "version-minor", "4");
-        mxmlElementSetAttr(root, "version-revision", "1");
-        mxmlElementSetAttr(root, "ZynAddSubFX-author", "Nasca Octavian Paul");
+        rootX = mxmlNewElement(treeX, "ZynAddSubFX-data");
+        mxmlElementSetAttr(rootX, "version-major", "2");
+        mxmlElementSetAttr(rootX, "version-minor", "4");
+        mxmlElementSetAttr(rootX, "version-revision", "1");
+        mxmlElementSetAttr(rootX, "ZynAddSubFX-author", "Nasca Octavian Paul");
         information.yoshiType = 0;
     }
 
-    node = root;
-    mxmlElementSetAttr(root, "Yoshimi-author", "Alan Ernest Calvert");
+    nodeX = rootX;
+    mxmlElementSetAttr(rootX, "Yoshimi-author", "Alan Ernest Calvert");
     string version{YOSHIMI_VERSION};
     size_t pos = version.find(' ');
     if (pos != string::npos)
@@ -204,14 +201,13 @@ XMLStore::XMLStore(SynthEngine& _synth, bool _isYoshi, bool includeBase) :
                 revision = version;
             else
                 revision = version.substr(0, pos);
-            //revision = version.substr(pos + 1, version.length());
         }
     }
-    mxmlElementSetAttr(root, "Yoshimi-major", major.c_str());
-    mxmlElementSetAttr(root, "Yoshimi-minor", minor.c_str());
-    mxmlElementSetAttr(root, "Yoshimi-revision", revision.c_str());
+    mxmlElementSetAttr(rootX, "Yoshimi-major", major.c_str());
+    mxmlElementSetAttr(rootX, "Yoshimi-minor", minor.c_str());
+    mxmlElementSetAttr(rootX, "Yoshimi-revision", revision.c_str());
 
-    info = addparams0("INFORMATION"); // specifications
+    infoX = addparams0("INFORMATION"); // specifications
 
     if (synth.getRuntime().xmlType == TOPLEVEL::XML::MasterConfig)
     {
@@ -248,8 +244,8 @@ XMLStore::XMLStore(SynthEngine& _synth, bool _isYoshi, bool includeBase) :
 
 XMLStore::~XMLStore()
 {
-    if (tree)
-        mxmlDelete(tree);
+    if (treeX)
+        mxmlDelete(treeX);
 }
 
 
@@ -257,9 +253,9 @@ void XMLStore::checkfileinformation(string const& filename, uint& names, int& ty
 {
     stackpos = 0; // we don't seem to be using any of this!
     memset(&parentstack, 0, sizeof(parentstack));
-    if (tree)
-        mxmlDelete(tree);
-    tree = NULL;
+    if (treeX)
+        mxmlDelete(treeX);
+    treeX = NULL;
 
 
     string report;
@@ -437,8 +433,8 @@ char *XMLStore::getXMLdata()
 {
     xml_k = 0;
     memset(tabs, 0, STACKSIZE + 2);
-    mxml_node_t *oldnode=node;
-    node = info;
+    mxml_node_t *oldnode=nodeX;
+    nodeX = infoX;
 
     switch (synth.getRuntime().xmlType)
     {
@@ -501,8 +497,8 @@ char *XMLStore::getXMLdata()
             addparstr("XMLtype", "Unknown");
             break;
     }
-    node = oldnode;
-    char *xmldata = mxmlSaveAllocString(tree, XMLStore_whitespace_callback);
+    nodeX = oldnode;
+    char *xmldata = mxmlSaveAllocString(treeX, XMLStore_whitespace_callback);
     return xmldata;
 }
 
@@ -556,7 +552,7 @@ void XMLStore::addparbool(string const& name, int val)
 
 void XMLStore::addparstr(string const& name, string const& val)
 {
-    mxml_node_t *element = mxmlNewElement(node, "string");
+    mxml_node_t *element = mxmlNewElement(nodeX, "string");
     mxmlElementSetAttr(element, "name", name.c_str());
     mxmlNewText(element, 0, val.c_str());
 }
@@ -564,21 +560,21 @@ void XMLStore::addparstr(string const& name, string const& val)
 
 void XMLStore::beginbranch(string const& name)
 {
-    push(node);
-    node = addparams0(name.c_str());
+    push(nodeX);
+    nodeX = addparams0(name.c_str());
 }
 
 
 void XMLStore::beginbranch(string const& name, int id)
 {
-    push(node);
-    node = addparams1(name.c_str(), "id", asString(id));
+    push(nodeX);
+    nodeX = addparams1(name.c_str(), "id", asString(id));
 }
 
 
 void XMLStore::endbranch()
 {
-    node = pop();
+    nodeX = pop();
 }
 
 // LOAD XML members
@@ -587,11 +583,11 @@ bool XMLStore::loadXMLfile(string const& filename)
     bool zynfile = true;
     bool yoshitoo = false;
 
-    if (tree)
-        mxmlDelete(tree);
-    tree = NULL;
-    node = NULL;
-    info = NULL;
+    if (treeX)
+        mxmlDelete(treeX);
+    treeX = NULL;
+    nodeX = NULL;
+    infoX = NULL;
     memset(&parentstack, 0, sizeof(parentstack));
     stackpos = 0;
     string report = "";
@@ -603,44 +599,44 @@ bool XMLStore::loadXMLfile(string const& filename)
         synth.getRuntime().Log("XML: Could not load xml file: " + filename, _SYS_::LogNotSerious);
          return false;
     }
-    root = tree = mxmlLoadString(NULL, removeBlanks(xmldata), MXML_OPAQUE_CALLBACK);
+    rootX = treeX = mxmlLoadString(NULL, removeBlanks(xmldata), MXML_OPAQUE_CALLBACK);
     delete [] xmldata;
-    if (!tree)
+    if (!treeX)
     {
         synth.getRuntime().Log("XML: File " + filename + " is not XML", _SYS_::LogNotSerious);
         return false;
     }
-    root = mxmlFindElement(tree, tree, "ZynAddSubFX-data", NULL, NULL, MXML_DESCEND);
-    if (!root)
+    rootX = mxmlFindElement(treeX, treeX, "ZynAddSubFX-data", NULL, NULL, MXML_DESCEND);
+    if (!rootX)
     {
         zynfile = false;
-        root = mxmlFindElement(tree, tree, "Yoshimi-data", NULL, NULL, MXML_DESCEND);
+        rootX = mxmlFindElement(treeX, treeX, "Yoshimi-data", NULL, NULL, MXML_DESCEND);
     }
 
-    if (!root)
+    if (!rootX)
     {
         synth.getRuntime().Log("XML: File " + filename + " doesn't contain valid data in this context", _SYS_::LogNotSerious);
         return false;
     }
-    node = root;
-    push(root);
-    info = mxmlFindElement(root, root, "INFORMATION", NULL, NULL, MXML_DESCEND_FIRST);
-    if (!info)  // container to hold meta-information (xml type)
-        info = addparams0("INFORMATION");
+    nodeX = rootX;
+    push(rootX);
+    infoX = mxmlFindElement(rootX, rootX, "INFORMATION", NULL, NULL, MXML_DESCEND_FIRST);
+    if (!infoX)  // container to hold meta-information (xml type)
+        infoX = addparams0("INFORMATION");
 
     synth.fileCompatible = true;
     if (zynfile)
     {
-        xml_version.major = string2int(mxmlElementGetAttr(root, "version-major"));
-        xml_version.minor = string2int(mxmlElementGetAttr(root, "version-minor"));
-        if(mxmlElementGetAttr(root, "version-revision") != NULL)
-            xml_version.revision = string2int(mxmlElementGetAttr(root, "version-revision"));
+        xml_version.major = string2int(mxmlElementGetAttr(rootX, "version-major"));
+        xml_version.minor = string2int(mxmlElementGetAttr(rootX, "version-minor"));
+        if(mxmlElementGetAttr(rootX, "version-revision") != NULL)
+            xml_version.revision = string2int(mxmlElementGetAttr(rootX, "version-revision"));
         else
             xml_version.revision = 0;
     }
-    if (mxmlElementGetAttr(root, "Yoshimi-major"))
+    if (mxmlElementGetAttr(rootX, "Yoshimi-major"))
     {
-        xml_version.y_major = string2int(mxmlElementGetAttr(root, "Yoshimi-major"));
+        xml_version.y_major = string2int(mxmlElementGetAttr(rootX, "Yoshimi-major"));
         yoshitoo = true;
     }
     else
@@ -649,11 +645,11 @@ bool XMLStore::loadXMLfile(string const& filename)
         if (xml_version.major > 2)
             synth.fileCompatible = false;
     }
-    if (mxmlElementGetAttr(root, "Yoshimi-minor"))
+    if (mxmlElementGetAttr(rootX, "Yoshimi-minor"))
     {
-        xml_version.y_minor = string2int(mxmlElementGetAttr(root, "Yoshimi-minor"));
-        if (mxmlElementGetAttr(root, "Yoshimi-revision") != NULL)
-            xml_version.y_revision = string2int(mxmlElementGetAttr(root, "Yoshimi-revision"));
+        xml_version.y_minor = string2int(mxmlElementGetAttr(rootX, "Yoshimi-minor"));
+        if (mxmlElementGetAttr(rootX, "Yoshimi-revision") != NULL)
+            xml_version.y_revision = string2int(mxmlElementGetAttr(rootX, "Yoshimi-revision"));
         else
             xml_version.y_revision = 0;
     }
@@ -692,34 +688,34 @@ bool XMLStore::loadXMLfile(string const& filename)
 
 bool XMLStore::putXMLdata(const char *xmldata)
 {
-    if (tree)
-        mxmlDelete(tree);
-    tree = NULL;
+    if (treeX)
+        mxmlDelete(treeX);
+    treeX = NULL;
     memset(&parentstack, 0, sizeof(parentstack));
     stackpos = 0;
     if (xmldata == NULL)
         return false;
-    root = tree = mxmlLoadString(NULL, xmldata, MXML_OPAQUE_CALLBACK);
-    if (tree == NULL)
+    rootX = treeX = mxmlLoadString(NULL, xmldata, MXML_OPAQUE_CALLBACK);
+    if (treeX == NULL)
         return false;
-    root = mxmlFindElement(tree, tree, "ZynAddSubFX-data", NULL, NULL, MXML_DESCEND);
-    if (!root)
-        root = mxmlFindElement(tree, tree, "Yoshimi-data", NULL, NULL, MXML_DESCEND);
-    node = root;
-    if (!root)
+    rootX = mxmlFindElement(treeX, treeX, "ZynAddSubFX-data", NULL, NULL, MXML_DESCEND);
+    if (!rootX)
+        rootX = mxmlFindElement(treeX, treeX, "Yoshimi-data", NULL, NULL, MXML_DESCEND);
+    nodeX = rootX;
+    if (!rootX)
         return false;
-    push(root);
+    push(rootX);
     return true;
 }
 
 
 bool XMLStore::enterbranch(string const& name)
 {
-    node = mxmlFindElement(peek(), peek(), name.c_str(), NULL, NULL,
+    nodeX = mxmlFindElement(peek(), peek(), name.c_str(), NULL, NULL,
                            MXML_DESCEND_FIRST);
-    if (!node)
+    if (!nodeX)
         return false;
-    push(node);
+    push(nodeX);
     if (name == "CONFIGURATION")
     {
         synth.getRuntime().lastXMLmajor = xml_version.y_major;
@@ -731,18 +727,18 @@ bool XMLStore::enterbranch(string const& name)
 
 bool XMLStore::enterbranch(string const& name, int id)
 {
-    node = mxmlFindElement(peek(), peek(), name.c_str(), "id",
+    nodeX = mxmlFindElement(peek(), peek(), name.c_str(), "id",
                            asString(id).c_str(), MXML_DESCEND_FIRST);
-    if (!node)
+    if (!nodeX)
         return false;
-    push(node);
+    push(nodeX);
     return true;
 }
 
 
 int XMLStore::getbranchid(int min, int max)
 {
-    int id = string2int(mxmlElementGetAttr(node, "id"));
+    int id = string2int(mxmlElementGetAttr(nodeX, "id"));
     if (min == 0 && max == 0)
         return id;
     if (id < min)
@@ -755,10 +751,10 @@ int XMLStore::getbranchid(int min, int max)
 
 uint XMLStore::getparU(string const& name, uint defaultpar, uint min, uint max)
 {
-    node = mxmlFindElement(peek(), peek(), "parU", "name", name.c_str(), MXML_DESCEND_FIRST);
-    if (!node)
+    nodeX = mxmlFindElement(peek(), peek(), "parU", "name", name.c_str(), MXML_DESCEND_FIRST);
+    if (!nodeX)
         return defaultpar;
-    const char *strval = mxmlElementGetAttr(node, "value");
+    const char *strval = mxmlElementGetAttr(nodeX, "value");
     if (!strval)
         return defaultpar;
     uint val = string2uint(strval);
@@ -772,10 +768,10 @@ uint XMLStore::getparU(string const& name, uint defaultpar, uint min, uint max)
 
 int XMLStore::getpar(string const& name, int defaultpar, int min, int max)
 {
-    node = mxmlFindElement(peek(), peek(), "par", "name", name.c_str(), MXML_DESCEND_FIRST);
-    if (!node)
+    nodeX = mxmlFindElement(peek(), peek(), "par", "name", name.c_str(), MXML_DESCEND_FIRST);
+    if (!nodeX)
         return defaultpar;
-    const char *strval = mxmlElementGetAttr(node, "value");
+    const char *strval = mxmlElementGetAttr(nodeX, "value");
     if (!strval)
         return defaultpar;
     int val = string2int(strval);
@@ -789,11 +785,11 @@ int XMLStore::getpar(string const& name, int defaultpar, int min, int max)
 
 float XMLStore::getparcombi(string const& name, float defaultpar, float min, float max)
 {
-    node = mxmlFindElement(peek(), peek(), "par", "name", name.c_str(), MXML_DESCEND_FIRST);
-    if (!node)
+    nodeX = mxmlFindElement(peek(), peek(), "par", "name", name.c_str(), MXML_DESCEND_FIRST);
+    if (!nodeX)
         return defaultpar;
     float result = 0;
-    const char *strval = mxmlElementGetAttr(node, "exact_value");
+    const char *strval = mxmlElementGetAttr(nodeX, "exact_value");
     if (strval != NULL)
     {
         union { float out; uint32_t in; } convert;
@@ -802,7 +798,7 @@ float XMLStore::getparcombi(string const& name, float defaultpar, float min, flo
     }
     else
     {
-        strval = mxmlElementGetAttr(node, "value");
+        strval = mxmlElementGetAttr(nodeX, "value");
         if (!strval)
         return defaultpar;
         result = string2float(string(strval));
@@ -829,10 +825,10 @@ int XMLStore::getpar255(string const& name, int defaultpar)
 
 int XMLStore::getparbool(string const& name, int defaultpar)
 {
-    node = mxmlFindElement(peek(), peek(), "par_bool", "name", name.c_str(), MXML_DESCEND_FIRST);
-    if (!node)
+    nodeX = mxmlFindElement(peek(), peek(), "par_bool", "name", name.c_str(), MXML_DESCEND_FIRST);
+    if (!nodeX)
         return defaultpar;
-    const char *strval = mxmlElementGetAttr(node, "value");
+    const char *strval = mxmlElementGetAttr(nodeX, "value");
     if (!strval)
         return defaultpar;
     char tmp = strval[0] | 0x20;
@@ -843,10 +839,10 @@ int XMLStore::getparbool(string const& name, int defaultpar)
 
 string XMLStore::getparstr(string const& name)
 {
-    node = mxmlFindElement(peek(), peek(), "string", "name", name.c_str(), MXML_DESCEND_FIRST);
-    if (!node)
+    nodeX = mxmlFindElement(peek(), peek(), "string", "name", name.c_str(), MXML_DESCEND_FIRST);
+    if (!nodeX)
         return string();
-    mxml_node_t *child = mxmlGetFirstChild(node);
+    mxml_node_t *child = mxmlGetFirstChild(nodeX);
     if (!child)
         return string();
     if (mxmlGetType(child) != MXML_OPAQUE)
@@ -857,12 +853,12 @@ string XMLStore::getparstr(string const& name)
 
 float XMLStore::getparreal(string const& name, float defaultpar)
 {
-    node = mxmlFindElement(peek(), peek(), "par_real", "name", name.c_str(),
+    nodeX = mxmlFindElement(peek(), peek(), "par_real", "name", name.c_str(),
                            MXML_DESCEND_FIRST);
-    if (!node)
+    if (!nodeX)
         return defaultpar;
 
-    const char *strval = mxmlElementGetAttr(node, "exact_value");
+    const char *strval = mxmlElementGetAttr(nodeX, "exact_value");
     if (strval != NULL)
     {
         union { float out; uint32_t in; } convert;
@@ -870,7 +866,7 @@ float XMLStore::getparreal(string const& name, float defaultpar)
         return convert.out;
     }
 
-    strval = mxmlElementGetAttr(node, "value");
+    strval = mxmlElementGetAttr(nodeX, "value");
     if (!strval)
         return defaultpar;
     return string2float(string(strval));
@@ -892,14 +888,14 @@ float XMLStore::getparreal(string const& name, float defaultpar, float min, floa
 
 mxml_node_t *XMLStore::addparams0(string const& name)
 {
-    mxml_node_t *element = mxmlNewElement(node, name.c_str());
+    mxml_node_t *element = mxmlNewElement(nodeX, name.c_str());
     return element;
 }
 
 
 mxml_node_t *XMLStore::addparams1(string const& name, string const& par1, string const& val1)
 {
-    mxml_node_t *element = mxmlNewElement(node, name.c_str());
+    mxml_node_t *element = mxmlNewElement(nodeX, name.c_str());
     mxmlElementSetAttr(element, par1.c_str(), val1.c_str());
     return element;
 }
@@ -908,7 +904,7 @@ mxml_node_t *XMLStore::addparams1(string const& name, string const& par1, string
 mxml_node_t *XMLStore::addparams2(string const& name, string const& par1, string const& val1,
                                     string const& par2, string const& val2)
 {
-    mxml_node_t *element = mxmlNewElement(node, name.c_str());
+    mxml_node_t *element = mxmlNewElement(nodeX, name.c_str());
     mxmlElementSetAttr(element, par1.c_str(), val1.c_str());
     mxmlElementSetAttr(element, par2.c_str(), val2.c_str());
     return element;
@@ -919,7 +915,7 @@ mxml_node_t *XMLStore::addparams3(string const& name, string const& par1, string
                                     string const& par2, string const& val2,
                                     string const& par3, string const& val3)
 {
-    mxml_node_t *element = mxmlNewElement(node, name.c_str());
+    mxml_node_t *element = mxmlNewElement(nodeX, name.c_str());
     mxmlElementSetAttr(element, par1.c_str(), val1.c_str());
     mxmlElementSetAttr(element, par2.c_str(), val2.c_str());
     mxmlElementSetAttr(element, par3.c_str(), val3.c_str());
@@ -944,7 +940,7 @@ mxml_node_t *XMLStore::pop()
     if (stackpos <= 0)
     {
         synth.getRuntime().Log("XML: Not good, XMLwrapper pop on empty parentstack", _SYS_::LogNotSerious);
-        return root;
+        return rootX;
     }
     mxml_node_t *node = parentstack[stackpos];
     parentstack[stackpos] = NULL;
@@ -958,7 +954,7 @@ mxml_node_t *XMLStore::peek()
     if (stackpos <= 0)
     {
         synth.getRuntime().Log("XML: Not good, XMLwrapper peek on an empty parentstack", _SYS_::LogNotSerious);
-        return root;
+        return rootX;
     }
     return parentstack[stackpos];
 }

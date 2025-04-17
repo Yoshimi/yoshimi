@@ -45,18 +45,23 @@ class SynthEngine;
 class XMLtree
 {
     struct Node;
-    Node* node_;
+    Node* node_{nullptr};
 
-        XMLtree(Node*);
+        XMLtree(Node*);     ////////////////////OOO unclear if we need this private constructor...
 
     public:
        ~XMLtree();
-        XMLtree();
+        XMLtree()                          = default;
         // shall only be moved
         XMLtree(XMLtree&&);
         XMLtree(XMLtree const&)            = delete;
         XMLtree& operator=(XMLtree&&)      = delete;
         XMLtree& operator=(XMLtree const&) = delete;
+        
+        explicit operator bool()  const
+        {
+            return bool(node_);
+        }
 };
 
 
@@ -64,15 +69,19 @@ class XMLtree
 /** Maintain tree structured data, which can be stored and retrieved from XML */
 class XMLStore
 {
+    XMLtree root;
+    
     public:
        ~XMLStore();
-        XMLStore(SynthEngine& _synth, bool _isYoshi = false, bool includeBase = true);
+        XMLStore(TOPLEVEL::XML type, SynthEngine& _synth, bool yoshiFormat = true);
         // shall not be copied nor moved
         XMLStore(XMLStore&&)                 = delete;
         XMLStore(XMLStore const&)            = delete;
         XMLStore& operator=(XMLStore&&)      = delete;
         XMLStore& operator=(XMLStore const&) = delete;
 
+        void buildXMLroot();
+        
         // SAVE to XML
         bool saveXMLfile(std::string _filename, bool useCompression = true); // return true if ok, false otherwise
 
@@ -170,10 +179,10 @@ class XMLStore
         void slowinfosearch(char *idx);
 
     private:
-        mxml_node_t *tree;
-        mxml_node_t *root;
-        mxml_node_t *node;
-        mxml_node_t *info;
+        mxml_node_t *treeX;
+        mxml_node_t *rootX;
+        mxml_node_t *nodeX;
+        mxml_node_t *infoX;
 
         // adds params like this:
         // <name>

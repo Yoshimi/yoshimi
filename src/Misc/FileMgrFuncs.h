@@ -611,7 +611,7 @@ inline bool saveText(string const& text, string const& filename)
 }
 
 
-inline char * loadGzipped(string const& _filename, string * report)
+inline char * loadGzipped(string const& _filename, string * report)      ///////////////////////////////////////TODO 4/25 : could return a string -- used only by XMLwrapper
 {
     string filename = _filename;
     char *data = NULL;

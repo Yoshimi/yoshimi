@@ -40,7 +40,8 @@
 #include <jack/session.h>
 #endif
 
-#include "Misc/XMLwrapper.h"
+#include "Misc/XMLwrapper.h"   /////////////////////////////////////////////////////////////////////////////TODO 4/25 : switch to XMLstore
+#include "Misc/XMLStore.h"
 #include "Misc/SynthEngine.h"
 #include "Misc/Config.h"
 #include "Misc/FileMgrFuncs.h"
@@ -537,6 +538,47 @@ bool Config::initFromPersistentConfig()
         }
     }
     return success;
+}
+
+
+void Config::initData(XMLStore& xml)
+{
+
+    xml.buildXMLroot();
+    if (xml.information.type == TOPLEVEL::XML::MasterConfig)
+    {
+/*      /////////////////////////////////////////////////////////////////////////////TODO 4/25 : adapt API for parameter access
+        beginbranch("BASE_PARAMETERS");
+            addparbool("enable_gui", synth.getRuntime().storedGui);
+            addparbool("enable_splash", synth.getRuntime().showSplash);
+            addparbool("enable_CLI", synth.getRuntime().storedCli);
+            addpar("show_CLI_context", synth.getRuntime().showCLIcontext);
+            addparbool("enable_single_master", synth.getRuntime().singlePath);
+            addparbool("enable_auto_instance", synth.getRuntime().autoInstance);
+            addparU("handle_padsynth_build", synth.getRuntime().handlePadSynthBuild);
+            addpar("gzip_compression", synth.getRuntime().gzipCompression);
+            addparbool("banks_checked", synth.getRuntime().banksChecked);
+            addparU("active_instances", synth.getRuntime().activeInstances.to_ulong());
+            addparstr("guide_version", synth.getRuntime().guideVersion);
+            addparstr("manual", synth.getRuntime().manualFile);
+        endbranch();
+*/
+        return;
+    }
+
+    if (xml.information.type <= TOPLEVEL::XML::Scale)
+    {
+/*      /////////////////////////////////////////////////////////////////////////////TODO 4/25 : adapt API for parameter access
+        beginbranch("BASE_PARAMETERS");
+            addpar("max_midi_parts", NUM_MIDI_CHANNELS);
+            addpar("max_kit_items_per_instrument", NUM_KIT_ITEMS);
+            addpar("max_system_effects", NUM_SYS_EFX);
+            addpar("max_insertion_effects", NUM_INS_EFX);
+            addpar("max_instrument_effects", NUM_PART_EFX);
+            addpar("max_addsynth_voices", NUM_VOICES);
+        endbranch();
+*/
+    }
 }
 
 
