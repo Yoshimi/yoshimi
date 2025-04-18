@@ -33,6 +33,7 @@
 #include "Misc/FormatFuncs.h"
 
 #include <sys/types.h>                  ///////////////////////////////////////TODO 4/25 : why?
+#include <utility>
 #include <cassert>
 #include <mxml.h>
 #include <zlib.h>
@@ -50,25 +51,58 @@ using func::asLongString;
 using func::asString;
 
 using std::string;
+using std::move;
 
 
 namespace { // internal details of MXML integration
 
-    struct Policy
-        {
-            mxml_node_t* mxmlElm()
-            {
-                return reinterpret_cast<mxml_node_t*>(this);
-            }
-        };
-}
+    /** Helper to fit with MXML's optionally-NULL char* arguments */
+    class OStr
+    {
+        string rendered{};
 
+    public:
+        OStr() = default;
+        // standard copy operations acceptable
+
+        OStr(string str)
+            : rendered{move(str)}
+            { }
+
+        template<typename X>
+        OStr(X x)
+            : rendered{func::asString(x)}
+            { }
+
+        operator bool()         const { return rendered.size(); }
+        operator const char*()  const { return rendered.size()? rendered.c_str() : nullptr; }
+    };
+
+
+    /** Configuration how to adapt and use the MXML API */
+    struct Policy
+    {
+        mxml_node_t* mxmlElm()
+        {
+            return reinterpret_cast<mxml_node_t*>(this);
+        }
+
+        mxml_node_t* searchChild(OStr elmName    =OStr()
+                                ,OStr attribName =OStr()
+                                ,OStr attribVal  =OStr())
+        {
+            return mxmlFindElement(mxmlElm(), mxmlElm(), elmName, attribName, attribVal, MXML_DESCEND_FIRST);
+        }
+    };
+}//(End)internal details
+
+
+/** Abstracted access point to an MXML tree representation */
 struct XMLtree::Node
     : Policy
     {
         static Node* asNode(mxml_node_t* mxmlElm)
         {
-            assert(mxmlElm);
             return reinterpret_cast<Node*>(mxmlElm);
         }
 
@@ -79,34 +113,175 @@ struct XMLtree::Node
         }
 
         void unref()
-        {   // decrement refcount -- possibly delete
+        {   //  decrement refcount -- possibly delete
             mxmlRelease(mxmlElm());
         }
+
+        Node* addChild(OStr elmName)
+        {
+            return asNode(mxmlNewElement(mxmlElm(), elmName));
+        }
+
+        Node* findChild(OStr elmName, OStr id =OStr())
+        {
+            OStr optIDAttrib{string{id? "id":nullptr}};
+            return asNode(searchChild(elmName, optIDAttrib, id));
+        }
+
+        Node& setAttrib(OStr attribName, OStr val)
+        {
+            mxmlElementSetAttr(mxmlElm(), attribName, val);
+            return *this;
+        }
+        Node& setText(OStr content)
+        {
+            bool leadingWhitespace{false};
+            mxmlNewText(mxmlElm(), leadingWhitespace, content);
+            return *this;
+        }
+
+        const char * getAttrib(OStr attribName)
+        {
+            return mxmlElementGetAttr(mxmlElm(), attribName);
+        }
+
+        const char * getText()
+        {
+            mxml_node_t* child = mxmlGetFirstChild(mxmlElm());
+            if (child and MXML_OPAQUE == mxmlGetType(child))
+                return mxmlGetOpaque(child);
+            else
+                return nullptr;
+        }
     };
+
+
 
 
 /* ===== XMLtree implementation backend ===== */
 
 XMLtree::~XMLtree()
 {
-    if (node_)
-        node_->unref();
+    if (node)
+        node->unref();
 }
 
-XMLtree::XMLtree(Node* treeLocation)     ////////////////////OOO unclear if we need this private constructor...
-    : node_{treeLocation}
+XMLtree::XMLtree(Node* treeLocation)
+    : node{treeLocation}
 {
-    assert(node_);
-    node_->addRef();
+    if (node)
+        node->addRef();
 }
 
 XMLtree::XMLtree(XMLtree&& ref)
-    : node_{nullptr}
+    : node{nullptr}
 {
-    std::swap(node_, ref.node_);
+    std::swap(node, ref.node);
 }
 
 
+XMLtree XMLtree::addElm(string name)
+{
+    assert(node);
+    return node->addChild(name);
+}
+
+XMLtree XMLtree::getElm(string name)
+{
+    return XMLtree{node? node->findChild(name) : nullptr};
+}
+
+XMLtree XMLtree::getElm(string name, int id)
+{
+    return XMLtree{node? node->findChild(name, id) : nullptr};
+}
+
+
+// add simple parameter: name, value
+void XMLtree::addPar_int(string const& name, int val)
+{
+    ///////////////////////////////////////////////////////OOO relocate impl. from XMLStore
+}
+
+// add unsigned integer parameter: name, value
+void XMLtree::addPar_uint(string const& name, uint val)
+{
+    ///////////////////////////////////////////////////////OOO relocate impl. from XMLStore
+}
+
+// add float parameter persisted as fixed bitstring: name, value
+void XMLtree::addPar_float(string const& name, float val)
+{
+    ///////////////////////////////////////////////////////OOO relocate impl. from XMLStore
+}
+
+void XMLtree::addPar_real(string const& name, float val)
+{
+    ///////////////////////////////////////////////////////OOO relocate impl. from XMLStore
+}
+
+void XMLtree::addPar_bool(string const& name, bool val)
+{
+    ///////////////////////////////////////////////////////OOO relocate impl. from XMLStore
+}
+
+// add string parameter (name and string)
+void XMLtree::addPar_str(string const& name, string const& val)
+{
+    ///////////////////////////////////////////////////////OOO relocate impl. from XMLStore
+}
+
+int  XMLtree::getPar_int(string const& name, int defaultVal, int min, int max)
+{
+    ///////////////////////////////////////////////////////OOO relocate impl. from XMLStore
+}
+
+// value limited to [0 ... 127]
+int  XMLtree::getPar_127(string const& name, int defaultVal)
+{
+    ///////////////////////////////////////////////////////OOO relocate impl. from XMLStore
+}
+
+// value limited to [0 ... 255]
+int  XMLtree::getPar_255(string const& name, int defaultVal)
+{
+    ///////////////////////////////////////////////////////OOO relocate impl. from XMLStore
+}
+
+uint XMLtree::getPar_uint(string const& name, uint defaultVal, uint min, uint max)
+{
+    ///////////////////////////////////////////////////////OOO relocate impl. from XMLStore
+}
+
+float XMLtree::getPar_float(string const& name, float defaultVal, float min, float max)
+{
+    ///////////////////////////////////////////////////////OOO relocate impl. from XMLStore
+}
+
+float XMLtree::getPar_real(string const& name, float defaultVal, float min, float max)
+{
+    ///////////////////////////////////////////////////////OOO relocate impl. from XMLStore
+}
+
+float XMLtree::getPar_real(string const& name, float defaultVal)
+{
+    ///////////////////////////////////////////////////////OOO relocate impl. from XMLStore
+}
+
+bool  XMLtree::getPar_bool(string const& name, bool defaultVal)
+{
+    ///////////////////////////////////////////////////////OOO relocate impl. from XMLStore
+}
+
+string XMLtree::getPar_str(string const& name)
+{
+    ///////////////////////////////////////////////////////OOO relocate impl. from XMLStore
+}
+
+
+
+
+/* ===== XMLStore implementation ===== */
 
 
 
@@ -151,7 +326,7 @@ void XMLStore::buildXMLroot()
 {
     treeX = mxmlNewElement(MXML_NO_PARENT, "?xml version=\"1.0\" encoding=\"UTF-8\"?");
     mxml_node_t *doctype = mxmlNewElement(treeX, "!DOCTYPE");
-    
+
     if (isYoshi)
     {
         mxmlElementSetAttr(doctype, "Yoshimi-data", NULL);
@@ -500,6 +675,17 @@ char *XMLStore::getXMLdata()
     nodeX = oldnode;
     char *xmldata = mxmlSaveAllocString(treeX, XMLStore_whitespace_callback);
     return xmldata;
+}
+
+
+XMLtree XMLStore::addElm(string name)
+{
+/////////////////////////////////////////////////OOO silently handle root element and then delegate to the XMLtree API
+}
+
+XMLtree XMLStore::getElm(string name)
+{
+/////////////////////////////////////////////////OOO silently tolerate empty root, otherwise navigate and then delegate to XMLtree API
 }
 
 

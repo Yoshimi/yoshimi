@@ -38,6 +38,7 @@
 // max tree depth
 #define STACKSIZE 128                  ////////////////////////////////////////TODO 4/25 : becomes obsolete
 
+using std::string;
 
 class SynthEngine;
 
@@ -45,7 +46,7 @@ class SynthEngine;
 class XMLtree
 {
     struct Node;
-    Node* node_{nullptr};
+    Node* node{nullptr};
 
         XMLtree(Node*);     ////////////////////OOO unclear if we need this private constructor...
 
@@ -57,11 +58,33 @@ class XMLtree
         XMLtree(XMLtree const&)            = delete;
         XMLtree& operator=(XMLtree&&)      = delete;
         XMLtree& operator=(XMLtree const&) = delete;
-        
+
         explicit operator bool()  const
         {
-            return bool(node_);
+            return bool(node);
         }
+
+        XMLtree addElm(string name);
+        XMLtree getElm(string name);
+        XMLtree getElm(string name, int id);
+
+        void addPar_int(string const& name, int val);     // add simple parameter: name, value
+        void addPar_uint(string const& name, uint val);   // add unsigned integer parameter: name, value
+        void addPar_float(string const& name, float val); // add float parameter persisted as fixed bitstring: name, value
+        void addPar_real(string const& name, float val);
+        void addPar_bool(string const& name, bool val);
+        void addPar_str(string const& name, string const& val);  // add string parameter (name and string)
+
+        int  getPar_int(string const& name, int defaultVal, int min, int max);
+        int  getPar_127(string const& name, int defaultVal);     // value limited to [0 ... 127]
+        int  getPar_255(string const& name, int defaultVal);     // value limited to [0 ... 255]
+        uint getPar_uint(string const& name, uint defaultVal, uint min = 0, uint max = std::numeric_limits<uint>::max());
+
+        float getPar_float(string const& name, float defaultVal, float min, float max);
+        float getPar_real(string const& name, float defaultVal, float min, float max);
+        float getPar_real(string const& name, float defaultVal);
+        bool  getPar_bool(string const& name, bool defaultVal);
+        string getPar_str(string const& name);
 };
 
 
@@ -70,7 +93,7 @@ class XMLtree
 class XMLStore
 {
     XMLtree root;
-    
+
     public:
        ~XMLStore();
         XMLStore(TOPLEVEL::XML type, SynthEngine& _synth, bool yoshiFormat = true);
@@ -81,7 +104,7 @@ class XMLStore
         XMLStore& operator=(XMLStore const&) = delete;
 
         void buildXMLroot();
-        
+
         // SAVE to XML
         bool saveXMLfile(std::string _filename, bool useCompression = true); // return true if ok, false otherwise
 
@@ -89,6 +112,8 @@ class XMLStore
         // the string is NULL terminated
         char* getXMLdata();
 
+        XMLtree addElm(string name);
+        XMLtree getElm(string name);
 
         void addparU(std::string const& name, uint val); // add unsigned integer parameter: name, value
 
