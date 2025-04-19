@@ -26,6 +26,7 @@
 #include <string>
 #include <sstream>
 #include <cstring>
+#include <iomanip>
 #include <list>
 
 namespace func {
@@ -93,6 +94,12 @@ inline std::string asString(uchar c)
 }
 
 
+inline std::string asString(bool yes)
+{
+    return yes? "true":"false";
+}
+
+
 inline std::string asString(float n)
 {
    std::ostringstream oss;
@@ -157,22 +164,60 @@ inline std::string asMidiNoteString(unsigned char n)
 }
 
 
+inline std::string asExactBitstring(float f)
+{
+    union { float value; uint32_t raw32bit; } converter;
+    converter.value = f;
+    std::ostringstream format;
+    format << "0x"           // ensure prefix for zero, and lower case 'x'
+           << std::hex
+           << std::noshowbase
+           << std::uppercase
+           << std::setw(4*2) // need 2 hex digits per byte
+           << std::setfill('0')
+           << converter.raw32bit;
+    return format.str();
+}
+
+
+
+inline float bitstring2float(std::string str)
+{
+    union { float value; uint32_t raw32bit; } converter;
+    std::istringstream parser(str);
+    uint32_t rawVal;
+    parser >> std::hex >> rawVal;
+    converter.raw32bit = rawVal;
+    return converter.value;
+}
+
 
 inline float string2float(std::string str)
 {
-    std::istringstream machine(str);
+    std::istringstream parser(str);
     float fval;
-    machine >> fval;
+    parser >> fval;
     return fval;
 }
 
 
 inline double string2double(std::string str)
 {
-    std::istringstream machine(str);
+    std::istringstream parser(str);
     double dval;
-    machine >> dval;
+    parser >> dval;
     return dval;
+}
+
+
+inline double string2bool(std::string str)
+{
+    if (str.length() > 0)
+    {                        // ASCII and compatible to lowercase
+        char lead = str[0] | 0x20;
+        return lead == 't' or lead == 'y' or lead == '1';
+    }
+    return false;
 }
 
 
@@ -188,27 +233,43 @@ inline bool isDigits(std::string str)
 
 inline int string2int(std::string str)
 {
-    std::istringstream machine(str);
+    std::istringstream parser(str);
     int intval;
-    machine >> intval;
+    parser >> intval;
+    return intval;
+}
+
+inline uint string2uint(std::string str)
+{
+    std::istringstream parser(str);
+    uint intval;
+    parser >> intval;
     return intval;
 }
 
 inline int64_t string2int64(std::string str)
 {
-    std::istringstream machine(str);
+    std::istringstream parser(str);
     int64_t longval;
-    machine >> longval;
+    parser >> longval;
     return longval;
+}
+
+inline uint32_t string2uint32(std::string str)
+{
+    std::istringstream parser(str);
+    uint32_t u32val;
+    parser >> u32val;
+    return u32val;
 }
 
 
 /* ensures MIDI compatible numbers without errors */
 inline int string2int127(std::string str)
 {
-    std::istringstream machine(str);
+    std::istringstream parser(str);
     int intval;
-    machine >> intval;
+    parser >> intval;
     if (intval < 0)
         intval = 0;
     else if (intval > 127)
@@ -216,14 +277,6 @@ inline int string2int127(std::string str)
     return intval;
 }
 
-
-inline uint string2uint(std::string str)
-{
-    std::istringstream machine(str);
-    uint intval;
-    machine >> intval;
-    return intval;
-}
 
 /*
  * turns the 1st count number to upper case

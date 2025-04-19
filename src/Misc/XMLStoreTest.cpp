@@ -30,6 +30,7 @@
 #include <iostream>
 #include <string>
 #include <memory>
+#include <limits>
 #include <cmath>
 
 //#include <functional>
@@ -52,6 +53,41 @@ void run_XMLStoreTest(SynthEngine& synth)
 {
     cout << "+++ Test XML handling................................." << endl;
 
+    // Hex formating
+    cout <<"int(0)   "<< func::asHexString(0)<<endl;
+    cout <<"int(15)  "<< func::asHexString(15)<<endl;
+    cout <<"int(-1)  "<< func::asHexString(-1)<<endl;
+    cout <<"uint(-1) "<< func::asHexString(uint(-1))<<endl;
+    cout <<"ExactBitstring 0.0           "<< func::asExactBitstring(0.0)<<endl;
+    cout <<"ExactBitstring 1.01          "<< func::asExactBitstring(1.01)<<endl;
+    cout <<"ExactBitstring -1.01         "<< func::asExactBitstring(-1.01)<<endl;
+    cout <<"ExactBitstring float.max     "<< func::asExactBitstring(std::numeric_limits<float>::max())<<endl;
+    cout <<"ExactBitstring float.min     "<< func::asExactBitstring(std::numeric_limits<float>::min())<<endl;
+    cout <<"ExactBitstring float.lowest  "<< func::asExactBitstring(std::numeric_limits<float>::lowest())<<endl;
+    cout <<"ExactBitstring float.epsilon "<< func::asExactBitstring(std::numeric_limits<float>::epsilon())<<endl;
+    cout <<"ExactBitstring float +inf    "<< func::asExactBitstring(INFINITY)<<endl;
+    cout <<"ExactBitstring float nan     "<< func::asExactBitstring(NAN)<<endl;
+    
+    cout <<"ExactBitstring 0.0           "<< func::asExactBitstring(0.0)<<endl;
+    cout <<"ExactBitstring 1.01          "<< func::asExactBitstring(1.01)<<endl;
+    cout <<"ExactBitstring -1.01         "<< func::asExactBitstring(-1.01)<<endl;
+    cout <<"ExactBitstring float.max     "<< func::asExactBitstring(std::numeric_limits<float>::max())<<endl;
+    cout <<"ExactBitstring float.min     "<< func::asExactBitstring(std::numeric_limits<float>::min())<<endl;
+    cout <<"ExactBitstring float.lowest  "<< func::asExactBitstring(std::numeric_limits<float>::lowest())<<endl;
+    cout <<"ExactBitstring float.epsilon "<< func::asExactBitstring(std::numeric_limits<float>::epsilon())<<endl;
+    cout <<"ExactBitstring float +inf    "<< func::asExactBitstring(INFINITY)<<endl;
+    cout <<"ExactBitstring float nan     "<< func::asExactBitstring(NAN)<<endl;
+    cout <<"read Bitstring  0x00000000 : "<< func::bitstring2float("0x00000000")<<endl;
+    cout <<"read Bitstring  0x3F8147AE : "<< func::bitstring2float("0x3F8147AE")<<endl;
+    cout <<"read Bitstring  0xBF8147AE : "<< func::bitstring2float("0xBF8147AE")<<endl;
+    cout <<"read Bitstring  0x7F7FFFFF : "<< func::bitstring2float("0x7F7FFFFF")<<endl;
+    cout <<"read Bitstring  0x00800000 : "<< func::bitstring2float("0x00800000")<<endl;
+    cout <<"read Bitstring  0xFF7FFFFF : "<< func::bitstring2float("0xFF7FFFFF")<<endl;
+    cout <<"read Bitstring  0x34000000 : "<< func::bitstring2float("0x34000000")<<endl;
+    cout <<"read Bitstring  0x7F800000 : "<< func::bitstring2float("0x7F800000")<<endl;
+    cout <<"read Bitstring  0x7FC00000 : "<< func::bitstring2float("0x7FC00000")<<endl;
+    cout << endl;
+
     // the following code is a simplified version of loading the base config
     string location = file::configDir();
     string baseConfig = location + "/" + YOSHIMI + EXTEN::config;
@@ -69,18 +105,18 @@ void run_XMLStoreTest(SynthEngine& synth)
     cout << "Loaded XML-Tree:\n"<<string{xmldata}<<endl;
     free(xmldata);
 
-    CHECK(xml.enterbranch("BASE_PARAMETERS"));
-    bool guiParam = xml.getparbool("enable_gui", true);
-    uint compParam = xml.getpar("gzip_compression", 5, 0, 9);
-    string guideVersion{xml.getparstr("guide_version")};
+    XMLtree baseParam = xml.getElm("BASE_PARAMETERS");
+    CHECK(baseParam);
+    bool guiParam = baseParam.getPar_bool("enable_gui", true);
+    uint compParam = baseParam.getPar_int("gzip_compression", 5, 0, 9);
+    string guideVersion{baseParam.getPar_str("guide_version")};
 
     cout << "enable_gui:"<<guiParam
          << "\ngzip_compression:"<<compParam
          << "\nguide_version:"<<guideVersion
          << endl;
 
-    xml.endbranch();
-    xml.addparreal("Heffalump", (1+sqrtf(5))/2);
+    baseParam.addPar_real("Heffalump", (1+sqrtf(5))/2);
 
     const string TESTFILE{"heffalump.xml"};
     CHECK(xml.saveXMLfile(TESTFILE, false))

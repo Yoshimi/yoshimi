@@ -33,10 +33,11 @@
 #include "Misc/FormatFuncs.h"
 
 #include <sys/types.h>                  ///////////////////////////////////////TODO 4/25 : why?
-#include <utility>
-#include <cassert>
 #include <mxml.h>
 #include <zlib.h>
+#include <cassert>
+#include <utility>
+#include <algorithm>
 #include <sstream>
 #include <string>
 
@@ -67,6 +68,10 @@ namespace { // internal details of MXML integration
 
         OStr(string str)
             : rendered{move(str)}
+            { }
+
+        OStr(const char* const literal)
+            : OStr(string(literal))
             { }
 
         template<typename X>
@@ -124,8 +129,13 @@ struct XMLtree::Node
 
         Node* findChild(OStr elmName, OStr id =OStr())
         {
-            OStr optIDAttrib{string{id? "id":nullptr}};
-            return asNode(searchChild(elmName, optIDAttrib, id));
+            OStr optIDAttrib{id? "id":nullptr};
+            return findChild(elmName, optIDAttrib, id);
+        }
+
+        Node* findChild(OStr elmName, OStr attribName, OStr attribVal)
+        {
+            return asNode(searchChild(elmName, attribName, attribVal));
         }
 
         Node& setAttrib(OStr attribName, OStr val)
@@ -197,85 +207,183 @@ XMLtree XMLtree::getElm(string name, int id)
 }
 
 
-// add simple parameter: name, value
+/** add simple parameter element: with attribute name, value */
 void XMLtree::addPar_int(string const& name, int val)
 {
-    ///////////////////////////////////////////////////////OOO relocate impl. from XMLStore
+    assert(node);
+    node->addChild("par")
+            ->setAttrib("name",name)
+             .setAttrib("value",val);
 }
 
-// add unsigned integer parameter: name, value
 void XMLtree::addPar_uint(string const& name, uint val)
 {
-    ///////////////////////////////////////////////////////OOO relocate impl. from XMLStore
+    assert(node);
+    node->addChild("parU")
+            ->setAttrib("name",name)
+             .setAttrib("value",val);
 }
 
-// add float parameter persisted as fixed bitstring: name, value
-void XMLtree::addPar_float(string const& name, float val)
+/** add value both as integral number and as float persisted as exact bitstring */
+void XMLtree::addPar_frac(string const& name, float val)
 {
-    ///////////////////////////////////////////////////////OOO relocate impl. from XMLStore
+    assert(node);
+    node->addChild("par")
+            ->setAttrib("name",  name)
+             .setAttrib("value", lrint(val)) // NOTE: rounded to integer
+             .setAttrib("exact_value", func::asExactBitstring(val));
 }
 
+/** add floating-point both textually in decimal-format and as exact bitstring */
 void XMLtree::addPar_real(string const& name, float val)
 {
-    ///////////////////////////////////////////////////////OOO relocate impl. from XMLStore
+    assert(node);
+    node->addChild("par_real")
+            ->setAttrib("name",  name)
+             .setAttrib("value", asLongString(val)) // decimal floating-point form
+             .setAttrib("exact_value", func::asExactBitstring(val));
 }
 
-void XMLtree::addPar_bool(string const& name, bool val)
+void XMLtree::addPar_bool(string const& name, bool yes)
 {
-    ///////////////////////////////////////////////////////OOO relocate impl. from XMLStore
+    assert(node);
+    node->addChild("par_bool")
+            ->setAttrib("name",name)
+             .setAttrib("value",yes? "yes":"no");
 }
 
-// add string parameter (name and string)
-void XMLtree::addPar_str(string const& name, string const& val)
+/** add string parameter: the name as attribute and the text as content */
+void XMLtree::addPar_str(string const& name, string const& text)
 {
-    ///////////////////////////////////////////////////////OOO relocate impl. from XMLStore
+    assert(node);
+    node->addChild("string")
+            ->setAttrib("name",name)
+             .setText(text);
 }
 
-int  XMLtree::getPar_int(string const& name, int defaultVal, int min, int max)
-{
-    ///////////////////////////////////////////////////////OOO relocate impl. from XMLStore
-}
 
-// value limited to [0 ... 127]
-int  XMLtree::getPar_127(string const& name, int defaultVal)
+/**
+ * Retrieve numeric value from a nested parameter element.
+ * - if present, the stored representation will be converted to an int ∈[min ... max]
+ * - otherwise, defaultVal is returned
+ */
+int XMLtree::getPar_int(string const& name, int defaultVal, int min, int max)
 {
-    ///////////////////////////////////////////////////////OOO relocate impl. from XMLStore
-}
-
-// value limited to [0 ... 255]
-int  XMLtree::getPar_255(string const& name, int defaultVal)
-{
-    ///////////////////////////////////////////////////////OOO relocate impl. from XMLStore
+    if (node)
+    {
+        Node* paramElm = node->findChild("par","name",name);
+        if (paramElm)
+        {
+            const char* valStr = paramElm->getAttrib("value");
+            if (valStr)
+                return std::clamp(string2int(valStr), min, max);
+        }
+    }
+    // parameter entry not retrieved
+    return defaultVal;
 }
 
 uint XMLtree::getPar_uint(string const& name, uint defaultVal, uint min, uint max)
 {
-    ///////////////////////////////////////////////////////OOO relocate impl. from XMLStore
+    if (node)
+    {
+        Node* paramElm = node->findChild("parU","name",name);
+        if (paramElm)                 //  ^^^^
+        {
+            const char* valStr = paramElm->getAttrib("value");
+            if (valStr)
+                return std::clamp(string2uint(valStr), min, max);
+        }                             // ^^^^
+    }
+    // parameter entry not retrieved
+    return defaultVal;
 }
 
-float XMLtree::getPar_float(string const& name, float defaultVal, float min, float max)
+/** @internal attempt to retrieve a float value,
+ *            preferably using the exact IEEE 754 bitstring stored in an attribute "exact_value";
+ *            For legacy format, fall back to the "value" attribute, which can either be a decimal
+ *            floating-point (for `<par_real...`) or even just an integer (for the 0...127 char params)
+ */
+optional<float> XMLtree::readParCombi(string const& elmID, string const& name)
 {
-    ///////////////////////////////////////////////////////OOO relocate impl. from XMLStore
+    if (node)
+    {
+        Node* paramElm = node->findChild(elmID,"name",name);
+        if (paramElm)
+        {
+            const char* valStr = paramElm->getAttrib("exact_value");
+            if (valStr)
+                return func::bitstring2float(valStr);
+
+            // fall-back to legacy format
+            valStr = paramElm->getAttrib("value");
+            if (valStr)
+                return string2float(valStr);
+        }
+    }
+    // parameter entry not retrieved
+    return std::nullopt;
 }
 
-float XMLtree::getPar_real(string const& name, float defaultVal, float min, float max)
+float XMLtree::getPar_frac(string const& name, float defaultVal, float min, float max)
 {
-    ///////////////////////////////////////////////////////OOO relocate impl. from XMLStore
+    auto val = readParCombi("par",name);
+    return std::clamp(val? *val:defaultVal, min, max);
 }
 
 float XMLtree::getPar_real(string const& name, float defaultVal)
 {
-    ///////////////////////////////////////////////////////OOO relocate impl. from XMLStore
+    auto val = readParCombi("par_real",name);
+    return val? *val:defaultVal;
 }
 
-bool  XMLtree::getPar_bool(string const& name, bool defaultVal)
+float XMLtree::getPar_real(string const& name, float defaultVal, float min, float max)
 {
-    ///////////////////////////////////////////////////////OOO relocate impl. from XMLStore
+    return std::clamp(getPar_real(name,defaultVal), min, max);
+}
+
+/** value limited to [0 ... 127] */
+int XMLtree::getPar_127(string const& name, int defaultVal)
+{
+    return getPar_int(name, defaultVal, 0, 127);
+}
+
+/** value limited to [0 ... 255] */
+int XMLtree::getPar_255(string const& name, int defaultVal)
+{
+    return getPar_int(name, defaultVal, 0, 255);
+}
+
+bool XMLtree::getPar_bool(string const& name, bool defaultVal)
+{
+    if (node)
+    {
+        Node* paramElm = node->findChild("par_bool","name",name);
+        if (paramElm)
+        {
+            const char* valStr = paramElm->getAttrib("value");
+            if (valStr)
+                return func::string2bool(valStr);
+        }
+    }
+    // parameter entry not retrieved
+    return defaultVal;
 }
 
 string XMLtree::getPar_str(string const& name)
 {
-    ///////////////////////////////////////////////////////OOO relocate impl. from XMLStore
+    if (node)
+    {
+        Node* paramElm = node->findChild("string","name",name);
+        if (paramElm)
+        {
+            const char* text = paramElm->getText();
+            if (text)
+                return string{text};
+        }
+    }
+    // parameter entry not retrieved
+    return string{};
 }
 
 
@@ -384,36 +492,7 @@ void XMLStore::buildXMLroot()
 
     infoX = addparams0("INFORMATION"); // specifications
 
-    if (synth.getRuntime().xmlType == TOPLEVEL::XML::MasterConfig)
-    {
-        beginbranch("BASE_PARAMETERS");
-            addparbool("enable_gui", synth.getRuntime().storedGui);
-            addparbool("enable_splash", synth.getRuntime().showSplash);
-            addparbool("enable_CLI", synth.getRuntime().storedCli);
-            addpar("show_CLI_context", synth.getRuntime().showCLIcontext);
-            addparbool("enable_single_master", synth.getRuntime().singlePath);
-            addparbool("enable_auto_instance", synth.getRuntime().autoInstance);
-            addparU("handle_padsynth_build", synth.getRuntime().handlePadSynthBuild);
-            addpar("gzip_compression", synth.getRuntime().gzipCompression);
-            addparbool("banks_checked", synth.getRuntime().banksChecked);
-            addparU("active_instances", synth.getRuntime().activeInstances.to_ulong());
-            addparstr("guide_version", synth.getRuntime().guideVersion);
-            addparstr("manual", synth.getRuntime().manualFile);
-        endbranch();
-        return;
-    }
-
-    if (synth.getRuntime().xmlType <= TOPLEVEL::XML::Scale)
-    {
-            beginbranch("BASE_PARAMETERS");
-                addpar("max_midi_parts", NUM_MIDI_CHANNELS);
-                addpar("max_kit_items_per_instrument", NUM_KIT_ITEMS);
-                addpar("max_system_effects", NUM_SYS_EFX);
-                addpar("max_insertion_effects", NUM_INS_EFX);
-                addpar("max_instrument_effects", NUM_PART_EFX);
-                addpar("max_addsynth_voices", NUM_VOICES);
-            endbranch();
-    }
+    ///////////////////////////////////////////////////////////////////////TODO 4/2025 : old code initialised base parameters in ctor -- must do that explicitly now --> Config::initData(xml)
 }
 
 
@@ -611,6 +690,7 @@ char *XMLStore::getXMLdata()
     mxml_node_t *oldnode=nodeX;
     nodeX = infoX;
 
+#if false ///////////////////////////////////////////////////////////////////////////////////////////////////TODO 4/25 : must handle the info node explicitly now, instead of injecting it as Side-Effect 
     switch (synth.getRuntime().xmlType)
     {
         case TOPLEVEL::XML::Instrument:
@@ -672,6 +752,7 @@ char *XMLStore::getXMLdata()
             addparstr("XMLtype", "Unknown");
             break;
     }
+#endif //////////////////////////////////////////////////////////////////////////////////////////////////////TODO 4/25 : (End) Handling of Info-Node
     nodeX = oldnode;
     char *xmldata = mxmlSaveAllocString(treeX, XMLStore_whitespace_callback);
     return xmldata;
@@ -689,79 +770,6 @@ XMLtree XMLStore::getElm(string name)
 }
 
 
-void XMLStore::addparU(string const& name, uint val)
-{
-    addparams2("parU", "name", name.c_str(), "value", asString(val));
-}
-
-
-void XMLStore::addpar(string const& name, int val)
-{
-    addparams2("par", "name", name.c_str(), "value", asString(val));
-}
-
-
-void XMLStore::addparcombi(string const& name, float val)
-{
-    union { float in; uint32_t out; } convert;
-    char buf[11];
-    convert.in = val;
-    sprintf(buf, "0x%8X", convert.out);
-    addparams3("par", "name", name.c_str(), "value", asString(lrintf(val)), "exact_value", buf);
-}
-
-
-void XMLStore::addparreal(string const& name, float val)
-{
-    union { float in; uint32_t out; } convert;
-    char buf[11];
-    convert.in = val;
-    sprintf(buf, "0x%8X", convert.out);
-    addparams3("par_real", "name", name.c_str(), "value", asLongString(val), "exact_value", buf);
-}
-
-
-void XMLStore::addpardouble(string const& name, double val)
-{
-    addparams2("par_real","name", name.c_str(), "value", asLongString(val));
-}
-
-
-void XMLStore::addparbool(string const& name, int val)
-{
-    if (val != 0)
-        addparams2("par_bool", "name", name.c_str(), "value", "yes");
-    else
-        addparams2("par_bool", "name", name.c_str(), "value", "no");
-}
-
-
-void XMLStore::addparstr(string const& name, string const& val)
-{
-    mxml_node_t *element = mxmlNewElement(nodeX, "string");
-    mxmlElementSetAttr(element, "name", name.c_str());
-    mxmlNewText(element, 0, val.c_str());
-}
-
-
-void XMLStore::beginbranch(string const& name)
-{
-    push(nodeX);
-    nodeX = addparams0(name.c_str());
-}
-
-
-void XMLStore::beginbranch(string const& name, int id)
-{
-    push(nodeX);
-    nodeX = addparams1(name.c_str(), "id", asString(id));
-}
-
-
-void XMLStore::endbranch()
-{
-    nodeX = pop();
-}
 
 // LOAD XML members
 bool XMLStore::loadXMLfile(string const& filename)
@@ -895,32 +903,6 @@ bool XMLStore::putXMLdata(const char *xmldata)
 }
 
 
-bool XMLStore::enterbranch(string const& name)
-{
-    nodeX = mxmlFindElement(peek(), peek(), name.c_str(), NULL, NULL,
-                           MXML_DESCEND_FIRST);
-    if (!nodeX)
-        return false;
-    push(nodeX);
-    if (name == "CONFIGURATION")
-    {
-        synth.getRuntime().lastXMLmajor = xml_version.y_major;
-        synth.getRuntime().lastXMLminor = xml_version.y_minor;
-    }
-    return true;
-}
-
-
-bool XMLStore::enterbranch(string const& name, int id)
-{
-    nodeX = mxmlFindElement(peek(), peek(), name.c_str(), "id",
-                           asString(id).c_str(), MXML_DESCEND_FIRST);
-    if (!nodeX)
-        return false;
-    push(nodeX);
-    return true;
-}
-
 
 int XMLStore::getbranchid(int min, int max)
 {
@@ -935,139 +917,6 @@ int XMLStore::getbranchid(int min, int max)
 }
 
 
-uint XMLStore::getparU(string const& name, uint defaultpar, uint min, uint max)
-{
-    nodeX = mxmlFindElement(peek(), peek(), "parU", "name", name.c_str(), MXML_DESCEND_FIRST);
-    if (!nodeX)
-        return defaultpar;
-    const char *strval = mxmlElementGetAttr(nodeX, "value");
-    if (!strval)
-        return defaultpar;
-    uint val = string2uint(strval);
-    if (val < min)
-        val = min;
-    else if (val > max)
-        val = max;
-    return val;
-}
-
-
-int XMLStore::getpar(string const& name, int defaultpar, int min, int max)
-{
-    nodeX = mxmlFindElement(peek(), peek(), "par", "name", name.c_str(), MXML_DESCEND_FIRST);
-    if (!nodeX)
-        return defaultpar;
-    const char *strval = mxmlElementGetAttr(nodeX, "value");
-    if (!strval)
-        return defaultpar;
-    int val = string2int(strval);
-    if (val < min)
-        val = min;
-    else if (val > max)
-        val = max;
-    return val;
-}
-
-
-float XMLStore::getparcombi(string const& name, float defaultpar, float min, float max)
-{
-    nodeX = mxmlFindElement(peek(), peek(), "par", "name", name.c_str(), MXML_DESCEND_FIRST);
-    if (!nodeX)
-        return defaultpar;
-    float result = 0;
-    const char *strval = mxmlElementGetAttr(nodeX, "exact_value");
-    if (strval != NULL)
-    {
-        union { float out; uint32_t in; } convert;
-        sscanf(strval+2, "%x", &convert.in);
-        result = convert.out;
-    }
-    else
-    {
-        strval = mxmlElementGetAttr(nodeX, "value");
-        if (!strval)
-        return defaultpar;
-        result = string2float(string(strval));
-    }
-    if (result < min)
-        result = min;
-    else if (result > max)
-        result = max;
-    return result;
-}
-
-
-int XMLStore::getpar127(string const& name, int defaultpar)
-{
-    return(getpar(name, defaultpar, 0, 127));
-}
-
-
-int XMLStore::getpar255(string const& name, int defaultpar)
-{
-    return(getpar(name, defaultpar, 0, 255));
-}
-
-
-int XMLStore::getparbool(string const& name, int defaultpar)
-{
-    nodeX = mxmlFindElement(peek(), peek(), "par_bool", "name", name.c_str(), MXML_DESCEND_FIRST);
-    if (!nodeX)
-        return defaultpar;
-    const char *strval = mxmlElementGetAttr(nodeX, "value");
-    if (!strval)
-        return defaultpar;
-    char tmp = strval[0] | 0x20;
-    return (tmp != '0' && tmp != 'n' && tmp != 'f') ? 1 : 0;
-}
-// case insensitive, anything other than '0', 'no', 'false' is treated as 'true'
-
-
-string XMLStore::getparstr(string const& name)
-{
-    nodeX = mxmlFindElement(peek(), peek(), "string", "name", name.c_str(), MXML_DESCEND_FIRST);
-    if (!nodeX)
-        return string();
-    mxml_node_t *child = mxmlGetFirstChild(nodeX);
-    if (!child)
-        return string();
-    if (mxmlGetType(child) != MXML_OPAQUE)
-        return string();
-    return string(mxmlGetOpaque(child));
-}
-
-
-float XMLStore::getparreal(string const& name, float defaultpar)
-{
-    nodeX = mxmlFindElement(peek(), peek(), "par_real", "name", name.c_str(),
-                           MXML_DESCEND_FIRST);
-    if (!nodeX)
-        return defaultpar;
-
-    const char *strval = mxmlElementGetAttr(nodeX, "exact_value");
-    if (strval != NULL)
-    {
-        union { float out; uint32_t in; } convert;
-        sscanf(strval+2, "%x", &convert.in);
-        return convert.out;
-    }
-
-    strval = mxmlElementGetAttr(nodeX, "value");
-    if (!strval)
-        return defaultpar;
-    return string2float(string(strval));
-}
-
-
-float XMLStore::getparreal(string const& name, float defaultpar, float min, float max)
-{
-    float result = getparreal(name, defaultpar);
-    if (result < min)
-        result = min;
-    else if (result > max)
-        result = max;
-    return result;
-}
 
 
 // Private parts

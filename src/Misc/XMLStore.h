@@ -34,11 +34,13 @@
 #include <mxml.h>                      ////////////////////////////////////////TODO 4/25 : remove from front-end
 #include <string>
 #include <limits>
+#include <optional>
 
 // max tree depth
 #define STACKSIZE 128                  ////////////////////////////////////////TODO 4/25 : becomes obsolete
 
 using std::string;
+using std::optional;
 
 class SynthEngine;
 
@@ -68,23 +70,26 @@ class XMLtree
         XMLtree getElm(string name);
         XMLtree getElm(string name, int id);
 
-        void addPar_int(string const& name, int val);     // add simple parameter: name, value
-        void addPar_uint(string const& name, uint val);   // add unsigned integer parameter: name, value
-        void addPar_float(string const& name, float val); // add float parameter persisted as fixed bitstring: name, value
-        void addPar_real(string const& name, float val);
+        void addPar_int(string const& name, int val);            // add simple parameter element: with attribute name, value
+        void addPar_uint(string const& name, uint val);          // add unsigned integer parameter: name, value
+        void addPar_frac(string const& name, float val);         // add value both as integral and as float persisted as exact bitstring
+        void addPar_real(string const& name, float val);         // add floating-point both textually and as exact bitstring
         void addPar_bool(string const& name, bool val);
-        void addPar_str(string const& name, string const& val);  // add string parameter (name and string)
+        void addPar_str(string const& name, string const&);      // add string parameter (name and string)
 
         int  getPar_int(string const& name, int defaultVal, int min, int max);
         int  getPar_127(string const& name, int defaultVal);     // value limited to [0 ... 127]
         int  getPar_255(string const& name, int defaultVal);     // value limited to [0 ... 255]
         uint getPar_uint(string const& name, uint defaultVal, uint min = 0, uint max = std::numeric_limits<uint>::max());
 
-        float getPar_float(string const& name, float defaultVal, float min, float max);
+        float getPar_frac(string const& name, float defaultVal, float min, float max);  // restore exact fractional value, fall-back to integral(legacy)
         float getPar_real(string const& name, float defaultVal, float min, float max);
         float getPar_real(string const& name, float defaultVal);
         bool  getPar_bool(string const& name, bool defaultVal);
         string getPar_str(string const& name);
+
+    private:
+        optional<float> readParCombi(string const&, string const& name);
 };
 
 
@@ -115,29 +120,6 @@ class XMLStore
         XMLtree addElm(string name);
         XMLtree getElm(string name);
 
-        void addparU(std::string const& name, uint val); // add unsigned integer parameter: name, value
-
-        void addpar(std::string const& name, int val); // add simple parameter: name, value
-
-        void addparcombi(std::string const& name, float val); // add float parameter persisted as fixed bitstring: name, value
-
-        void addparreal(std::string const& name, float val);
-
-        void addpardouble(std::string const& name, double val);
-
-        void addparbool(std::string const& name, int val); // 1 => "yes", else "no"         /////////////////TODO 4/25 : change to bool
-
-        // add string parameter (name and string)
-        void addparstr(std::string const& name, std::string const& val);
-
-        // add a branch
-        void beginbranch(std::string const& name);
-        void beginbranch(std::string const& name, int id);
-
-        // this must be called after each branch (nodes that contains child nodes)
-        void endbranch();
-
-
         // we always save with a blank first line
         const char *removeBlanks(const char *c)
         {while (isspace(*c)) ++c; return c;}
@@ -148,45 +130,12 @@ class XMLStore
         // used by the clipboard
         bool putXMLdata(const char *xmldata);
 
-        // enter into the branch
-        // returns 1 if is ok, or 0 otherwise
-        bool enterbranch(std::string const& name);
-
-        // enter into the branch with id
-        // returns 1 if is ok, or 0 otherwise
-        bool enterbranch(std::string const& name, int id);
-
-        // exits from a branch
-        void exitbranch() { pop(); }
-
         // get the the branch_id and limits it between the min and max
         // if min==max==0, it will not limit it
         // if there isn't any id, will return min
         // this must be called only immediately after enterbranch()
-        int getbranchid(int min, int max);
+        int getbranchid(int min, int max);         ////////////////////////////////////////////OOO what is this for?
 
-        // it returns the parameter and limits it between min and max
-        // if min==max==0, it will not limit it
-        // if no parameter will be here, the defaultpar will be returned
-        uint getparU(std::string const& name, uint defaultpar, uint min = 0, uint max = std::numeric_limits<uint>::max());
-
-        int getpar(std::string const& name, int defaultpar, int min, int max);
-
-        float getparcombi(std::string const& name, float defaultpar, float min, float max);
-
-        // the same as getpar, but the limits are 0 and 127
-        int getpar127(std::string const& name, int defaultpar);
-
-         // the same as getpar, but the limits are 0 and 255
-        int getpar255(std::string const& name, int defaultpar);
-
-       int getparbool(std::string const& name, int defaultpar);
-
-         std::string getparstr(std::string const& name);
-
-        float getparreal(std::string const& name, float defaultpar);
-        float getparreal(std::string const& name, float defaultpar,
-                         float min, float max);
 
         bool minimal; // false if all parameters will be stored
 
