@@ -35,6 +35,7 @@
 
 #include "Misc/Log.h"
 #include "Misc/Alloc.h"
+#include "Misc/VerInfo.h"
 #include "Misc/InstanceManager.h"
 #include "MusicIO/MusicClient.h"
 #ifdef GUI_FLTK
@@ -113,6 +114,8 @@ class Config
         int     lastXMLmajor;
         int     lastXMLminor;
         bool    oldConfig;
+
+        static const VerInfo VER_YOSHI_CURR, VER_ZYN_COMPAT;
 
         static bool        showSplash;
         static bool        singlePath;

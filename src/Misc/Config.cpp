@@ -35,6 +35,7 @@
 #include <unistd.h>
 #include <cassert>
 #include <memory>
+#include <regex>
 
 #if defined(JACK_SESSION)
 #include <jack/session.h>
@@ -65,6 +66,7 @@ using file::loadText;
 using func::nearestPowerOf2;
 using func::asString;
 using func::string2int;
+using func::string2uint;
 
 using std::string;
 using std::cout;
@@ -74,7 +76,31 @@ using std::endl;
 namespace { // Implementation details...
 
     TextMsgBuffer& textMsgBuffer = TextMsgBuffer::instance();
+
+
+    static std::regex VERSION_SYNTAX{R"~((\d+)(?:\.(\d+))?(?:\.(\d+))?)~", std::regex::optimize};
+
+    VerInfo parseVersion(string const& spec)
+    {
+        std::smatch mat;
+        if (std::regex_search(spec, mat, VERSION_SYNTAX))
+            return VerInfo{                string2uint(mat[1])
+                          ,mat[2].matched? string2uint(mat[2]) : 0
+                          ,mat[3].matched? string2uint(mat[3]) : 0
+                          };
+        else
+            return VerInfo{0};
+    }
 }
+
+/**
+ * Implementation: parse string with program version specification
+ */
+VerInfo::VerInfo(string const& spec)
+    : VerInfo{parseVersion(spec)}
+    { }
+
+
 
 uchar panLaw = 1;
 
@@ -85,6 +111,9 @@ bitset<32> Config::activeInstances{0};
 int        Config::showCLIcontext{1};
 
 string Config::globalJackSessionUuid = "";
+
+const VerInfo Config::VER_YOSHI_CURR{YOSHIMI_VERSION};
+const VerInfo Config::VER_ZYN_COMPAT{2,4,1};
 
 
 Config::Config(SynthEngine& synthInstance)
@@ -544,7 +573,7 @@ bool Config::initFromPersistentConfig()
 void Config::initData(XMLStore& xml)
 {
 
-    xml.buildXMLroot();
+    xml.normaliseRoot();
     if (xml.information.type == TOPLEVEL::XML::MasterConfig)
     {
 /*      /////////////////////////////////////////////////////////////////////////////TODO 4/25 : adapt API for parameter access

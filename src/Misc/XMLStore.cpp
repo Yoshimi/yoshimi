@@ -57,6 +57,49 @@ using std::move;
 
 namespace { // internal details of MXML integration
 
+    const auto XML_HEADER = "?xml version=\"1.0\" encoding=\"UTF-8\"?";
+
+    auto topElmName(XMLStore::Metadata const& meta)
+    {
+        return meta.isYoshiFormat()? "Yoshimi-data"
+                                   : "ZynAddSubFX-data";
+    }
+
+    string renderXmlType(TOPLEVEL::XML type)
+    {
+        switch (type)
+        {
+            case TOPLEVEL::XML::Instrument:
+                return "Instrument";
+            case TOPLEVEL::XML::Patch:
+                return "Parameters";
+            case TOPLEVEL::XML::Scale:
+                return "Scales";
+            case TOPLEVEL::XML::State:
+                return "Session";
+            case TOPLEVEL::XML::Vector:
+                return "Vector Control";
+            case TOPLEVEL::XML::MLearn:
+                return "Midi Learn";
+            case TOPLEVEL::XML::MasterConfig:
+            case TOPLEVEL::XML::MasterUpdate:
+                return "Config Base";
+            case TOPLEVEL::XML::Config:
+                return "Config Instance";
+            case TOPLEVEL::XML::Presets:
+                return "Presets";
+            case TOPLEVEL::XML::Bank:
+                return "Roots and Banks";
+            case TOPLEVEL::XML::History:
+                return "Recent Files";
+            case TOPLEVEL::XML::PresetDirs:
+                return "Preset Directories";
+            default:
+                return "Yoshimi Data";
+        }
+    }
+
+
     /** Helper to fit with MXML's optionally-NULL char* arguments */
     class OStr
     {
@@ -102,13 +145,27 @@ namespace { // internal details of MXML integration
 }//(End)internal details
 
 
-/** Abstracted access point to an MXML tree representation */
+/**
+ * Abstracted access point to an MXML tree representation.
+ * @remark the »downstream« code using the XML library stores Node*
+ *         to represent an abstracted element backed by XML, and can
+ *         access and manipulate its content through the Node interface.
+ *         Yet the pointer stored there at runtime actually points at
+ *         an internal struct defined by MXML. The translation between
+ *         both worlds is handled in the Policy baseclass; this allows
+ *         us to adapt to different MXML versions.
+ */
 struct XMLtree::Node
     : Policy
     {
         static Node* asNode(mxml_node_t* mxmlElm)
         {
             return reinterpret_cast<Node*>(mxmlElm);
+        }
+
+        static Node* newTree()
+        {
+            return asNode(mxmlNewElement(MXML_NO_PARENT, XML_HEADER));
         }
 
         void addRef()
@@ -181,6 +238,11 @@ XMLtree::XMLtree(Node* treeLocation)
 {
     if (node)
         node->addRef();
+
+    static_assert(1 == sizeof(XMLtree::Node)
+                 ,"Node acts as placeholder for a MXML datatype "
+                  "and must not define any data fields on its own."
+                 );
 }
 
 XMLtree::XMLtree(XMLtree&& ref)
@@ -192,7 +254,8 @@ XMLtree::XMLtree(XMLtree&& ref)
 
 XMLtree XMLtree::addElm(string name)
 {
-    assert(node);
+    if (!node)
+        node = Node::newTree();
     return node->addChild(name);
 }
 
@@ -206,6 +269,13 @@ XMLtree XMLtree::getElm(string name, int id)
     return XMLtree{node? node->findChild(name, id) : nullptr};
 }
 
+
+XMLtree& XMLtree::addAttrib(string name, string val)
+{
+    assert(node);
+    node->setAttrib(name,val);
+    return *this;
+}
 
 /** add simple parameter element: with attribute name, value */
 void XMLtree::addPar_int(string const& name, int val)
@@ -408,13 +478,21 @@ const char *XMLStore_whitespace_callback(mxml_node_t* node, int where)
 }
 
 
-XMLStore::XMLStore(TOPLEVEL::XML type, SynthEngine& _synth, bool yoshiFormat):
-    stackpos(0),
-    xml_k(0),
-    isYoshi(yoshiFormat),
-    synth(_synth)
+XMLStore::XMLStore(TOPLEVEL::XML type, SynthEngine& OBSOLETE, bool yoshiFormat)
+    : meta{type
+          ,yoshiFormat? Config::YOSHIMI_VER : VerInfo{}
+          ,Config::ZYNADDSUBFX_VER
+          }
+    , stackpos(0)
+    , xml_k(0)
+    , isYoshi(yoshiFormat)
+    , synth(OBSOLETE)
+    , minimal(not synth.getRuntime().xmlmax)   ///////////////////////////////////OOO does this ever represent state independent from the global config???
+    , treeX{nullptr}
+    , rootX{nullptr}
+    , nodeX{nullptr}
+    , infoX{nullptr}
 {
-    minimal = not synth.getRuntime().xmlmax;
     information.PADsynth_used = 0;
     information.ADDsynth_used = 0;
     information.SUBsynth_used = 0;
@@ -429,74 +507,87 @@ XMLStore::XMLStore(TOPLEVEL::XML type, SynthEngine& _synth, bool yoshiFormat):
     infoX = nullptr;  // BOOOOOOOOOM
 }
 
-
-void XMLStore::buildXMLroot()
+XMLStore::XMLStore(string filename, uint gzipCompressionLevel, SynthEngine& OBSOLETE)
+    : stackpos(0)
+    , xml_k(0)
+    , isYoshi(true)
+    , synth(OBSOLETE)
+    , minimal(not synth.getRuntime().xmlmax)
+    , treeX{nullptr}
+    , rootX{nullptr}
+    , nodeX{nullptr}
+    , infoX{nullptr}
 {
-    treeX = mxmlNewElement(MXML_NO_PARENT, "?xml version=\"1.0\" encoding=\"UTF-8\"?");
-    mxml_node_t *doctype = mxmlNewElement(treeX, "!DOCTYPE");
+    /////////////////////////////////////////////////////////////OOO load and parse XML here
+    normaliseRoot();
+}
 
-    if (isYoshi)
-    {
-        mxmlElementSetAttr(doctype, "Yoshimi-data", NULL);
-        rootX = mxmlNewElement(treeX, "Yoshimi-data");
-        information.yoshiType = 1;
-    }
-    else
-    {
-        mxmlElementSetAttr(doctype, "ZynAddSubFX-data", NULL);
-        rootX = mxmlNewElement(treeX, "ZynAddSubFX-data");
-        mxmlElementSetAttr(rootX, "version-major", "2");
-        mxmlElementSetAttr(rootX, "version-minor", "4");
-        mxmlElementSetAttr(rootX, "version-revision", "1");
-        mxmlElementSetAttr(rootX, "ZynAddSubFX-author", "Nasca Octavian Paul");
-        information.yoshiType = 0;
-    }
-
-    nodeX = rootX;
-    mxmlElementSetAttr(rootX, "Yoshimi-author", "Alan Ernest Calvert");
-    string version{YOSHIMI_VERSION};
-    size_t pos = version.find(' ');
-    if (pos != string::npos)
-        version = version.substr(0, pos); // might be an rc or M version.
-
-    string major    = "2";
-    string minor    = "0";
-    string revision = "0";
-
-    pos = version.find('.');
-    if (pos == string::npos)
-        major = version;
-    else
-    {
-        major = version.substr(0, pos);
-        version = version.substr(pos + 1, version.length());
-
-        pos = version.find('.');
-        if (pos == string::npos)
-            minor = version;
-        else
-        {
-            minor = version.substr(0, pos);
-            version = version.substr(pos + 1, version.length());
-
-            pos = version.find('.');
-            if (pos == string::npos)
-                revision = version;
-            else
-                revision = version.substr(0, pos);
-        }
-    }
-    mxmlElementSetAttr(rootX, "Yoshimi-major", major.c_str());
-    mxmlElementSetAttr(rootX, "Yoshimi-minor", minor.c_str());
-    mxmlElementSetAttr(rootX, "Yoshimi-revision", revision.c_str());
-
-    infoX = addparams0("INFORMATION"); // specifications
-
-    ///////////////////////////////////////////////////////////////////////TODO 4/2025 : old code initialised base parameters in ctor -- must do that explicitly now --> Config::initData(xml)
+XMLStore::XMLStore(string xml, SynthEngine& OBSOLETE)
+    : stackpos(0)
+    , xml_k(0)
+    , isYoshi(true)
+    , synth(OBSOLETE)
+    , minimal(not synth.getRuntime().xmlmax)
+    , treeX{nullptr}
+    , rootX{nullptr}
+    , nodeX{nullptr}
+    , infoX{nullptr}
+{
+    /////////////////////////////////////////////////////////////OOO parse given XML string here
+    normaliseRoot();
 }
 
 
-XMLStore::~XMLStore()
+void XMLStore::normaliseRoot()
+{
+    if (not root)
+    {
+        if (meta.isYoshiFormat())
+        {
+            root.addElm("!DOCTYPE").addAttrib(topElmName(meta));
+            root.addElm(topElmName(meta))
+                .addAttrib("Yoshimi-major",   asString(meta.yoshimiVer.maj))
+                .addAttrib("Yoshimi-minor",   asString(meta.yoshimiVer.min))
+                .addAttrib("Yoshimi-revision",asString(meta.yoshimiVer.rev))
+                .addAttrib("Yoshimi-author",  "Alan Ernest Calvert")
+                ;
+        }
+        else
+        {
+            root.addElm("!DOCTYPE").addAttrib(topElmName(meta));
+            root.addElm(topElmName(meta))
+                .addAttrib("version-major",     asString(meta.zynVer.maj))
+                .addAttrib("version-minor",     asString(meta.zynVer.min))
+                .addAttrib("version-revision",  asString(meta.zynVer.rev))
+                .addAttrib("ZynAddSubFX-author","Nasca Octavian Paul")
+                .addAttrib("Yoshimi-author",    "Alan Ernest Calvert")
+                .addAttrib("Yoshimi-major",     asString(Config::YOSHIMI_VER.maj))
+                .addAttrib("Yoshimi-minor",     asString(Config::YOSHIMI_VER.min))
+                .addAttrib("Yoshimi-revision",  asString(Config::YOSHIMI_VER.rev))
+                ;                               //  Note: default version, not in metadata
+        }
+        assert(root);
+        root.addElm("INFORMATION")
+            .addAttrib("XMLtype", renderXmlType(meta.type));
+    }
+    else
+    {
+        ///////////////////////////////////////////////////OOO handle the case when XMLStore is created from existing XML
+    }
+}
+    ///////////////////////////////////////////////////////////////////////TODO 4/2025 : old code initialised base parameters in ctor -- must do that explicitly now --> Config::initData(xml)
+
+XMLtree XMLStore::accessTop()
+{
+    if (not root)
+        normaliseRoot();
+    assert (root);
+    return root.getElm(topElmName(meta));
+}
+
+
+
+XMLStore::~XMLStore()  ////////////////////////////////////////////////////TODO 4/2025 : must go away in the end, since all memory management becomes automatic!!
 {
     if (treeX)
         mxmlDelete(treeX);
@@ -759,17 +850,9 @@ char *XMLStore::getXMLdata()
 }
 
 
-XMLtree XMLStore::addElm(string name)
-{
-/////////////////////////////////////////////////OOO silently handle root element and then delegate to the XMLtree API
-}
 
-XMLtree XMLStore::getElm(string name)
-{
-/////////////////////////////////////////////////OOO silently tolerate empty root, otherwise navigate and then delegate to XMLtree API
-}
-
-
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////TODO 4/25 : all old code below is obsolete !!!!
 
 // LOAD XML members
 bool XMLStore::loadXMLfile(string const& filename)

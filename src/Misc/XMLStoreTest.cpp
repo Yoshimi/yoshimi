@@ -54,6 +54,7 @@ void run_XMLStoreTest(SynthEngine& synth)
     cout << "+++ Test XML handling................................." << endl;
 
     // Hex formating
+    cout <<"Verify Bitstring conversion..." << endl;
     cout <<"int(0)   "<< func::asHexString(0)<<endl;
     cout <<"int(15)  "<< func::asHexString(15)<<endl;
     cout <<"int(-1)  "<< func::asHexString(-1)<<endl;
@@ -87,7 +88,38 @@ void run_XMLStoreTest(SynthEngine& synth)
     cout <<"read Bitstring  0x7F800000 : "<< func::bitstring2float("0x7F800000")<<endl;
     cout <<"read Bitstring  0x7FC00000 : "<< func::bitstring2float("0x7FC00000")<<endl;
     cout << endl;
-
+    
+    cout <<"Verify Version info..." << endl;
+    CHECK(VerInfo("").maj           == 0 );
+    CHECK(VerInfo("").min           == 0 );
+    CHECK(VerInfo("").rev           == 0 );
+    CHECK(VerInfo("55555555555").maj== std::numeric_limits<uint>::max() );
+    CHECK(VerInfo("55555555555").min== 0 );
+    CHECK(VerInfo("55555555555").rev== 0 );
+    CHECK(VerInfo("1.2").maj        == 1 );
+    CHECK(VerInfo("1.2").min        == 2 );
+    CHECK(VerInfo("1.2").rev        == 0 );
+    CHECK(VerInfo("1.2.").maj       == 1 );
+    CHECK(VerInfo("1.2.").min       == 2 );
+    CHECK(VerInfo("1.2.").rev       == 0 );
+    CHECK(VerInfo("1.2.3.").maj     == 1 );
+    CHECK(VerInfo("1.2.3.").min     == 2 );
+    CHECK(VerInfo("1.2.3.").rev     == 3 );
+    CHECK(VerInfo("1.2.3.4.5").maj  == 1 );
+    CHECK(VerInfo("1.2.3.4.5").min  == 2 );
+    CHECK(VerInfo("1.2.3.4.5").rev  == 3 );
+    CHECK(VerInfo("x1.2.3.4.5").maj == 1 );
+    CHECK(VerInfo("x1.2.3.4.5").min == 2 );
+    CHECK(VerInfo("x1.2.3.4.5").rev == 3 );
+    
+    CHECK(VerInfo("1.2.3")     == VerInfo(1,2,3))
+    CHECK(VerInfo("xx1.2.3uu") == VerInfo(1,2,3))
+    CHECK(VerInfo("1.2")       == VerInfo(1,2,0))
+    CHECK(VerInfo("6")         == VerInfo(6,0,0))
+    CHECK(VerInfo("5") < VerInfo("6"))
+    CHECK(VerInfo("5") < VerInfo("5.1"))
+    CHECK(VerInfo("5") < VerInfo("5.0.1"))
+    
     // the following code is a simplified version of loading the base config
     string location = file::configDir();
     string baseConfig = location + "/" + YOSHIMI + EXTEN::config;

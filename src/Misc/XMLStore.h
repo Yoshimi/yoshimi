@@ -30,6 +30,7 @@
 #define XML_STORE_H
 
 #include "globals.h"
+#include "VerInfo.h"
 
 #include <mxml.h>                      ////////////////////////////////////////TODO 4/25 : remove from front-end
 #include <string>
@@ -70,6 +71,8 @@ class XMLtree
         XMLtree getElm(string name);
         XMLtree getElm(string name, int id);
 
+        XMLtree& addAttrib(string name, string val ="");
+
         void addPar_int(string const& name, int val);            // add simple parameter element: with attribute name, value
         void addPar_uint(string const& name, uint val);          // add unsigned integer parameter: name, value
         void addPar_frac(string const& name, float val);         // add value both as integral and as float persisted as exact bitstring
@@ -100,15 +103,22 @@ class XMLStore
     XMLtree root;
 
     public:
-       ~XMLStore();
-        XMLStore(TOPLEVEL::XML type, SynthEngine& _synth, bool yoshiFormat = true);
-        // shall not be copied nor moved
-        XMLStore(XMLStore&&)                 = delete;
+       ~XMLStore(); /////////////////////////////////////////////////////////////////////////////////////////TODO 4/25 obsolete -- automatic memory management!
+
+        XMLStore(TOPLEVEL::XML type, SynthEngine& OBSOLETE, bool yoshiFormat = true);
+
+        XMLStore(string filename, uint gzipCompressionLevel, SynthEngine& OBSOLETE);
+
+        XMLStore(string xml, SynthEngine& OBSOLETE);
+
+        // can be moved
+        XMLStore(XMLStore&&)                 = default;
+        // shall not be copied or assigned
         XMLStore(XMLStore const&)            = delete;
         XMLStore& operator=(XMLStore&&)      = delete;
         XMLStore& operator=(XMLStore const&) = delete;
 
-        void buildXMLroot();
+        void normaliseRoot();
 
         // SAVE to XML
         bool saveXMLfile(std::string _filename, bool useCompression = true); // return true if ok, false otherwise
@@ -117,8 +127,11 @@ class XMLStore
         // the string is NULL terminated
         char* getXMLdata();
 
-        XMLtree addElm(string name);
-        XMLtree getElm(string name);
+        XMLtree accessTop();
+
+        XMLtree addElm(string name){ return accessTop().addElm(name);  }
+        XMLtree getElm(string name){ return root? accessTop().getElm(name) : XMLtree{}; }
+
 
         // we always save with a blank first line
         const char *removeBlanks(const char *c)
@@ -136,6 +149,16 @@ class XMLStore
         // this must be called only immediately after enterbranch()
         int getbranchid(int min, int max);         ////////////////////////////////////////////OOO what is this for?
 
+
+        struct Metadata
+        {
+            TOPLEVEL::XML type{TOPLEVEL::XML::Instrument};
+            VerInfo yoshimiVer{};
+            VerInfo zynVer{};
+
+            bool isYoshiFormat() const { return bool(yoshimiVer); }
+        };
+        Metadata meta;
 
         bool minimal; // false if all parameters will be stored
 
