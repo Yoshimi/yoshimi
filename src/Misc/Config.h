@@ -33,6 +33,7 @@
 #include <deque>
 #include <list>
 
+#include "Misc/Log.h"
 #include "Misc/Alloc.h"
 #include "Misc/InstanceManager.h"
 #include "MusicIO/MusicClient.h"
@@ -74,8 +75,9 @@ class Config
         void announce();
         void usage();
         void Log(string const& msg, char tostderr = _SYS_::LogNormal);
-        void LogError(string const& msg);
         void flushLog();
+        /** provide a Logger to delegate to this Config / runtime */
+        Logger const& getLogger(){ return logHandler; }
         bool loadPresetsList();
         bool savePresetsList();
         bool saveMasterConfig();
@@ -289,6 +291,8 @@ class Config
         string jackSessionDir;
         string baseConfig;
         string presetDir;
+
+        Logger logHandler;
 
         friend class YoshimiLV2Plugin;
 };

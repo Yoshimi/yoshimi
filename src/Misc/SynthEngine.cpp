@@ -373,7 +373,7 @@ bool SynthEngine::Init(uint audiosrate, int audiobufsize)
      */
     if (!interchange.Init())
     {
-        Runtime.LogError("interChange init failed");
+        Runtime.Log("[ERROR] interChange init failed", _SYS_::LogError);
         goto bail_out;
     }
 

@@ -206,6 +206,7 @@ Config::Config(SynthEngine& synthInstance)
     , jackSessionDir{}
     , baseConfig{}
     , presetDir{}
+    , logHandler{[this](string const& msg, char tostderr){ this->Log(msg,tostderr); }}
 {
     std::cerr.precision(4);
 }
@@ -1162,12 +1163,6 @@ void Config::Log(string const& msg, char tostderr)
     }
     else
         cerr << msg << endl; // error log
-}
-
-
-void Config::LogError(const string &msg)
-{
-    cerr << "[ERROR] " << msg << endl;
 }
 
 
