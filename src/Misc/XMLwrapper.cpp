@@ -190,7 +190,7 @@ void XMLwrapper::checkfileinformation(string const& filename, uint& names, int& 
 
 
     string report;
-    char *xmldata = loadGzipped(filename, &report);
+    char *xmldata = file::loadGzipped_OBSOLETE_(filename, &report);
     if (not report.empty())
         synth.getRuntime().Log(report, _SYS_::LogNotSerious);
     if (!xmldata)
@@ -520,7 +520,7 @@ bool XMLwrapper::loadXMLfile(string const& filename)
     memset(&parentstack, 0, sizeof(parentstack));
     stackpos = 0;
     string report = "";
-    char* xmldata = loadGzipped(filename, &report);
+    char* xmldata = file::loadGzipped_OBSOLETE_(filename, &report);
     if (report != "")
         synth.getRuntime().Log(report, _SYS_::LogNotSerious);
     if (xmldata == NULL)

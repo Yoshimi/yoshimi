@@ -573,7 +573,7 @@ bool Config::initFromPersistentConfig()
 void Config::initData(XMLStore& xml)
 {
 
-    xml.normaliseRoot();
+//    xml.buildXMLRoot();
     if (xml.information.type == TOPLEVEL::XML::MasterConfig)
     {
 /*      /////////////////////////////////////////////////////////////////////////////TODO 4/25 : adapt API for parameter access

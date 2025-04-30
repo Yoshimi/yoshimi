@@ -31,6 +31,7 @@
 
 #include "globals.h"
 #include "VerInfo.h"
+#include "Log.h"
 
 #include <mxml.h>                      ////////////////////////////////////////TODO 4/25 : remove from front-end
 #include <string>
@@ -51,7 +52,7 @@ class XMLtree
     struct Node;
     Node* node{nullptr};
 
-        XMLtree(Node*);     ////////////////////OOO unclear if we need this private constructor...
+        XMLtree(Node*);
 
     public:
        ~XMLtree();
@@ -67,11 +68,16 @@ class XMLtree
             return bool(node);
         }
 
+        static XMLtree parse(const char*);                       // Factory: create from XML buffer
+        const char* render();                                    // render XMLtree into new malloc() buffer
+
         XMLtree addElm(string name);
         XMLtree getElm(string name);
         XMLtree getElm(string name, int id);
 
         XMLtree& addAttrib(string name, string val ="");
+        string getAttrib(string name);
+        uint   getAttrib_uint(string name);
 
         void addPar_int(string const& name, int val);            // add simple parameter element: with attribute name, value
         void addPar_uint(string const& name, uint val);          // add unsigned integer parameter: name, value
@@ -105,11 +111,9 @@ class XMLStore
     public:
        ~XMLStore(); /////////////////////////////////////////////////////////////////////////////////////////TODO 4/25 obsolete -- automatic memory management!
 
-        XMLStore(TOPLEVEL::XML type, SynthEngine& OBSOLETE, bool yoshiFormat = true);
-
-        XMLStore(string filename, uint gzipCompressionLevel, SynthEngine& OBSOLETE);
-
-        XMLStore(string xml, SynthEngine& OBSOLETE);
+        XMLStore(TOPLEVEL::XML type, SynthEngine& OBSOLETE, bool zynCompat =false);
+        XMLStore(string filename, Logger const& log, SynthEngine& OBSOLETE);
+        XMLStore(const char* xml, SynthEngine& OBSOLETE);
 
         // can be moved
         XMLStore(XMLStore&&)                 = default;
@@ -118,7 +122,7 @@ class XMLStore
         XMLStore& operator=(XMLStore&&)      = delete;
         XMLStore& operator=(XMLStore const&) = delete;
 
-        void normaliseRoot();
+        explicit operator bool()  const { return bool(root); }
 
         // SAVE to XML
         bool saveXMLfile(std::string _filename, bool useCompression = true); // return true if ok, false otherwise
@@ -137,12 +141,6 @@ class XMLStore
         const char *removeBlanks(const char *c)
         {while (isspace(*c)) ++c; return c;}
 
-        // LOAD from XML
-        bool loadXMLfile(std::string const& filename); // true if loaded ok
-
-        // used by the clipboard
-        bool putXMLdata(const char *xmldata);
-
         // get the the branch_id and limits it between the min and max
         // if min==max==0, it will not limit it
         // if there isn't any id, will return min
@@ -156,7 +154,8 @@ class XMLStore
             VerInfo yoshimiVer{};
             VerInfo zynVer{};
 
-            bool isYoshiFormat() const { return bool(yoshimiVer); }
+            bool isZynCompat() const { return bool(zynVer); }
+            bool isValid()     const { return bool(zynVer) or bool(yoshimiVer); }
         };
         Metadata meta;
 
@@ -176,6 +175,10 @@ class XMLStore
         void slowinfosearch(char *idx);
 
     private:
+        void buildXMLRoot();
+        Metadata extractMetadata();
+        static XMLtree loadFile(string filename, Logger const& log);
+
         mxml_node_t *treeX;
         mxml_node_t *rootX;
         mxml_node_t *nodeX;
@@ -216,7 +219,6 @@ class XMLStore
             int y_revision;
         } xml_version;
 
-        bool isYoshi;
         SynthEngine& synth;
 };
 

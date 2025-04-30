@@ -58,11 +58,12 @@ using std::move;
 namespace { // internal details of MXML integration
 
     const auto XML_HEADER = "?xml version=\"1.0\" encoding=\"UTF-8\"?";
+    const auto ROOT_ZYN   = "ZynAddSubFX-data";
+    const auto ROOT_YOSHI = "Yoshimi-data";
 
     auto topElmName(XMLStore::Metadata const& meta)
     {
-        return meta.isYoshiFormat()? "Yoshimi-data"
-                                   : "ZynAddSubFX-data";
+        return meta.isZynCompat()? ROOT_ZYN : ROOT_YOSHI;
     }
 
     string renderXmlType(TOPLEVEL::XML type)
@@ -99,6 +100,41 @@ namespace { // internal details of MXML integration
         }
     }
 
+    TOPLEVEL::XML parseXMLtype(string const& spec)
+    {
+        if (spec == "Instrument")      return TOPLEVEL::XML::Instrument;
+        if (spec == "Parameters")      return TOPLEVEL::XML::Patch;
+        if (spec == "Scales")          return TOPLEVEL::XML::Scale;
+        if (spec == "Session")         return TOPLEVEL::XML::State;
+        if (spec == "Vector Control")  return TOPLEVEL::XML::Vector;
+        if (spec == "Midi Learn")      return TOPLEVEL::XML::MLearn;
+        if (spec == "Config Base")     return TOPLEVEL::XML::MasterConfig;
+        if (spec == "Config Instance") return TOPLEVEL::XML::Config;
+        if (spec == "Presets")         return TOPLEVEL::XML::Presets;
+        if (spec == "Roots and Banks") return TOPLEVEL::XML::Bank;
+        if (spec == "Recent Files")    return TOPLEVEL::XML::History;
+        if (spec == "Preset Directories") return TOPLEVEL::XML::PresetDirs;
+
+        return TOPLEVEL::XML::Instrument;
+    }
+    
+    
+    const char *XMLStore_whitespace_callback(mxml_node_t* node, int where)
+    {
+        const char *name = mxmlGetElement(node);
+
+        if (where == MXML_WS_BEFORE_OPEN && name && !strncmp(name, "?xml", 4))
+            return NULL;
+        if (where == MXML_WS_BEFORE_CLOSE && name && !strncmp(name, "string", 6))
+            return NULL;
+
+        if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
+            return "\n";
+        return NULL;
+    }
+
+
+
 
     /** Helper to fit with MXML's optionally-NULL char* arguments */
     class OStr
@@ -114,7 +150,7 @@ namespace { // internal details of MXML integration
             { }
 
         OStr(const char* const literal)
-            : OStr(string(literal))
+            : OStr(string(literal? literal:""))
             { }
 
         template<typename X>
@@ -141,6 +177,16 @@ namespace { // internal details of MXML integration
         {
             return mxmlFindElement(mxmlElm(), mxmlElm(), elmName, attribName, attribVal, MXML_DESCEND_FIRST);
         }
+
+        static mxml_node_t* parse(const char* xml)
+        {
+            return mxmlLoadString(NULL, xml, MXML_OPAQUE_CALLBACK);  // treat all node content as »opaque« data, i.e. passed-through as-is
+        }
+
+        const char* render()
+        {
+            return mxmlSaveAllocString(mxmlElm(), XMLStore_whitespace_callback);
+        }
     };
 }//(End)internal details
 
@@ -166,6 +212,12 @@ struct XMLtree::Node
         static Node* newTree()
         {
             return asNode(mxmlNewElement(MXML_NO_PARENT, XML_HEADER));
+        }
+
+        static Node* parse(const char* xml)
+        {
+            assert (xml);
+            return asNode(Policy::parse(xml));
         }
 
         void addRef()
@@ -252,6 +304,24 @@ XMLtree::XMLtree(XMLtree&& ref)
 }
 
 
+/** Factory: create from XML buffer.
+ * @remark buffer is owned by caller and will only be read
+ * @return new XMLtree handle, which can be empty in case of parsing failure.
+ */
+XMLtree XMLtree::parse(const char* xml)
+{
+    return xml? Node::parse(xml) : nullptr;
+}
+
+/** render XMLtree into new malloc() buffer
+ * @note caller must deallocate returned buffer with `free()`
+ */
+const char* XMLtree::render()
+{
+    return node? node->render() : nullptr;
+}
+
+
 XMLtree XMLtree::addElm(string name)
 {
     if (!node)
@@ -269,6 +339,17 @@ XMLtree XMLtree::getElm(string name, int id)
     return XMLtree{node? node->findChild(name, id) : nullptr};
 }
 
+string XMLtree::getAttrib(string name)
+{
+    const char* valStr = node? node->getAttrib(name) : nullptr;
+    return valStr? string{valStr} : string{};
+}
+
+uint XMLtree::getAttrib_uint(string name)
+{
+    const char* valStr = node? node->getAttrib(name) : nullptr;
+    return valStr? string2uint(valStr) : 0;
+}
 
 XMLtree& XMLtree::addAttrib(string name, string val)
 {
@@ -463,35 +544,20 @@ string XMLtree::getPar_str(string const& name)
 
 
 
-const char *XMLStore_whitespace_callback(mxml_node_t* node, int where)
-{
-    const char *name = mxmlGetElement(node);
-
-    if (where == MXML_WS_BEFORE_OPEN && name && !strncmp(name, "?xml", 4))
-        return NULL;
-    if (where == MXML_WS_BEFORE_CLOSE && name && !strncmp(name, "string", 6))
-        return NULL;
-
-    if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
-        return "\n";
-    return NULL;
-}
-
-
-XMLStore::XMLStore(TOPLEVEL::XML type, SynthEngine& OBSOLETE, bool yoshiFormat)
+XMLStore::XMLStore(TOPLEVEL::XML type, SynthEngine& OBSOLETE, bool zynCompat)
     : meta{type
-          ,yoshiFormat? Config::YOSHIMI_VER : VerInfo{}
-          ,Config::ZYNADDSUBFX_VER
+          ,Config::VER_YOSHI_CURR
+          ,zynCompat? Config::VER_ZYN_COMPAT : VerInfo()
           }
-    , stackpos(0)
-    , xml_k(0)
-    , isYoshi(yoshiFormat)
-    , synth(OBSOLETE)
-    , minimal(not synth.getRuntime().xmlmax)   ///////////////////////////////////OOO does this ever represent state independent from the global config???
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////TODO 5/25 : stateful tree position logic broken. MUST GET RID of this "current position"
+    , minimal(not synth.getRuntime().xmlmax)   ///////////////////////////////////OOO does this ever represent some state independent from the global config???
     , treeX{nullptr}
     , rootX{nullptr}
     , nodeX{nullptr}
     , infoX{nullptr}
+    , stackpos(0)
+    , xml_k(0)
+    , synth(OBSOLETE)
 {
     information.PADsynth_used = 0;
     information.ADDsynth_used = 0;
@@ -500,87 +566,109 @@ XMLStore::XMLStore(TOPLEVEL::XML type, SynthEngine& OBSOLETE, bool yoshiFormat)
     information.type = type;
     memset(&parentstack, 0, sizeof(parentstack));
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////OOO : stateful tree position logic broken. MUST GET RID of this "current position"
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////TODO 5/25 : stateful tree position logic broken. MUST GET RID of this "current position"
     treeX = nullptr;  // boom
     rootX = nullptr;  // BOOOOM
     nodeX = nullptr;  // BOOOOOOM
     infoX = nullptr;  // BOOOOOOOOOM
 }
 
-XMLStore::XMLStore(string filename, uint gzipCompressionLevel, SynthEngine& OBSOLETE)
-    : stackpos(0)
-    , xml_k(0)
-    , isYoshi(true)
-    , synth(OBSOLETE)
+XMLStore::XMLStore(string filename, Logger const& log, SynthEngine& OBSOLETE)
+    : root{loadFile(filename,log)}
+    , meta{extractMetadata()}
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////TODO 5/25 : stateful tree position logic broken. MUST GET RID of this "current position"
     , minimal(not synth.getRuntime().xmlmax)
     , treeX{nullptr}
     , rootX{nullptr}
     , nodeX{nullptr}
     , infoX{nullptr}
-{
-    /////////////////////////////////////////////////////////////OOO load and parse XML here
-    normaliseRoot();
-}
-
-XMLStore::XMLStore(string xml, SynthEngine& OBSOLETE)
-    : stackpos(0)
+    , stackpos(0)
     , xml_k(0)
-    , isYoshi(true)
     , synth(OBSOLETE)
+    { }
+
+XMLStore::XMLStore(const char* xml, SynthEngine& OBSOLETE)
+    : root{XMLtree::parse(xml)}
+    , meta{extractMetadata()}
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////TODO 5/25 : stateful tree position logic broken. MUST GET RID of this "current position"
     , minimal(not synth.getRuntime().xmlmax)
     , treeX{nullptr}
     , rootX{nullptr}
     , nodeX{nullptr}
     , infoX{nullptr}
-{
-    /////////////////////////////////////////////////////////////OOO parse given XML string here
-    normaliseRoot();
-}
+    , stackpos(0)
+    , xml_k(0)
+    , synth(OBSOLETE)
+    { }
 
 
-void XMLStore::normaliseRoot()
+void XMLStore::buildXMLRoot()
 {
-    if (not root)
+    if (root)
+        return;
+
+    assert (meta.isValid());
+
+    if (meta.isZynCompat())
     {
-        if (meta.isYoshiFormat())
-        {
-            root.addElm("!DOCTYPE").addAttrib(topElmName(meta));
-            root.addElm(topElmName(meta))
-                .addAttrib("Yoshimi-major",   asString(meta.yoshimiVer.maj))
-                .addAttrib("Yoshimi-minor",   asString(meta.yoshimiVer.min))
-                .addAttrib("Yoshimi-revision",asString(meta.yoshimiVer.rev))
-                .addAttrib("Yoshimi-author",  "Alan Ernest Calvert")
-                ;
-        }
-        else
-        {
-            root.addElm("!DOCTYPE").addAttrib(topElmName(meta));
-            root.addElm(topElmName(meta))
-                .addAttrib("version-major",     asString(meta.zynVer.maj))
-                .addAttrib("version-minor",     asString(meta.zynVer.min))
-                .addAttrib("version-revision",  asString(meta.zynVer.rev))
-                .addAttrib("ZynAddSubFX-author","Nasca Octavian Paul")
-                .addAttrib("Yoshimi-author",    "Alan Ernest Calvert")
-                .addAttrib("Yoshimi-major",     asString(Config::YOSHIMI_VER.maj))
-                .addAttrib("Yoshimi-minor",     asString(Config::YOSHIMI_VER.min))
-                .addAttrib("Yoshimi-revision",  asString(Config::YOSHIMI_VER.rev))
-                ;                               //  Note: default version, not in metadata
-        }
-        assert(root);
-        root.addElm("INFORMATION")
-            .addAttrib("XMLtype", renderXmlType(meta.type));
+        root.addElm("!DOCTYPE").addAttrib(topElmName(meta));
+        root.addElm(topElmName(meta))
+            .addAttrib("version-major",     asString(meta.zynVer.maj))
+            .addAttrib("version-minor",     asString(meta.zynVer.min))
+            .addAttrib("version-revision",  asString(meta.zynVer.rev))
+            .addAttrib("Yoshimi-major",     asString(meta.yoshimiVer.maj))
+            .addAttrib("Yoshimi-minor",     asString(meta.yoshimiVer.min))
+            .addAttrib("Yoshimi-revision",  asString(meta.yoshimiVer.rev))
+            .addAttrib("ZynAddSubFX-author","Nasca Octavian Paul")
+            .addAttrib("Yoshimi-author",    "Alan Ernest Calvert")
+            ;
     }
     else
-    {
-        ///////////////////////////////////////////////////OOO handle the case when XMLStore is created from existing XML
+    {// Yoshimi native format
+        root.addElm("!DOCTYPE").addAttrib(topElmName(meta));
+        root.addElm(topElmName(meta))
+            .addAttrib("Yoshimi-major",   asString(meta.yoshimiVer.maj))
+            .addAttrib("Yoshimi-minor",   asString(meta.yoshimiVer.min))
+            .addAttrib("Yoshimi-revision",asString(meta.yoshimiVer.rev))
+            .addAttrib("Yoshimi-author",  "Alan Ernest Calvert")
+            ;
     }
+    assert(root);
+    root.addElm("INFORMATION")
+        .addAttrib("XMLtype", renderXmlType(meta.type));
+}
+
+
+XMLStore::Metadata XMLStore::extractMetadata()
+{
+    if (XMLtree top = root.getElm(ROOT_YOSHI))
+        return Metadata{parseXMLtype(top.getElm("INFORMATION").getPar_str("XMLtype"))
+                       ,VerInfo{top.getAttrib_uint("Yoshimi-major")
+                               ,top.getAttrib_uint("Yoshimi-minor")
+                               ,top.getAttrib_uint("Yoshimi-revision")
+                               }
+                       ,Config::ZYNADDSUBFX_VER
+                       };
+    else
+    if (XMLtree top = root.getElm(ROOT_ZYN))
+        return Metadata{parseXMLtype(top.getElm("INFORMATION").getPar_str("XMLtype"))
+                       ,VerInfo{top.getAttrib_uint("Yoshimi-major")
+                               ,top.getAttrib_uint("Yoshimi-minor")
+                               ,top.getAttrib_uint("Yoshimi-revision")
+                               }
+                       ,VerInfo{top.getAttrib_uint("version-major")
+                               ,top.getAttrib_uint("version-minor")
+                               ,top.getAttrib_uint("version-revision")
+                               }
+                       };
+    else
+        return Metadata{}; // marked as invalid
 }
     ///////////////////////////////////////////////////////////////////////TODO 4/2025 : old code initialised base parameters in ctor -- must do that explicitly now --> Config::initData(xml)
 
 XMLtree XMLStore::accessTop()
 {
-    if (not root)
-        normaliseRoot();
+    buildXMLRoot();
     assert (root);
     return root.getElm(topElmName(meta));
 }
@@ -604,7 +692,8 @@ void XMLStore::checkfileinformation(string const& filename, uint& names, int& ty
 
 
     string report;
-    char *xmldata = loadGzipped(filename, &report);
+    string xml = loadGzipped(filename, report);
+    char* xmldata = & xml[0];
     if (not report.empty())
         synth.getRuntime().Log(report, _SYS_::LogNotSerious);
     if (!xmldata)
@@ -855,134 +944,20 @@ char *XMLStore::getXMLdata()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////TODO 4/25 : all old code below is obsolete !!!!
 
 // LOAD XML members
-bool XMLStore::loadXMLfile(string const& filename)
+XMLtree XMLStore::loadFile(string filename, Logger const& log)
 {
-    bool zynfile = true;
-    bool yoshitoo = false;
+    string report{};
+    string xmldata = loadGzipped(filename, report);
+    if (not report.empty())
+        log(report, _SYS_::LogNotSerious);
 
-    if (treeX)
-        mxmlDelete(treeX);
-    treeX = NULL;
-    nodeX = NULL;
-    infoX = NULL;
-    memset(&parentstack, 0, sizeof(parentstack));
-    stackpos = 0;
-    string report = "";
-    char* xmldata = loadGzipped(filename, &report);
-    if (report != "")
-        synth.getRuntime().Log(report, _SYS_::LogNotSerious);
-    if (xmldata == NULL)
-    {
-        synth.getRuntime().Log("XML: Could not load xml file: " + filename, _SYS_::LogNotSerious);
-         return false;
-    }
-    rootX = treeX = mxmlLoadString(NULL, removeBlanks(xmldata), MXML_OPAQUE_CALLBACK);
-    delete [] xmldata;
-    if (!treeX)
-    {
-        synth.getRuntime().Log("XML: File " + filename + " is not XML", _SYS_::LogNotSerious);
-        return false;
-    }
-    rootX = mxmlFindElement(treeX, treeX, "ZynAddSubFX-data", NULL, NULL, MXML_DESCEND);
-    if (!rootX)
-    {
-        zynfile = false;
-        rootX = mxmlFindElement(treeX, treeX, "Yoshimi-data", NULL, NULL, MXML_DESCEND);
-    }
+    XMLtree content{XMLtree::parse(xmldata.c_str())};
+    if (not content)
+        log("XML: File \""+filename+"\" can not be parsed as XML", _SYS_::LogNotSerious);
+    if (xmldata.empty())
+        log("XML: Could not load xml file: " + filename, _SYS_::LogNotSerious);
 
-    if (!rootX)
-    {
-        synth.getRuntime().Log("XML: File " + filename + " doesn't contain valid data in this context", _SYS_::LogNotSerious);
-        return false;
-    }
-    nodeX = rootX;
-    push(rootX);
-    infoX = mxmlFindElement(rootX, rootX, "INFORMATION", NULL, NULL, MXML_DESCEND_FIRST);
-    if (!infoX)  // container to hold meta-information (xml type)
-        infoX = addparams0("INFORMATION");
-
-    synth.fileCompatible = true;
-    if (zynfile)
-    {
-        xml_version.major = string2int(mxmlElementGetAttr(rootX, "version-major"));
-        xml_version.minor = string2int(mxmlElementGetAttr(rootX, "version-minor"));
-        if(mxmlElementGetAttr(rootX, "version-revision") != NULL)
-            xml_version.revision = string2int(mxmlElementGetAttr(rootX, "version-revision"));
-        else
-            xml_version.revision = 0;
-    }
-    if (mxmlElementGetAttr(rootX, "Yoshimi-major"))
-    {
-        xml_version.y_major = string2int(mxmlElementGetAttr(rootX, "Yoshimi-major"));
-        yoshitoo = true;
-    }
-    else
-    {
-        synth.getRuntime().lastXMLmajor = 0;
-        if (xml_version.major > 2)
-            synth.fileCompatible = false;
-    }
-    if (mxmlElementGetAttr(rootX, "Yoshimi-minor"))
-    {
-        xml_version.y_minor = string2int(mxmlElementGetAttr(rootX, "Yoshimi-minor"));
-        if (mxmlElementGetAttr(rootX, "Yoshimi-revision") != NULL)
-            xml_version.y_revision = string2int(mxmlElementGetAttr(rootX, "Yoshimi-revision"));
-        else
-            xml_version.y_revision = 0;
-    }
-    else
-        synth.getRuntime().lastXMLminor = 0;
-    string exten = findExtension(filename);
-    if (exten.length() != 4 && exten != EXTEN::state)
-        return true; // we don't want config stuff
-
-    if (synth.getRuntime().logXMLheaders)
-    {
-        if (yoshitoo && xml_version.major > 2)
-        { // we were giving the wrong value :(
-            xml_version.major = 2;
-            xml_version.minor = 4;
-            xml_version.revision = 1;
-        }
-        if (zynfile)
-        {
-            string text = "ZynAddSubFX version major " + asString(xml_version.major) + ", minor " + asString(xml_version.minor);
-            if (xml_version.revision > 0)
-                text += (", revision " + asString(xml_version.revision));
-            synth.getRuntime().Log(text);
-        }
-        if (yoshitoo)
-        {
-            string text = "Yoshimi version major " + asString(xml_version.y_major) + ", minor " + asString(xml_version.y_minor);
-            if (xml_version.y_revision > 0)
-                text += (", revision " + asString(xml_version.y_revision));
-            synth.getRuntime().Log(text);
-        }
-    }
-    return true;
-}
-
-
-bool XMLStore::putXMLdata(const char *xmldata)
-{
-    if (treeX)
-        mxmlDelete(treeX);
-    treeX = NULL;
-    memset(&parentstack, 0, sizeof(parentstack));
-    stackpos = 0;
-    if (xmldata == NULL)
-        return false;
-    rootX = treeX = mxmlLoadString(NULL, xmldata, MXML_OPAQUE_CALLBACK);
-    if (treeX == NULL)
-        return false;
-    rootX = mxmlFindElement(treeX, treeX, "ZynAddSubFX-data", NULL, NULL, MXML_DESCEND);
-    if (!rootX)
-        rootX = mxmlFindElement(treeX, treeX, "Yoshimi-data", NULL, NULL, MXML_DESCEND);
-    nodeX = rootX;
-    if (!rootX)
-        return false;
-    push(rootX);
-    return true;
+    return content;
 }
 
 

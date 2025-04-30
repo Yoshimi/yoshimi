@@ -128,12 +128,16 @@ void run_XMLStoreTest(SynthEngine& synth)
 
     synth.getRuntime().xmlType = TOPLEVEL::XML::MasterConfig;
 
-    XMLStore xml{TOPLEVEL::XML::MasterConfig, synth, true};    //////////////////OOO should define other ctor to load file directly!
-    synth.getRuntime().initData(xml);
-    bool success = xml.loadXMLfile(baseConfig);
-    CHECK(success);
+    XMLStore xmlNew{TOPLEVEL::XML::MasterConfig, synth, true};
+    synth.getRuntime().initData(xmlNew);
+    char* xmldata = xmlNew.getXMLdata();
+    cout << "Loaded XML-Tree:\n"<<string{xmldata}<<endl;
+    free(xmldata);
 
-    char* xmldata = xml.getXMLdata();
+    XMLStore xml{baseConfig, synth.getRuntime().getLogger(), synth};
+    CHECK(xml);
+
+    xmldata = xml.getXMLdata();
     cout << "Loaded XML-Tree:\n"<<string{xmldata}<<endl;
     free(xmldata);
 
