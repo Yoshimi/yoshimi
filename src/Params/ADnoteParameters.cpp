@@ -468,7 +468,7 @@ void ADnoteParameters::add2XML(XMLwrapper& xml)
 {
     // currently not used
     // bool yoshiFormat = synth.usingYoshiType;
-    xml.information.ADDsynth_used = 1;
+    xml.information.ADDsynth_used = 1;   //////////////////////////////////////////////////////////TODO 5/25 : better put it directly into the INFORMATION node!
 
     xml.addparbool("stereo", GlobalPar.PStereo);
 

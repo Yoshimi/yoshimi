@@ -130,14 +130,14 @@ void run_XMLStoreTest(SynthEngine& synth)
 
     XMLStore xmlNew{TOPLEVEL::XML::MasterConfig, synth, true};
     synth.getRuntime().initData(xmlNew);
-    char* xmldata = xmlNew.getXMLdata();
+    char* xmldata = xmlNew.render();
     cout << "Loaded XML-Tree:\n"<<string{xmldata}<<endl;
     free(xmldata);
 
     XMLStore xml{baseConfig, synth.getRuntime().getLogger(), synth};
     CHECK(xml);
 
-    xmldata = xml.getXMLdata();
+    xmldata = xml.render();
     cout << "Loaded XML-Tree:\n"<<string{xmldata}<<endl;
     free(xmldata);
 
@@ -155,7 +155,7 @@ void run_XMLStoreTest(SynthEngine& synth)
     baseParam.addPar_real("Heffalump", (1+sqrtf(5))/2);
 
     const string TESTFILE{"heffalump.xml"};
-    CHECK(xml.saveXMLfile(TESTFILE, false))
+    CHECK(xml.saveXMLfile(TESTFILE,synth.getRuntime().getLogger()))
 
     cout << "Bye Cruel World..." <<endl;
 }

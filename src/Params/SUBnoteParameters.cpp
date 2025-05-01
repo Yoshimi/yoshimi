@@ -123,7 +123,7 @@ void SUBnoteParameters::add2XML(XMLwrapper& xml)
 {
     // currently not used
     // bool yoshiFormat = synth.usingYoshiType;
-    xml.information.SUBsynth_used = 1;
+    xml.information.SUBsynth_used = 1;   //////////////////////////////////////////////////////////TODO 5/25 : better put it directly into the INFORMATION node!
 
     xml.addpar("num_stages",Pnumstages);
     xml.addpar("harmonic_mag_type",Phmagtype);

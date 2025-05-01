@@ -118,7 +118,17 @@ namespace { // internal details of MXML integration
         return TOPLEVEL::XML::Instrument;
     }
     
-    
+    /** @remark our XML files often start with leading whitespace
+     *          which is not tolerated by the XML parser */
+    const char* withoutLeadingWhitespace(string xml)
+    {
+        const char * text = xml.c_str();
+        while (isspace(*text))
+            ++text;
+        return text;
+    }
+
+
     const char *XMLStore_whitespace_callback(mxml_node_t* node, int where)
     {
         const char *name = mxmlGetElement(node);
@@ -183,8 +193,10 @@ namespace { // internal details of MXML integration
             return mxmlLoadString(NULL, xml, MXML_OPAQUE_CALLBACK);  // treat all node content as »opaque« data, i.e. passed-through as-is
         }
 
-        const char* render()
+        char* render()
         {
+            mxmlSetWrapMargin(0);
+            // disable automatic line wrapping and control whitespace per callback
             return mxmlSaveAllocString(mxmlElm(), XMLStore_whitespace_callback);
         }
     };
@@ -316,7 +328,7 @@ XMLtree XMLtree::parse(const char* xml)
 /** render XMLtree into new malloc() buffer
  * @note caller must deallocate returned buffer with `free()`
  */
-const char* XMLtree::render()
+char* XMLtree::render()
 {
     return node? node->render() : nullptr;
 }
@@ -822,128 +834,57 @@ void XMLStore::slowinfosearch(char *idx)
   return;
 }
 
-
-// SAVE XML members
-
-bool XMLStore::saveXMLfile(string _filename, bool useCompression)
+/**
+ * Render tree contents into XML format.
+ * @return NULL if empty, otherwise pointer to a char buffer, allocated with malloc()
+ * @warning user must free the returned buffer
+ */
+char* XMLStore::render()
 {
-    string filename{_filename};
-    char* xmldata = getXMLdata();
+    return root.render();
+}
 
-    if (!xmldata)
-    {
-        synth.getRuntime().Log("XML: Failed to allocate xml data space");
-        return false;
-    }
 
-    uint compression = 0;
-    if (useCompression)
-        compression = synth.getRuntime().gzipCompression;
-    if (compression <= 0)
-    {
-        if (!saveText(xmldata, filename))
-        {
-            synth.getRuntime().Log("XML: Failed to save xml file " + filename + " for save", _SYS_::LogNotSerious);
-            return false;
-        }
-    }
+/**
+ * Render tree contents into XML format and write it into a file,
+ * possibly gzip compressed (0 means no compression)
+ * @return true on success
+ */
+bool XMLStore::saveXMLfile(string filename, Logger const& log, uint gzipCompressionLevel)
+{
+    bool success{false};
+    if (not root)
+        log("XML: empty tree -- nothing to save", _SYS_::LogNotSerious);
     else
     {
-        if (compression > 9)
-            compression = 9;
-        string result = saveGzipped(xmldata, filename, compression);
-        if (result > "")
+        char* xmldata = render();
+        if (not xmldata)
+            log("XML: Failed to allocate storage for rendered XML");
+        else
         {
-            synth.getRuntime().Log(result, _SYS_::LogNotSerious);
-            return false;
+            gzipCompressionLevel = std::clamp(gzipCompressionLevel, 0u, 9u);
+            if (gzipCompressionLevel == 0)
+            {
+                if (not saveText(xmldata, filename))
+                    log("XML: Failed to save xml file " + filename + "(uncompressed)", _SYS_::LogNotSerious);
+                else
+                    success = true;
+            }
+            else
+            {
+                string result = saveGzipped(xmldata, filename, gzipCompressionLevel);
+                if (not result.empty())
+                    log(result, _SYS_::LogNotSerious);
+                else
+                    success = true;
+            }
+            free(xmldata);
         }
     }
-    free(xmldata);
-    return true;
+    return success;
 }
 
 
-char *XMLStore::getXMLdata()
-{
-    xml_k = 0;
-    memset(tabs, 0, STACKSIZE + 2);
-    mxml_node_t *oldnode=nodeX;
-    nodeX = infoX;
-
-#if false ///////////////////////////////////////////////////////////////////////////////////////////////////TODO 4/25 : must handle the info node explicitly now, instead of injecting it as Side-Effect 
-    switch (synth.getRuntime().xmlType)
-    {
-        case TOPLEVEL::XML::Instrument:
-        {
-            addparbool("ADDsynth_used", (information.ADDsynth_used != 0));
-            addparbool("SUBsynth_used", (information.SUBsynth_used != 0));
-            addparbool("PADsynth_used", (information.PADsynth_used != 0));
-            break;
-        }
-        case TOPLEVEL::XML::Patch:
-            addparstr("XMLtype", "Parameters");
-            break;
-
-        case TOPLEVEL::XML::Scale:
-            addparstr("XMLtype", "Scales");
-            break;
-
-        case TOPLEVEL::XML::State:
-            addparstr("XMLtype", "Session");
-            break;
-
-        case TOPLEVEL::XML::Vector:
-            addparstr("XMLtype", "Vector Control");
-            break;
-
-        case TOPLEVEL::XML::MLearn:
-            addparstr("XMLtype", "Midi Learn");
-            break;
-
-        case TOPLEVEL::XML::MasterConfig:
-        case TOPLEVEL::XML::MasterUpdate:
-            addparstr("XMLtype", "Config Base");
-            break;
-
-        case TOPLEVEL::XML::Config:
-            addparstr("XMLtype", "Config Instance");
-            break;
-
-        case TOPLEVEL::XML::Presets:
-            addparstr("XMLtype", "Presets");
-            break;
-
-        case TOPLEVEL::XML::Bank:
-        {
-            addparstr("XMLtype", "Roots and Banks");
-            addpar("Banks_Version", synth.bank.readVersion());
-            break;
-        }
-
-        case TOPLEVEL::XML::History:
-            addparstr("XMLtype", "Recent Files");
-            break;
-
-        case TOPLEVEL::XML::PresetDirs:
-            addparstr("XMLtype", "Preset Directories");
-            break;
-
-        default:
-            addparstr("XMLtype", "Unknown");
-            break;
-    }
-#endif //////////////////////////////////////////////////////////////////////////////////////////////////////TODO 4/25 : (End) Handling of Info-Node
-    nodeX = oldnode;
-    char *xmldata = mxmlSaveAllocString(treeX, XMLStore_whitespace_callback);
-    return xmldata;
-}
-
-
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////TODO 4/25 : all old code below is obsolete !!!!
-
-// LOAD XML members
 XMLtree XMLStore::loadFile(string filename, Logger const& log)
 {
     string report{};
@@ -951,7 +892,7 @@ XMLtree XMLStore::loadFile(string filename, Logger const& log)
     if (not report.empty())
         log(report, _SYS_::LogNotSerious);
 
-    XMLtree content{XMLtree::parse(xmldata.c_str())};
+    XMLtree content{XMLtree::parse(withoutLeadingWhitespace(xmldata))};
     if (not content)
         log("XML: File \""+filename+"\" can not be parsed as XML", _SYS_::LogNotSerious);
     if (xmldata.empty())
@@ -961,6 +902,8 @@ XMLtree XMLStore::loadFile(string filename, Logger const& log)
 }
 
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////TODO 4/25 : all old code below is obsolete !!!!
 
 int XMLStore::getbranchid(int min, int max)
 {

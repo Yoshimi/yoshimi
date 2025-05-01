@@ -69,7 +69,7 @@ class XMLtree
         }
 
         static XMLtree parse(const char*);                       // Factory: create from XML buffer
-        const char* render();                                    // render XMLtree into new malloc() buffer
+        char* render();                                          // render XMLtree into new malloc() buffer
 
         XMLtree addElm(string name);
         XMLtree getElm(string name);
@@ -124,22 +124,17 @@ class XMLStore
 
         explicit operator bool()  const { return bool(root); }
 
-        // SAVE to XML
-        bool saveXMLfile(std::string _filename, bool useCompression = true); // return true if ok, false otherwise
 
-        // returns the new allocated string that contains the XML data (used for clipboard)
-        // the string is NULL terminated
-        char* getXMLdata();
+        char* render();                                           // rendered XML into malloc() char buffer (NULL terminated)
+        bool saveXMLfile(string filename, Logger const& log       // render XML and store to file, possibly compressed, return true on success
+                        ,uint gzipCompressionLevel =0);
+
 
         XMLtree accessTop();
 
         XMLtree addElm(string name){ return accessTop().addElm(name);  }
         XMLtree getElm(string name){ return root? accessTop().getElm(name) : XMLtree{}; }
 
-
-        // we always save with a blank first line
-        const char *removeBlanks(const char *c)
-        {while (isspace(*c)) ++c; return c;}
 
         // get the the branch_id and limits it between the min and max
         // if min==max==0, it will not limit it

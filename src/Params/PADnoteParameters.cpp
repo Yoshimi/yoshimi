@@ -942,7 +942,7 @@ void PADnoteParameters::add2XML(XMLwrapper& xml)
 {
     // currently not used
     // bool yoshiFormat = synth.usingYoshiType;
-    xml.information.PADsynth_used = 1;
+    xml.information.PADsynth_used = 1;   //////////////////////////////////////////////////////////TODO 5/25 : better put it directly into the INFORMATION node!
 
     xml.addparbool("stereo", PStereo);
     xml.addpar("mode",Pmode);

@@ -2667,7 +2667,7 @@ bool SynthEngine::saveBanks()
 
     auto xml{std::make_unique<XMLwrapper>(*this, true)};
     xml->beginbranch("BANKLIST");
-    bank.saveToConfigFile(*xml);
+    bank.saveToConfigFile(*xml);  ///////////////////////////////////////////////////////TODO 5/25 : must ensure that the bank-version is stored: addpar("Banks_Version", synth.bank.readVersion());
     xml->endbranch();
 
     if (!xml->saveXMLfile(bankname))

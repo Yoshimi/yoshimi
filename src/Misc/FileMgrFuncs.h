@@ -571,7 +571,7 @@ inline void dir2string(string &wanted, string currentDir, string exten, int opt 
 }
 
 
-inline string saveGzipped(char *data, string const& filename, int compression)
+inline string saveGzipped(const char* data, string const& filename, int compression)
 {
     char options[10];
     snprintf(options, 10, "wb%d", compression);
@@ -580,9 +580,9 @@ inline string saveGzipped(char *data, string const& filename, int compression)
     gzfile = gzopen(filename.c_str(), options);
     if (gzfile == NULL)
         return "gzopen() == NULL";
-    gzputs(gzfile, data);
+    int res = gzputs(gzfile, data);
     gzclose(gzfile);
-    return "";
+    return res<0? "Failure writing compressed data": "";
 }
 
 
