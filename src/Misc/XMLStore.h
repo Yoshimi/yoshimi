@@ -33,13 +33,9 @@
 #include "VerInfo.h"
 #include "Log.h"
 
-#include <mxml.h>                      ////////////////////////////////////////TODO 4/25 : remove from front-end
 #include <string>
 #include <limits>
 #include <optional>
-
-// max tree depth
-#define STACKSIZE 128                  ////////////////////////////////////////TODO 4/25 : becomes obsolete
 
 using std::string;
 using std::optional;
@@ -109,11 +105,9 @@ class XMLStore
     XMLtree root;
 
     public:
-       ~XMLStore(); /////////////////////////////////////////////////////////////////////////////////////////TODO 4/25 obsolete -- automatic memory management!
-
-        XMLStore(TOPLEVEL::XML type, SynthEngine& OBSOLETE, bool zynCompat =false);
-        XMLStore(string filename, Logger const& log, SynthEngine& OBSOLETE);
-        XMLStore(const char* xml, SynthEngine& OBSOLETE);
+        XMLStore(TOPLEVEL::XML type, bool zynCompat =false);
+        XMLStore(string filename, Logger const& log);
+        XMLStore(const char* xml);
 
         // can be moved
         XMLStore(XMLStore&&)                 = default;
@@ -136,13 +130,6 @@ class XMLStore
         XMLtree getElm(string name){ return root? accessTop().getElm(name) : XMLtree{}; }
 
 
-        // get the the branch_id and limits it between the min and max
-        // if min==max==0, it will not limit it
-        // if there isn't any id, will return min
-        // this must be called only immediately after enterbranch()
-        int getbranchid(int min, int max);         ////////////////////////////////////////////OOO what is this for?
-
-
         struct Metadata
         {
             TOPLEVEL::XML type{TOPLEVEL::XML::Instrument};
@@ -154,67 +141,13 @@ class XMLStore
         };
         Metadata meta;
 
-        bool minimal; // false if all parameters will be stored
-
-        struct {
-            int type;
-            uchar ADDsynth_used;
-            uchar SUBsynth_used;
-            uchar PADsynth_used;
-            bool yoshiType;
-        } information;
-
         // opens a file and parse only the "information" data on it
-
-        void checkfileinformation(std::string const& filename, uint& names, int& type);
-        void slowinfosearch(char *idx);
+        static void checkfileinformation(std::string const& filename, Logger const& log, uint& names, int& type);
 
     private:
         void buildXMLRoot();
         Metadata extractMetadata();
         static XMLtree loadFile(string filename, Logger const& log);
-
-        mxml_node_t *treeX;
-        mxml_node_t *rootX;
-        mxml_node_t *nodeX;
-        mxml_node_t *infoX;
-
-        // adds params like this:
-        // <name>
-        // returns the node
-        //mxml_node_t *addparams0(const char *name);
-        mxml_node_t *addparams0(std::string const&  name);
-
-        // adds params like this: <name par1="val1">, returns the node
-        mxml_node_t *addparams1(std::string const& name, std::string const& par1, std::string const& val1);
-
-        // adds params like this: <name par1="val1" par2="val2">, returns the node
-        mxml_node_t *addparams2(std::string const& name, std::string const& par1, std::string const& val1,
-                                std::string const& par2, std::string const& val2);
-
-        mxml_node_t *addparams3(std::string const& name, std::string const& par1, std::string const& val1,
-                                std::string const& par2, std::string const& val2,
-                                std::string const& par3, std::string const& val3);
-
-        // this is used to store the parents
-        mxml_node_t *parentstack[STACKSIZE];
-        int stackpos;
-        int xml_k;
-        char tabs[STACKSIZE + 2];
-
-        void push(mxml_node_t *node);
-        mxml_node_t* pop();
-        mxml_node_t* peek();
-        struct {
-            int major; // settings format version
-            int minor;
-            int revision;
-            int y_major;
-            int y_minor;
-            int y_revision;
-        } xml_version;
-
-        SynthEngine& synth;
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////////////WIP Prototype 4/25 - throw away when done!!!!!

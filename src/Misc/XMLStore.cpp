@@ -28,11 +28,9 @@
 
 #include "Misc/Config.h"
 #include "Misc/XMLStore.h"
-#include "Misc/SynthEngine.h"                  //////////////////////////////////////////////////////////////TODO 4/25 : why?? should never be linked to Yoshimi core logic
 #include "Misc/FileMgrFuncs.h"
 #include "Misc/FormatFuncs.h"
 
-#include <sys/types.h>                  ///////////////////////////////////////TODO 4/25 : why?
 #include <mxml.h>
 #include <zlib.h>
 #include <cassert>
@@ -51,6 +49,7 @@ using func::string2float;
 using func::asLongString;
 using func::asString;
 
+using std::optional;
 using std::string;
 using std::move;
 
@@ -117,7 +116,7 @@ namespace { // internal details of MXML integration
 
         return TOPLEVEL::XML::Instrument;
     }
-    
+
     /** @remark our XML files often start with leading whitespace
      *          which is not tolerated by the XML parser */
     const char* withoutLeadingWhitespace(string xml)
@@ -556,61 +555,21 @@ string XMLtree::getPar_str(string const& name)
 
 
 
-XMLStore::XMLStore(TOPLEVEL::XML type, SynthEngine& OBSOLETE, bool zynCompat)
+XMLStore::XMLStore(TOPLEVEL::XML type, bool zynCompat)
     : meta{type
           ,Config::VER_YOSHI_CURR
           ,zynCompat? Config::VER_ZYN_COMPAT : VerInfo()
           }
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////TODO 5/25 : stateful tree position logic broken. MUST GET RID of this "current position"
-    , minimal(not synth.getRuntime().xmlmax)   ///////////////////////////////////OOO does this ever represent some state independent from the global config???
-    , treeX{nullptr}
-    , rootX{nullptr}
-    , nodeX{nullptr}
-    , infoX{nullptr}
-    , stackpos(0)
-    , xml_k(0)
-    , synth(OBSOLETE)
-{
-    information.PADsynth_used = 0;
-    information.ADDsynth_used = 0;
-    information.SUBsynth_used = 0;
-    information.yoshiType = true;
-    information.type = type;
-    memset(&parentstack, 0, sizeof(parentstack));
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////TODO 5/25 : stateful tree position logic broken. MUST GET RID of this "current position"
-    treeX = nullptr;  // boom
-    rootX = nullptr;  // BOOOOM
-    nodeX = nullptr;  // BOOOOOOM
-    infoX = nullptr;  // BOOOOOOOOOM
-}
-
-XMLStore::XMLStore(string filename, Logger const& log, SynthEngine& OBSOLETE)
-    : root{loadFile(filename,log)}
-    , meta{extractMetadata()}
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////TODO 5/25 : stateful tree position logic broken. MUST GET RID of this "current position"
-    , minimal(not synth.getRuntime().xmlmax)
-    , treeX{nullptr}
-    , rootX{nullptr}
-    , nodeX{nullptr}
-    , infoX{nullptr}
-    , stackpos(0)
-    , xml_k(0)
-    , synth(OBSOLETE)
     { }
 
-XMLStore::XMLStore(const char* xml, SynthEngine& OBSOLETE)
+XMLStore::XMLStore(string filename, Logger const& log)
+    : root{loadFile(filename,log)}
+    , meta{extractMetadata()}
+    { }
+
+XMLStore::XMLStore(const char* xml)
     : root{XMLtree::parse(xml)}
     , meta{extractMetadata()}
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////TODO 5/25 : stateful tree position logic broken. MUST GET RID of this "current position"
-    , minimal(not synth.getRuntime().xmlmax)
-    , treeX{nullptr}
-    , rootX{nullptr}
-    , nodeX{nullptr}
-    , infoX{nullptr}
-    , stackpos(0)
-    , xml_k(0)
-    , synth(OBSOLETE)
     { }
 
 
@@ -659,7 +618,7 @@ XMLStore::Metadata XMLStore::extractMetadata()
                                ,top.getAttrib_uint("Yoshimi-minor")
                                ,top.getAttrib_uint("Yoshimi-revision")
                                }
-                       ,Config::ZYNADDSUBFX_VER
+                       ,VerInfo{}
                        };
     else
     if (XMLtree top = root.getElm(ROOT_ZYN))
@@ -687,27 +646,29 @@ XMLtree XMLStore::accessTop()
 
 
 
-XMLStore::~XMLStore()  ////////////////////////////////////////////////////TODO 4/2025 : must go away in the end, since all memory management becomes automatic!!
-{
-    if (treeX)
-        mxmlDelete(treeX);
+
+
+namespace{
+    struct Info{
+        int type{0};
+        uchar ADDsynth_used{false};
+        uchar SUBsynth_used{false};
+        uchar PADsynth_used{false};
+        bool yoshiType{false};
+    };
+
+    void slowinfosearch(char *idx, Info& information);
 }
 
-
-void XMLStore::checkfileinformation(string const& filename, uint& names, int& type)
+void XMLStore::checkfileinformation(string const& filename, Logger const& log, uint& names, int& type)
 {
-    stackpos = 0; // we don't seem to be using any of this!
-    memset(&parentstack, 0, sizeof(parentstack));
-    if (treeX)
-        mxmlDelete(treeX);
-    treeX = NULL;
-
+    Info information;
 
     string report;
     string xml = loadGzipped(filename, report);
     char* xmldata = & xml[0];
     if (not report.empty())
-        synth.getRuntime().Log(report, _SYS_::LogNotSerious);
+        log(report, _SYS_::LogNotSerious);
     if (!xmldata)
         return;
     char* first = strstr(xmldata, "<!DOCTYPE Yoshimi-data>");
@@ -759,14 +720,16 @@ void XMLStore::checkfileinformation(string const& filename, uint& names, int& ty
         type = string2int(idx + 23);
 
     if (seen != 7) // at least one was missing
-        slowinfosearch(xmldata);
+        slowinfosearch(xmldata, information);
     delete [] xmldata;
     names = information.ADDsynth_used | (information.SUBsynth_used << 1) | (information.PADsynth_used << 2) | (information.yoshiType << 3);
     return;
 }
 
 
-void XMLStore::slowinfosearch(char *idx)
+namespace {// local helper
+
+void slowinfosearch(char *idx, Info& information)
 {
     idx = strstr(idx, "<INSTRUMENT_KIT>");
     if (idx == NULL)
@@ -833,6 +796,8 @@ void XMLStore::slowinfosearch(char *idx)
     }
   return;
 }
+}//(End)local helper
+
 
 /**
  * Render tree contents into XML format.
@@ -899,98 +864,4 @@ XMLtree XMLStore::loadFile(string filename, Logger const& log)
         log("XML: Could not load xml file: " + filename, _SYS_::LogNotSerious);
 
     return content;
-}
-
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////TODO 4/25 : all old code below is obsolete !!!!
-
-int XMLStore::getbranchid(int min, int max)
-{
-    int id = string2int(mxmlElementGetAttr(nodeX, "id"));
-    if (min == 0 && max == 0)
-        return id;
-    if (id < min)
-        id = min;
-    else if (id > max)
-        id = max;
-    return id;
-}
-
-
-
-
-// Private parts
-
-mxml_node_t *XMLStore::addparams0(string const& name)
-{
-    mxml_node_t *element = mxmlNewElement(nodeX, name.c_str());
-    return element;
-}
-
-
-mxml_node_t *XMLStore::addparams1(string const& name, string const& par1, string const& val1)
-{
-    mxml_node_t *element = mxmlNewElement(nodeX, name.c_str());
-    mxmlElementSetAttr(element, par1.c_str(), val1.c_str());
-    return element;
-}
-
-
-mxml_node_t *XMLStore::addparams2(string const& name, string const& par1, string const& val1,
-                                    string const& par2, string const& val2)
-{
-    mxml_node_t *element = mxmlNewElement(nodeX, name.c_str());
-    mxmlElementSetAttr(element, par1.c_str(), val1.c_str());
-    mxmlElementSetAttr(element, par2.c_str(), val2.c_str());
-    return element;
-}
-
-
-mxml_node_t *XMLStore::addparams3(string const& name, string const& par1, string const& val1,
-                                    string const& par2, string const& val2,
-                                    string const& par3, string const& val3)
-{
-    mxml_node_t *element = mxmlNewElement(nodeX, name.c_str());
-    mxmlElementSetAttr(element, par1.c_str(), val1.c_str());
-    mxmlElementSetAttr(element, par2.c_str(), val2.c_str());
-    mxmlElementSetAttr(element, par3.c_str(), val3.c_str());
-    return element;
-}
-
-
-void XMLStore::push(mxml_node_t *node)
-{
-    if (stackpos >= STACKSIZE - 1)
-    {
-        synth.getRuntime().Log("XML: Not good, XMLwrapper push on a full parentstack", _SYS_::LogNotSerious);
-        return;
-    }
-    stackpos++;
-    parentstack[stackpos] = node;
-}
-
-
-mxml_node_t *XMLStore::pop()
-{
-    if (stackpos <= 0)
-    {
-        synth.getRuntime().Log("XML: Not good, XMLwrapper pop on empty parentstack", _SYS_::LogNotSerious);
-        return rootX;
-    }
-    mxml_node_t *node = parentstack[stackpos];
-    parentstack[stackpos] = NULL;
-    stackpos--;
-    return node;
-}
-
-
-mxml_node_t *XMLStore::peek()
-{
-    if (stackpos <= 0)
-    {
-        synth.getRuntime().Log("XML: Not good, XMLwrapper peek on an empty parentstack", _SYS_::LogNotSerious);
-        return rootX;
-    }
-    return parentstack[stackpos];
 }

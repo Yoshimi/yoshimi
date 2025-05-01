@@ -57,7 +57,7 @@ struct VerInfo
 
     explicit operator bool()  const
     {
-        return maj == 0 and min == 0 and rev == 0;
+        return maj > 0 or min > 0;
     }
 
     friend bool operator==(VerInfo const& v1, VerInfo const& v2)

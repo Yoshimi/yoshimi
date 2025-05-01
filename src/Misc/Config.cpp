@@ -573,40 +573,32 @@ bool Config::initFromPersistentConfig()
 void Config::initData(XMLStore& xml)
 {
 
-//    xml.buildXMLRoot();
-    if (xml.information.type == TOPLEVEL::XML::MasterConfig)
+    if (xml.meta.type == TOPLEVEL::XML::MasterConfig)
     {
-/*      /////////////////////////////////////////////////////////////////////////////TODO 4/25 : adapt API for parameter access
-        beginbranch("BASE_PARAMETERS");
-            addparbool("enable_gui", synth.getRuntime().storedGui);
-            addparbool("enable_splash", synth.getRuntime().showSplash);
-            addparbool("enable_CLI", synth.getRuntime().storedCli);
-            addpar("show_CLI_context", synth.getRuntime().showCLIcontext);
-            addparbool("enable_single_master", synth.getRuntime().singlePath);
-            addparbool("enable_auto_instance", synth.getRuntime().autoInstance);
-            addparU("handle_padsynth_build", synth.getRuntime().handlePadSynthBuild);
-            addpar("gzip_compression", synth.getRuntime().gzipCompression);
-            addparbool("banks_checked", synth.getRuntime().banksChecked);
-            addparU("active_instances", synth.getRuntime().activeInstances.to_ulong());
-            addparstr("guide_version", synth.getRuntime().guideVersion);
-            addparstr("manual", synth.getRuntime().manualFile);
-        endbranch();
-*/
-        return;
+        XMLtree base = xml.addElm("BASE_PARAMETERS");
+            base.addPar_bool("enable_gui", synth.getRuntime().storedGui);
+            base.addPar_bool("enable_splash", synth.getRuntime().showSplash);
+            base.addPar_bool("enable_CLI", synth.getRuntime().storedCli);
+            base.addPar_int ("show_CLI_context", synth.getRuntime().showCLIcontext);
+            base.addPar_bool("enable_single_master", synth.getRuntime().singlePath);
+            base.addPar_bool("enable_auto_instance", synth.getRuntime().autoInstance);
+            base.addPar_uint("handle_padsynth_build", synth.getRuntime().handlePadSynthBuild);
+            base.addPar_int ("gzip_compression", synth.getRuntime().gzipCompression);
+            base.addPar_bool("banks_checked", synth.getRuntime().banksChecked);
+            base.addPar_uint("active_instances", synth.getRuntime().activeInstances.to_ulong());
+            base.addPar_str ("guide_version", synth.getRuntime().guideVersion);
+            base.addPar_str ("manual", synth.getRuntime().manualFile);
     }
-
-    if (xml.information.type <= TOPLEVEL::XML::Scale)
+    else
+    if (xml.meta.type <= TOPLEVEL::XML::Scale)
     {
-/*      /////////////////////////////////////////////////////////////////////////////TODO 4/25 : adapt API for parameter access
-        beginbranch("BASE_PARAMETERS");
-            addpar("max_midi_parts", NUM_MIDI_CHANNELS);
-            addpar("max_kit_items_per_instrument", NUM_KIT_ITEMS);
-            addpar("max_system_effects", NUM_SYS_EFX);
-            addpar("max_insertion_effects", NUM_INS_EFX);
-            addpar("max_instrument_effects", NUM_PART_EFX);
-            addpar("max_addsynth_voices", NUM_VOICES);
-        endbranch();
-*/
+        XMLtree base = xml.addElm("BASE_PARAMETERS");
+            base.addPar_int("max_midi_parts", NUM_MIDI_CHANNELS);
+            base.addPar_int("max_kit_items_per_instrument", NUM_KIT_ITEMS);
+            base.addPar_int("max_system_effects", NUM_SYS_EFX);
+            base.addPar_int("max_insertion_effects", NUM_INS_EFX);
+            base.addPar_int("max_instrument_effects", NUM_PART_EFX);
+            base.addPar_int("max_addsynth_voices", NUM_VOICES);
     }
 }
 
