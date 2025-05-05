@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0308
+version 1.0402
 header_name {.h}
 code_name {.cc}
 comment {MasterUI.h} {not_in_source in_header
@@ -522,9 +522,9 @@ class MasterUI {: {public GuiUpdates}
 
                 synth->signalGuiWindowClosed();
             }}
-      xywh {9 24 385 525} type Double labelfont 13 labelsize 12 resizable
+      xywh {9 24 385 525} type Double labelfont 13 labelsize 12 hide resizable
       code0 {mainDW = 385; mainDH = 470;}
-      code1 {masterwindow->size_range(394, 500, 0, 0, 0, 0, 1);} visible
+      code1 {masterwindow->size_range(394, 500, 0, 0, 0, 0, 1);}
     } {
       Fl_Box keyHandle {
         label keyhandler
