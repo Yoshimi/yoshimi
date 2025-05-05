@@ -173,18 +173,18 @@ std::string banklist [] = {
 };
 
 std::string displaylist [] = {
-    "Hide",         "",
-    "Show",         "",
-    "Xposition",    "horizintal position in pixels",
-    "Yposition",    "vertical position in pixels",
-    "Width",        "width in pixels",
+    "HIde",         "hide window",
+    "SHow",         "show window",
+    "XPosition",    "horizintal position in pixels",
+    "YPosition",    "vertical position in pixels",
+    "WIdth",        "width in pixels",
     "HEight",       "height in pixels",
     "SElect",       "set the selection as the theme", // theme entries
-    "Copy",         "copy the selection to one with a new name",
-    "Rename",       "change the name of the selection",
-    "Delete",       "remove the selection from the list",
-    "Import",       "import an external theme file",
-    "Export",       "export the selection to an external theme file",
+    "COpy",         "copy the selection to one with a new name",
+    "REname",       "change the name of the selection",
+    "DElete",       "remove the selection from the list",
+    "IMport",       "import an external theme file",
+    "EXport",       "export the selection to an external theme file",
     "@end","@end"
 };
 
@@ -1201,9 +1201,50 @@ std::string subPadPosition [] = {"harmonic", "ushift", "lshift", "upower", "lpow
 std::string unisonPhase [] = {"none", "random", "half", "third", "quarter", "fifth"};
 
 // CLI display controls
-std::string displaySingle [] = {"MAin", "ABout", "COnfig", "PResets", "REPorts", "FOLder", "Query", "NAme", "RECent", "PATh", "ROot", "BAnk", "SEarch", "SCales", "MIXer", "VEctor", "LEarn", "KEyboard", "MIDi", "COntrollers", "EDit", "KIt", "AFtertouch", "LIst", "RETrigger", "@end"};
 
-std::string displayRoot [] = {"SYstem", "INsert", "EFfects", "SUBsynth", "PADsynth", "ADDsynth", "VOice", "MOdulator", "@end"};
+// std::string displayRoot [] = {"SYstem", "INsert", "EFfects", "SUBsynth", "PADsynth", "ADDsynth", "VOice", "MOdulator", "@end"};
+
+std::string displayRoot [] = {
+    "MAin",
+    "ABout",
+    "COnfig2", //     (settings)
+    "PResets",
+    "QUery", //       (and message)
+    "NAme", //        (input box)
+    "RECent",
+    "PATh", //        (roots, preset dirs)
+    "ROot", //        (list of banks)
+    "BAnk", //        (list of instruments)
+    "SEarch",
+    "SCales",
+    "MIXer",
+    "VEctor",
+    "LEarn",
+    "KEyboard",
+    "MIDi", //        (CCs)     assumes active part
+    "COntrollers", //           assumes active part
+    "EDit", //        (part)    assumes active part
+    "KIt", //                   assumes active part
+    "AFtertouch", //            assumes active part
+    "LIst", //       (voice)    requires Addsynth active
+    "RETrigger", //  (Padsynth) requires Padsynth active
+
+//none of the above have subs
+
+    "SYstem", //      (effects)
+    "INsert", //      (effects)
+
+//the following assume an active part
+
+    "EFfects", //     (part)
+    "SUbsynth",
+    "PADsynth",
+    "ADDsynth",
+    "VOice",     //    requires Addsynth active
+    "MOdulator", //    requires Addsynth active
+
+    "@end"
+};
 
 std::string displayBranch [] = {"WAveform", "RESonance", "AMlitude", "FRequency", "FIlter", "@end"};
 

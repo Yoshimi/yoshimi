@@ -124,6 +124,50 @@ namespace LISTS {
     test,
     };
 }
+namespace DISPLAY_ROOT {
+    enum{
+    main,
+    about,
+    config,
+    presets,
+    query,
+    name,
+    recent,
+    path,
+    root,
+    bank,
+    search,
+    scales,
+    mixer,
+    vector,
+    learn,
+    keyboard,
+    midi,
+    controllers,
+    edit,
+    kit,
+    aftertouch,
+
+    list,
+    retrigger,
+
+    system,
+    insert,
+
+    effects,
+    subsynth,
+    padsynth,
+    addsynth,
+    voice,
+    modulator,
+    };
+}
+
+namespace DISPLAY_LIST {
+    enum{
+        hide, show, xpos, ypos, width, heig, sele, copy, rena, dele, imop, expo,
+    };
+}
 
 extern std::string basics [];
 
@@ -133,11 +177,11 @@ extern std::string configlist [];
 
 extern std::string banklist [];
 
+extern std::string displaylist [];
+
 extern std::string partlist [];
 
 extern std::string mcontrollist [];
-
-extern std::string commonlist [];
 
 extern std::string addsynthlist [];
 
@@ -255,10 +299,10 @@ extern std::string subMagType [];
 extern std::string subPadPosition [];
 extern std::string unisonPhase [];
 
-extern std::string displaySingle [];
 extern std::string displayRoot [];
 extern std::string displayBranch [];
 extern std::string displayLeaf [];
+
 
 
 #endif

@@ -252,6 +252,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
     uchar engine    = getData->data.engine;
     uchar insert    = getData->data.insert;
     uchar parameter = getData->data.parameter;
+    uchar offset    = getData->data.offset;
     uchar miscmsg   = getData->data.miscmsg;
 
     if (control == TOPLEVEL::control::dataExchange)
@@ -271,32 +272,47 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
     {
         synth->getRuntime().Log("Found display control GUI link");
         synth->CBtest(getData);
-        //synth->getGuiMaster()->partui->instrumenteditwindow->show();
-        //synth->getGuiMaster()->partui->subnoteui->Showsub();
-        //synth->getGuiMaster()->partui->subnoteui->bandwidthsettingsui->show();
-        //MasterUI *link = synth->getGuiMaster();
-        /*int tyr = 1;
-        switch (tyr)
+
+        std::cout << "  root = " << displayRoot[offset] << std::endl;
+        std::cout << "  control = " << displaylist[control] << std::endl;
+
+        switch (offset)
         {
-            case 0:
-                ;
+            case DISPLAY_ROOT::about:
+            {
+                if (control == DISPLAY_LIST::hide)
+                    synth->getGuiMaster()->aboutwindow->hide();
+                else if (control == DISPLAY_LIST::show)
+                    synth->getGuiMaster()->aboutwindow->show();
                 break;
-            case 1:
-               synth->getGuiMaster()->partui->adnoteui->ShowGlobal();
-               break;
-            case 2:
-                synth->getGuiMaster()->partui->subnoteui->Showsub();
+            }
+            case DISPLAY_ROOT::edit:
+            {
+                if (control == DISPLAY_LIST::hide)
+                    synth->getGuiMaster()->partui->instrumenteditwindow->hide();
+                else if (control == DISPLAY_LIST::show)
+                    synth->getGuiMaster()->partui->instrumenteditwindow->show();
                 break;
-            case 3:
-                synth->getGuiMaster()->partui->padnoteui->Showpad();
+            }
+            case DISPLAY_ROOT::mixer:
+            {
+                if (control == DISPLAY_LIST::hide)
+                    synth->getGuiMaster()->panelwindow->hide();
+                else if (control == DISPLAY_LIST::show)
+                    synth->getGuiMaster()->panelwindow->show();
                 break;
+            }
+
+            case DISPLAY_ROOT::bank:
+            {
+                if (control == DISPLAY_LIST::hide)
+                    synth->getGuiMaster()->bankui->Hide();
+                else if (control == DISPLAY_LIST::show)
+                    synth->getGuiMaster()->bankui->Show();
+                break;
+            }
             default:
-                return;
-        }*/
-        int pointer = 0;
-        while (displaySingle[pointer] != "@end"){
-            std::cout << displaySingle[pointer] << std::endl;
-            ++pointer;
+                std::cout << "unknown section" << std::endl;
         }
         return;
     }
