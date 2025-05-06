@@ -274,48 +274,134 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
         synth->CBtest(getData);
 
         std::cout << "  root = " << displayRoot[offset] << std::endl;
-        std::cout << "  control = " << displaylist[control] << std::endl;
+        std::cout << "  control = " << displaylist[control * 2] << std::endl;
 
+        Fl_Window *linkptr; // not sure if this is completely safe!
+
+        bool selfset = false;
         switch (offset)
         {
             case DISPLAY_ROOT::about:
             {
-                if (control == DISPLAY_LIST::hide)
-                    synth->getGuiMaster()->aboutwindow->hide();
-                else if (control == DISPLAY_LIST::show)
-                    synth->getGuiMaster()->aboutwindow->show();
+                linkptr = synth->getGuiMaster()->aboutwindow;
                 break;
             }
-            case DISPLAY_ROOT::edit:
+            case DISPLAY_ROOT::keyboard:
             {
-                if (control == DISPLAY_LIST::hide)
-                    synth->getGuiMaster()->partui->instrumenteditwindow->hide();
-                else if (control == DISPLAY_LIST::show)
-                    synth->getGuiMaster()->partui->instrumenteditwindow->show();
+                linkptr = synth->getGuiMaster()->virkeyboard->virkeyboardwindow;
+                break;
+            }
+            case DISPLAY_ROOT::config:
+            {
+                linkptr = synth->getGuiMaster()->configui->configwindow;
                 break;
             }
             case DISPLAY_ROOT::mixer:
             {
-                if (control == DISPLAY_LIST::hide)
-                    synth->getGuiMaster()->panelwindow->hide();
-                else if (control == DISPLAY_LIST::show)
-                    synth->getGuiMaster()->panelwindow->show();
+                linkptr = synth->getGuiMaster()->panelwindow;
+                break;
+            }
+            case DISPLAY_ROOT::learn:
+            {
+                linkptr = synth->getGuiMaster()->midilearnui->midilearnwindow;
                 break;
             }
 
-            case DISPLAY_ROOT::bank:
+            case DISPLAY_ROOT::vector:
             {
-                if (control == DISPLAY_LIST::hide)
-                    synth->getGuiMaster()->bankui->Hide();
-                else if (control == DISPLAY_LIST::show)
-                    synth->getGuiMaster()->bankui->Show();
+                linkptr = synth->getGuiMaster()->vectorui->vectorwindow;
                 break;
             }
+
+            case DISPLAY_ROOT::roots: // bank structure is different!
+            {
+                if (control == DISPLAY_LIST::show)
+                {
+                    synth->getGuiMaster()->bankui->ShowRoot();
+                    selfset = true;
+                }
+                else if (control == DISPLAY_LIST::hide)
+                {
+                    synth->getGuiMaster()->bankui->Hide(2);
+                    selfset = true;
+                }
+                else
+                    linkptr = synth->getGuiMaster()->bankui->bankuiwindow;
+                break;
+            }
+            case DISPLAY_ROOT::banks:
+            {
+                if (control == DISPLAY_LIST::show)
+                {
+                    synth->getGuiMaster()->bankui->Showbank();
+                    selfset = true;
+                }
+                else if (control == DISPLAY_LIST::hide)
+                {
+                    synth->getGuiMaster()->bankui->Hide(1);
+                    selfset = true;
+                }
+                else
+                    linkptr = synth->getGuiMaster()->bankui->bankuiwindow;
+                break;
+            }
+            case DISPLAY_ROOT::instruments:
+            {
+                if (control == DISPLAY_LIST::show)
+                {
+                    synth->getGuiMaster()->bankui->ShowInst();
+                    selfset = true;
+                }
+                else if (control == DISPLAY_LIST::hide)
+                {
+                    synth->getGuiMaster()->bankui->Hide(0);
+                    selfset = true;
+                }
+                else
+                    linkptr = synth->getGuiMaster()->bankui->instrumentuiwindow;
+                break;
+            }
+            case DISPLAY_ROOT::search:
+            {
+                if (control == DISPLAY_LIST::show)
+                {
+                    synth->getGuiMaster()->bankui->ShowSearch();
+                    selfset = true;
+                }
+                else if (control == DISPLAY_LIST::hide)
+                {
+                    synth->getGuiMaster()->bankui->Hide(3);
+                    selfset = true;
+                }
+                else
+                    linkptr = synth->getGuiMaster()->bankui->searchwin;
+                break;
+            }
+
+            case DISPLAY_ROOT::edit:
+            {
+                linkptr = synth->getGuiMaster()->synth->getGuiMaster()->partui->instrumenteditwindow;
+                break;
+            }
+
             default:
-                std::cout << "unknown section" << std::endl;
+            {
+                synth->getRuntime().Log("Unknown display command");
+                selfset = true;
+            }
+        }
+        if (selfset)
+            linkptr = nullptr;
+        else
+        {
+            if (control == DISPLAY_LIST::hide)
+                linkptr->hide();
+            else if (control == DISPLAY_LIST::show) // need to find position for show
+                linkptr->show();
         }
         return;
     }
+
     if (control == TOPLEVEL::control::copyPaste)
     {
         if (getData->data.type == TOPLEVEL::type::Adjust)

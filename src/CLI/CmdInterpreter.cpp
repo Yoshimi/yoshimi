@@ -2602,17 +2602,27 @@ int CmdInterpreter::commandList(Parser& input)
 
 void CmdInterpreter::manageDisplay(Parser& input)
 {
-    //std::cout << "got here" << std::endl;
-
     // find root word
     string root = string{input};
     int selected = stringNumInList(root, displayRoot, 2);
+
+    if (selected < 0)
+    {
+        synth->getRuntime().Log("Assuming main");
+        selected = 0;
+    }
+
     input.skipChars();
 
     // find command
     string name = string(input);
-    int command = (stringNumInList(name, displaylist,2)) / 2; // steps in twos
-
+    int command = (stringNumInList(name, displaylist,2));
+    if (command < 0 || command & 1) // NOTE step across descriptions
+    {
+        synth->getRuntime().Log("Unrecognised command entry");
+        return;
+    }
+    command /= 2;
     sendDirect(synth, TOPLEVEL::action::fromCLI, 0, TOPLEVEL::type::Write, command, TOPLEVEL::section::display, UNUSED, UNUSED, UNUSED, UNUSED, selected, NO_MSG);
     return;
 }

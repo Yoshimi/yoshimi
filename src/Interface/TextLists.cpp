@@ -175,7 +175,7 @@ std::string banklist [] = {
 std::string displaylist [] = {
     "HIde",         "hide window",
     "SHow",         "show window",
-    "XPosition",    "horizintal position in pixels",
+    "XPosition",    "horizontal position in pixels",
     "YPosition",    "vertical position in pixels",
     "WIdth",        "width in pixels",
     "HEight",       "height in pixels",
@@ -1207,14 +1207,15 @@ std::string unisonPhase [] = {"none", "random", "half", "third", "quarter", "fif
 std::string displayRoot [] = {
     "MAin",
     "ABout",
-    "COnfig2", //     (settings)
+    "COnfig", //      (settings)
     "PResets",
     "QUery", //       (and message)
     "NAme", //        (input box)
     "RECent",
     "PATh", //        (roots, preset dirs)
-    "ROot", //        (list of banks)
-    "BAnk", //        (list of instruments)
+    "ROots", //       (list of bank roots)
+    "BAnks", //       (list of banks)
+    "INstruments", // (list of instruments)
     "SEarch",
     "SCales",
     "MIXer",
@@ -1243,7 +1244,7 @@ std::string displayRoot [] = {
     "VOice",     //    requires Addsynth active
     "MOdulator", //    requires Addsynth active
 
-    "@end"
+    "@end","@end"
 };
 
 std::string displayBranch [] = {"WAveform", "RESonance", "AMlitude", "FRequency", "FIlter", "@end"};
