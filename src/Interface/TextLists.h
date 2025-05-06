@@ -134,8 +134,9 @@ namespace DISPLAY_ROOT {
     name,
     recent,
     path,
-    root,
-    bank,
+    roots,
+    banks,
+    instruments,
     search,
     scales,
     mixer,
@@ -159,7 +160,7 @@ namespace DISPLAY_ROOT {
     padsynth,
     addsynth,
     voice,
-    modulator,
+    modulator
     };
 }
 
