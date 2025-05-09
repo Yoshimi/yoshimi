@@ -6,7 +6,7 @@
     Copyright 2009-2010, Alan Calvert
     Copyright 2016 Will Godfrey
     Copyright 2017 Jesper Lloyd
-    Copyright 2020-2024, Will Godfrey & others
+    Copyright 2020-2025, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -32,7 +32,7 @@
 #include <FL/fl_draw.H>
 #include <FL/Fl_Tooltip.H>
 #include <FL/Fl_Group.H>
-#include <FL/x.H>
+// #include <FL/x.H> // never used!
 #include <cairo.h>
 #include <cairo-xlib.h>
 

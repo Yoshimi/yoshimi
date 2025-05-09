@@ -118,7 +118,6 @@ set (FltkUI_sources
     ../UI/WidgetMWSlider.cpp
     ../UI/WidgetCheckButton.cpp
     ../UI/WidgetSpinner.cpp
-    ../UI/YoshiWin.cpp
 )
 
 add_definitions (-DYOSHIMI_LV2_PLUGIN=1)
