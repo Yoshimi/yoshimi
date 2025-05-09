@@ -2,7 +2,7 @@
     TextLists.h
 
     Copyright 2019-2023, Will Godfrey
-    Copyright 2024, Kristian Amlie
+    Copyright 2024-2025, Kristian Amlie, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -128,7 +128,7 @@ namespace DISPLAY_ROOT {
     enum{
     main,
     about,
-    config,
+    settings,
     presets,
     query,
     name,
@@ -166,7 +166,7 @@ namespace DISPLAY_ROOT {
 
 namespace DISPLAY_LIST {
     enum{
-        hide, show, xpos, ypos, width, heig, sele, copy, rena, dele, imop, expo,
+        hide, show, xpos, ypos, width, height, select, copy, renam, delet, imprt, exprt,
     };
 }
 

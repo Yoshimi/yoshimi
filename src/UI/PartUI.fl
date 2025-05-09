@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0308
+version 1.0402
 header_name {.h}
 code_name {.cc}
 comment {PartUI.h} {not_in_source in_header
@@ -709,7 +709,7 @@ class PartUI {: {public Fl_Group, PartUI_}
             uchar effNum = inseffectui->effNum();
             uchar effType = o->value();
             send_data(TOPLEVEL::action::forceUpdate, PART::control::effectType, effType, TOPLEVEL::type::Integer, npart, UNUSED, effNum, TOPLEVEL::insert::partEffectSelect);}
-        tooltip {Effect Type} xywh {86 8 92 22} box UP_BOX down_box BORDER_BOX labelsize 11 labelcolor 64 textfont 1 textsize 12 textcolor 64
+        tooltip {Effect Type} xywh {86 8 92 22} down_box BORDER_BOX labelsize 11 labelcolor 64 textfont 1 textsize 12 textcolor 64
         code0 {o->add("No Effect");o->add("Reverb");o->add("Echo");o->add("Chorus");o->add("Phaser");o->add("AlienWah");o->add("Distortion");o->add("EQ");o->add("DynFilter");}
         code1 {o->value(0); // initially "No Effect"}
       } {}
@@ -2336,6 +2336,32 @@ class PartUI {: {public Fl_Group, PartUI_}
     code {//
     instrumenteditwindow->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("Edit"), npart, TOPLEVEL::windowTitle)).c_str());} {}
   }
+  Function {Show(int win)} {} {
+    code {//
+        switch(win)
+        {
+            case 0:
+                Showedit();
+                break;
+            case 1:
+                Showkit();
+                break;
+            case 2:
+                Showefx();
+                break;
+            case 3:
+                Showctl();
+                break;
+            case 4:
+                ShowAT();
+                break;
+            case 5:
+                Showctlmidi();
+                break;
+            default:
+                break;
+        }} {}
+  }
   Function {Showedit()} {} {
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
@@ -2432,6 +2458,38 @@ class PartUI {: {public Fl_Group, PartUI_}
     instrumentkitlist->resize(fetchX, fetchY, fetchW, fetchH);
     instrumentkitlist->show();
     kitSeen = true;} {}
+  }
+  Function {Hide(int win)} {} {
+    code {//
+        switch(win)
+        {
+            case 0:
+                saveWin(synth, instrumenteditwindow->w(), instrumenteditwindow->h(), instrumenteditwindow->x(),instrumenteditwindow->y(), true, "Part-edit");
+                instrumenteditwindow->hide();
+                break;
+            case 1:
+                saveWin(synth, instrumentkitlist->w(), instrumentkitlist->h(), instrumentkitlist->x(), instrumentkitlist->y(), false, "Part-kit");
+                instrumentkitlist->hide();
+                break;
+            case 2:
+                saveWin(synth, partfx->w(), partfx->h(),  partfx->x(),  partfx->y(), false, "Part-effects");
+                partfx->hide();
+                break;
+            case 3:
+                saveWin(synth, ctlwindow->w(), ctlwindow->h(), ctlwindow->x(), ctlwindow->y(), false, "Part-controllers");
+                ctlwindow->hide();
+                break;
+            case 4:
+                saveWin(synth, aftertouchcontrol->w(), aftertouchcontrol->h(), aftertouchcontrol->x(), aftertouchcontrol->y(), false, "Part-aftertouch");
+                aftertouchcontrol->hide();
+                break;
+            case 5:
+                saveWin(synth,  ctlmidi->w(),  ctlmidi->h(), ctlmidi->x(), ctlmidi->y(), false, "Part-ctlmidi");
+                ctlmidi->hide();
+                break;
+            default:
+                break;
+        }} {}
   }
   Function {wincheck()} {} {
     code {//
