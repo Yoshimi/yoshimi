@@ -1201,52 +1201,44 @@ std::string subPadPosition [] = {"harmonic", "ushift", "lshift", "upower", "lpow
 std::string unisonPhase [] = {"none", "random", "half", "third", "quarter", "fifth"};
 
 // CLI display controls
-
-// std::string displayRoot [] = {"SYstem", "INsert", "EFfects", "SUBsynth", "PADsynth", "ADDsynth", "VOice", "MOdulator", "@end"};
-
 std::string displayRoot [] = {
-    "MAin",
-    "ABout",
-    "COnfig", //      (settings)
-    "PResets",
-    "QUery", //       (and message)
-    "NAme", //        (input box)
+    "MAIn",
+    "ABOut",
+    "SETtings",
+    "PREsets",
+    "QUEry", //       (and message)
+    "NAMe", //        (input box)
     "RECent",
-    "PATh", //        (roots, preset dirs)
-    "ROots", //       (list of bank roots)
-    "BAnks", //       (list of banks)
+    "PATh", //        (preset dirs)
+    "ROOts", //       (list of bank roots)
+    "BANks", //       (list of banks)
     "INstruments", // (list of instruments)
-    "SEarch",
-    "SCales",
+    "SEArch",
+    "SCAles",
     "MIXer",
-    "VEctor",
-    "LEarn",
-    "KEyboard",
+    "VECtor",
+    "LEArn",
+    "KEYboard",
     "MIDi", //        (CCs)     assumes active part
-    "COntrollers", //           assumes active part
-    "EDit", //        (part)    assumes active part
-    "KIt", //                   assumes active part
-    "AFtertouch", //            assumes active part
-    "LIst", //       (voice)    requires Addsynth active
+    "CONtrollers", //           assumes active part
+    "EDIt", //        (part)    assumes active part
+    "KIT", //                   assumes active part
+    "AFTertouch", //            assumes active part
+    "LISt", //       (voice)    requires Addsynth active
     "RETrigger", //  (Padsynth) requires Padsynth active
-
 //none of the above have subs
-
-    "SYstem", //      (effects)
-    "INsert", //      (effects)
-
+    "SYStem", //      (effects)
+    "INSert", //      (effects)
 //the following assume an active part
-
-    "EFfects", //     (part)
+    "EFFects", //     (part)
     "SUbsynth",
     "PADsynth",
     "ADDsynth",
-    "VOice",     //    requires Addsynth active
-    "MOdulator", //    requires Addsynth active
-
-    "@end","@end"
+    "VOIce",     //    requires Addsynth active
+    "MODulator", //    requires Addsynth active
+    "@end"
 };
 
-std::string displayBranch [] = {"WAveform", "RESonance", "AMlitude", "FRequency", "FIlter", "@end"};
+std::string displayBranch [] = {"WAVeform", "RESonance", "AMPlitude", "FREquency", "FILter", "@end"};
 
-std::string displayLeaf []= {"FORmant", "ENvelope", "@end"};
+std::string displayLeaf []= {"FORmant", "ENVelope", "@end"};

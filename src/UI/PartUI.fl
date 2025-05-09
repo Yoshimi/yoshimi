@@ -2345,6 +2345,32 @@ class PartUI {: {public Fl_Group, PartUI_}
     code {//
     instrumenteditwindow->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("Edit"), npart, TOPLEVEL::windowTitle)).c_str());} {}
   }
+  Function {Show(int win)} {} {
+    code {//
+        switch(win)
+        {
+            case 0:
+                Showedit();
+                break;
+            case 1:
+                Showkit();
+                break;
+            case 2:
+                Showefx();
+                break;
+            case 3:
+                Showctl();
+                break;
+            case 4:
+                ShowAT();
+                break;
+            case 5:
+                Showctlmidi();
+                break;
+            default:
+                break;
+        }} {}
+  }
   Function {Showedit()} {} {
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
@@ -2441,6 +2467,38 @@ class PartUI {: {public Fl_Group, PartUI_}
     instrumentkitlist->resize(fetchX, fetchY, fetchW, fetchH);
     instrumentkitlist->show();
     kitSeen = true;} {}
+  }
+  Function {Hide(int win)} {} {
+    code {//
+        switch(win)
+        {
+            case 0:
+                saveWin(synth, instrumenteditwindow->w(), instrumenteditwindow->h(), instrumenteditwindow->x(),instrumenteditwindow->y(), true, "Part-edit");
+                instrumenteditwindow->hide();
+                break;
+            case 1:
+                saveWin(synth, instrumentkitlist->w(), instrumentkitlist->h(), instrumentkitlist->x(), instrumentkitlist->y(), false, "Part-kit");
+                instrumentkitlist->hide();
+                break;
+            case 2:
+                saveWin(synth, partfx->w(), partfx->h(),  partfx->x(),  partfx->y(), false, "Part-effects");
+                partfx->hide();
+                break;
+            case 3:
+                saveWin(synth, ctlwindow->w(), ctlwindow->h(), ctlwindow->x(), ctlwindow->y(), false, "Part-controllers");
+                ctlwindow->hide();
+                break;
+            case 4:
+                saveWin(synth, aftertouchcontrol->w(), aftertouchcontrol->h(), aftertouchcontrol->x(), aftertouchcontrol->y(), false, "Part-aftertouch");
+                aftertouchcontrol->hide();
+                break;
+            case 5:
+                saveWin(synth,  ctlmidi->w(),  ctlmidi->h(), ctlmidi->x(), ctlmidi->y(), false, "Part-ctlmidi");
+                ctlmidi->hide();
+                break;
+            default:
+                break;
+        }} {}
   }
   Function {wincheck()} {} {
     code {//

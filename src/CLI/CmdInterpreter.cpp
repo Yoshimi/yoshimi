@@ -2604,7 +2604,7 @@ void CmdInterpreter::manageDisplay(Parser& input)
 {
     // find root word
     string root = string{input};
-    int selected = stringNumInList(root, displayRoot, 2);
+    int selected = stringNumInList(root, displayRoot, 3);
 
     if (selected < 0)
     {
@@ -2616,14 +2616,14 @@ void CmdInterpreter::manageDisplay(Parser& input)
 
     // find command
     string name = string(input);
-    int command = (stringNumInList(name, displaylist,2));
+    int command = stringNumInList(name, displaylist, 3);
     if (command < 0 || command & 1) // NOTE step across descriptions
     {
         synth->getRuntime().Log("Unrecognised command entry");
         return;
     }
     command /= 2;
-    sendDirect(synth, TOPLEVEL::action::fromCLI, 0, TOPLEVEL::type::Write, command, TOPLEVEL::section::display, UNUSED, UNUSED, UNUSED, UNUSED, selected, NO_MSG);
+    sendDirect(synth, TOPLEVEL::action::fromCLI, 0, TOPLEVEL::type::Write, command, TOPLEVEL::section::display, UNUSED, UNUSED, selected, UNUSED, UNUSED, NO_MSG);
     return;
 }
 

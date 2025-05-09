@@ -485,6 +485,71 @@ class MasterUI {: {public GuiUpdates}
           ;}
       ;} {}} {}
   }
+  Function {Show(int win)} {} {
+    code {//
+
+    switch (win)
+    {
+        case 0:
+            Showmaster();
+            break;
+        case 1:
+            Showpanel();
+            break;
+        case 2:
+            virkeyboard->ShowKbd();
+            break;
+        case 3:
+            break;
+        case 4:
+            break;
+        case 5:
+            ShowAbout();
+            break;
+
+    }} {}
+  }
+  Function {Hide(int win)} {} {
+    code {//
+
+    switch (win)
+    {
+        case 0:
+            break;
+        case 1:
+        {
+            saveWin(synth, panelwindow->w(), panelwindow->h(), panelwindow->x(), panelwindow->y(), panelType, "Mixer");
+            panelwindow->hide();
+            delete panelwindow;
+        }
+            break;
+        case 2:
+            virkeyboard->Hide();
+            break;
+        //case 3:
+            //ShowKit();
+            //break;
+        //case 4:
+            //break:
+        case 5:
+            aboutwindow->hide();
+            break;
+
+    }} {}
+  }
+  Function {ShowAbout()} {} {
+    code {//
+        int X, Y, W, H, O;
+        loadWin(synth, W, H, X, Y, O, "Master-about");
+        if (W < aboutDW || H < aboutDH)
+        {
+            W = aboutDW;
+            H = aboutDH;
+        }
+        checkSane(X, Y, W, H, aboutDW, aboutDH);
+        aboutwindow->resize(X, Y, W, H);
+        aboutwindow->show();} {}
+  }
   Function {Showmaster()} {return_type bool
   } {
     code {//

@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0308
+version 1.0402
 header_name {.h}
 code_name {.cc}
 comment {BankUI.h} {not_in_source in_header
@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of original ZynAddSubFX code.
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include <unistd.h>} {public local
@@ -71,6 +71,7 @@ decl {\#include "Interface/TextLists.h"} {public local
 
 decl {\#include "MasterUI.h"} {private local
 }
+
 decl {\#include "UI/Themes.h"} {private local
 }
 
@@ -307,7 +308,7 @@ class RootSlot {: {public Fl_Button, RootProcess_}
   }
 }
 
-class BankUI {: {public BankProcess_, RootProcess_}
+class BankUI {open : {public BankProcess_, RootProcess_}
 } {
   Function {make_window()} {} {
     Fl_Window instrumentuiwindow {
@@ -1130,15 +1131,34 @@ class BankUI {: {public BankProcess_, RootProcess_}
 
         delete rootuiwindow;} {}
   }
-  Function {Show()} {} {
+  Function {Show(int type = -1)} {} {
     code {// called from part UI
-    rescan_for_banks();
-    set_bank_slot();
-    ShowInst();
-    mode = 1;
-    removeselection();
-    setHighlight(mode);
-    refreshmainwindow();} {}
+    switch (type)
+    {
+        case 0:
+            ShowInst();
+            break;
+        case 1:
+            Showbank();
+            break;
+        case 2:
+            ShowRoot();
+            break;
+        case 3:
+            ShowSearch();
+            break;
+        default:
+        {
+            rescan_for_banks();
+            set_bank_slot();
+            ShowInst();
+            mode = 1;
+            removeselection();
+            setHighlight(mode);
+            refreshmainwindow();
+            break;
+        }
+    }} {}
   }
   Function {ShowInst()} {} {
     code {//
@@ -1243,7 +1263,8 @@ class BankUI {: {public BankProcess_, RootProcess_}
             break;
         default:
             break;
-    }} {}
+    }} {selected
+    }
   }
   Function {init(Fl_Spinner *cbwig_)} {} {
     code {//
