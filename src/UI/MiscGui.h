@@ -263,7 +263,7 @@ inline void setVisible(SynthEngine *synth, bool v, std::string filename)
     saveText(values, file::configDir() + "/windows/" + ID + filename);
 }
 
-inline void checkSane(int& x, int& y, int& w, int& h, int defW, int defH, bool halfsize = false)
+inline void checkSane(int& x, int& y, int& w, int& h, int defW, int defH, bool halfsize = false, bool priority = false)
 {
     int minX, minY, maxW, maxH;
     Fl::screen_xywh(minX, minY, maxW, maxH, x, y, w, h);
@@ -276,8 +276,15 @@ inline void checkSane(int& x, int& y, int& w, int& h, int defW, int defH, bool h
     maxW -= 5; // wiggle room
     maxH -= 30; // space for minimal titlebar
 
-    if ((w / defW) != (h / defH)) // ratio
-        w = h / defH * defW; // doesn't matter which one we pick!
+    float dw = w;
+    float dh = h;
+    if ((dw / defW) != (dh / defH)) // ratio
+    {
+        if (priority)
+            dh = dw /defW * defH;
+        else
+            dw = dh / defH * defW;
+    }
 
     int adjustW;
     int adjustH;
@@ -291,33 +298,35 @@ inline void checkSane(int& x, int& y, int& w, int& h, int defW, int defH, bool h
         adjustW = maxW;
         adjustH = maxH;
     }
-    if (w > maxW || h > maxH) // size
+    if (dw > maxW || dh > maxH) // size
     {
-        h = adjustH;
-        w = adjustW;
-        if (h / defH > w / defW)
+        dh = adjustH;
+        dw = adjustW;
+        if (dh / defH > dw / defW)
         {
-            h = w / defW * defH;
+            dh = dw / defW * defH;
         }
         else
         {
-            w = h / defH * defW;
+            dw = dh / defH * defW;
         }
     }
 
-    if ((x + w) > maxW) // position
+    if ((x + dw) > maxW) // position
     {
-        x = maxW - w;
+        x = maxW - dw;
         if (x < 5)
             x = 5;
     }
-    if ((y + h) > maxH)
+    if ((y + dh) > maxH)
     {
-        y = maxH - h;
+        y = maxH - dh;
         if (y < 30)
             y = 30;
     }
 
+    w = dw;
+    h = dh;
     // Restore position relative to screen position.
     x += minX;
     y += minY;
