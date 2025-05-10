@@ -490,20 +490,21 @@ class MasterUI {: {public GuiUpdates}
 
     switch (win)
     {
-        case 0:
+        case DISPLAY_ROOT::main:
             Showmaster();
             break;
-        case 1:
+        case DISPLAY_ROOT::mixer:
             Showpanel();
             break;
-        case 2:
+        case DISPLAY_ROOT::keyboard:
             virkeyboard->ShowKbd();
             break;
-        case 3:
+        case DISPLAY_ROOT::settings:
+            configui->Show(synth);
             break;
-        case 4:
-            break;
-        case 5:
+        //case 4:
+            //break;
+        case DISPLAY_ROOT::about:
             ShowAbout();
             break;
 
@@ -514,16 +515,15 @@ class MasterUI {: {public GuiUpdates}
 
     switch (win)
     {
-        case 0:
+        case DISPLAY_ROOT::main:
             break;
-        case 1:
+        case DISPLAY_ROOT::mixer:
         {
             saveWin(synth, panelwindow->w(), panelwindow->h(), panelwindow->x(), panelwindow->y(), panelType, "Mixer");
             panelwindow->hide();
-            delete panelwindow;
         }
             break;
-        case 2:
+        case DISPLAY_ROOT::keyboard:
             virkeyboard->Hide();
             break;
         //case 3:
@@ -531,11 +531,62 @@ class MasterUI {: {public GuiUpdates}
             //break;
         //case 4:
             //break:
-        case 5:
+        case DISPLAY_ROOT::about:
             aboutwindow->hide();
             break;
 
     }} {}
+  }
+  Function {winStyle(int win, int x, int y, int w, int h)} {} {
+    code {//
+        int X;
+        int Y;
+        int W;
+        int H;
+        switch (win)
+        {
+            case DISPLAY_ROOT::about:
+                X = aboutwindow->x();
+                Y = aboutwindow->y();
+                W = aboutwindow->w();
+                H = aboutwindow->h();
+            break;
+            case DISPLAY_ROOT::settings:
+                X = configui->configwindow->x();
+                Y = configui->configwindow->y();
+                W = configui->configwindow->w();
+                H = configui->configwindow->h();
+            break;
+            default:
+                break;
+        }
+        bool priority = false;
+
+        if (x >= 0) // currently can only change one at a time
+            X = x;
+        else if (y >= 0)
+            Y = y;
+        else if (w >= 0)
+        {
+            W = w;
+            priority = true;
+        }
+        else if (h >= 0)
+            H = h;
+
+        switch (win)
+        {
+            case DISPLAY_ROOT::about:
+                checkSane(X,Y,W,H,aboutDW, aboutDH, false, priority);
+                aboutwindow->resize(X,Y,W,H);
+                break;
+            case DISPLAY_ROOT::settings:
+                checkSane(X,Y,W,H,configui->confDW, configui->confDH, false, priority);
+                configui->configwindow->resize(X,Y,W,H);
+                break;
+            default:
+                break;
+        };} {}
   }
   Function {ShowAbout()} {} {
     code {//

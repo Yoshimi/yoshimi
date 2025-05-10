@@ -246,13 +246,14 @@ void GuiUpdates::decode_envelope(SynthEngine *synth, CommandBlock *getData)
 
 void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
 {
+    float value     = getData->data.value;
     uchar control   = getData->data.control;
     uchar npart     = getData->data.part;
     uchar kititem   = getData->data.kit;
     uchar engine    = getData->data.engine;
     uchar insert    = getData->data.insert;
     uchar parameter = getData->data.parameter;
-    uchar offset    = getData->data.offset;
+    //uchar offset    = getData->data.offset;
     uchar miscmsg   = getData->data.miscmsg;
 
     if (control == TOPLEVEL::control::dataExchange)
@@ -276,7 +277,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
         std::cout << "\n\n  root = " << displayRoot[insert] << std::endl;
         std::cout << "  control = " << displaylist[control * 2] << std::endl;
 
-        int operation;
+        //int operation;
         switch (insert)
         {
             case DISPLAY_ROOT::main:
@@ -284,7 +285,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                 switch (control)
                 {
                     case DISPLAY_LIST::show:
-                        synth->getGuiMaster()->Show(0);
+                        synth->getGuiMaster()->Show(DISPLAY_ROOT::main);
                         break;
                     case DISPLAY_LIST::hide:
                         synth->getRuntime().Log("Can't hide main window");
@@ -296,10 +297,22 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                 switch (control)
                 {
                     case DISPLAY_LIST::show:
-                        synth->getGuiMaster()->Show(5);
+                        synth->getGuiMaster()->Show(DISPLAY_ROOT::about);
                         break;
                     case DISPLAY_LIST::hide:
-                        synth->getGuiMaster()->Hide(5);
+                        synth->getGuiMaster()->Hide(DISPLAY_ROOT::about);
+                        break;
+                    case DISPLAY_LIST::xpos:
+                        synth->getGuiMaster()->winStyle(DISPLAY_ROOT::about, int(value), -1, -1, -1);
+                        break;
+                    case DISPLAY_LIST::ypos:
+                        synth->getGuiMaster()->winStyle(DISPLAY_ROOT::about, -1, int(value), -1, -1);
+                        break;
+                    case DISPLAY_LIST::width:
+                        synth->getGuiMaster()->winStyle(DISPLAY_ROOT::about, -1, -1, int(value), -1);
+                        break;
+                    case DISPLAY_LIST::height:
+                        synth->getGuiMaster()->winStyle(DISPLAY_ROOT::about, -1, -1, -1, int(value));
                         break;
                 }
                 break;
@@ -309,10 +322,10 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                 switch (control)
                 {
                     case DISPLAY_LIST::show:
-                        synth->getGuiMaster()->Show(2);
+                        synth->getGuiMaster()->Show(DISPLAY_ROOT::keyboard);
                         break;
                     case DISPLAY_LIST::hide:
-                        synth->getGuiMaster()->Hide(2);
+                        synth->getGuiMaster()->Hide(DISPLAY_ROOT::keyboard);
                         break;
                 }
                 break;
@@ -327,6 +340,18 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                     case DISPLAY_LIST::hide:
                         synth->getGuiMaster()->configui->configwindow->hide();
                         break;
+                    case DISPLAY_LIST::xpos:
+                        synth->getGuiMaster()->winStyle(DISPLAY_ROOT::settings, int(value), -1, -1, -1);
+                        break;
+                    case DISPLAY_LIST::ypos:
+                        synth->getGuiMaster()->winStyle(DISPLAY_ROOT::settings, -1, int(value), -1, -1);
+                        break;
+                    case DISPLAY_LIST::width:
+                        synth->getGuiMaster()->winStyle(DISPLAY_ROOT::settings, -1, -1, int(value), -1);
+                        break;
+                    case DISPLAY_LIST::height:
+                        synth->getGuiMaster()->winStyle(DISPLAY_ROOT::settings, -1, -1, -1, int(value));
+                        break;
                 }
                 break;
             }
@@ -335,10 +360,10 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                 switch (control)
                 {
                     case DISPLAY_LIST::show:
-                        synth->getGuiMaster()->Show(1);
+                        synth->getGuiMaster()->Show(DISPLAY_ROOT::mixer);
                         break;
                     case DISPLAY_LIST::hide:
-                        synth->getGuiMaster()->Hide(1);
+                        synth->getGuiMaster()->Hide(DISPLAY_ROOT::mixer);
                         break;
                 }
                 break;

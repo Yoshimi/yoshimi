@@ -26,7 +26,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include <iostream>} {public local
@@ -66,7 +66,12 @@ decl {\#include "Misc/TextMsgBuffer.h"
     }} {private local
 }
 
+<<<<<<< HEAD
 class ConfigUI {} {
+=======
+class ConfigUI {open
+} {
+>>>>>>> b31821f4 (Revised the structure of the display controls, so now making progress.)
   Function {isLV2()} {return_type bool
   } {
     code {return synth->getRuntime().isLV2;} {}
@@ -2288,9 +2293,9 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
   }
   decl {int oldBank;} {private local
   }
-  decl {float confDW;} {private local
+  decl {float confDW;} {public local
   }
-  decl {float confDH;} {private local
+  decl {float confDH;} {selected public local
   }
   decl {float preDW;} {private local
   }

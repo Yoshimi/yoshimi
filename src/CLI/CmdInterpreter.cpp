@@ -2623,7 +2623,9 @@ void CmdInterpreter::manageDisplay(Parser& input)
         return;
     }
     command /= 2;
-    sendDirect(synth, TOPLEVEL::action::fromCLI, 0, TOPLEVEL::type::Write, command, TOPLEVEL::section::display, UNUSED, UNUSED, selected, UNUSED, UNUSED, NO_MSG);
+    input.skipChars();
+    float value = string2int(input);
+    sendDirect(synth, TOPLEVEL::action::fromCLI, value, TOPLEVEL::type::Write, command, TOPLEVEL::section::display, UNUSED, UNUSED, selected, UNUSED, UNUSED, NO_MSG);
     return;
 }
 

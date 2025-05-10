@@ -166,7 +166,7 @@ namespace DISPLAY_ROOT {
 
 namespace DISPLAY_LIST {
     enum{
-        hide, show, xpos, ypos, width, height, select, copy, renam, delet, imprt, exprt,
+        hide, show, xpos, ypos, width, height, select, copy, rename, remove, fetch, send,
     };
 }
 
