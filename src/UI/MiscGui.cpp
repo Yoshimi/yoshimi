@@ -289,6 +289,18 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                         break;
                     case DISPLAY_LIST::hide:
                         synth->getRuntime().Log("Can't hide main window");
+                        case DISPLAY_LIST::xpos:
+                        synth->getGuiMaster()->winStyle(DISPLAY_ROOT::main, int(value), -1, -1, -1);
+                        break;
+                    case DISPLAY_LIST::ypos:
+                        synth->getGuiMaster()->winStyle(DISPLAY_ROOT::main, -1, int(value), -1, -1);
+                        break;
+                    case DISPLAY_LIST::width:
+                        synth->getGuiMaster()->winStyle(DISPLAY_ROOT::main, -1, -1, int(value), -1);
+                        break;
+                    case DISPLAY_LIST::height:
+                        synth->getGuiMaster()->winStyle(DISPLAY_ROOT::main, -1, -1, -1, int(value));
+                        break;
                 }
                 break;
             }
