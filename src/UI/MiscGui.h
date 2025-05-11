@@ -263,28 +263,36 @@ inline void setVisible(SynthEngine *synth, bool v, std::string filename)
     saveText(values, file::configDir() + "/windows/" + ID + filename);
 }
 
-inline void checkSane(int& x, int& y, int& w, int& h, int defW, int defH, bool halfsize = false, bool priority = false)
+inline void checkSane(int& x, int& y, int& w, int& h, int defW, int defH, bool halfsize = false, int priority = 0)
 {
+    if (!priority) return;
     int minX, minY, maxW, maxH;
     Fl::screen_xywh(minX, minY, maxW, maxH, x, y, w, h);
 
     // Pretend that this is the center screen, which makes calculations easier.
     // We will reverse this at the bottom.
-    x -= minX;
-    y -= minY;
+    //x -= minX;
+    //y -= minY;
 
     maxW -= 5; // wiggle room
     maxH -= 30; // space for minimal titlebar
+    std::cout <<"  dw " << defW << "  dh " << defH << std::endl;
+    std::cout << "pri " << priority <<"  w " << w << "  h " << h << std::endl;
 
-    float dw = w;
+    std::cout << "difference " << abs((w/defW) - (h/defH)) << std::endl;
+
+    float dx = x;
+    float dy = y;
     float dh = h;
-    if ((dw / defW) != (dh / defH)) // ratio
+    float dw = w;
+    //if (abs((dw/defW) - (dh/defH)) < 2.0) // ratio
     {
-        if (priority)
-            dh = dw /defW * defH;
-        else
-            dw = dh / defH * defW;
+        if (priority == 1)
+            dh = (dw*defH) / defW;
+        else if (priority == 2)
+            dw = (dh*defW) / defH;
     }
+    std::cout <<"  dw " << dw << "  dh " << dh << std::endl;
 
     int adjustW;
     int adjustH;
@@ -312,24 +320,31 @@ inline void checkSane(int& x, int& y, int& w, int& h, int defW, int defH, bool h
         }
     }
 
-    if ((x + dw) > maxW) // position
+    if ((dx + dw) > maxW) // position
     {
-        x = maxW - dw;
-        if (x < 5)
-            x = 5;
+        dx = maxW - dw;
+        if (dx < 5)
+            dx = 5;
     }
-    if ((y + dh) > maxH)
+    if ((dy + dh) > maxH)
     {
-        y = maxH - dh;
-        if (y < 30)
-            y = 30;
+        dy = maxH - dh;
+        if (dy < 30)
+            dy = 30;
     }
 
-    w = dw;
-    h = dh;
     // Restore position relative to screen position.
-    x += minX;
-    y += minY;
+    //dx += minX;
+    //dy += minY;
+    std::cout << "X " << x << "  " << dx << std::endl;
+    std::cout << "Y " << y << "  " << dy << std::endl;
+    std::cout << "W " << w << "  " << dw << std::endl;
+    std::cout << "H " << h << "  " << dh << std::endl;
+    x = int(dx + 0.4);
+    y = int(dy + 0.4);
+    w = int(dw + 0.4);
+    h = int(dh + 0.4);
+
 }
 
 inline void voiceOscUpdate(SynthEngine *synth_, int npart, int kititem, int nvoice, int &nvs, int &nvp)
