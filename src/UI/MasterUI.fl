@@ -330,6 +330,8 @@ class MasterUI {: {public GuiUpdates}
 
       lastmainW = -1;
       lastpanelW = 0;
+      panelreset = 2;
+      lastpanelH = 0;
       lastmsgW = 0;
       lasttextW = 0;
       lastsyseffW = 0;
@@ -494,7 +496,7 @@ class MasterUI {: {public GuiUpdates}
             Showmaster();
             break;
         case DISPLAY_ROOT::mixer:
-            Showpanel();
+            mixerpanel->do_callback();
             break;
         case DISPLAY_ROOT::keyboard:
             virkeyboard->ShowKbd();
@@ -557,6 +559,12 @@ class MasterUI {: {public GuiUpdates}
                 W = aboutwindow->w();
                 H = aboutwindow->h();
             break;
+            case DISPLAY_ROOT::mixer:
+                X = panelwindow->x();
+                Y = panelwindow->y();
+                W = panelwindow->w();
+                H = panelwindow->h();
+            break;
             case DISPLAY_ROOT::settings:
                 X = configui->configwindow->x();
                 Y = configui->configwindow->y();
@@ -589,14 +597,19 @@ class MasterUI {: {public GuiUpdates}
                 checkSane(X,Y,W,H,aboutDW, aboutDH, false, priority);
                 aboutwindow->resize(X,Y,W,H);
                 break;
+            case DISPLAY_ROOT::main:
+                checkSane(X,Y,W,H,mainDW, mainDH, false, priority);
+                masterwindow->resize(X,Y,W,H);
+                break;
+            case DISPLAY_ROOT::mixer:
+                checkSane(X,Y,W,H,lastpanelW, lastpanelH, false, priority);
+                panelwindow->resize(X,Y,W,H);
+                updatepanel(true);
+                break;
             case DISPLAY_ROOT::settings:
                 checkSane(X,Y,W,H,configui->confDW, configui->confDH, false, priority);
                 configui->configwindow->resize(X,Y,W,H);
                 break;
-            case DISPLAY_ROOT::main:
-                checkSane(X,Y,W,H,mainDW, mainDH, false, priority);
-                masterwindow->resize(X,Y,W,H);;
-            break;
             default:
                 break;
         };} {}
@@ -2909,7 +2922,7 @@ Alan Calvert started the project}
         if (panelVisible)
             panelpart = npart % NUM_MIDI_CHANNELS;
 
-        bool seen = false;;
+        bool seen = false;
         switch (control)
         {
             case PART::control::enable:
@@ -4581,8 +4594,14 @@ bpmfallback->format(format);} {}
     {
         if (panelwindow->w() != lastpanelW)
         {
+            //std::cout << "panelR " << panelreset << std::endl;
             panelRtext();
-            lastpanelW = panelwindow->w();
+            if (panelreset > 0)
+                --panelreset;
+            else{
+                lastpanelW = panelwindow->w();
+                lastpanelH = panelwindow->h();
+            }
         }
     }
 
@@ -5138,6 +5157,10 @@ bpmfallback->format(format);} {}
   decl {int lastmainW} {private local
   }
   decl {int lastpanelW} {private local
+  }
+  decl {int panelreset} {private local
+  }
+  decl {int lastpanelH} {private local
   }
   decl {int lastmsgW} {private local
   }

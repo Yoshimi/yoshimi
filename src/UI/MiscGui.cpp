@@ -342,7 +342,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                 }
                 break;
             }
-            case DISPLAY_ROOT::settings: // this needs improving!
+            case DISPLAY_ROOT::settings:
             {
                 switch (control)
                 {
@@ -376,6 +376,18 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                         break;
                     case DISPLAY_LIST::hide:
                         synth->getGuiMaster()->Hide(DISPLAY_ROOT::mixer);
+                        break;
+                    case DISPLAY_LIST::xpos:
+                        synth->getGuiMaster()->winStyle(DISPLAY_ROOT::mixer, int(value), -1, -1, -1);
+                        break;
+                    case DISPLAY_LIST::ypos:
+                        synth->getGuiMaster()->winStyle(DISPLAY_ROOT::mixer, -1, int(value), -1, -1);
+                        break;
+                    case DISPLAY_LIST::width:
+                        synth->getGuiMaster()->winStyle(DISPLAY_ROOT::mixer, -1, -1, int(value), -1);
+                        break;
+                    case DISPLAY_LIST::height:
+                        synth->getGuiMaster()->winStyle(DISPLAY_ROOT::mixer, -1, -1, -1, int(value));
                         break;
                 }
                 break;
