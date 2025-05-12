@@ -25,17 +25,12 @@
 
 #include "Misc/FileMgrFuncs.h"
 #include "Misc/SynthEngine.h"
-//#include "Misc/FormatFuncs.h"
 
 #include <iostream>
 #include <string>
 #include <memory>
 #include <limits>
 #include <cmath>
-
-//#include <functional>
-//#include <string>
-//#include <array>
 
 using std::string;
 using std::cout;
@@ -52,6 +47,12 @@ using std::endl;
 void run_XMLStoreTest(SynthEngine& synth)
 {
     cout << "+++ Test XML handling................................." << endl;
+    XMLStore xmlNew{TOPLEVEL::XML::MasterConfig, true};
+    synth.getRuntime().initBaseConfig(xmlNew);
+    char* xmldata = xmlNew.render();
+    cout << "Loaded XML-Tree:\n"<<string{xmldata}<<endl;
+    free(xmldata);
+
 
     // Hex formating
     cout <<"Verify Bitstring conversion..." << endl;
@@ -124,17 +125,9 @@ void run_XMLStoreTest(SynthEngine& synth)
     string location = file::configDir();
     string baseConfig = location + "/" + YOSHIMI + EXTEN::config;
     CHECK(file::isRegularFile(baseConfig))
+
     cout << "Loading from: "<<baseConfig<<endl;
-
-    synth.getRuntime().xmlType = TOPLEVEL::XML::MasterConfig;
-
-    XMLStore xmlNew{TOPLEVEL::XML::MasterConfig, synth, true};
-    synth.getRuntime().initData(xmlNew);
-    char* xmldata = xmlNew.render();
-    cout << "Loaded XML-Tree:\n"<<string{xmldata}<<endl;
-    free(xmldata);
-
-    XMLStore xml{baseConfig, synth.getRuntime().getLogger(), synth};
+    XMLStore xml{baseConfig, synth.getRuntime().getLogger()};
     CHECK(xml);
 
     xmldata = xml.render();

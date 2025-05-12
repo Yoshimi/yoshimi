@@ -59,15 +59,14 @@ class XMLtree
         XMLtree& operator=(XMLtree&&)      = delete;
         XMLtree& operator=(XMLtree const&) = delete;
 
-        explicit operator bool()  const
-        {
-            return bool(node);
-        }
+        explicit operator bool()  const { return     bool(node); }
+        bool empty()              const { return not bool(node); }
 
         static XMLtree parse(const char*);                       // Factory: create from XML buffer
         char* render();                                          // render XMLtree into new malloc() buffer
 
         XMLtree addElm(string name);
+        XMLtree addElm(string name, int id);
         XMLtree getElm(string name);
         XMLtree getElm(string name, int id);
 
@@ -116,7 +115,8 @@ class XMLStore
         XMLStore& operator=(XMLStore&&)      = delete;
         XMLStore& operator=(XMLStore const&) = delete;
 
-        explicit operator bool()  const { return bool(root); }
+        explicit operator bool()  const { return     bool(root); }
+        bool empty()              const { return not bool(root); }
 
 
         char* render();                                           // rendered XML into malloc() char buffer (NULL terminated)

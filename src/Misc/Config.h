@@ -48,6 +48,7 @@ using std::bitset;
 using std::string;
 using std::list;
 
+class XMLtree;
 class XMLStore;
 class XMLwrapper;   /////////////////////////////////////////////////////////////////////////////TODO 4/25 : switch to XMLstore
 class SynthEngine;
@@ -85,7 +86,7 @@ class Config
         bool saveMasterConfig();
         bool saveInstanceConfig();
         void loadConfig();
-        void initData(XMLStore&);
+        void initBaseConfig(XMLStore&);
         bool updateConfig(int control, int value);
         bool saveSessionData(string sessionfile);
         int  saveSessionData(char** dataBuffer);
@@ -171,7 +172,7 @@ class Config
         bool          historyLock[TOPLEVEL::XML::ScalaMap + 1];
         int           xmlType;
         uchar         instrumentFormat;
-        int           enableProgChange;
+        bool          enableProgChange;
         bool          toConsole;
         int           consoleTextSize;
         bool          hideErrors;
@@ -279,11 +280,14 @@ class Config
         void defaultPresets();
         void buildConfigLocation();
         bool initFromPersistentConfig();
-        bool extractBaseParameters(XMLwrapper& xml);
-        bool extractConfigData(XMLwrapper& xml);
+        bool extractBaseParameters(XMLStore& xml);
+        bool extractConfigData(XMLStore& xml);
+        bool extractConfigData_OBSOLETE(XMLwrapper& xml);////////////////////////////////////////////////////TODO 5/2025 : evaluate version  /////OOO
         void capturePatchState(XMLwrapper& xml);
         bool restorePatchState(XMLwrapper& xml);
-        void addConfigXML(XMLwrapper& xml);
+        void migrateLegacyPresetsList(XMLtree&);
+        void addConfigXML(XMLStore& xml);
+        void addConfigXML_OBSOLETE(XMLwrapper& xml);/////////////////////////////////////////////////////////TODO 5/2025 : evaluate version  /////OOO
         void saveJackSession();
 
         string findHtmlManual();
@@ -295,6 +299,7 @@ class Config
         const string programcommand;
         string jackSessionDir;
         string baseConfig;
+        string presetList;
         string presetDir;
 
         Logger logHandler;

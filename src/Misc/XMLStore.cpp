@@ -340,6 +340,13 @@ XMLtree XMLtree::addElm(string name)
     return node->addChild(name);
 }
 
+XMLtree XMLtree::addElm(string name, int id)
+{
+    XMLtree child = addElm(name);
+    child.addAttrib("id", asString(id));
+    return child;
+}
+
 XMLtree XMLtree::getElm(string name)
 {
     return XMLtree{node? node->findChild(name) : nullptr};
@@ -433,8 +440,7 @@ int XMLtree::getPar_int(string const& name, int defaultVal, int min, int max)
 {
     if (node)
     {
-        Node* paramElm = node->findChild("par","name",name);
-        if (paramElm)
+        if (Node* paramElm = node->findChild("par","name",name))
         {
             const char* valStr = paramElm->getAttrib("value");
             if (valStr)
@@ -445,17 +451,24 @@ int XMLtree::getPar_int(string const& name, int defaultVal, int min, int max)
     return defaultVal;
 }
 
+/** @note performs transparent migration of values formerly stored as int `"value"` */
 uint XMLtree::getPar_uint(string const& name, uint defaultVal, uint min, uint max)
 {
     if (node)
     {
-        Node* paramElm = node->findChild("parU","name",name);
-        if (paramElm)                 //  ^^^^
-        {
+        if (Node* paramElm = node->findChild("parU","name",name))
+        {                                 //  ^^^^
             const char* valStr = paramElm->getAttrib("value");
             if (valStr)
                 return std::clamp(string2uint(valStr), min, max);
         }                             // ^^^^
+        else
+        if (Node* paramElm = node->findChild("par","name",name))
+        {
+            const char* valStr = paramElm->getAttrib("value");
+            if (valStr)
+                return std::clamp(uint(string2int(valStr)), min, max);
+        }                      // ^^^^        ^^^
     }
     // parameter entry not retrieved
     return defaultVal;
@@ -516,16 +529,23 @@ int XMLtree::getPar_255(string const& name, int defaultVal)
     return getPar_int(name, defaultVal, 0, 255);
 }
 
+/** @note performs transparent migration of settings formerly stored as int `"value"` */
 bool XMLtree::getPar_bool(string const& name, bool defaultVal)
 {
     if (node)
     {
-        Node* paramElm = node->findChild("par_bool","name",name);
-        if (paramElm)
+        if (Node* paramElm = node->findChild("par_bool","name",name))
         {
             const char* valStr = paramElm->getAttrib("value");
             if (valStr)
                 return func::string2bool(valStr);
+        }
+        else
+        if (Node* paramElm = node->findChild("par","name",name))
+        {
+            const char* valStr = paramElm->getAttrib("value");
+            if (valStr)
+                return bool(string2int(valStr));
         }
     }
     // parameter entry not retrieved
@@ -592,6 +612,8 @@ void XMLStore::buildXMLRoot()
             .addAttrib("Yoshimi-revision",  asString(meta.yoshimiVer.rev))
             .addAttrib("ZynAddSubFX-author","Nasca Octavian Paul")
             .addAttrib("Yoshimi-author",    "Alan Ernest Calvert")
+            .addElm("INFORMATION")
+            .addPar_str("XMLtype", renderXmlType(meta.type));
             ;
     }
     else
@@ -602,11 +624,11 @@ void XMLStore::buildXMLRoot()
             .addAttrib("Yoshimi-minor",   asString(meta.yoshimiVer.min))
             .addAttrib("Yoshimi-revision",asString(meta.yoshimiVer.rev))
             .addAttrib("Yoshimi-author",  "Alan Ernest Calvert")
+            .addElm("INFORMATION")
+            .addPar_str("XMLtype", renderXmlType(meta.type));
             ;
     }
     assert(root);
-    root.addElm("INFORMATION")
-        .addAttrib("XMLtype", renderXmlType(meta.type));
 }
 
 
