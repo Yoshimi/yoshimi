@@ -504,13 +504,25 @@ class MasterUI {: {public GuiUpdates}
         case DISPLAY_ROOT::settings:
             configui->Show(synth);
             break;
-        //case 4:
-            //break;
+        case DISPLAY_ROOT::filer:
+            int X, Y, W, H, O;
+            loadWin(synth, W, H, X, Y, O, "Master-filer");
+            if (W < filerDW || H < filerDH)
+            {
+                W = filerDW;
+                H = filerDH;
+            }
+            checkSane(X, Y, W, H, filerDW, filerDH);
+            filerwindow->resize(X, Y, W, H);
+            filerwindow->show();
+            filermask->show();
+            break;
         case DISPLAY_ROOT::about:
             ShowAbout();
             break;
 
-    }} {}
+    };
+    ;} {}
   }
   Function {Hide(int win)} {} {
     code {//
@@ -528,11 +540,10 @@ class MasterUI {: {public GuiUpdates}
         case DISPLAY_ROOT::keyboard:
             virkeyboard->Hide();
             break;
-        //case 3:
-            //ShowKit();
-            //break;
-        //case 4:
-            //break:
+        case DISPLAY_ROOT::filer:
+            saveWin(synth, filerwindow->w(), filerwindow->h(), filerwindow->x(), filerwindow->y(), true, "Master-filer");
+            filerwindow->hide();
+            break;
         case DISPLAY_ROOT::about:
             aboutwindow->hide();
             break;
@@ -564,6 +575,12 @@ class MasterUI {: {public GuiUpdates}
                 Y = panelwindow->y();
                 W = panelwindow->w();
                 H = panelwindow->h();
+            break;
+            case DISPLAY_ROOT::filer:
+                X = filerwindow->x();
+                Y = filerwindow->y();
+                W = filerwindow->w();
+                H = filerwindow->h();
             break;
             case DISPLAY_ROOT::settings:
                 X = configui->configwindow->x();
@@ -605,6 +622,10 @@ class MasterUI {: {public GuiUpdates}
                 checkSane(X,Y,W,H,lastpanelW, lastpanelH, false, priority);
                 panelwindow->resize(X,Y,W,H);
                 updatepanel(true);
+                break;
+            case DISPLAY_ROOT::filer:
+                checkSane(X,Y,W,H,filerDW, filerDH, false, priority);
+                filerwindow->resize(X,Y,W,H);
                 break;
             case DISPLAY_ROOT::settings:
                 checkSane(X,Y,W,H,configui->confDW, configui->confDH, false, priority);
@@ -2186,7 +2207,7 @@ Alan Calvert started the project}
       label {Yoshimi : Filer}
       callback {//
         filerclose->do_callback();}
-      xywh {236 77 550 350} type Double hide resizable
+      xywh {157 83 550 350} type Double hide resizable
       code0 {filerDW = o->w(); filerDH = o->h();}
       code1 {o->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("File Manager"), UNUSED, TOPLEVEL::windowTitle)).c_str());}
       code2 {o->size_range(filerDW, filerDH, 0, 0, 0, 0, 1);} modal
@@ -2412,6 +2433,10 @@ Alan Calvert started the project}
       Fl_Scroll filerscroll {
         xywh {10 96 444 244} type VERTICAL color 7 labelcolor 64
       } {}
+      Fl_Button filermask {
+        label {Filer Display Outline}
+        xywh {2 2 546 346} box DOWN_BOX labelsize 20
+      }
     }
   }
   Function {setfiler(string title, string name, bool save, int exten)} {return_type string
@@ -2430,6 +2455,7 @@ Alan Calvert started the project}
     filernamegroup->show();
     filerframe ->show();
     filershort->hide();
+    filermask->hide();
     string currentfave = string(favebrowse->text(1)).substr(4);
     if (extension == TOPLEVEL::XML::Dir)
     {
@@ -2670,6 +2696,9 @@ Alan Calvert started the project}
     savefavourites();
     return filerfound;} {}
   }
+  Function {filerloop()} {} {
+    code {printf("Hello, World!\\n");} {}
+  }
   Function {fillfiler(string type_name)} {} {
     code {//
         string tofetch;
@@ -2808,7 +2837,8 @@ Alan Calvert started the project}
         float dScale = filerwindow->w() / float(filerDW);
         int size12 = int(12 * dScale);
         int size14 = int(14 * dScale);
-
+        if (filermask->visible())
+            filermask->labelsize(20 * dScale);
         fileroldpath->labelsize(size12);
             fileroldpath->textsize(size12);
         filernamegroup->labelsize(size12);
@@ -4585,6 +4615,12 @@ bpmfallback->format(format);} {}
             ++lastmainW;
         else
             lastmainW = masterwindow->w();
+    }
+
+    if (lastfilerW != filerwindow->w())
+    {
+        filerRtext();
+        lastfilerW = filerwindow->w();
     }
 
     if (yoshiLog->logConsole->visible())

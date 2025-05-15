@@ -130,6 +130,7 @@ namespace DISPLAY_ROOT {
     about,
     settings,
     presets,
+    filer,
     query,
     name,
     recent,

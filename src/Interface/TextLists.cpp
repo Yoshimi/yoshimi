@@ -1206,6 +1206,7 @@ std::string displayRoot [] = {
     "ABOut",
     "SETtings",
     "PREsets",
+    "FILer",
     "QUEry", //       (and message)
     "NAMe", //        (input box)
     "RECent",

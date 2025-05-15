@@ -8,7 +8,7 @@ decl {\#include <cmath>} {public local
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014 -2024, Will Godfrey
+Copyright 2014 -2025, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU General Public
@@ -26,7 +26,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include <iostream>} {public local
@@ -66,12 +66,7 @@ decl {\#include "Misc/TextMsgBuffer.h"
     }} {private local
 }
 
-<<<<<<< HEAD
 class ConfigUI {} {
-=======
-class ConfigUI {open
-} {
->>>>>>> b31821f4 (Revised the structure of the display controls, so now making progress.)
   Function {isLV2()} {return_type bool
   } {
     code {return synth->getRuntime().isLV2;} {}
@@ -88,99 +83,110 @@ class ConfigUI {open
     } {
       Fl_Button Tab1 {
         label {&Main Settings}
-        callback {mainTab->show();
-patch1->show();
-patch2->hide();
-patch3->hide();
-patch4->hide();
-patch5->hide();
-patch6->hide();
-switchesTab->hide();
-jackTab->hide();
-alsaTab->hide();
-midiTab->hide();
-themeTab->hide();}
+        callback {//
+            mainTab->show();
+            patch1->show();
+            patch2->hide();
+            patch3->hide();
+            patch4->hide();
+            patch5->hide();
+            patch6->hide();
+            switchesTab->hide();
+            jackTab->hide();
+            alsaTab->hide();
+            midiTab->hide();
+            themeTab->hide();
+            ;}
         xywh {5 5 91 22} box THIN_UP_FRAME selection_color 47 labelsize 12 labelcolor 64
       }
       Fl_Button Tab2 {
         label {&Switches}
-        callback {switchesTab->show();
-patch2->show();
-patch1->hide();
-patch3->hide();
-patch4->hide();
-patch5->hide();
-patch6->hide();
-mainTab->hide();
-jackTab->hide();
-alsaTab->hide();
-midiTab->hide();
-themeTab->hide();}
+        callback {//
+            switchesTab->show();
+            patch2->show();
+            patch1->hide();
+            patch3->hide();
+            patch4->hide();
+            patch5->hide();
+            patch6->hide();
+            mainTab->hide();
+            jackTab->hide();
+            alsaTab->hide();
+            midiTab->hide();
+            themeTab->hide();
+            ;}
         xywh {98 5 66 22} box THIN_UP_FRAME selection_color 47 labelsize 12 labelcolor 64
       }
       Fl_Button Tab3 {
         label {&Jack}
-        callback {jackTab->show();
-patch3->show();
-patch1->hide();
-patch2->hide();
-patch4->hide();
-patch5->hide();
-patch6->hide();
-mainTab->hide();
-switchesTab->hide();
-alsaTab->hide();
-midiTab->hide();
-themeTab->hide();}
+        callback {//
+            jackTab->show();
+            patch3->show();
+            patch1->hide();
+            patch2->hide();
+            patch4->hide();
+            patch5->hide();
+            patch6->hide();
+            mainTab->hide();
+            switchesTab->hide();
+            alsaTab->hide();
+            midiTab->hide();
+            themeTab->hide();
+            ;}
         xywh {166 5 38 22} box THIN_UP_FRAME selection_color 47 labelsize 12 labelcolor 64
       }
       Fl_Button Tab4 {
         label {&Alsa}
-        callback {alsaTab->show();
-patch4->show();
-patch1->hide();
-patch2->hide();
-patch3->hide();
-patch5->hide();
-patch6->hide();
-mainTab->hide();
-switchesTab->hide();
-jackTab->hide();
-midiTab->hide();
-themeTab->hide();}
+        callback {;
+            alsaTab->show();
+            patch4->show();
+            patch1->hide();
+            patch2->hide();
+            patch3->hide();
+            patch5->hide();
+            patch6->hide();
+            mainTab->hide();
+            switchesTab->hide();
+            jackTab->hide();
+            midiTab->hide();
+            themeTab->hide();
+            ;}
         xywh {206 5 38 22} box THIN_UP_FRAME selection_color 47 labelsize 12 labelcolor 64
       }
       Fl_Button Tab5 {
         label {MIDI &CCs}
-        callback {midiTab->show();
-patch5->show();
-patch1->hide();
-patch2->hide();
-patch3->hide();
-patch4->hide();
-patch6->hide();
-mainTab->hide();
-switchesTab->hide();
-jackTab->hide();
-alsaTab->hide();
-themeTab->hide();}
+        callback {;
+            midiTab->show();
+            patch5->show();
+            patch1->hide();
+            patch2->hide();
+            patch3->hide();
+            patch4->hide();
+            patch6->hide();
+            mainTab->hide();
+            switchesTab->hide();
+            jackTab->hide();
+            alsaTab->hide();
+            themeTab->hide();
+            ;}
         xywh {246 5 58 22} box THIN_UP_FRAME selection_color 47 labelsize 12 labelcolor 64
       }
       Fl_Button Tab6 {
         label {&Theme}
-        callback {themeTab->show();
-patch6->show();
-patch1->hide();
-patch2->hide();
-patch3->hide();
-patch4->hide();
-patch5->hide();
-mainTab->hide();
-switchesTab->hide();
-jackTab->hide();
-alsaTab->hide();
-midiTab->hide();
-fillThemes();
+        callback {;
+            themeTab->show();
+            patch6->show();
+            patch1->hide();
+            patch2->hide();
+            patch3->hide();
+            patch4->hide();
+            patch5->hide();
+            mainTab->hide();
+            switchesTab->hide();
+            jackTab->hide();
+            alsaTab->hide();
+            midiTab->hide();
+            fillThemes();
 ;}
         xywh {305 5 58 22} box THIN_UP_FRAME selection_color 47 labelsize 12 labelcolor 64
       }
@@ -2103,7 +2109,8 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
                     configwindow->resize(fetchX, fetchY, fetchW, fetchH);
                     lastconfigW = 0;
                     configSeen = true;
-                    configwindow->show();} {}
+                    configwindow->show();
+                    ;} {}
   }
   Function {Showpresets(SynthEngine *synth)} {} {
     code {//
@@ -2295,7 +2302,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
   }
   decl {float confDW;} {public local
   }
-  decl {float confDH;} {selected public local
+  decl {float confDH;} {public local
   }
   decl {float preDW;} {private local
   }
