@@ -29,9 +29,10 @@
 #ifndef CONTROLLER_H
 #define CONTROLLER_H
 
-class XMLwrapper;
-
 class SynthEngine;
+class XMLwrapper;   /////////////////////////////////////////////////////////////////////////////TODO 5/25 : switch to XMLstore
+class XMLtree;
+
 
 class Controller
 {
@@ -40,10 +41,10 @@ class Controller
         Controller(SynthEngine *_synth);
 
         void resetall();
-
-        void add2XML(XMLwrapper& xml);
         void defaults();
-        void getfromXML(XMLwrapper& xml);
+
+        void add2XML(XMLtree&);
+        void getfromXML(XMLtree&);
 
         // Controllers functions
         void setpitchwheel(int value);

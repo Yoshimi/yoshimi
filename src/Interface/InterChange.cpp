@@ -1694,7 +1694,7 @@ float InterChange::readAllData(CommandBlock& cmd)
     if (npart < NUM_MIDI_PARTS && synth.part[npart]->busy)
     {
         cmd.data.control = TOPLEVEL::control::partBusy; // part busy message
-        cmd.data.kit = UNUSED;
+        cmd.data.kit    = UNUSED;
         cmd.data.engine = UNUSED;
         cmd.data.insert = UNUSED;
     }

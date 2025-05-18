@@ -119,9 +119,8 @@ namespace { // internal details of MXML integration
 
     /** @remark our XML files often start with leading whitespace
      *          which is not tolerated by the XML parser */
-    const char* withoutLeadingWhitespace(string xml)
+    const char* withoutLeadingWhitespace(const char * text)
     {
-        const char * text = xml.c_str();
         while (isspace(*text))
             ++text;
         return text;
@@ -321,7 +320,8 @@ XMLtree::XMLtree(XMLtree&& ref)
  */
 XMLtree XMLtree::parse(const char* xml)
 {
-    return xml? Node::parse(xml) : nullptr;
+    return xml? Node::parse(withoutLeadingWhitespace(xml))
+              : nullptr;
 }
 
 /** render XMLtree into new malloc() buffer
@@ -340,7 +340,7 @@ XMLtree XMLtree::addElm(string name)
     return node->addChild(name);
 }
 
-XMLtree XMLtree::addElm(string name, int id)
+XMLtree XMLtree::addElm(string name, uint id)
 {
     XMLtree child = addElm(name);
     child.addAttrib("id", asString(id));
@@ -352,7 +352,7 @@ XMLtree XMLtree::getElm(string name)
     return XMLtree{node? node->findChild(name) : nullptr};
 }
 
-XMLtree XMLtree::getElm(string name, int id)
+XMLtree XMLtree::getElm(string name, uint id)
 {
     return XMLtree{node? node->findChild(name, id) : nullptr};
 }
@@ -500,6 +500,8 @@ optional<float> XMLtree::readParCombi(string const& elmID, string const& name)
     return std::nullopt;
 }
 
+/** a (former) int parameter that has been refined to allow for fractional values,
+ *  falling back to integral values when loading legacy instruments. */
 float XMLtree::getPar_frac(string const& name, float defaultVal, float min, float max)
 {
     auto val = readParCombi("par",name);
@@ -879,7 +881,7 @@ XMLtree XMLStore::loadFile(string filename, Logger const& log)
     if (not report.empty())
         log(report, _SYS_::LogNotSerious);
 
-    XMLtree content{XMLtree::parse(withoutLeadingWhitespace(xmldata))};
+    XMLtree content{XMLtree::parse(xmldata.c_str())};
     if (not content)
         log("XML: File \""+filename+"\" can not be parsed as XML", _SYS_::LogNotSerious);
     if (xmldata.empty())

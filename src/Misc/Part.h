@@ -45,9 +45,10 @@ class ADnote;
 class SUBnote;
 class PADnote;
 class Controller;
-class XMLwrapper;
+class XMLwrapper;   /////////////////////////////////////////////////////////////////////////////TODO 5/25 : switch to XMLstore
 class Microtonal;
 class EffectMgr;
+class XMLtree;
 
 class SynthEngine;
 
@@ -97,11 +98,10 @@ class Part
         }
 
         bool saveXML(string filename, bool yoshiFormat); // result true for load ok, otherwise false
-        int  loadXMLinstrument(string filename);
-        void add2XML(XMLwrapper& xml, bool subset = false);
-        void add2XMLinstrument(XMLwrapper& xml);
-        void getfromXML(XMLwrapper& xml);
-        void getfromXMLinstrument(XMLwrapper& xml);
+        int  loadXML(string filename);
+        void add2XML_YoshimiPartSetup(XMLtree&);
+        void add2XML_YoshimiInstrument(XMLtree&);
+        void getfromXML(XMLtree&);
         float getLimits(CommandBlock* getData);
 
         std::unique_ptr<Controller> ctl;
@@ -188,9 +188,13 @@ class Part
         bool  busy;
 
         int getLastNote()  const { return this->prevNote; }
-        SynthEngine* getSynthEngine() const {return synth;}
+        SynthEngine& getSynthEngine() const {return synth;}
 
     private:
+        void getfromXML_InstrumentData(XMLtree&);
+        void add2XML_InstrumentData(XMLtree&);
+        void add2XML_synthUsage(XMLtree&);
+
         void setPan(float value);
         void KillNotePos(int pos);
         void ReleaseNotePos(int pos);
@@ -253,7 +257,7 @@ class Part
 
         Omni omniByCC;
 
-        SynthEngine* synth;
+        SynthEngine& synth;
 };
 
 #endif /*PART_H*/

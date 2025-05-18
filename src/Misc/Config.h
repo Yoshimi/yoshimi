@@ -280,11 +280,11 @@ class Config
         void defaultPresets();
         void buildConfigLocation();
         bool initFromPersistentConfig();
-        bool extractBaseParameters(XMLStore& xml);
-        bool extractConfigData(XMLStore& xml);
+        bool extractBaseParameters(XMLStore&);
+        bool extractConfigData(XMLStore&);
         bool extractConfigData_OBSOLETE(XMLwrapper& xml);////////////////////////////////////////////////////TODO 5/2025 : evaluate version  /////OOO
-        void capturePatchState(XMLwrapper& xml);
-        bool restorePatchState(XMLwrapper& xml);
+        void capturePatchState(XMLStore&);
+        bool restorePatchState(XMLStore&);
         void migrateLegacyPresetsList(XMLtree&);
         void addConfigXML(XMLStore& xml);
         void addConfigXML_OBSOLETE(XMLwrapper& xml);/////////////////////////////////////////////////////////TODO 5/2025 : evaluate version  /////OOO

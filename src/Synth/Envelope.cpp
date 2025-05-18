@@ -68,7 +68,7 @@ void Envelope::releasekey()
 
 void Envelope::recomputePoints()
 {
-    if (!_envpars->Pfreemode)
+    if (not _envpars->Pfreemode)
         _envpars->converttofree();
 
     int mode = _envpars->Envmode;

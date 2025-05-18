@@ -31,6 +31,8 @@
 #include "Synth/Resonance.h"
 #include "Misc/SynthEngine.h"
 #include "Misc/NumericFuncs.h"
+#include "Misc/XMLwrapper.h" ////////////////////////////////////////////////////////////////////TODO 5/25 : switch to XMLstore
+#include "Misc/XMLStore.h"
 
 using func::power;
 
@@ -43,7 +45,7 @@ Resonance::Resonance(SynthEngine& _synth) : ParamBase{_synth}
 
 void Resonance::defaults()
 {
-    Penabled = 0;
+    Penabled = false;
     PmaxdB = 20;
     Pcenterfreq = 64; // 1 kHz
     Poctavesfreq = 64;
@@ -67,8 +69,8 @@ void Resonance::setpoint(int n, unsigned char p)
 // Apply the resonance to FFT data
 void Resonance::applyres(int n, fft::Spectrum& fftdata, float freq)
 {
-    if (Penabled == 0)
-        return; // if the resonance is disabled
+    if (not Penabled)
+        return; // resonance is disabled
     float sum = 0.0;
     float l1 = logf(getfreqx(0.0) * ctlcenter);
     float l2 = logf(2.0f) * getoctavesfreq() * ctlbw;
@@ -238,39 +240,39 @@ void Resonance::sendcontroller(ushort ctl, float par)
 }
 
 
-void Resonance::add2XML(XMLwrapper& xml)
+void Resonance::add2XML(XMLtree& xmlRes)
 {
-    xml.addparbool("enabled",Penabled);
+    xmlRes.addPar_bool("enabled",Penabled);
 
-    if ((Penabled==0)&&(xml.minimal)) return;
+    if (not (Penabled or synth.getRuntime().xmlmax))
+        return;  // omit storing resonance curve when disabled
 
-    xml.addparcombi("max_db",PmaxdB);
-    xml.addparcombi("center_freq",Pcenterfreq);
-    xml.addparcombi("octaves_freq",Poctavesfreq);
-    xml.addparbool("protect_fundamental_frequency",Pprotectthefundamental);
-    xml.addpar("resonance_points",MAX_RESONANCE_POINTS);
-    for (int i=0; i<MAX_RESONANCE_POINTS; i++)
+    xmlRes.addPar_frac("max_db"      , PmaxdB);
+    xmlRes.addPar_frac("center_freq" , Pcenterfreq);
+    xmlRes.addPar_frac("octaves_freq", Poctavesfreq);
+    xmlRes.addPar_bool("protect_fundamental_frequency",Pprotectthefundamental);
+    xmlRes.addPar_int ("resonance_points", MAX_RESONANCE_POINTS);
+    for (uint i=0; i<MAX_RESONANCE_POINTS; i++)
     {
-        xml.beginbranch("RESPOINT",i);
-        xml.addpar("val",Prespoints[i]);
-        xml.endbranch();
+        XMLtree xmlPt = xmlRes.addElm("RESPOINT",i);
+        xmlPt.addPar_int("val",Prespoints[i]);
     }
 }
 
 
-void Resonance::getfromXML(XMLwrapper& xml)
+void Resonance::getfromXML(XMLtree& xmlRes)
 {
-    Penabled=xml.getparbool("enabled",Penabled);
+    assert(xmlRes);
+    Penabled = xmlRes.getPar_bool("enabled",Penabled);
 
-    PmaxdB=xml.getparcombi("max_db",PmaxdB,0,127);
-    Pcenterfreq=xml.getparcombi("center_freq",Pcenterfreq,0,127);
-    Poctavesfreq=xml.getparcombi("octaves_freq",Poctavesfreq,0,127);
-    Pprotectthefundamental=xml.getparbool("protect_fundamental_frequency",Pprotectthefundamental);
-    for (int i=0; i<MAX_RESONANCE_POINTS; i++)
+    PmaxdB                = xmlRes.getPar_frac("max_db"      , PmaxdB      , 0,127);
+    Pcenterfreq           = xmlRes.getPar_frac("center_freq" , Pcenterfreq , 0,127);
+    Poctavesfreq          = xmlRes.getPar_frac("octaves_freq", Poctavesfreq, 0,127);
+    Pprotectthefundamental= xmlRes.getPar_bool("protect_fundamental_frequency",Pprotectthefundamental);
+    for (uint i=0; i<MAX_RESONANCE_POINTS; i++)
     {
-        if (xml.enterbranch("RESPOINT",i)==0) continue;
-        Prespoints[i]=xml.getpar127("val",Prespoints[i]);
-        xml.exitbranch();
+        if (XMLtree xmlPt = xmlRes.getElm("RESPOINT",i))
+            Prespoints[i] = xmlPt.getPar_127("val",Prespoints[i]);
     }
 }
 

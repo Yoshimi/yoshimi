@@ -51,7 +51,7 @@
 #include "Misc/FileMgrFuncs.h"
 #include "Misc/NumericFuncs.h"
 #include "Misc/FormatFuncs.h"
-#include "Misc/XMLwrapper.h"
+#include "Misc/XMLStore.h"
 #include "Synth/OscilGen.h"
 #include "Params/ADnoteParameters.h"
 #include "Params/PADnoteParameters.h"
@@ -341,7 +341,7 @@ bool SynthEngine::Init(uint audiosrate, int audiobufsize)
     if (Runtime.instrumentLoad.size())
     {
         string filename = Runtime.instrumentLoad;
-        if (part[Runtime.load2part]->loadXMLinstrument(filename))
+        if (part[Runtime.load2part]->loadXML(filename))
         {
             part[Runtime.load2part]->Penabled = 1;
             Runtime.Log("Instrument file " + filename + " loaded");
@@ -608,7 +608,7 @@ void SynthEngine::setReproducibleState(int seed)
                 if (kitItem.adpars and kitItem.Padenabled)
                     for (int v = 0; v < NUM_VOICES; ++v)
                     {
-                        if (!kitItem.adpars->VoicePar[v].Enabled) continue;
+                        if (not kitItem.adpars->VoicePar[v].Enabled) continue;
                         kitItem.adpars->VoicePar[v].OscilSmp->reseed(randomINT());
                         kitItem.adpars->VoicePar[v].FMSmp->reseed(randomINT());
                     }
@@ -1178,7 +1178,7 @@ bool SynthEngine::setProgram(string const& fname, int npart)
     getRuntime().currentPart = npart;
     interchange.undoRedoClear();
     bool ok = true;
-    if (!part[npart]->loadXMLinstrument(fname))
+    if (!part[npart]->loadXML(fname))
         ok = false;
     return ok;
 }
@@ -2967,192 +2967,146 @@ bool SynthEngine::saveHistory()
 }
 
 
-void SynthEngine::add2XML(XMLwrapper& xml)
+void SynthEngine::add2XML(XMLStore& xml)
 {
-    xml.beginbranch("MASTER");
-    xml.addpar("current_midi_parts", Runtime.numAvailableParts);
-    xml.addpar("panning_law", Runtime.panLaw);
-    xml.addparcombi("volume", Pvolume);
-    xml.addpar("key_shift", Pkeyshift);
-    xml.addparreal("bpm_fallback", PbpmFallback);
-    xml.addpar("channel_switch_type", Runtime.channelSwitchType);
-    xml.addpar("channel_switch_CC", Runtime.channelSwitchCC);
+    XMLtree xmlMaster = xml.addElm("MASTER");
 
-    xml.beginbranch("MICROTONAL");
-    microtonal.add2XML(xml);
-    xml.endbranch();
+    xmlMaster.addPar_int ("current_midi_parts" , Runtime.numAvailableParts);
+    xmlMaster.addPar_int ("panning_law"        , Runtime.panLaw);
+    xmlMaster.addPar_frac("volume"             , Pvolume);
+    xmlMaster.addPar_int ("key_shift"          , Pkeyshift);
+    xmlMaster.addPar_real("bpm_fallback"       , PbpmFallback);
+    xmlMaster.addPar_int ("channel_switch_type", Runtime.channelSwitchType);
+    xmlMaster.addPar_int ("channel_switch_CC"  , Runtime.channelSwitchCC);
 
-    for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
+    XMLtree xmlMicrotonal = xmlMaster.addElm("MICROTONAL");
+    microtonal.add2XML(xmlMicrotonal);
+
+    for (uint npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
-        xml.beginbranch("PART",npart);
-        part[npart]->add2XML(xml);
-        xml.endbranch();
+        XMLtree xmlPart = xmlMaster.addElm("PART",npart);
+        part[npart]->add2XML_YoshimiPartSetup(xmlPart);
     }
 
-    xml.beginbranch("SYSTEM_EFFECTS");
-    for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
+    XMLtree xmlSysEffects = xmlMaster.addElm("SYSTEM_EFFECTS");
+    for (uint nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
     {
-        xml.beginbranch("SYSTEM_EFFECT", nefx);
-        xml.beginbranch("EFFECT");
-        sysefx[nefx]->add2XML(xml);
-        xml.endbranch();
+        XMLtree xmlSysfx = xmlSysEffects.addElm("SYSTEM_EFFECT", nefx);
+            XMLtree xmlEffectSetting = xmlSysfx.addElm("EFFECT");
+            sysefx[nefx]->add2XML(xmlEffectSetting);
 
-        for (int pefx = 0; pefx < NUM_MIDI_PARTS; ++pefx)
-        {
-            xml.beginbranch("VOLUME", pefx);
-            xml.addpar("vol", Psysefxvol[nefx][pefx]);
-            xml.endbranch();
-        }
+            for (uint pefx = 0; pefx < NUM_MIDI_PARTS; ++pefx)
+            {
+                XMLtree xmlMixVol = xmlSysfx.addElm("VOLUME", pefx);
+                xmlMixVol.addPar_int("vol", Psysefxvol[nefx][pefx]);
+            }
 
-        for (int tonefx = nefx + 1; tonefx < NUM_SYS_EFX; ++tonefx)
-        {
-            xml.beginbranch("SENDTO", tonefx);
-            xml.addpar("send_vol", Psysefxsend[nefx][tonefx]);
-            xml.endbranch();
-        }
-        xml.endbranch();
+            for (int tonefx = nefx + 1; tonefx < NUM_SYS_EFX; ++tonefx)
+            {
+                XMLtree xmlSendVol = xmlSysfx.addElm("SENDTO", tonefx);
+                xmlSendVol.addPar_int("send_vol", Psysefxsend[nefx][tonefx]);
+            }
     }
-    xml.endbranch();
 
-    xml.beginbranch("INSERTION_EFFECTS");
-    for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
+    XMLtree xmlInsEffects = xmlMaster.addElm("INSERTION_EFFECTS");
+    for (uint nefx = 0; nefx < NUM_INS_EFX; ++nefx)
     {
-        xml.beginbranch("INSERTION_EFFECT", nefx);
-        xml.addpar("part", Pinsparts[nefx]);
+        XMLtree xmlInsfx = xmlInsEffects.addElm("INSERTION_EFFECT", nefx);
+        xmlInsfx.addPar_int("part", Pinsparts[nefx]);
 
-        xml.beginbranch("EFFECT");
-        insefx[nefx]->add2XML(xml);
-        xml.endbranch();
-        xml.endbranch();
+            XMLtree xmlEffectSetting = xmlInsfx.addElm("EFFECT");
+            insefx[nefx]->add2XML(xmlEffectSetting);
     }
-    xml.endbranch(); // INSERTION_EFFECTS
-    for (int i = 0; i < NUM_MIDI_CHANNELS; ++i)
-    {
+
+    for (uint i = 0; i < NUM_MIDI_CHANNELS; ++i)
         if (Runtime.vectordata.Xaxis[i] < 127)
         {
-            xml.beginbranch("VECTOR", i);
-            vectorcontrol.insertVectorData(i, false, xml, "");
-            xml.endbranch(); // VECTOR
+            XMLtree xmlVector = xmlMaster.addElm("VECTOR", i);
+            vectorcontrol.insertVectorData(i, false, xmlVector, "");
         }
-    }
-    xml.endbranch(); // MASTER
 }
 
 
 bool SynthEngine::savePatchesXML(string filename)
 {
     filename = setExtension(filename, EXTEN::patchset);
-    Runtime.xmlType = TOPLEVEL::XML::Patch;
-    auto xml{std::make_unique<XMLwrapper>(*this, true)};
-    add2XML(*xml);
-    bool succes = xml->saveXMLfile(filename);
-    return succes;
+    XMLStore xml{TOPLEVEL::XML::Patch};
+    this->add2XML(xml);
+    return xml.saveXMLfile(filename
+                          ,Runtime.getLogger()
+                          ,Runtime.gzipCompression);
 }
 
 
 bool SynthEngine::loadXML(string const& filename)
 {
-    auto xml{std::make_unique<XMLwrapper>(*this, true)};
-    if (!xml->loadXMLfile(filename))
-    {
+    XMLStore xml{filename, Runtime.getLogger()};
+    if (not xml)
         return false;
-    }
     defaults();
-    bool success = getfromXML(*xml);
+    bool success = getfromXML(xml);
     setAllPartMaps();
     return success;
 }
 
 
-bool SynthEngine::getfromXML(XMLwrapper& xml)
+bool SynthEngine::getfromXML(XMLStore& xml)
 {
-    if (!xml.enterbranch("MASTER"))
+    XMLtree xmlMaster = xml.getElm("MASTER");
+    if (not xmlMaster)
     {
-        Runtime.Log("SynthEngine getfromXML, no MASTER branch");
+        Runtime.Log("SynthEngine getfromXML: no <MASTER> branch found in XML");
         return false;
     }
-    Runtime.numAvailableParts = xml.getpar("current_midi_parts", NUM_MIDI_CHANNELS, NUM_MIDI_CHANNELS, NUM_MIDI_PARTS);
-    Runtime.panLaw = xml.getpar("panning_law", Runtime.panLaw, MAIN::panningType::cut, MAIN::panningType::boost);
-    setPvolume(xml.getparcombi("volume", Pvolume, 0, 127));
-    setPkeyshift(xml.getpar("key_shift", Pkeyshift, MIN_KEY_SHIFT + 64, MAX_KEY_SHIFT + 64));
-    PbpmFallback = xml.getparreal("bpm_fallback", PbpmFallback, BPM_FALLBACK_MIN, BPM_FALLBACK_MAX);
-    Runtime.channelSwitchType = xml.getpar("channel_switch_type", Runtime.channelSwitchType, 0, 5);
-    Runtime.channelSwitchCC = xml.getpar("channel_switch_CC", Runtime.channelSwitchCC, 0, 128);
+    Runtime.numAvailableParts = xmlMaster.getPar_int("current_midi_parts", NUM_MIDI_CHANNELS, NUM_MIDI_CHANNELS, NUM_MIDI_PARTS);
+    Runtime.panLaw = xmlMaster.getPar_int("panning_law", Runtime.panLaw, MAIN::panningType::cut, MAIN::panningType::boost);
+    setPvolume(xmlMaster.getPar_frac("volume", Pvolume, 0, 127));
+    setPkeyshift(xmlMaster.getPar_int("key_shift", Pkeyshift, MIN_KEY_SHIFT + 64, MAX_KEY_SHIFT + 64));
+    PbpmFallback = xmlMaster.getPar_real("bpm_fallback", PbpmFallback, BPM_FALLBACK_MIN, BPM_FALLBACK_MAX);
+    Runtime.channelSwitchType = xmlMaster.getPar_int("channel_switch_type", Runtime.channelSwitchType, 0, 5);
+    Runtime.channelSwitchCC   = xmlMaster.getPar_int("channel_switch_CC", Runtime.channelSwitchCC, 0, 128);
     Runtime.channelSwitchValue = 0;
-    for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
-    {
-        if (!xml.enterbranch("PART", npart))
-            continue;
-        part[npart]->getfromXML(xml);
-        xml.exitbranch();
-        if (partonoffRead(npart) && (part[npart]->Paudiodest & 2))
-            Config::instances().registerAudioPort(getUniqueId(), npart);
-    }
+    for (uint npart = 0; npart < NUM_MIDI_PARTS; ++npart)
+        if (XMLtree xmlPart = xmlMaster.getElm("PART", npart))
+        {
+            part[npart]->getfromXML(xmlPart);
+            if (partonoffRead(npart) && (part[npart]->Paudiodest & 2))
+                Config::instances().registerAudioPort(getUniqueId(), npart);
+        }
 
-    if (xml.enterbranch("MICROTONAL"))
-    {
-        microtonal.getfromXML(xml);
-        xml.exitbranch();
-    }
+    if (XMLtree xmlMicrotonal = xmlMaster.getElm("MICROTONAL"))
+        microtonal.getfromXML(xmlMicrotonal);
 
     sysefx[0]->defaults();
-    if (xml.enterbranch("SYSTEM_EFFECTS"))
-    {
-        for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
-        {
-            if (!xml.enterbranch("SYSTEM_EFFECT", nefx))
-                continue;
-            if (xml.enterbranch("EFFECT"))
+    if (XMLtree xmlSysEffects = xmlMaster.getElm("SYSTEM_EFFECTS"))
+        for (uint nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
+            if (XMLtree xmlSysfx = xmlSysEffects.getElm("SYSTEM_EFFECT", nefx))
             {
-                sysefx[nefx]->getfromXML(xml);
-                xml.exitbranch();
+                if (XMLtree xmlEffectSetting = xmlSysfx.getElm("EFFECT"))
+                    sysefx[nefx]->getfromXML(xmlEffectSetting);
+
+                for (uint partefx = 0; partefx < NUM_MIDI_PARTS; ++partefx)
+                    if (XMLtree xmlMixVol = xmlSysfx.getElm("VOLUME", partefx))
+                        setPsysefxvol(partefx, nefx, xmlMixVol.getPar_127("vol", Psysefxvol[partefx][nefx]));
+
+                for (uint tonefx = nefx + 1; tonefx < NUM_SYS_EFX; ++tonefx)
+                    if (XMLtree xmlSendVol = xmlSysfx.getElm("SENDTO", tonefx))
+                        setPsysefxsend(nefx, tonefx, xmlSendVol.getPar_127("send_vol", Psysefxsend[nefx][tonefx]));
             }
 
-            for (int partefx = 0; partefx < NUM_MIDI_PARTS; ++partefx)
-            {
-                if (!xml.enterbranch("VOLUME", partefx))
-                    continue;
-                setPsysefxvol(partefx, nefx,xml.getpar127("vol", Psysefxvol[partefx][nefx]));
-                xml.exitbranch();
-            }
-
-            for (int tonefx = nefx + 1; tonefx < NUM_SYS_EFX; ++tonefx)
-            {
-                if (!xml.enterbranch("SENDTO", tonefx))
-                    continue;
-                setPsysefxsend(nefx, tonefx, xml.getpar127("send_vol", Psysefxsend[nefx][tonefx]));
-                xml.exitbranch();
-            }
-            xml.exitbranch();
-        }
-        xml.exitbranch();
-    }
-
-    if (xml.enterbranch("INSERTION_EFFECTS"))
-    {
+    if (XMLtree xmlInsEffects = xmlMaster.getElm("INSERTION_EFFECTS"))
         for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
-        {
-            if (!xml.enterbranch("INSERTION_EFFECT", nefx))
-                continue;
-            Pinsparts[nefx] = xml.getpar("part", Pinsparts[nefx], -2, NUM_MIDI_PARTS);
-            if (xml.enterbranch("EFFECT"))
+            if (XMLtree xmlInsfx = xmlInsEffects.getElm("INSERTION_EFFECT", nefx))
             {
-                insefx[nefx]->getfromXML(xml);
-                xml.exitbranch();
+                Pinsparts[nefx] = xmlInsfx.getPar_int("part", Pinsparts[nefx], -2, NUM_MIDI_PARTS);
+                if (XMLtree xmlEffectSetting = xmlInsfx.getElm("EFFECT"))
+                    insefx[nefx]->getfromXML(xmlEffectSetting);
             }
-            xml.exitbranch();
-        }
-        xml.exitbranch();
-    }
+
     for (uchar i = 0; i < NUM_MIDI_CHANNELS; ++i)
-    {
-        if (xml.enterbranch("VECTOR", i))
-        {
-            vectorcontrol.extractVectorData(i, xml, "");
-            xml.endbranch();
-        }
-    }
-    xml.endbranch(); // MASTER
+        if (XMLtree xmlVector = xmlMaster.getElm("VECTOR", i))
+            vectorcontrol.extractVectorData(i, xmlVector, "");
+
     // possibly push changed effect state to GUI
     maybePublishEffectsToGui();
     return true;

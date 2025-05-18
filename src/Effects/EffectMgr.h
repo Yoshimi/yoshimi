@@ -37,9 +37,11 @@
 #include "Effects/EQ.h"
 #include "Effects/DynamicFilter.h"
 #include "Misc/Alloc.h"
-#include "Misc/XMLwrapper.h"
-#include "Misc/SynthEngine.h"
 #include "Params/FilterParams.h"
+
+class SynthEngine;
+class XMLwrapper;   /////////////////////////////////////////////////////////////////////////////TODO 4/25 : switch to XMLstore
+class XMLtree;
 
 
 class EffectMgr : public ParamBase
@@ -49,8 +51,8 @@ class EffectMgr : public ParamBase
 
         void defaults() override;
 
-        void add2XML(XMLwrapper& xml);
-        void getfromXML(XMLwrapper& xml);
+        void add2XML(XMLtree&);
+        void getfromXML(XMLtree&);
 
         void out(float *smpsl, float *smpsr);
 

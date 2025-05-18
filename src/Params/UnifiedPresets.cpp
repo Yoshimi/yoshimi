@@ -359,13 +359,13 @@ string UnifiedPresets::accessXML(XMLwrapper& xml, bool isLoad)
         {
             sectionType->voiceDefaults(voice);
             xml.enterbranch(name);
-            sectionType->getfromXMLsection(xml, voice);
+            sectionType->getfromXML_voice(xml, voice);
             xml.exitbranch();
         }
         else
         {
             xml.beginbranch(name);
-            sectionType->add2XMLsection(xml, voice);
+            sectionType->add2XML_voice(xml, voice);
             xml.endbranch();
         }
     }
@@ -511,7 +511,7 @@ string UnifiedPresets::filterXML(XMLwrapper& xml, bool isLoad)
         name = "Pfiltern";
     }
 
-    FilterParams *sectionType;
+    FilterParams* sectionType;
 
     // top level
     if (npart == TOPLEVEL::section::systemEffects)
@@ -560,7 +560,7 @@ string UnifiedPresets::filterXML(XMLwrapper& xml, bool isLoad)
         else
         {
             xml.enterbranch(name);
-            sectionType->getfromXMLsection(xml, offset);
+            sectionType->getfromXML_vowel(xml, offset);
             xml.exitbranch();
         }
     }
@@ -575,7 +575,7 @@ string UnifiedPresets::filterXML(XMLwrapper& xml, bool isLoad)
         else
         {
             xml.beginbranch(name);
-            sectionType->add2XMLsection(xml, offset);
+            sectionType->add2XML_vowel(xml, offset);
             xml.endbranch();
         }
     }

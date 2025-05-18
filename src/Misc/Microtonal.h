@@ -32,7 +32,8 @@
 #include "Misc/NumericFuncs.h"
 
 class SynthEngine;
-class XMLwrapper;
+class XMLwrapper;   /////////////////////////////////////////////////////////////////////////////TODO 4/25 : switch to XMLstore
+class XMLtree;
 
 using std::string;
 using func::power;
@@ -90,8 +91,8 @@ class Microtonal
         string Pname;
         string Pcomment;
 
-        void add2XML(XMLwrapper&);
-        int  getfromXML(XMLwrapper&);
+        void add2XML(XMLtree&);
+        int  getfromXML(XMLtree&);
         bool saveXML(string const& filename);
         int  loadXML(string const& filename);
 

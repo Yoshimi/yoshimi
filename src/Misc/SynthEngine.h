@@ -53,7 +53,8 @@ class Part;
 class EffectMgr;
 struct EffectDTO;
 struct EqGraphDTO;
-class XMLwrapper;
+class XMLStore;
+class XMLwrapper;   /////////////////////////////////////////////////////////////////////////////TODO 5/25 : switch to XMLstore
 class Controller;
 class TextMsgBuffer;
 class InterfaceAnchor;
@@ -96,7 +97,7 @@ class SynthEngine
         void postBootHook(bool);
 
         bool savePatchesXML(string filename);
-        void add2XML(XMLwrapper& xml);
+        void add2XML(XMLStore&);
         string manualname();
         void defaults();
 
@@ -115,7 +116,7 @@ class SynthEngine
         bool loadHistory();
         bool saveHistory();
 
-        bool getfromXML(XMLwrapper& xml);
+        bool getfromXML(XMLStore&);
 
         void NoteOn(uchar chan, uchar note, uchar velocity);
         void NoteOff(uchar chan, uchar note);

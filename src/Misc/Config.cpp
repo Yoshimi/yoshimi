@@ -1131,34 +1131,32 @@ void Config::addConfigXML_OBSOLETE(XMLwrapper& xml)
 bool Config::saveSessionData(string sessionfile)
 {
     sessionfile = setExtension(sessionfile, EXTEN::state);
-    xmlType = TOPLEVEL::XML::State;
-    auto xml{std::make_unique<XMLwrapper>(synth, true)};
+    XMLStore xml{TOPLEVEL::XML::State};
 
-    capturePatchState(*xml);
+    capturePatchState(xml);
 
-    bool success = xml->saveXMLfile(sessionfile);
+    bool success = xml.saveXMLfile(sessionfile, getLogger(), gzipCompression);
     if (success)
-        Log("Session data saved to " + sessionfile, _SYS_::LogNotSerious);
+        Log("Session data saved to \""+sessionfile+"\"", _SYS_::LogNotSerious);
     else
-        Log("Failed to save session data to " + sessionfile, _SYS_::LogNotSerious);
+        Log("Failed to save session data to \""+sessionfile+"\"", _SYS_::LogNotSerious);
     return success;
 }
 
 /** Variation to extract config and patch state for LV2 */
 int Config::saveSessionData(char** dataBuffer)
 {
-    xmlType = TOPLEVEL::XML::State;
-    auto xml{std::make_unique<XMLwrapper>(synth, true)};
+    XMLStore xml{TOPLEVEL::XML::State};
 
-    capturePatchState(*xml);
+    capturePatchState(xml);
 
-    *dataBuffer = xml->getXMLdata();
+    *dataBuffer = xml.render();
     return strlen(*dataBuffer) + 1;
 }
 
-void Config::capturePatchState(XMLwrapper& xml)
+void Config::capturePatchState(XMLStore& xml)
 {
-    addConfigXML_OBSOLETE(xml);
+    addConfigXML(xml);
     synth.add2XML(xml);
     synth.midilearn.insertMidiListData(xml);
 }
@@ -1176,11 +1174,11 @@ bool Config::restoreSessionData(string sessionfile)
         Log("Session file " + sessionfile + " not available", _SYS_::LogNotSerious);
     else
     {
-        auto xml{std::make_unique<XMLwrapper>(synth, true)};
-        if (!xml->loadXMLfile(sessionfile))
-            Log("Failed to load xml file " + sessionfile, _SYS_::LogNotSerious);
+        XMLStore xml{sessionfile, getLogger()};
+        if (not xml)
+            Log("Failed to load xml file \""+sessionfile+"\"", _SYS_::LogNotSerious);
         else
-            return restorePatchState(*xml);
+            return restorePatchState(xml);
     }
     return false;
 }
@@ -1190,27 +1188,25 @@ bool Config::restoreSessionData(const char* dataBuffer, int size)
 {
     (void)size; // currently unused
 
-    while (isspace(*dataBuffer))
-        ++dataBuffer;
-    auto xml{std::make_unique<XMLwrapper>(synth, true)};
-    if (!xml->putXMLdata(dataBuffer))
-        Log("SynthEngine: putXMLdata failed");
+    XMLStore xml{dataBuffer};
+    if (not xml)
+        Log("Unable to parse XML to restore session state.");
     else
-        return restorePatchState(*xml);
+        return restorePatchState(xml);
 
     return false;
 }
 
-bool Config::restorePatchState(XMLwrapper& xml)
+bool Config::restorePatchState(XMLStore& xml)
 {
-    bool success = extractConfigData_OBSOLETE(xml);
+    bool success = extractConfigData(xml);
     if (success)
     {
         synth.defaults();
         success = synth.getfromXML(xml);
         if (success)
             synth.setAllPartMaps();
-        bool oklearn = synth.midilearn.extractMidiListData(false, xml);
+        bool oklearn = false; ///////// synth.midilearn.extractMidiListData(false, xml);   /////////////////////OOO midi-learn to XMLStore
         if (oklearn)
             synth.midilearn.updateGui(MIDILEARN::control::hideGUI);
             // handles possibly undefined window

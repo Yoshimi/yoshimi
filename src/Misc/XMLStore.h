@@ -66,9 +66,9 @@ class XMLtree
         char* render();                                          // render XMLtree into new malloc() buffer
 
         XMLtree addElm(string name);
-        XMLtree addElm(string name, int id);
+        XMLtree addElm(string name, uint id);
         XMLtree getElm(string name);
-        XMLtree getElm(string name, int id);
+        XMLtree getElm(string name, uint id);
 
         XMLtree& addAttrib(string name, string val ="");
         string getAttrib(string name);
