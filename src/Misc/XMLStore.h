@@ -141,14 +141,29 @@ class XMLStore
         };
         Metadata meta;
 
+        struct Features;
+
         // opens a file and parse only the "information" data on it
-        static void checkfileinformation(std::string const& filename, Logger const& log, uint& names, int& type);
+        static Features checkfileinformation(std::string const& filename, Logger const& log);
 
     private:
         void buildXMLRoot();
         Metadata extractMetadata();
         static XMLtree loadFile(string filename, Logger const& log);
 };
+
+/** used to classify instruments
+ * @wee XMLStore::checkfileinformation()
+ */
+struct XMLStore::Features
+{
+    int   instType{0};
+    bool  yoshiFormat{false};
+    uchar ADDsynth_used{false};
+    uchar SUBsynth_used{false};
+    uchar PADsynth_used{false};
+};
+
 
 /////////////////////////////////////////////////////////////////////////////////////////////////WIP Prototype 4/25 - throw away when done!!!!!
 void run_XMLStoreTest(SynthEngine&);

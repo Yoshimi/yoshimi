@@ -412,7 +412,7 @@ char *XMLwrapper::getXMLdata()
         case TOPLEVEL::XML::Bank:
         {
             addparstr("XMLtype", "Roots and Banks");
-            addpar("Banks_Version", synth.bank.readVersion());
+            addpar("Banks_Version", synth.bank.getVersion());
             break;
         }
 

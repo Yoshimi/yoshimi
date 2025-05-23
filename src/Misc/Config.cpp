@@ -1199,20 +1199,19 @@ bool Config::restoreSessionData(const char* dataBuffer, int size)
 
 bool Config::restorePatchState(XMLStore& xml)
 {
-    bool success = extractConfigData(xml);
-    if (success)
+    if (extractConfigData(xml))
     {
         synth.defaults();
-        success = synth.getfromXML(xml);
-        if (success)
+        if (synth.getfromXML(xml))
+        {
             synth.setAllPartMaps();
-        bool oklearn = false; ///////// synth.midilearn.extractMidiListData(false, xml);   /////////////////////OOO midi-learn to XMLStore
-        if (oklearn)
-            synth.midilearn.updateGui(MIDILEARN::control::hideGUI);
-            // handles possibly undefined window
+            if (synth.midilearn.extractMidiListData(xml))
+                synth.midilearn.updateGui(MIDILEARN::control::hideGUI);
+                                       // handles possibly undefined window
+            return true;
+        }
     }
-
-    return success;
+    return false;
 }
 
 

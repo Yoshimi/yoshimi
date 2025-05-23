@@ -791,7 +791,7 @@ void Microtonal::add2XML(XMLtree& xmlMicrotonal)
             xmlKeyboard.addPar_int("map_size"          , Pmapsize);
             xmlKeyboard.addPar_int("formal_octave_size", PformalOctaveSize);
             xmlKeyboard.addPar_int("mapping_enabled"   , Pmappingenabled);
-            for (uint i = 0; i < Pmapsize; ++i)
+            for (uint i = 0; i < uint(Pmapsize); ++i)
             {
                 XMLtree xmlKeymap = xmlKeyboard.addElm("KEYMAP", i);
                 xmlKeymap.addPar_int("degree" , Pmapping[i]);
@@ -903,15 +903,15 @@ int Microtonal::getfromXML(XMLtree& xmlMicrotonal)
 
 bool Microtonal::saveXML(string const& filename)
 {
-    synth->getRuntime().xmlType = TOPLEVEL::XML::Scale;
-    auto xml{std::make_unique<XMLwrapper>(*synth)};
+    bool zynCompat = true;
+    XMLStore xml{TOPLEVEL::XML::Scale, zynCompat};
 
-    xml->beginbranch("MICROTONAL");
-    add2XML(*xml);
-    xml->endbranch();
+    XMLtree xmlMicrotonal = xml.addElm("MICROTONAL");
+    this->add2XML(xmlMicrotonal);
 
-    bool result = xml->saveXMLfile(filename);
-    return result;
+    return xml.saveXMLfile(filename
+                          ,synth->getRuntime().getLogger()
+                          ,synth->getRuntime().gzipCompression);
 }
 
 

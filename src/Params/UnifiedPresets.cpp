@@ -419,7 +419,7 @@ string UnifiedPresets::oscilXML(XMLtree& xmlTop, bool isLoad)
 
     if (engineType >= (PART::engine::addVoice1))
     {
-        uint voiceID{engineType - PART::engine::addVoice1};
+        uint voiceID = engineType - PART::engine::addVoice1;
         // engine is encoded as: addSynth, subSynth, padSynth, addVoice1...+NUM_VOICES, addMod1....+NUM_VOICES
         if (engineType >= PART::engine::addMod1)
         {

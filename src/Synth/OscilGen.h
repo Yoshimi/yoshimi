@@ -31,14 +31,15 @@
 #include <limits.h>
 #include <vector>
 
+#include "DSP/FFTwrapper.h"
 #include "Misc/RandomGen.h"
 #include "Misc/WaveShapeSamples.h"
-#include "Misc/XMLwrapper.h"
-#include "DSP/FFTwrapper.h"
 #include "Params/OscilParameters.h"
 #include "Synth/Resonance.h"
 
 class SynthEngine;
+class XMLwrapper;   /////////////////////////////////////////////////////////////////////////////TODO 5/25 : switch to XMLstore
+class XMLtree;
 
 class OscilGen : private WaveShapeSamples
 {

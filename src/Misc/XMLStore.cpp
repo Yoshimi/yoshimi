@@ -673,87 +673,81 @@ XMLtree XMLStore::accessTop()
 
 
 namespace{
-    struct Info{
-        int type{0};
-        uchar ADDsynth_used{false};
-        uchar SUBsynth_used{false};
-        uchar PADsynth_used{false};
-        bool yoshiType{false};
-    };
-
-    void slowinfosearch(char *idx, Info& information);
+    void slowinfosearch(char* idx, XMLStore::Features&);
 }
 
-void XMLStore::checkfileinformation(string const& filename, Logger const& log, uint& names, int& type)
+
+XMLStore::Features XMLStore::checkfileinformation(string const& filename, Logger const& log)
 {
-    Info information;
+    Features features;
 
     string report;
     string xml = loadGzipped(filename, report);
-    char* xmldata = & xml[0];
     if (not report.empty())
         log(report, _SYS_::LogNotSerious);
-    if (!xmldata)
-        return;
-    char* first = strstr(xmldata, "<!DOCTYPE Yoshimi-data>");
-    information.yoshiType = (first!= NULL);
-    char* start = strstr(xmldata, "<INFORMATION>");
-    char* end = strstr(xmldata, "</INFORMATION>");
-    char* idx = start;
-    uint seen = 0;
 
-    if (start && end && start < end)
+    if (not xml.empty())
     {
-        // Andrew: just make it simple
-        // Will: but not too simple :)
+        char* xmldata = & xml[0];
+        char* first = strstr(xmldata, "<!DOCTYPE Yoshimi-data>");
+        features.yoshiFormat = bool(first);
+        char* start = strstr(xmldata, "<INFORMATION>");
+        char* end = strstr(xmldata, "</INFORMATION>");
+        char* idx = start;
+        uint seen = 0;
 
-        /*
-         * the following could be in any order. We are checking for
-         * the actual existence of the fields as well as their value.
-         */
-        idx = strstr(start, "name=\"ADDsynth_used\"");
-        if (idx != NULL)
+        if (start && end && start < end)
         {
-            seen |= 2;
-            if (strstr(idx, "name=\"ADDsynth_used\" value=\"yes\""))
-                information.ADDsynth_used = 1;
+            // Andrew: just make it simple
+            // Will: but not too simple :)
+
+            /*
+             * the following could be in any order. We are checking for
+             * the actual existence of the fields as well as their value.
+             */
+            idx = strstr(start, "name=\"ADDsynth_used\"");
+            if (idx != NULL)
+            {
+                seen |= 2;
+                if (strstr(idx, "name=\"ADDsynth_used\" value=\"yes\""))
+                    features.ADDsynth_used = 1;
+            }
+
+            idx = strstr(start, "name=\"SUBsynth_used\"");
+            if (idx != NULL)
+            {
+                seen |= 4;
+                if (strstr(idx, "name=\"SUBsynth_used\" value=\"yes\""))
+                    features.SUBsynth_used = 1;
+            }
+
+            idx = strstr(start, "name=\"PADsynth_used\"");
+            if (idx != NULL)
+            {
+                seen |= 1;
+                if (strstr(idx, "name=\"PADsynth_used\" value=\"yes\""))
+                    features.PADsynth_used = 1;
+            }
         }
 
-        idx = strstr(start, "name=\"SUBsynth_used\"");
-        if (idx != NULL)
-        {
-            seen |= 4;
-            if (strstr(idx, "name=\"SUBsynth_used\" value=\"yes\""))
-                information.SUBsynth_used = 1;
-        }
+        idx = strstr(xmldata, "<INFO>");
+        if (idx)
+        {// search for the classification type of the instrument
+            idx = strstr(idx, "par name=\"type\" value=\"");
+            if (idx != NULL)
+                features.instType = string2int(idx + 23);
 
-        idx = strstr(start, "name=\"PADsynth_used\"");
-        if (idx != NULL)
-        {
-            seen |= 1;
-            if (strstr(idx, "name=\"PADsynth_used\" value=\"yes\""))
-                information.PADsynth_used = 1;
+            if (seen != 7) // at least one was missing
+                slowinfosearch(xmldata, features);
         }
     }
-
-    idx = strstr(xmldata, "<INFO>");
-    if (idx == NULL)
-        return;
-    idx = strstr(idx, "par name=\"type\" value=\"");
-    if (idx != NULL)
-        type = string2int(idx + 23);
-
-    if (seen != 7) // at least one was missing
-        slowinfosearch(xmldata, information);
-    delete [] xmldata;
-    names = information.ADDsynth_used | (information.SUBsynth_used << 1) | (information.PADsynth_used << 2) | (information.yoshiType << 3);
-    return;
+    return features;
 }
 
 
 namespace {// local helper
 
-void slowinfosearch(char *idx, Info& information)
+void slowinfosearch(char* idx, XMLStore::Features& features)
 {
     idx = strstr(idx, "<INSTRUMENT_KIT>");
     if (idx == NULL)
@@ -787,33 +781,33 @@ void slowinfosearch(char *idx, Info& information)
         if (!strstr(idx, "name=\"enabled\" value=\"yes\""))
             continue;
 
-        if (!information.ADDsynth_used)
+        if (!features.ADDsynth_used)
         {
             idx = strstr(idx, "name=\"add_enabled\"");
             if (idx == NULL)
                 return;
             if (strncmp(idx + 26 , "yes", 3) == 0)
-                information.ADDsynth_used = 1;
+                features.ADDsynth_used = 1;
         }
-        if (!information.SUBsynth_used)
+        if (!features.SUBsynth_used)
         {
             idx = strstr(idx, "name=\"sub_enabled\"");
             if (idx == NULL)
                 return;
             if (strncmp(idx + 26 , "yes", 3) == 0)
-                information.SUBsynth_used = 1;
+                features.SUBsynth_used = 1;
         }
-        if (!information.PADsynth_used)
+        if (!features.PADsynth_used)
         {
             idx = strstr(idx, "name=\"pad_enabled\"");
             if (idx == NULL)
                 return;
             if (strncmp(idx + 26 , "yes", 3) == 0)
-                information.PADsynth_used = 1;
+                features.PADsynth_used = 1;
         }
-        if (information.ADDsynth_used
-          & information.SUBsynth_used
-          & information.PADsynth_used)
+        if (features.ADDsynth_used
+          & features.SUBsynth_used
+          & features.PADsynth_used)
         {
             return;
         }

@@ -107,9 +107,9 @@ class SynthEngine
         bool loadPatchSetAndUpdate(string filename);
         bool installBanks();
         bool saveBanks();
-        void newHistory(string name, int group);
-        void addHistory(string const& name, int group);
-        std::vector<string>& getHistory(int group);
+        void newHistory(string name, uint group);
+        void addHistory(string const& name, uint group);
+        std::vector<string>& getHistory(uint group);
         void setHistoryLock(int group, bool status);
         bool getHistoryLock(int group);
         string lastItemSeen(int group);
@@ -121,7 +121,7 @@ class SynthEngine
         void NoteOn(uchar chan, uchar note, uchar velocity);
         void NoteOff(uchar chan, uchar note);
         int RunChannelSwitch(uchar chan, int value);
-        void SetController(uchar chan, int CCtype, short int par);
+        void SetController(uchar chan, int CCtype, short par);
         void SetZynControls(bool in_place);
         int setRootBank(int root, int bank, bool inplace = false);
         int setProgramByName(CommandBlock&);

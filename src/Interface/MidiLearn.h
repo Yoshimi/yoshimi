@@ -31,13 +31,15 @@
 #include "Interface/Data2Text.h"
 #include "Interface/Text2Data.h"
 
-class XMLwrapper;
 class SynthEngine;
 class DataText;
 class TextData;
+class XMLwrapper;   /////////////////////////////////////////////////////////////////////////////TODO 5/25 : switch to XMLstore
+class XMLStore;
 
 using std::string;
 using std::list;
+
 
 class MidiLearn : private DataText, TextData
 {
@@ -78,9 +80,9 @@ class MidiLearn : private DataText, TextData
         void listAll(list<string>& msg_buf);
         bool remove(int itemNumber);
         void generalOperations(CommandBlock& getData);
-        bool insertMidiListData(XMLwrapper&);
+        void insertMidiListData(XMLStore&);
         bool loadList(const string& name);
-        bool extractMidiListData(bool full, XMLwrapper&);
+        bool extractMidiListData(XMLStore&);
         void updateGui(int opp = 0);
 
 
@@ -90,7 +92,7 @@ class MidiLearn : private DataText, TextData
         CommandBlock learnTransferBlock;
 
         int findEntry(list<LearnBlock>&, int lastpos, ushort CC, uchar chan, LearnBlock& block, bool show);
-        string findName(list<LearnBlock>::iterator it);
+        string findName(LearnBlock&);
         void insertLine(ushort CC, uchar chan);
         bool saveList(string const& name);
         void writeToGui(CommandBlock& putData);

@@ -27,15 +27,16 @@
 
 */
 
-#include <set>
+#include <cassert>
 #include <iostream>
-#include <string>
 #include <algorithm>
 #include <iterator>
 #include <optional>
+#include <string>
 #include <memory>
 #include <thread>
 #include <chrono>
+#include <set>
 
 #ifdef GUI_FLTK
     #include "MasterUI.h"
@@ -104,7 +105,7 @@ namespace { // Global implementation internal history data
 SynthEngine::SynthEngine(uint instanceID)
     : uniqueId{instanceID}
     , Runtime{*this}
-    , bank{this}
+    , bank{*this}
     , interchange{*this}
     , midilearn{*this}
     , mididecode{this}
@@ -983,6 +984,7 @@ void SynthEngine::SetZynControls(bool in_place)
 
 int SynthEngine::setRootBank(int root, int banknum, bool inplace)
 {
+                      ///////TODO this function should be in class Bank (makes SyntEngine needlessly complex)
     string name = "";
     int foundRoot;
     int originalRoot = Runtime.currentRoot;
@@ -1284,6 +1286,7 @@ void SynthEngine::cliOutput(list<string>& msg_buf, uint lines)
 
 void SynthEngine::ListPaths(list<string>& msg_buf)
 {
+                      ///////TODO this function should be in class Bank (makes SyntEngine needlessly complex)
     string label;
     string prefix;
     msg_buf.push_back("Root Paths");
@@ -1307,6 +1310,7 @@ void SynthEngine::ListPaths(list<string>& msg_buf)
 
 void SynthEngine::ListBanks(int rootNum, list<string>& msg_buf)
 {
+                      ///////TODO this function should be in class Bank (makes SyntEngine needlessly complex)
     string label;
     string prefix;
     if (rootNum < 0 || rootNum >= MAX_BANK_ROOT_DIRS)
@@ -1339,6 +1343,7 @@ void SynthEngine::ListBanks(int rootNum, list<string>& msg_buf)
 
 void SynthEngine::ListInstruments(int bankNum, list<string>& msg_buf)
 {
+                      ///////TODO this function should be in class Bank (makes SyntEngine needlessly complex)
     int root = Runtime.currentRoot;
     string label;
 
@@ -1457,6 +1462,7 @@ void SynthEngine::ListSettings(list<string>& msg_buf)
     msg_buf.push_back("  Master volume " + asString((int) Pvolume));
     msg_buf.push_back("  Master key shift " + asString(Pkeyshift - 64));
 
+                      ///////TODO the following block should delegate to class Bank (makes SyntEngine needlessly complex)
     root = Runtime.currentRoot;
     if (bank.roots.count(root) > 0 && !bank.roots [root].path.empty())
     {
@@ -2637,19 +2643,19 @@ bool SynthEngine::loadPatchSetAndUpdate(string fname)
 
 bool SynthEngine::installBanks()
 {
-    string name = file::configDir() + '/' + YOSHIMI;
-    string bankname = name + ".banks";
+                      ///////TODO this function should be in class Bank (makes SyntEngine needlessly complex)
+    string bankFile = file::configDir() + '/' + YOSHIMI + ".banks";
     bool newBanks = false;
-    if (isRegularFile(bankname))
+    if (isRegularFile(bankFile))
     {
-        newBanks = bank.establishBanks(bankname);
+        newBanks = bank.establishBanks(bankFile);
     }
     else
     {
        newBanks = bank.establishBanks(std::nullopt);
        Runtime.currentRoot = 5;
     }
-    Runtime.Log("\nFound " + asString(bank.InstrumentsInBanks) + " instruments in " + asString(bank.BanksInRoots) + " banks");
+    Runtime.Log("\nFound " + asString(bank.instrumentsInBanks) + " instruments in " + asString(bank.banksInRoots) + " banks");
 
     if (newBanks)
         Runtime.Log(textMsgBuffer.fetch(setRootBank(5, 5) & 0xff));
@@ -2663,31 +2669,34 @@ bool SynthEngine::saveBanks()
 {
     string name = file::configDir() + '/' + YOSHIMI;
     string bankname = name + ".banks";
-    Runtime.xmlType = TOPLEVEL::XML::Bank;
 
-    auto xml{std::make_unique<XMLwrapper>(*this, true)};
-    xml->beginbranch("BANKLIST");
-    bank.saveToConfigFile(*xml);  ///////////////////////////////////////////////////////TODO 5/25 : must ensure that the bank-version is stored: addpar("Banks_Version", synth.bank.readVersion());
-    xml->endbranch();
+    XMLStore xml{TOPLEVEL::XML::Bank};
+    XMLtree xmlInfo = xml.accessTop().getElm("INFORMATION");
+    // Info-node is added automatically together with the metadata for root
+    // for banks we store the current Bank-Version there
+    xmlInfo.addPar_int("Banks_Version", bank.getVersion());
 
-    if (!xml->saveXMLfile(bankname))
+    XMLtree xmlBankList = xml.addElm("BANKLIST");
+    bank.saveToConfigFile(xmlBankList);
+
+    if (not xml.saveXMLfile(bankname, getRuntime().getLogger(), getRuntime().gzipCompression))
         Runtime.Log("Failed to save config to " + bankname);
 
     return true;
 }
 
 
-void SynthEngine::newHistory(string name, int group)
+void SynthEngine::newHistory(string name, uint group)
 {
     if (findLeafName(name) < "!")
         return;
-    if (group == TOPLEVEL::XML::Instrument && (name.rfind(EXTEN::yoshInst) != string::npos))
+    if (group == TOPLEVEL::XML::Instrument and name.rfind(EXTEN::yoshInst) != string::npos)
         name = setExtension(name, EXTEN::zynInst);
     getHistory(group).push_back(name);
 }
 
 
-void SynthEngine::addHistory(string const& name, int group)
+void SynthEngine::addHistory(string const& name, uint group)
 {
     if (findLeafName(name) < "!")
     {
@@ -2703,16 +2712,16 @@ void SynthEngine::addHistory(string const& name, int group)
         return;
     }
 
-    vector<string>& listType{getHistory(group)};
-    auto it = listType.begin();
-    listType.erase(std::remove(it, listType.end(), name), listType.end()); // remove all matches
-    listType.insert(listType.begin(), name);
-    while(listType.size() > MAX_HISTORY)
-        listType.pop_back();
+    vector<string>& historyData{getHistory(group)};
+    auto it = historyData.begin();
+    historyData.erase(std::remove(it, historyData.end(), name), historyData.end()); // remove all matches
+    historyData.insert(historyData.begin(), name);
+    while(historyData.size() > MAX_HISTORY)
+        historyData.pop_back();
 }
 
 
-vector<string>& SynthEngine::getHistory(int group)
+vector<string>& SynthEngine::getHistory(uint group)
 {
     switch(group)
     {
@@ -2750,7 +2759,7 @@ vector<string>& SynthEngine::getHistory(int group)
         default:
             // can't identify what is calling this.
             // It's connected with opening the filer on presets
-            Runtime.Log("Unrecognised group " + to_string(group) + "\nUsing patchset history");
+            Runtime.Log("Unrecognised history group " + to_string(group) + "\nUsing patchset history");
             return ParamsHistory;
     }
 }
@@ -2781,189 +2790,182 @@ string SynthEngine::lastItemSeen(int group)
 
 bool SynthEngine::loadHistory()
 {
-    string historyname = file::localDir()  + "/recent";
-    if (!isRegularFile(historyname))
-    {   // recover old version
-        historyname = file::configDir() + '/' + YOSHIMI + ".history";
-        if (!isRegularFile(historyname))
+    string historyFile{file::localDir()  + "/recent"};
+    if (not isRegularFile(historyFile))
+    {   // second attempt at legacy location...
+        historyFile = file::configDir() + '/' + YOSHIMI + ".history";
+        if (not isRegularFile(historyFile))
         {
             Runtime.Log("Missing recent history file");
             return false;
         }
     }
-    auto xml{std::make_unique<XMLwrapper>(*this, true)};
-    xml->loadXMLfile(historyname);
-    if (!xml->enterbranch("HISTORY"))
+    XMLStore xml{historyFile, Runtime.getLogger()};
+    XMLtree xmlHistory = xml.getElm("HISTORY");
+    if (not xmlHistory)
     {
-        Runtime. Log("extractHistoryData, no HISTORY branch");
+        Runtime. Log("Failed to extract history data, no <HISTORY> branch in \""+historyFile+"\"");
         return false;
     }
-    int hist_size;
-    int count;
-    string filetype;
-    string type;
-    string extension;
-    for (count = TOPLEVEL::XML::Instrument; count <= TOPLEVEL::XML::ScalaMap; ++count)
+    uint typeID;
+    string historyKind;
+    string fileTypeID;
+    for (typeID = TOPLEVEL::XML::Instrument; typeID <= TOPLEVEL::XML::ScalaMap; ++typeID)
     {
-        switch (count)
+        switch (typeID)
         {
             case TOPLEVEL::XML::Instrument:
-                type = "XMZ_INSTRUMENTS";
-                extension = "xiz_file";
+                historyKind = "XMZ_INSTRUMENTS";
+                fileTypeID = "xiz_file";
                 break;
             case TOPLEVEL::XML::Patch:
-                type = "XMZ_PATCH_SETS";
-                extension = "xmz_file";
+                historyKind = "XMZ_PATCH_SETS";
+                fileTypeID = "xmz_file";
                 break;
             case TOPLEVEL::XML::Scale:
-                type = "XMZ_SCALE";
-                extension = "xsz_file";
+                historyKind = "XMZ_SCALE";
+                fileTypeID = "xsz_file";
                 break;
             case TOPLEVEL::XML::State:
-                type = "XMZ_STATE";
-                extension = "state_file";
+                historyKind = "XMZ_STATE";
+                fileTypeID = "state_file";
                 break;
             case TOPLEVEL::XML::Vector:
-                type = "XMZ_VECTOR";
-                extension = "xvy_file";
+                historyKind = "XMZ_VECTOR";
+                fileTypeID = "xvy_file";
                 break;
             case TOPLEVEL::XML::MLearn:
-                type = "XMZ_MIDILEARN";
-                extension = "xly_file";
+                historyKind = "XMZ_MIDILEARN";
+                fileTypeID = "xly_file";
                 break;
             case TOPLEVEL::XML::Presets:
-                type = "XMZ_PRESETS";
-                extension = "xpz_file";
+                historyKind = "XMZ_PRESETS";
+                fileTypeID = "xpz_file";
                 break;
 
             case TOPLEVEL::XML::PadSample:
-                type = "XMZ_PADSAMPLE";
-                extension = "wav_file";
+                historyKind = "XMZ_PADSAMPLE";
+                fileTypeID = "wav_file";
                 break;
             case TOPLEVEL::XML::ScalaTune:
-                type = "XMZ_TUNING";
-                extension = "scl_file";
+                historyKind = "XMZ_TUNING";
+                fileTypeID = "scl_file";
                 break;
             case TOPLEVEL::XML::ScalaMap:
-                type = "XMZ_KEYMAP";
-                extension = "kbm_file";
+                historyKind = "XMZ_KEYMAP";
+                fileTypeID = "kbm_file";
                 break;
         }
-        if (xml->enterbranch(type))
-        { // should never exceed max history
-            Runtime.historyLock[count] = xml->getparbool("lock_status", false);
-            hist_size = xml->getpar("history_size", 0, 0, MAX_HISTORY);
+        if (XMLtree xmlHistoryType = xmlHistory.getElm(historyKind))
+        {
+            Runtime.historyLock[typeID] = xmlHistoryType.getPar_bool("lock_status", false);
+            uint hist_size = xmlHistoryType.getPar_int("history_size", 0, 0, MAX_HISTORY);
             if (hist_size > 0)
-            {
-                for (int i = 0; i < hist_size; ++i)
+            {// should never exceed max history
+                assert (hist_size <= MAX_HISTORY);
+                for (uint i = 0; i < hist_size; ++i)
                 {
-                    if (xml->enterbranch("XMZ_FILE", i))
+                    if (XMLtree xmlFile = xmlHistoryType.getElm("XMZ_FILE", i))
                     {
-                        filetype = xml->getparstr(extension);
-                        if (extension == "xiz_file" && !isRegularFile(filetype))
+                        string histFileName = xmlFile.getPar_str(fileTypeID);
+                        if (fileTypeID == "xiz_file" and not isRegularFile(histFileName))
                         {
-                            if (filetype.rfind(EXTEN::zynInst) != string::npos)
-                                filetype = setExtension(filetype, EXTEN::yoshInst);
+                            if (histFileName.rfind(EXTEN::zynInst) != string::npos)
+                                histFileName = setExtension(histFileName, EXTEN::yoshInst);
                         }
-                        if (filetype.size() && isRegularFile(filetype))
-                            newHistory(filetype, count);
-                        xml->exitbranch();
+                        if (not histFileName.empty() and isRegularFile(histFileName))
+                            newHistory(histFileName, typeID);
                     }
 
                 }
 
-                string tryRecent = xml->getparstr("most_recent");
-                if (!tryRecent.empty())
-                    historyLastSeen.at(count) = tryRecent;
+                string tryRecent = xmlHistoryType.getPar_str("most_recent");
+                if (not tryRecent.empty())
+                    historyLastSeen.at(typeID) = tryRecent;
             }
-            xml->exitbranch();
         }
-    }
-    xml->exitbranch();
+    }// for
     return true;
 }
 
 
 bool SynthEngine::saveHistory()
 {
-    string historyname = file::localDir()  + "/recent";
-    Runtime.xmlType = TOPLEVEL::XML::History;
-
-    auto xml{std::make_unique<XMLwrapper>(*this, true)};
-    xml->beginbranch("HISTORY");
+    XMLStore xml{TOPLEVEL::XML::History};
+    XMLtree xmlHistory = xml.addElm("HISTORY");
     {
-        int count;
-        string type;
-        string extension;
-        for (count = TOPLEVEL::XML::Instrument; count <= TOPLEVEL::XML::ScalaMap; ++count)
+        uint typeID;
+        string historyKind;
+        string fileTypeID;
+        for (typeID = TOPLEVEL::XML::Instrument; typeID <= TOPLEVEL::XML::ScalaMap; ++typeID)
         {
-            switch (count)
+            switch (typeID)
             {
                 case TOPLEVEL::XML::Instrument:
-                    type = "XMZ_INSTRUMENTS";
-                    extension = "xiz_file";
+                    historyKind = "XMZ_INSTRUMENTS";
+                    fileTypeID = "xiz_file";
                     break;
                 case TOPLEVEL::XML::Patch:
-                    type = "XMZ_PATCH_SETS";
-                    extension = "xmz_file";
+                    historyKind = "XMZ_PATCH_SETS";
+                    fileTypeID = "xmz_file";
                     break;
                 case TOPLEVEL::XML::Scale:
-                    type = "XMZ_SCALE";
-                    extension = "xsz_file";
+                    historyKind = "XMZ_SCALE";
+                    fileTypeID = "xsz_file";
                     break;
                 case TOPLEVEL::XML::State:
-                    type = "XMZ_STATE";
-                    extension = "state_file";
+                    historyKind = "XMZ_STATE";
+                    fileTypeID = "state_file";
                     break;
                 case TOPLEVEL::XML::Vector:
-                    type = "XMZ_VECTOR";
-                    extension = "xvy_file";
+                    historyKind = "XMZ_VECTOR";
+                    fileTypeID = "xvy_file";
                     break;
                 case TOPLEVEL::XML::MLearn:
-                    type = "XMZ_MIDILEARN";
-                    extension = "xly_file";
+                    historyKind = "XMZ_MIDILEARN";
+                    fileTypeID = "xly_file";
                     break;
                 case TOPLEVEL::XML::Presets:
-                    type = "XMZ_PRESETS";
-                    extension = "xpz_file";
+                    historyKind = "XMZ_PRESETS";
+                    fileTypeID = "xpz_file";
                     break;
 
                 case TOPLEVEL::XML::PadSample:
-                    type = "XMZ_PADSAMPLE";
-                    extension = "wav_file";
+                    historyKind = "XMZ_PADSAMPLE";
+                    fileTypeID = "wav_file";
                     break;
                 case TOPLEVEL::XML::ScalaTune:
-                    type = "XMZ_TUNING";
-                    extension = "scl_file";
+                    historyKind = "XMZ_TUNING";
+                    fileTypeID = "scl_file";
                     break;
                 case TOPLEVEL::XML::ScalaMap:
-                    type = "XMZ_KEYMAP";
-                    extension = "kbm_file";
+                    historyKind = "XMZ_KEYMAP";
+                    fileTypeID = "kbm_file";
                     break;
             }
-            vector<string> const& listType{getHistory(count)};
-            if (listType.size())
+            vector<string> const& historyData{getHistory(typeID)};
+            if (not historyData.empty())
             {
-                int x = 0;
-                xml->beginbranch(type);
-                    xml->addparbool("lock_status", Runtime.historyLock[count]);
-                    xml->addpar("history_size", listType.size());
-                    for (auto const& historyEntry : listType)
+                uint i{0};
+                XMLtree xmlHistoryType = xmlHistory.addElm(historyKind);
+                    xmlHistoryType.addPar_bool("lock_status", Runtime.historyLock[typeID]);
+                    xmlHistoryType.addPar_int ("history_size", historyData.size());
+                    assert(historyData.size() <= MAX_HISTORY);
+                    for (auto const& historyEntry : historyData)
                     {
-                        xml->beginbranch("XMZ_FILE", x);
-                            xml->addparstr(extension, historyEntry);
-                        xml->endbranch();
-                        ++x;
+                        XMLtree xmlFile = xmlHistoryType.addElm("XMZ_FILE", i);
+                            xmlFile.addPar_str(fileTypeID, historyEntry);
+                        ++i;
                     }
-                    xml->addparstr("most_recent", historyLastSeen.at(count));
-                xml->endbranch();
+                    xmlHistoryType.addPar_str("most_recent", historyLastSeen.at(typeID));
             }
-        }
+        }// for
     }
-    xml->endbranch();
-    if (!xml->saveXMLfile(historyname))
-        Runtime.Log("Failed to save data to " + historyname);
-    return true;
+    string historyFile = file::localDir()  + "/recent";
+    bool success = xml.saveXMLfile(historyFile, Runtime.getLogger(), Runtime.gzipCompression);
+    if (not success)
+        Runtime.Log("Failed to save history index to \""+ historyFile+"\"");
+    return success;
 }
 
 
