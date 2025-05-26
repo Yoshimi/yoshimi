@@ -415,7 +415,8 @@ void InterChange::indirectTransfers(CommandBlock& cmd, bool noForward)
     }
 
      // CLI message text has to be set here.
-    if (!synth.fileCompatible)
+    //  But flag will be cleared further down...
+    if (synth.getRuntime().incompatibleZynFile)
         text += "\nPossibly incompatible file from ZynAddSubFX 3.x";
 
     if (newMsg)
@@ -466,10 +467,9 @@ void InterChange::indirectTransfers(CommandBlock& cmd, bool noForward)
         if (not ok)
             synth.getRuntime().Log("Unable to  write to returnsBuffer buffer");
 
-        // cancelling and GUI report must be set after action completed.
-        if (not synth.fileCompatible)
+        // GUI report must be set after action completed...
+        if (synth.getRuntime().incompatibleZynFile)
         {
-            synth.fileCompatible = true;
 #ifdef GUI_FLTK
             if (synth.getRuntime().showGui and
                (cmd.data.source & TOPLEVEL::action::noAction) == TOPLEVEL::action::fromGUI)
@@ -481,10 +481,8 @@ void InterChange::indirectTransfers(CommandBlock& cmd, bool noForward)
 #endif
         }
     }
-    else // don't leave this hanging
-    {
-        synth.fileCompatible = true;
-    }
+    // in any case clear out the warning flag.
+    synth.getRuntime().incompatibleZynFile = false;
 }
 
 

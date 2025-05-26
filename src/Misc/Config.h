@@ -83,11 +83,13 @@ class Config
         Logger const& getLogger(){ return logHandler; }
         bool loadPresetsList();
         bool savePresetsList();
+        void loadConfig();
+        bool updateConfig(int control, int value);
+        void initBaseConfig(XMLStore&);
+        void verifyVersion(XMLStore const&);
+        void maybeMigrateConfig();
         bool saveMasterConfig();
         bool saveInstanceConfig();
-        void loadConfig();
-        void initBaseConfig(XMLStore&);
-        bool updateConfig(int control, int value);
         bool saveSessionData(string sessionfile);
         int  saveSessionData(char** dataBuffer);
         bool restoreSessionData(string sessionfile);
@@ -114,9 +116,11 @@ class Config
         uint    build_ID;
         int     lastXMLmajor;
         int     lastXMLminor;
-        bool    oldConfig;
+        VerInfo loadedConfigVer;
+        bool    incompatibleZynFile;
 
         static const VerInfo VER_YOSHI_CURR, VER_ZYN_COMPAT;
+        static bool is_compatible (VerInfo const&);
 
         static bool        showSplash;
         static bool        singlePath;
@@ -307,5 +311,8 @@ class Config
         friend class YoshimiLV2Plugin;
 };
 
-#endif /*CONFIG_H*/
+/** Convenience function to verify Metadata of loaded XML files */
+void postLoadCheck(XMLStore const&, SynthEngine&);
 
+
+#endif /*CONFIG_H*/

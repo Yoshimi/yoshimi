@@ -459,10 +459,21 @@ class MasterUI {: {public GuiUpdates}
           string msg = "As this is a first time start, please check 'Yoshimi->Settings'. More information can be found in the manual.";
           setmessage(UNUSED, true, msg, "Close");
       }
-      else if (synth->getRuntime().oldConfig)
+      else if (not Config::is_compatible(synth->getRuntime().loadedConfigVer))
       {
-          string msg;
-          msg = "Existing config older than V " + to_string(MIN_CONFIG_MAJOR) + "." + to_string(MIN_CONFIG_MINOR) + " \\nCheck settings.";
+          auto& newVer = synth->getRuntime().loadedConfigVer;
+          auto& currVer = Config::VER_YOSHI_CURR;
+          string msg{"Existing config from v"
+                    + asString(newVer.maj)
+                    + "."
+                    + asString(newVer.min)
+                    + (newVer < currVer? " < v":" > v")
+                    + asString(currVer.maj)
+                    + "."
+                    + asString(currVer.min)
+                    + (currVer < newVer? "\\nWARNING: if you change and thus save this config, some newer settings may be lost."
+                                       : "\\nImported settings were auto-saved, please check config.")
+                    };
           setmessage(UNUSED, true, msg, "Close");
       }
       else

@@ -114,7 +114,6 @@ SynthEngine::SynthEngine(uint instanceID)
     , partlock{}
     , legatoPart{0}
     , masterMono{false}
-    , fileCompatible{true}
     // part[]
     , fadeAll{0}
     , fadeStep{0}
@@ -524,7 +523,6 @@ void SynthEngine::defaults()
         Pinsparts[nefx] = -1;
     }
     masterMono = false;
-    fileCompatible = true;
 
     // System Effects init
     syseffnum = 0;
@@ -3043,6 +3041,7 @@ bool SynthEngine::savePatchesXML(string filename)
 bool SynthEngine::loadXML(string const& filename)
 {
     XMLStore xml{filename, Runtime.getLogger()};
+    postLoadCheck(xml,*this);
     if (not xml)
         return false;
     defaults();

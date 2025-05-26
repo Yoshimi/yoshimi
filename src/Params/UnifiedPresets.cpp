@@ -765,6 +765,7 @@ void UnifiedPresets::load()
     }
 
     XMLStore xml{filename, logger};
+    postLoadCheck(xml,synth);
     if (xml)
         accessXML(xml, true);
     else

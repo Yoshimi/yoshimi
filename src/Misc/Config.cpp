@@ -114,7 +114,7 @@ int        Config::showCLIcontext{1};
 string Config::globalJackSessionUuid = "";
 
 const VerInfo Config::VER_YOSHI_CURR{YOSHIMI_VERSION};
-const VerInfo Config::VER_ZYN_COMPAT{2,4,1};
+const VerInfo Config::VER_ZYN_COMPAT{2,4,3};
 
 
 Config::Config(SynthEngine& synthInstance)
@@ -124,7 +124,8 @@ Config::Config(SynthEngine& synthInstance)
     , build_ID{BUILD_NUMBER}
     , lastXMLmajor{0}
     , lastXMLminor{0}
-    , oldConfig{false}
+    , loadedConfigVer{VER_YOSHI_CURR}
+    , incompatibleZynFile{false}
     , runSynth{false}          // will be set by Instance::startUp()
     , finishedCLI{true}
     , isLittleEndian{true}
@@ -482,7 +483,7 @@ bool Config::initFromPersistentConfig()
     {
         // load baseConfig (always from the primary file)
         XMLStore xml{baseConfig, getLogger()};
-        /////////////////////////////////////////////////////////////////////////////////////////////////////TODO 5/2025 : evaluate version  /////OOO
+        verifyVersion(xml);
         success = not xml.empty();
         if (success)
             success = extractBaseParameters(xml);    // note: we want correct base values even in a secondary config instance
@@ -508,7 +509,7 @@ bool Config::initFromPersistentConfig()
     {
         // load instance configuration values
         XMLStore xml{configFile, getLogger()};
-        /////////////////////////////////////////////////////////////////////////////////////////////////////TODO 5/2025 : evaluate version  /////OOO
+        verifyVersion(xml);
         success = not xml.empty();
         if (success)
             success = extractConfigData(xml);
@@ -516,20 +517,28 @@ bool Config::initFromPersistentConfig()
             Log("loadConfig load instance failed");
     }
 
-    if (synth.getUniqueId() == 0 && sessionStage != _SYS_::type::RestoreConf)
+#if false ///////////////////////////////////////////////////////////////////////////////////////////TODO 5/2025 //////////OOO obsolete, check now done in Config::verifyVersion
+    if (synth.getUniqueId() == 0
+            and sessionStage != _SYS_::type::RestoreConf
+            and this->loadedOldConfig
+        )
+        /*  Always re-save to fix.
+         *  Furthermore, this flag causes a warning,
+         *  yet any possible migration was already done on loading,
+         *  so user may wish to accept this unchanged.
+         */
     {
         int currentVersion = lastXMLmajor * 10 + lastXMLminor;
         int storedVersion = MIN_CONFIG_MAJOR * 10 + MIN_CONFIG_MINOR;
         if (currentVersion < storedVersion)
         {
-            oldConfig = true;
+            loadedOldConfig = true;
             saveInstanceConfig();
-            // Always resave to fix.
-            // User may wish to accept this unchanged.
         }
         else
-            oldConfig = false;
+            loadedOldConfig = false;
     }
+#endif    ///////////////////////////////////////////////////////////////////////////////////////////TODO 5/2025 //////////OOO obsolete
 
     if (sessionStage == _SYS_::type::RestoreConf)
         return true;
@@ -537,7 +546,7 @@ bool Config::initFromPersistentConfig()
     if (sessionStage != _SYS_::type::Normal)
     {
         XMLStore xml{stateFile, getLogger()};
-        /////////////////////////////////////////////////////////////////////////////////////////////////////TODO 5/2025 : evaluate version  /////OOO
+        verifyVersion(xml);
         success = not xml.empty();
         if (success)
         {
@@ -1046,6 +1055,122 @@ return true;
 }
         /////////////////////////////////////////////////////////////////////////////////////////////////////TODO 5/2025 : duplicated for switch to new code  /////OOO
 
+namespace {
+    string render(VerInfo const& ver)
+    {
+        return "v"
+             + asString(ver.maj)
+             + "."
+             + asString(ver.min)
+             + (ver.rev? "."+asString(ver.rev)
+                       : "")
+             ;
+    }
+}
+
+
+/** @remark to simplify invoking the version check after loading XML */
+void postLoadCheck(XMLStore const& xml, SynthEngine& synth)
+{
+    synth.getRuntime().verifyVersion(xml);
+}
+
+/**
+ * Evaluate Metadata to ensure version compatibility.
+ * Generate diagnostic and warnings and set compatibility flags.
+ * @note this function should be invoked explicitly,
+ *       whenever some XML file has been loaded.
+ */
+void Config::verifyVersion(XMLStore const& xml)
+{
+    if (not xml.meta.isValid())
+        Log("XML: no valid data format found in file.", _SYS_::LogNotSerious);
+    else
+    if (xml.meta.isZynCompat()
+        and not xml.meta.yoshimiVer        // file was indeed written by ZynAddSubFX
+        and VER_ZYN_COMPAT < xml.meta.zynVer)
+    {
+        this->incompatibleZynFile |= true;
+        Log("XML: found incompatible ZynAddSubFX version "
+           +asString(xml.meta.zynVer.maj) +"."
+           +asString(xml.meta.zynVer.min)
+           , _SYS_::LogNotSerious);
+    }
+    else
+    if (xml.meta.yoshimiVer     // it's a Yoshimi config file
+        and (  xml.meta.type == TOPLEVEL::XML::MasterConfig
+            or xml.meta.type == TOPLEVEL::XML::Config))
+    {
+        if (not is_compatible(xml.meta.yoshimiVer))
+            loadedConfigVer.forceReset(xml.meta.yoshimiVer);
+    }
+
+    if (logXMLheaders)
+    {
+        string text{"XML("};
+        if (not xml.meta.isValid())
+            text += "empty/invalid metadata).";
+        else
+        {
+            text += renderXmlType(xml.meta.type) +") ";
+            if (xml.meta.zynVer and not xml.meta.yoshimiVer)
+                text += "ZynAddSubFX format " + render(xml.meta.zynVer);
+                     //  XML with Zyn doctype, presumably written by ZynAddSubFX
+            else
+            if (xml.meta.isZynCompat())
+                text += "ZynAddSubFX compatible "
+                      + render(xml.meta.zynVer)
+                      + " by Yoshimi "
+                      + render(xml.meta.yoshimiVer);
+                      // XML with ZynAddSubFX doctype, yet written by Yoshimi
+            else
+                text += "YoshimiFormat " + render(xml.meta.yoshimiVer);
+        }
+
+        Log(text);
+    }
+}
+
+bool Config::is_compatible (VerInfo const& ver)
+{
+    if (is_equivalent(ver, VER_YOSHI_CURR))
+        return true;                                 // only revision differs => compatible
+    if (ver.maj == VER_YOSHI_CURR.maj)
+        return not (VER_YOSHI_CURR.min < ver.min);   // same major: silently accept any lower minor
+    else
+     return false;                                   // else mark any differing version as incompatible
+}
+
+/**
+ * Perform migration tasks in case an incompatible configuration is detected.
+ * @remark basically it is sufficient just to re-save the current config,
+ *         since our code for loading XML typically performs any necessary
+ *         data migration on the spot.
+ * @warning only to be called on the primary instance, and after initialisation
+ *         and loading of config, history and banks is complete.
+ */
+void Config::maybeMigrateConfig()
+{
+    if (is_compatible(loadedConfigVer)) return;
+
+    if (loadedConfigVer < VER_YOSHI_CURR)
+    {// loadedConfig is from an earlier version => safe to migrate
+        saveMasterConfig();
+        saveInstanceConfig();
+        Log("\n"
+            "\n+++++++++----------------------------++"
+            "\nMigration of Config "
+           +render(loadedConfigVer)
+           +" --> "
+           +render(VER_YOSHI_CURR)
+           +"\n+++++++++----------------------------++"
+            "\n"
+           );
+    }
+ // NOTE: never automatically re-save config written by a never version than this codebase,
+ //       since doing so may potentially discard additional settings present in the loaded config.
+}
+
 
 bool Config::saveMasterConfig()
 {
@@ -1175,6 +1300,7 @@ bool Config::restoreSessionData(string sessionfile)
     else
     {
         XMLStore xml{sessionfile, getLogger()};
+        verifyVersion(xml);
         if (not xml)
             Log("Failed to load xml file \""+sessionfile+"\"", _SYS_::LogNotSerious);
         else

@@ -78,6 +78,19 @@ struct VerInfo
             or (v1.maj == v2.maj and v1.min < v2.min)
             or (v1.min == v2.min and v1.rev < v2.rev);
     }
+
+    friend bool is_equivalent (VerInfo const& v1, VerInfo const& v2)
+    {
+        return v1.maj == v2.maj
+           and v1.min == v2.min;
+    }
+
+
+    /** forcibly replace this VersionInfo with the given other version */
+    void forceReset(VerInfo const& changedVersion)
+    {
+        new(this) VerInfo{changedVersion};
+    }// re-construct in-place, since const data fields can not be assigned
 };
 
 #endif /*VER_INFO_H*/

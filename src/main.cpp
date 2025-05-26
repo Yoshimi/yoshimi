@@ -249,11 +249,12 @@ int main(int argc, char *argv[])
         goto bail_out;
     }
 
-    if (Config::primary().oldConfig)
-    {
+    if (not Config::is_compatible(Config::primary().loadedConfigVer))
+        cout << "\nExisting config differs from v"
+             << Config::VER_YOSHI_CURR.maj << "."
+             << Config::VER_YOSHI_CURR.min
+             << "\nCheck settings.\n"<< endl;
 
-        cout << "\nExisting config older than " << MIN_CONFIG_MAJOR << "." << MIN_CONFIG_MINOR << "\nCheck settings.\n"<< endl;
-    }
 
     pthread_t threadMainLoop;
     pthread_attr_t pthreadAttr;

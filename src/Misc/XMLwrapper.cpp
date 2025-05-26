@@ -549,7 +549,7 @@ bool XMLwrapper::loadXMLfile(string const& filename)
     }
     node = root;
     push(root);
-    synth.fileCompatible = true;
+//  synth.fileCompatible = true;   ////////////////OOO obsolete
     if (zynfile)
     {
         xml_version.major = string2int(mxmlElementGetAttr(root, "version-major"));
@@ -567,8 +567,8 @@ bool XMLwrapper::loadXMLfile(string const& filename)
     else
     {
         synth.getRuntime().lastXMLmajor = 0;
-        if (xml_version.major > 2)
-            synth.fileCompatible = false;
+//      if (xml_version.major > 2)
+//          synth.fileCompatible = false;   ////////////////OOO obsolete
     }
     if (mxmlElementGetAttr(root, "Yoshimi-minor"))
     {

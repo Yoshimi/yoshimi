@@ -342,10 +342,13 @@ bool InstanceManager::Instance::startUp(PluginCreator pluginCreator)
             runtime().Log("SynthEngine init failed",_SYS_::LogError);
         else
         {
-            if (isPrimary())
-                synth->loadHistory();
             // discover persistent bank file structure
             synth->installBanks();
+            if (isPrimary())
+            {
+                synth->loadHistory();
+                synth->getRuntime().maybeMigrateConfig();
+            }
             //
             // Note: the following launches or connects to the processing threads
             if (not client->start())

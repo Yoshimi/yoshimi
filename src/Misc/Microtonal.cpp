@@ -919,6 +919,7 @@ int Microtonal::loadXML(string const& filename)
 {
     auto& logg = synth->getRuntime().getLogger();
     XMLStore xml{filename, logg};
+    postLoadCheck(xml,*synth);
     if (not xml)
         logg("Microtonal: failed to read XML file \""+filename+"\"");
     else

@@ -65,58 +65,6 @@ namespace { // internal details of MXML integration
         return meta.isZynCompat()? ROOT_ZYN : ROOT_YOSHI;
     }
 
-    string renderXmlType(TOPLEVEL::XML type)
-    {
-        switch (type)
-        {
-            case TOPLEVEL::XML::Instrument:
-                return "Instrument";
-            case TOPLEVEL::XML::Patch:
-                return "Parameters";
-            case TOPLEVEL::XML::Scale:
-                return "Scales";
-            case TOPLEVEL::XML::State:
-                return "Session";
-            case TOPLEVEL::XML::Vector:
-                return "Vector Control";
-            case TOPLEVEL::XML::MLearn:
-                return "Midi Learn";
-            case TOPLEVEL::XML::MasterConfig:
-            case TOPLEVEL::XML::MasterUpdate:
-                return "Config Base";
-            case TOPLEVEL::XML::Config:
-                return "Config Instance";
-            case TOPLEVEL::XML::Presets:
-                return "Presets";
-            case TOPLEVEL::XML::Bank:
-                return "Roots and Banks";
-            case TOPLEVEL::XML::History:
-                return "Recent Files";
-            case TOPLEVEL::XML::PresetDirs:
-                return "Preset Directories";
-            default:
-                return "Yoshimi Data";
-        }
-    }
-
-    TOPLEVEL::XML parseXMLtype(string const& spec)
-    {
-        if (spec == "Instrument")      return TOPLEVEL::XML::Instrument;
-        if (spec == "Parameters")      return TOPLEVEL::XML::Patch;
-        if (spec == "Scales")          return TOPLEVEL::XML::Scale;
-        if (spec == "Session")         return TOPLEVEL::XML::State;
-        if (spec == "Vector Control")  return TOPLEVEL::XML::Vector;
-        if (spec == "Midi Learn")      return TOPLEVEL::XML::MLearn;
-        if (spec == "Config Base")     return TOPLEVEL::XML::MasterConfig;
-        if (spec == "Config Instance") return TOPLEVEL::XML::Config;
-        if (spec == "Presets")         return TOPLEVEL::XML::Presets;
-        if (spec == "Roots and Banks") return TOPLEVEL::XML::Bank;
-        if (spec == "Recent Files")    return TOPLEVEL::XML::History;
-        if (spec == "Preset Directories") return TOPLEVEL::XML::PresetDirs;
-
-        return TOPLEVEL::XML::Instrument;
-    }
-
     /** @remark our XML files often start with leading whitespace
      *          which is not tolerated by the XML parser */
     const char* withoutLeadingWhitespace(const char * text)
@@ -199,6 +147,63 @@ namespace { // internal details of MXML integration
         }
     };
 }//(End)internal details
+
+
+/* ==== Helper for metadata parsing and rendering ==== */
+
+string renderXmlType(TOPLEVEL::XML type)
+{
+    switch (type)
+    {
+        case TOPLEVEL::XML::Instrument:
+            return "Instrument";
+        case TOPLEVEL::XML::Patch:
+            return "Parameters";
+        case TOPLEVEL::XML::Scale:
+            return "Scales";
+        case TOPLEVEL::XML::State:
+            return "Session";
+        case TOPLEVEL::XML::Vector:
+            return "Vector Control";
+        case TOPLEVEL::XML::MLearn:
+            return "Midi Learn";
+        case TOPLEVEL::XML::MasterConfig:
+        case TOPLEVEL::XML::MasterUpdate:
+            return "Config Base";
+        case TOPLEVEL::XML::Config:
+            return "Config Instance";
+        case TOPLEVEL::XML::Presets:
+            return "Presets";
+        case TOPLEVEL::XML::Bank:
+            return "Roots and Banks";
+        case TOPLEVEL::XML::History:
+            return "Recent Files";
+        case TOPLEVEL::XML::PresetDirs:
+            return "Preset Directories";
+        default:
+            return "Yoshimi Data";
+    }
+}
+
+TOPLEVEL::XML parseXMLtype(string const& spec)
+{
+    if (spec == "Instrument")      return TOPLEVEL::XML::Instrument;
+    if (spec == "Parameters")      return TOPLEVEL::XML::Patch;
+    if (spec == "Scales")          return TOPLEVEL::XML::Scale;
+    if (spec == "Session")         return TOPLEVEL::XML::State;
+    if (spec == "Vector Control")  return TOPLEVEL::XML::Vector;
+    if (spec == "Midi Learn")      return TOPLEVEL::XML::MLearn;
+    if (spec == "Config Base")     return TOPLEVEL::XML::MasterConfig;
+    if (spec == "Config Instance") return TOPLEVEL::XML::Config;
+    if (spec == "Presets")         return TOPLEVEL::XML::Presets;
+    if (spec == "Roots and Banks") return TOPLEVEL::XML::Bank;
+    if (spec == "Recent Files")    return TOPLEVEL::XML::History;
+    if (spec == "Preset Directories") return TOPLEVEL::XML::PresetDirs;
+
+    return TOPLEVEL::XML::Instrument;
+}
+
+
 
 
 /**

@@ -74,6 +74,7 @@ uchar Vectors::loadVector(uchar baseChan, string const& name, bool full)
         else
         {
             XMLStore xml{file, logg};
+            postLoadCheck(xml,synth);
             if (not xml)
                 logg("Could not parse XML file \""+file+"\"", _SYS_::LogNotSerious);
             else

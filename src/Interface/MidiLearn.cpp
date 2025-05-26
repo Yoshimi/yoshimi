@@ -936,6 +936,7 @@ bool MidiLearn::loadList(string const& name)
         else
         {
             XMLStore xml{file, logg};
+            postLoadCheck(xml,synth);
             if (xml and extractMidiListData(xml))
             {
                 synth.addHistory(file, TOPLEVEL::XML::MLearn);

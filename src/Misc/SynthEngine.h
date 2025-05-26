@@ -161,7 +161,6 @@ class SynthEngine
         uchar legatoPart;
 
         bool masterMono;
-        bool fileCompatible;
 
         float getLimits(CommandBlock *getData);
         float getVectorLimits(CommandBlock *getData);

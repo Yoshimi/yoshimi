@@ -1464,6 +1464,7 @@ int Part::loadXML(string filename)
 
     auto& logg = synth.getRuntime().getLogger();
     XMLStore xml{filename, logg};
+    postLoadCheck(xml,synth);
     if (not xml)
     {
         logg("Part: loadXML failed to load instrument file " + filename);

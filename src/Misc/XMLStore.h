@@ -165,6 +165,11 @@ struct XMLStore::Features
 };
 
 
+/** Helper for diagnostics */
+string renderXmlType(TOPLEVEL::XML);
+TOPLEVEL::XML parseXMLtype(string const&);
+
+
 /////////////////////////////////////////////////////////////////////////////////////////////////WIP Prototype 4/25 - throw away when done!!!!!
 void run_XMLStoreTest(SynthEngine&);
 /////////////////////////////////////////////////////////////////////////////////////////////////WIP Prototype 4/25 - throw away when done!!!!!
