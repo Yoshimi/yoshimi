@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0308
+version 1.0403
 header_name {.h}
 code_name {.cc}
 comment {EffUI.h} {not_in_source in_header
@@ -11,7 +11,7 @@ comment {EffUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2010, Alan Calvert
-Copyright 2016-2024, Will Godfrey, Kristian Amlie & others
+Copyright 2016-2025, Will Godfrey, Kristian Amlie & others
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU General Public
@@ -225,14 +225,14 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         label Preset
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, 16, o->value(), (EFFECT::type::reverb), TOPLEVEL::type::Integer);}
-        xywh {115 13 90 15} box UP_BOX down_box BORDER_BOX selection_color 49 labelsize 11 labelcolor 64 textfont 1 textsize 10 textcolor 188
+        xywh {115 13 90 15} down_box BORDER_BOX selection_color 49 labelsize 11 labelcolor 64 textfont 1 textsize 10 textcolor 188
         code0 {o->add("Cathedral 1");o->add("Cathedral 2");o->add("Cathedral 3");o->add("Hall 1");o->add("Hall 2");o->add("Room 1");o->add("Room 2");o->add("Basement");o->add("Tunnel");o->add("Echoed 1");o->add("Echoed 2");o->add("Very Long 1");o->add("Very Long 2");}
       } {}
       Fl_Choice revp10 {
         label Type
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, 10, o->value(), (EFFECT::type::reverb), TOPLEVEL::type::Integer);}
-        xywh {240 13 75 15} box UP_BOX down_box BORDER_BOX selection_color 49 labelsize 11 labelcolor 64 textfont 1 textsize 10 textcolor 188
+        xywh {240 13 75 15} down_box BORDER_BOX selection_color 49 labelsize 11 labelcolor 64 textfont 1 textsize 10 textcolor 188
         code0 {o->add("Random");o->add("Freeverb");o->add("Bandwidth");}
       } {}
       Fl_Dial revp0 {
@@ -419,7 +419,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         label Preset
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, 16, o->value(), (EFFECT::type::echo), TOPLEVEL::type::Integer);}
-        xywh {102 13 96 15} box UP_BOX down_box BORDER_BOX selection_color 49 labelsize 11 labelcolor 64 textfont 1 textsize 10 textcolor 188
+        xywh {102 13 96 15} down_box BORDER_BOX selection_color 49 labelsize 11 labelcolor 64 textfont 1 textsize 10 textcolor 188
         code0 {o->add("Echo 1");o->add("Echo 2");o->add("Echo 3");o->add("Echo 4");o->add("Simple Echo");o->add("Canyon");o->add("Panning Echo 1");o->add("Panning Echo 2");o->add("Feedback Echo 3");}
       } {}
       Fl_Dial echop0 {
@@ -562,14 +562,14 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
         label Preset
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, 16, o->value(), (EFFECT::type::chorus), TOPLEVEL::type::Integer);}
-        xywh {121 13 96 16} box UP_BOX down_box BORDER_BOX selection_color 49 labelsize 11 labelcolor 64 textfont 1 textsize 10 textcolor 188
+        xywh {121 13 96 16} down_box BORDER_BOX selection_color 49 labelsize 11 labelcolor 64 textfont 1 textsize 10 textcolor 188
         code0 {o->add("Chorus 1");o->add("Chorus 2");o->add("Chorus 3");o->add("Celeste 1");o->add("Celeste 2");o->add("Flange 1");o->add("Flange 2");o->add("Flange 3");o->add("Flange 4");o->add("Flange 5");}
       } {}
       Fl_Choice chorusp4 {
         label {LFO type}
         callback {//
         send_data(0, 4, o->value(), (EFFECT::type::chorus), TOPLEVEL::type::Integer);}
-        tooltip {LFO function} xywh {189 65 43 15} box UP_BOX down_box BORDER_BOX selection_color 49 labelsize 10 labelcolor 64 align 2 textfont 1 textsize 9 textcolor 188
+        tooltip {LFO function} xywh {189 65 43 15} down_box BORDER_BOX selection_color 49 labelsize 10 labelcolor 64 align 2 textfont 1 textsize 9 textcolor 188
         code0 {o->add("Sine");o->add("Tri");}
       } {}
       Fl_Dial chorusp0 {
@@ -758,14 +758,14 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
         label Preset
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, 16, o->value(), (EFFECT::type::phaser), TOPLEVEL::type::Integer);}
-        xywh {65 21 82 15} box UP_BOX down_box BORDER_BOX selection_color 49 labelsize 11 labelcolor 64 align 1 textfont 1 textsize 10 textcolor 188
+        xywh {65 21 82 15} down_box BORDER_BOX selection_color 49 labelsize 11 labelcolor 64 align 1 textfont 1 textsize 10 textcolor 188
         code0 {o->add("Phaser 1");o->add("Phaser 2");o->add("Phaser 3");o->add("Phaser 4");o->add("Phaser 5");o->add("Phaser 6");o->add("APhaser 1");o->add("APhaser 2");o->add("APhaser 3");o->add("APhaser 4");o->add("APhaser 5");o->add("APhaser 6");}
       } {}
       Fl_Choice phaserp4 {
         label {LFO Type}
         callback {//
         send_data(0, 4, o->value(), (EFFECT::type::phaser), TOPLEVEL::type::Integer);}
-        tooltip {LFO function} xywh {199 65 43 15} box UP_BOX down_box BORDER_BOX selection_color 49 labelsize 10 labelcolor 64 align 2 textfont 1 textsize 9 textcolor 188
+        tooltip {LFO function} xywh {199 65 43 15} down_box BORDER_BOX selection_color 49 labelsize 10 labelcolor 64 align 2 textfont 1 textsize 9 textcolor 188
         code0 {o->add("Sine");o->add("Tri");}
       } {}
       Fl_Dial phaserp0 {
@@ -984,14 +984,14 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
         label Preset
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, 16, o->value(), (EFFECT::type::alienWah), TOPLEVEL::type::Integer);}
-        xywh {135 13 96 15} box UP_BOX down_box BORDER_BOX selection_color 49 labelsize 11 labelcolor 64 textfont 1 textsize 10 textcolor 188
+        xywh {135 13 96 15} down_box BORDER_BOX selection_color 49 labelsize 11 labelcolor 64 textfont 1 textsize 10 textcolor 188
         code0 {o->add("Alienwah 1");o->add("Alienwah 2");o->add("Alienwah 3");o->add("Alienwah 4");}
       } {}
       Fl_Choice awp4 {
         label {LFO type}
         callback {//
         send_data(0, 4, o->value(), (EFFECT::type::alienWah), TOPLEVEL::type::Integer);}
-        tooltip {LFO function} xywh {185 65 43 15} box UP_BOX down_box BORDER_BOX selection_color 49 labelsize 10 labelcolor 64 align 2 textfont 1 textsize 9 textcolor 188
+        tooltip {LFO function} xywh {185 65 43 15} down_box BORDER_BOX selection_color 49 labelsize 10 labelcolor 64 align 2 textfont 1 textsize 9 textcolor 188
         code0 {o->add("Sine");o->add("Tri");}
       } {}
       Fl_Dial awp0 {
@@ -1170,14 +1170,14 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
         label Preset
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, 16, o->value(), (EFFECT::type::distortion), TOPLEVEL::type::Integer);}
-        xywh {139 13 96 16} box UP_BOX down_box BORDER_BOX selection_color 49 labelsize 11 labelcolor 64 textfont 1 textsize 10 textcolor 188
+        xywh {139 13 96 16} down_box BORDER_BOX selection_color 49 labelsize 11 labelcolor 64 textfont 1 textsize 10 textcolor 188
         code0 {o->add("Overdrive 1");o->add("Overdrive 2");o->add("Exciter 1");o->add("Exciter 2");o->add("Guitar Amp");o->add("Quantize");}
       } {}
       Fl_Choice distp5 {
         label Type
         callback {//
         send_data(0, 5, o->value(), (EFFECT::type::distortion), TOPLEVEL::type::Integer);}
-        xywh {192 56 60 15} box UP_BOX down_box BORDER_BOX selection_color 49 labelsize 10 labelcolor 64 align 2 textfont 1 textsize 9 textcolor 188
+        xywh {192 56 60 15} down_box BORDER_BOX selection_color 49 labelsize 10 labelcolor 64 align 2 textfont 1 textsize 9 textcolor 188
         code0 {o->add("Atan");o->add("Asym 1");o->add("Power1");o->add("Sine");o->add("Quants");o->add("Zigzag");o->add("Limit");o->add("LimtiU");o->add("LimitL");o->add("ILimit");o->add("Clip");o->add("Asym 2");o->add("Power2");o->add("Sigm");}
       } {}
       Fl_Dial distp0 {
@@ -1347,7 +1347,7 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
         label Type
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, 10, o->value(), (EFFECT::type::eq), TOPLEVEL::type::Integer);}
-        tooltip Type xywh {323 20 40 15} box UP_BOX down_box BORDER_BOX selection_color 49 labelsize 11 labelcolor 64 align 1 when 6 textfont 1 textsize 9 textcolor 188
+        tooltip Type xywh {323 20 40 15} down_box BORDER_BOX selection_color 49 labelsize 11 labelcolor 64 align 1 when 6 textfont 1 textsize 9 textcolor 188
         code0 {o->add("Off");o->add("Lp1");o->add("Hp1");o->add("Lp2");o->add("Hp2");o->add("Bp2");o->add("N2");o->add("Pk");o->add("LSh");o->add("HSh");}
       } {}
       Fl_Group bandgroup {
@@ -1429,14 +1429,14 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
         label Preset
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, 16, o->value(), (EFFECT::type::dynFilter), TOPLEVEL::type::Integer);}
-        xywh {132 13 90 16} box UP_BOX down_box BORDER_BOX selection_color 49 labelsize 11 labelcolor 64 textfont 1 textsize 10 textcolor 188
+        xywh {132 13 90 16} down_box BORDER_BOX selection_color 49 labelsize 11 labelcolor 64 textfont 1 textsize 10 textcolor 188
         code0 {o->add("WahWah");o->add("AutoWah");o->add("Sweep");o->add("VocalMorph1");o->add("VocalMorph2");}
       } {}
       Fl_Choice dfp4 {
         label {LFO type}
         callback {//
         send_data(0, 4, o->value(), (EFFECT::type::dynFilter), TOPLEVEL::type::Integer);}
-        tooltip {LFO function} xywh {190 60 43 15} box UP_BOX down_box BORDER_BOX selection_color 49 labelsize 10 labelcolor 64 align 2 textfont 1 textsize 9 textcolor 188
+        tooltip {LFO function} xywh {190 60 43 15} down_box BORDER_BOX selection_color 49 labelsize 10 labelcolor 64 align 2 textfont 1 textsize 9 textcolor 188
         code0 {o->add("Sine");o->add("Tri");}
       } {}
       Fl_Dial dfp0 {
@@ -2683,11 +2683,7 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
             break;
     }
     lastEff = nextEff;
-    this->show();
-    //if (nextEff != EFFECT::type::none)
-    {
-        //effRtext(this->w()/380, nextEff - EFFECT::type::none);
-    }} {}
+    this->show();} {}
   }
   Function {refresh()} {} {
     code {refresh(npart);} {}

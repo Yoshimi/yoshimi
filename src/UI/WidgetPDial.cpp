@@ -32,7 +32,8 @@
 #include <FL/fl_draw.H>
 #include <FL/Fl_Tooltip.H>
 #include <FL/Fl_Group.H>
-// #include <FL/x.H> // never used!
+
+#include <FL/platform.H>
 #include <cairo.h>
 #include <cairo-xlib.h>
 

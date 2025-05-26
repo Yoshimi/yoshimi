@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE ZynAddSubFX-data>
-<ZynAddSubFX-data version-major="2" version-minor="4"
-version-revision="1" ZynAddSubFX-author="Nasca Octavian Paul"
-Yoshimi-author="Alan Ernest Calvert" Yoshimi-major="2" Yoshimi-minor="3"
-Yoshimi-revision="3">
+<!DOCTYPE Yoshimi-data>
+<Yoshimi-data Yoshimi-author="Alan Ernest Calvert" Yoshimi-major="2"
+Yoshimi-minor="3" Yoshimi-revision="3">
 <INFORMATION>
 <par_bool name="ADDsynth_used" value="yes" />
 <par_bool name="SUBsynth_used" value="yes" />
@@ -1318,5 +1316,36 @@ GPL V2 or later</string>
 <par_bool name="bypass" value="no" />
 </INSTRUMENT_EFFECT>
 </INSTRUMENT_EFFECTS>
+<par name="key_mode" value="0" />
+<par name="channel_aftertouch" value="0" />
+<par name="key_aftertouch" value="0" />
+<par name="random_detune" value="0" />
+<par name="random_velocity" value="0" />
+<par_bool name="breath_disable" value="no" />
 </INSTRUMENT>
-</ZynAddSubFX-data>
+<CONTROLLER>
+<par name="pitchwheel_bendrange" value="200" />
+<par_bool name="expression_receive" value="yes" />
+<par name="panning_depth" value="64" />
+<par name="filter_cutoff_depth" value="64" />
+<par name="filter_q_depth" value="64" />
+<par name="bandwidth_depth" value="64" />
+<par name="mod_wheel_depth" value="80" />
+<par_bool name="mod_wheel_exponential" value="no" />
+<par_bool name="fm_amp_receive" value="yes" />
+<par_bool name="volume_receive" value="yes" />
+<par name="volume_range" value="96" />
+<par_bool name="sustain_receive" value="yes" />
+<par_bool name="portamento_receive" value="yes" />
+<par name="portamento_time" value="64" />
+<par name="portamento_pitchthresh" value="3" />
+<par name="portamento_pitchthreshtype" value="1" />
+<par name="portamento_portamento" value="0" />
+<par name="portamento_updowntimestretch" value="64" />
+<par name="portamento_proportional" value="0" />
+<par name="portamento_proprate" value="80" />
+<par name="portamento_propdepth" value="90" />
+<par name="resonance_center_depth" value="64" />
+<par name="resonance_bandwidth_depth" value="64" />
+</CONTROLLER>
+</Yoshimi-data>

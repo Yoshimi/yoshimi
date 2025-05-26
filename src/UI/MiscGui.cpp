@@ -29,6 +29,7 @@
 #include <FL/Fl.H>
 #include <FL/fl_draw.H>
 
+#include <FL/platform.H>
 #include <cairo.h>
 #include <cairo-xlib.h>
 

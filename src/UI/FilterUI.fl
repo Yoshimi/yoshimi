@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0308
+version 1.0403
 header_name {.h}
 code_name {.cc}
 comment {FilterUI.h} {not_in_source in_header
@@ -11,7 +11,7 @@ comment {FilterUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2016-2024 Will Godfrey
+Copyright 2016-2025 Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU General Public
@@ -209,20 +209,7 @@ class FormantFilterGraph {: {public Fl_Box}
         }
         parent.formantRtext();
         fl_line_style(0,1);
-
-        /*  original version
-
-        pars->formantfilterH(*nvowel, lx, graphpoints);
-
-        oiy = int((graphpoints[0] / maxdB + 1.0) * ly / 2.0);
-        for (i = 1; i < lx; ++i)
-        {
-            int iy = int((graphpoints[i] / maxdB + 1.0) * ly / 2.0);
-            if (iy >= 0 && oiy >= 0 && iy < ly && oiy < lx)
-                fl_line(ox + i - 1, oy + ly - oiy, ox, oy + ly - iy);
-            oiy = iy;
-        }
-        */} {}
+        ;} {}
   }
   Function {~FormantFilterGraph()} {} {
     code {delete [] graphpoints;} {}

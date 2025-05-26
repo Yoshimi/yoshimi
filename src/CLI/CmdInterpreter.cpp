@@ -2684,18 +2684,20 @@ void CmdInterpreter::listCurrentParts(Parser& input, list<string>& msg_buf)
                 name += " - " + text;
             else
             {
+                name += " to";
                 if (dest == 1)
                     name += " Main";
                 else if (dest == 2)
                     name += " Part";
                 else
                     name += " Both";
-                bool omni = bool(readControl(synth, 0, PART::control::omni, TOPLEVEL::section::part1 + partno) + 1);
-                name += omni ? "  Omni " : "  Chan ";
+                bool omni = bool(readControl(synth, 0, PART::control::omni, TOPLEVEL::section::part1 + partno));
+                name += omni ? " Omni " : " Chan";
                 int ch = int(readControl(synth, 0, PART::control::midiChannel, TOPLEVEL::section::part1 + partno) + 1);
                 if (ch < 10)
                     name += " ";
-                name += to_string(ch);
+                if (not omni)
+                    name += to_string(ch);
                 if (full)
                 {
                     name += "  key Min ";

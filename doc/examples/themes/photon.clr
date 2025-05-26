@@ -5,7 +5,7 @@ This would corrupt the colour map.
 ------------------ data start marker
 100,0, Grey scale min-max (can be reversed) optional + R,G,B, (tint)
 20,20,20, Panels (R,G,B or #rrggbb)
-255,255,255, RESERVED
+0,0,0, RESERVED
 75,57,44, Knob shadow (#4b392c)
 24,20,16, Knob highlight (#181410)
 10,10,10, Knob ring
@@ -17,7 +17,7 @@ This would corrupt the colour map.
 180,180,180, Slider peg changed
 20,20,20, Keyboard slider backgrounds
 90,114,142, Keyboard mod wheel fill
-255,255,255, RESERVED
+0,0,0, RESERVED
 0,100,70, Link buttons
 75,75,55, Inverse link buttons
 90,114,142, Action buttons
@@ -55,7 +55,7 @@ This would corrupt the colour map.
 180,180,180, VU_text
 0,200,200,VU overload
 15,5,25, Filer favourites background
-255,255,255, RESERVED
+0,0,0, RESERVED
 188,159,118, Bank/Instrument select lit
 188,159,118, Bank/instrument rename lit
 188,159,118, Bank/Instrument add/save lit
@@ -66,7 +66,7 @@ This would corrupt the colour map.
 0,100,70, Current bank highlight
 95,115,5, Instrument being swapped
 255,255,0, Instrument original name
-255,255,255, RESERVED
+0,0,0, RESERVED
 20,20,20, General graph background
 100,100,100, Waveform graph grid
 43,43,43, Resonance graph grid
@@ -89,7 +89,7 @@ This would corrupt the colour map.
 75,75,75, Padsynth profile grid
 165,165,165, Padsynth profile centre mark
 188,159,118, PadSynth profile equivalent markers
-255,255,255, RESERVED
+0,0,0, RESERVED
 0,100,70, PadSynth profile fill
 118,159,118, PadSynth profile line
 105,105,105, PadSynth profile line disabled
@@ -116,7 +116,7 @@ This would corrupt the colour map.
 0,0,0, Envelope control point
 255,0,0, Envelope control point selected
 0,0,255, Envelope sustain line
-0,0,0, Envelope line
+118,159,118, Envelope line
 0,255,255, Envelope line selected
 =================== data end marker
 Add your own notes here:

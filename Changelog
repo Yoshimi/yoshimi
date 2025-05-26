@@ -1,5 +1,15 @@
 yoshimi 2.3.3.3 M
 
+2025-5-26 Will
+bn 2386
+Fixed Omni CLI off by one error and clarified messages.
+Added Fl/platform.H to MiscGui.cpp and WidgetPDial.cpp
+    for FLTK V1.4 compatibility.
+Removed some long redundant commented out code.
+Updated some theme example files.
+Added Fiddle Kit to Strings bank.
+Added Hollow Pulse to Will_Godfrey_Companion bank.
+
 2025-5-9 Will
 bn 2385
 Removed redundant and commented YoshiWin code.

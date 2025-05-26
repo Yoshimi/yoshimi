@@ -218,7 +218,7 @@ std::string partlist [] = {
     "CLear [s]",           "sets current instrument level parameters to default.",
     "",                    "ALL, resets the entire part, including controllers etc.",
     "CHannel <n>",         "MIDI channel (> 32 disables, > 16 note off only)",
-    "OMni <s>",            "Omni mode (OFF, {other})",
+    "OMni <s>",            "Omni mode (ON, {other})",
     "AFtertouch Chan <s1> [s2]", "Off, Filter (Down) + Peak (Down) + Bend (Down) + Modulation + Volume",
     "AFtertouch Key <s1> [s2]",  "Off, Filter (Down) + Peak (Down) + Bend (Down) + Modulation",
     "Destination <s>",     "jack audio destination (Main, Part, Both)",

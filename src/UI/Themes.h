@@ -71,7 +71,7 @@
   248 - 250
 */
 
-const int gen_text_back = 7; // we shouldn't really use this - it's complicated!
+const int gen_text_back = 7; // we shouldn't really use this one - it's complicated!
 const int reserved_0 = 56;
 const int graph_back = 57;
 const int slider_track = 62;
@@ -192,7 +192,7 @@ const int VU_text = 255;
 
   All new definitions must be placed at the end of the list table
   so that new work doesn't mess up existing themes.
-  Ideally, use colours as close as possible to the colour table.
+  Ideally, use colours as close as possible to the deault colour table.
 */
 const int COLOURLIST = 114;
 const unsigned char colourNumbers [COLOURLIST] = {
@@ -376,7 +376,7 @@ static std::string colourData [] = {
     "240,250,230, Filer favourites background",
     "0,0,0, RESERVED",
     "0,255,0, Bank/Instrument select lit",
-    "255,0,255, Bank/instrument rename lit",
+    "255,0,255, Bank/Instrument rename lit",
     "255,255,0, Bank/Instrument add/save lit",
     "255,0,0, Bank/Instrument delete lit",
     "0,0,255, Bank/Instrument swap lit",
