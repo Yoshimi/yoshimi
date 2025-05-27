@@ -56,11 +56,8 @@ add_definitions(-Wno-vla) # Nothing wrong with variable length arrays
 project (Yoshimi)
 
 set (YOSHIMI_VERSION "2.3.3.3")
-
-add_definitions (-DMIN_CONFIG_MAJOR=2)
-add_definitions (-DMIN_CONFIG_MINOR=3)
-
 file (WRITE version.txt "${YOSHIMI_VERSION}")
+
 
 set (CMAKE_INCLUDE_CURRENT_DIR ON)
 set (CMAKE_USE_RELATIVE_PATHS OFF)
@@ -305,10 +302,7 @@ set (Effects_sources
 set (Misc_sources
     Misc/Bank.cpp  Misc/BuildScheduler.cpp  Misc/CmdOptions.cpp
     Misc/Config.cpp  Misc/InstanceManager.cpp  Misc/Microtonal.cpp  Misc/Part.cpp
-    Misc/SynthEngine.cpp  Misc/WavFile.cpp  Misc/XMLStore.cpp  Misc/XMLwrapper.cpp
-##///////////////////////////////////////////////////////////////////////////////////////////////WIP Prototype 4/25 - throw away when done!!!!!
-    Misc/XMLStoreTest.cpp
-##///////////////////////////////////////////////////////////////////////////////////////////////WIP Prototype 4/25 - throw away when done!!!!!
+    Misc/SynthEngine.cpp  Misc/WavFile.cpp  Misc/XMLStore.cpp
 )
 
 set (Interface_Sources

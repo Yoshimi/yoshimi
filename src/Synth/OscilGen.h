@@ -38,13 +38,12 @@
 #include "Synth/Resonance.h"
 
 class SynthEngine;
-class XMLwrapper;   /////////////////////////////////////////////////////////////////////////////TODO 5/25 : switch to XMLstore
-class XMLtree;
+
 
 class OscilGen : private WaveShapeSamples
 {
     public:
-        OscilGen(fft::Calc&,Resonance *res_, SynthEngine *_synth, OscilParameters *params_);
+        OscilGen(fft::Calc&, Resonance* res_, SynthEngine* _synth, OscilParameters* params_);
        ~OscilGen() = default;
 
         // shall not be copied or moved or assigned
@@ -54,7 +53,7 @@ class OscilGen : private WaveShapeSamples
         OscilGen& operator=(OscilGen const&) = delete;
 
 
-        void changeParams(OscilParameters *params_);
+        void changeParams(OscilParameters* params_);
 
         void prepare();
 

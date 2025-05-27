@@ -30,7 +30,6 @@
 #include "Params/ParamCheck.h"
 
 class SynthEngine;
-class XMLwrapper;   /////////////////////////////////////////////////////////////////////////////TODO 5/25 : switch to XMLstore
 class XMLtree;
 
 
@@ -65,7 +64,7 @@ class EnvelopeParams : public ParamBase
         uchar Plinearenvelope;         // if the amplitude envelope is linear
 
         float PA_dt, PD_dt, PR_dt,
-                      PA_val, PD_val, PS_val, PR_val;
+              PA_val, PD_val, PS_val, PR_val;
 
         int Envmode; // 1 for ADSR parameters (linear amplitude)
                      // 2 for ADSR_dB parameters (dB amplitude)
@@ -81,7 +80,7 @@ class EnvelopeParams : public ParamBase
         uchar Dforcedrelease;
         uchar Dlinearenvelope;
         float DA_dt, DD_dt, DR_dt,
-                      DA_val, DD_val, DS_val, DR_val;
+              DA_val, DD_val, DS_val, DR_val;
 };
 
 class envelopeLimit

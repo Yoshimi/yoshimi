@@ -38,7 +38,7 @@ inline string listpos(int count, int human)
 
 
 class SynthEngine;
-class XMLwrapper;   /////////////////////////////////////////////////////////////////////////////TODO 5/25 : switch to XMLstore
+class XMLStore;
 class XMLtree;
 
 
@@ -88,7 +88,7 @@ class UnifiedPresets
         void list(string dirname, string& name);
         string findPresetType();
         string accessXML   (XMLStore&, bool isLoad);
-        string synthXML    (XMLtree&,  bool isLoad);
+        string synthXML    (XMLtree&, bool isLoad);
         string effectXML   (XMLtree&, bool isLoad);
         string resonanceXML(XMLtree&, bool isLoad);
         string oscilXML    (XMLtree&, bool isLoad);

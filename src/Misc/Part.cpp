@@ -37,7 +37,6 @@
 #include "Effects/EffectMgr.h"
 #include "DSP/FFTwrapper.h"
 #include "Misc/XMLStore.h"
-#include "Misc/XMLwrapper.h" ////////////////////////////////////////////////////////////////////TODO 5/25 : switch to XMLstore
 #include "Misc/Microtonal.h"
 #include "Misc/SynthEngine.h"
 #include "Misc/SynthHelper.h"
@@ -59,28 +58,28 @@ using func::setAllPan;
 using func::decibel;
 using std::string;
 
-Part::Part(uchar id, Microtonal* microtonal_, fft::Calc& fft_, SynthEngine& _synth) :
-    ctl{new Controller(&_synth)},
-    partID{id},
-    partoutl(_synth.buffersize),
-    partoutr(_synth.buffersize),
-    tmpoutl(_synth.getRuntime().genMixl), // Note: alias to a global shared buffer
-    tmpoutr(_synth.getRuntime().genMixr),
-    microtonal(microtonal_),
-    fft(fft_),
-    prevNote{-1},
-    prevPos{0},
-    prevFreq{-1.0f},
-    prevLegatoMode{false},
-    killallnotes(false),
-    oldFilterState{-1},
-    oldFilterQstate{-1},
-    oldBendState{-1},
-    oldVolumeState{-1},
-    oldVolumeAdjust{-1},
-    oldModulationState{-1},
-    omniByCC{false},
-    synth(_synth)
+Part::Part(uchar id, Microtonal* microtonal_, fft::Calc& fft_, SynthEngine& _synth)
+    : ctl{new Controller(&_synth)}
+    , partID{id}
+    , partoutl(_synth.buffersize)
+    , partoutr(_synth.buffersize)
+    , tmpoutl(_synth.getRuntime().genMixl) // Note: alias to a global shared buffer
+    , tmpoutr(_synth.getRuntime().genMixr)
+    , microtonal{microtonal_}
+    , fft{fft_}
+    , prevNote{-1}
+    , prevPos{0}
+    , prevFreq{-1.0f}
+    , prevLegatoMode{false}
+    , killallnotes(false)
+    , oldFilterState{-1}
+    , oldFilterQstate{-1}
+    , oldBendState{-1}
+    , oldVolumeState{-1}
+    , oldVolumeAdjust{-1}
+    , oldModulationState{-1}
+    , omniByCC{false}
+    , synth{_synth}
 {
 
     for (int n = 0; n < NUM_KIT_ITEMS; ++n)
@@ -1408,7 +1407,7 @@ void Part::add2XML_synthUsage(XMLtree& xmlInfo)
      * _Historical Note (Hermann)_: in 5/2025 the interface for handling XML was
      * reworked, including the way how meta information are checked and processed.
      * The original code relied on a statefull "XMLwrapper", which was _navigated_
-     * through the XMLtree (while the new code uses DOM style with sub trees);
+     * through the XML tree (while the new code uses DOM style with sub trees);
      * when some synth-component was added, also a state flag in the XMLwrapper
      * was set. Later, when saving to XML, as a side-effect, these three flags
      * were injected into the <INFORMATION> node (and if you saved the same

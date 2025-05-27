@@ -35,7 +35,6 @@
 #include "Params/ParamCheck.h"
 
 class SynthEngine;
-class XMLwrapper;   /////////////////////////////////////////////////////////////////////////////TODO 5/25 : switch to XMLstore
 class XMLtree;
 
 
@@ -90,7 +89,7 @@ class LFOParams : public ParamBase
 class LFOlimit
 {
     public:
-        float getLFOlimits(CommandBlock *getData);
+        float getLFOlimits(CommandBlock* getData);
 };
 
 /*

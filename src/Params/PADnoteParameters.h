@@ -48,7 +48,6 @@ using std::unique_ptr;
 using std::vector;
 
 class XMLtree;
-class XMLwrapper;   /////////////////////////////////////////////////////////////////////////////TODO 5/25 : switch to XMLstore
 class OscilParameters;
 class EnvelopeParams;
 class Resonance;

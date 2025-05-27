@@ -27,7 +27,6 @@
 #include <iostream>
 
 #include "Misc/XMLStore.h"
-#include "Misc/XMLwrapper.h" ////////////////////////////////////////////////////////////////////TODO 5/25 : switch to XMLstore
 #include "Misc/SynthEngine.h"
 #include "Effects/EffectMgr.h"
 #include "Effects/EQ.h"

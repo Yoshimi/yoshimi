@@ -109,8 +109,7 @@ using RootEntryMap = std::map<size_t, RootEntry>;
 
 
 class SynthEngine;
-class XMLwrapper;   /////////////////////////////////////////////////////////////////////////////TODO 5/25 : switch to XMLstore
-class XMLStore;
+class XMLtree;
 
 
 class Bank

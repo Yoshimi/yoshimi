@@ -54,7 +54,6 @@ class EffectMgr;
 struct EffectDTO;
 struct EqGraphDTO;
 class XMLStore;
-class XMLwrapper;   /////////////////////////////////////////////////////////////////////////////TODO 5/25 : switch to XMLstore
 class Controller;
 class TextMsgBuffer;
 class InterfaceAnchor;
@@ -120,15 +119,15 @@ class SynthEngine
 
         void NoteOn(uchar chan, uchar note, uchar velocity);
         void NoteOff(uchar chan, uchar note);
-        int RunChannelSwitch(uchar chan, int value);
+        int  RunChannelSwitch(uchar chan, int value);
         void SetController(uchar chan, int CCtype, short par);
         void SetZynControls(bool in_place);
-        int setRootBank(int root, int bank, bool inplace = false);
-        int setProgramByName(CommandBlock&);
-        int setProgramFromBank(CommandBlock&, bool inplace = false);
+        int  setRootBank(int root, int bank, bool inplace = false);
+        int  setProgramByName(CommandBlock&);
+        int  setProgramFromBank(CommandBlock&, bool inplace = false);
         bool setProgram(string const& fname, int npart);
-        int ReadBankRoot();
-        int ReadBank();
+        int  ReadBankRoot();
+        int  ReadBank();
         void SetPartChanForVector(uchar npart, uchar nchan);
         void SetPartPortamento(int npart, bool state);
         bool ReadPartPortamento(int npart);
@@ -141,14 +140,14 @@ class SynthEngine
         void ListVectors(std::list<string>& msg_buf);
         bool SingleVector(std::list<string>& msg_buf, int chan);
         void ListSettings(std::list<string>& msg_buf);
-        int SetSystemValue(int type, int value);
-        int LoadNumbered(uchar group, uchar entry);
+        int  SetSystemValue(int type, int value);
+        int  LoadNumbered(uchar group, uchar entry);
         bool vectorInit(int dHigh, uchar chan, int par);
         void vectorSet(int dHigh, uchar chan, int par);
         void ClearNRPNs();
         void resetAll(bool andML);
         void ShutUp();
-        int MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_MIDI_PARTS + 1], int to_process = 0);
+        int  MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_MIDI_PARTS + 1], int to_process = 0);
         void partonoffLock(uint npart, int what);
         void partonoffWrite(uint npart, int what);
         char partonoffRead(uint npart);
@@ -165,7 +164,7 @@ class SynthEngine
         float getLimits(CommandBlock *getData);
         float getVectorLimits(CommandBlock *getData);
         float getConfigLimits(CommandBlock *getData);
-        void CBtest(CommandBlock *candidate, bool miscmsg = false);
+        void  CBtest(CommandBlock *candidate, bool miscmsg = false);
 
 
         Part *part[NUM_MIDI_PARTS];
@@ -319,5 +318,4 @@ class SynthEngine
         void setReproducibleState(int value);
         void swapTestPADtable();
 };
-
-#endif
+#endif /*SYNTHENGINE_H*/

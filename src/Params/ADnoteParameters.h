@@ -43,7 +43,6 @@ enum FMTYPE { NONE, MORPH, RING_MOD, PHASE_MOD, FREQ_MOD, PW_MOD };
 extern int ADnote_unison_sizes[];
 
 class SynthEngine;
-class XMLwrapper;   /////////////////////////////////////////////////////////////////////////////TODO 5/25 : switch to XMLstore
 class XMLtree;
 
 
@@ -112,8 +111,8 @@ struct ADnoteVoiceParam { // Voice parameters
                                     // externFMoscil => current voice
     uchar Poscilphase, PFMoscilphase; // oscillator phases
     bool  Pfilterbypass;            // filter bypass
-    OscilParameters *POscil;
-    OscilGen        *OscilSmp;
+    OscilParameters* POscil;
+    OscilGen*        OscilSmp;
 
     // Frequency parameters
     bool  Pfixedfreq;           // If the base frequency is fixed to 440 Hz
@@ -133,7 +132,7 @@ struct ADnoteVoiceParam { // Voice parameters
     EnvelopeParams *FreqEnvelope;
 
     bool  PFreqLfoEnabled;       // Frequency LFO
-    LFOParams *FreqLfo;
+    LFOParams* FreqLfo;
 
     // Amplitude parameters
     uchar PPanning;              //  1 - left, 64 - center, 127 - right
@@ -151,17 +150,17 @@ struct ADnoteVoiceParam { // Voice parameters
     EnvelopeParams *AmpEnvelope;
 
     bool  PAmpLfoEnabled;        // Amplitude LFO
-    LFOParams *AmpLfo;
+    LFOParams* AmpLfo;
 
     // Filter parameters
     bool  PFilterEnabled;        // Voice Filter
-    FilterParams *VoiceFilter;
+    FilterParams* VoiceFilter;
 
     bool  PFilterEnvelopeEnabled;// Filter Envelope
-    EnvelopeParams *FilterEnvelope;
+    EnvelopeParams* FilterEnvelope;
 
     bool  PFilterLfoEnabled;     // LFO Envelope
-    LFOParams *FilterLfo;
+    LFOParams* FilterLfo;
 
     uchar PFilterVelocityScale;
     uchar PFilterVelocityScaleFunction;
@@ -174,11 +173,11 @@ struct ADnoteVoiceParam { // Voice parameters
     // Modulator parameters
     uchar PFMEnabled;            // 0 = off, 1 = Morph, 2 = RM, 3 = PM, 4 = FM, 5 = PWM
     bool  PFMringToSide;         // allow carrier through
-    short PFMVoice;              // Voice that I use as modullator instead of POscilFM.
+    short PFMVoice;              // Voice that I use as modulator instead of POscilFM.
                                  // It is -1 if I use POscilFM(default).
                                  // It may not be equal or bigger than current voice
-    OscilParameters *POscilFM;   // Modullator oscillator
-    OscilGen        *FMSmp;
+    OscilParameters* POscilFM;   // Modulator oscillator
+    OscilGen       * FMSmp;
 
     uchar  PFMVolume;                // Modulator Volume
     uchar  PFMVolumeDamp;            // Modulator damping at higher frequencies
@@ -206,7 +205,7 @@ class ADnoteParameters : public ParamBase
         void add2XML_voice(XMLtree&, const uint nvoice);
         void getfromXML(XMLtree&);
         void getfromXML_voice(XMLtree&, const uint nvoice);
-        float getLimits(CommandBlock *getData);
+        float getLimits(CommandBlock* getData);
         float getBandwidthDetuneMultiplier();
         float getUnisonFrequencySpreadCents(int nvoice);
         void setGlobalPan(char pan, uchar panLaw);

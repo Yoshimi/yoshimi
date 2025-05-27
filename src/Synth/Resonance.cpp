@@ -31,7 +31,6 @@
 #include "Synth/Resonance.h"
 #include "Misc/SynthEngine.h"
 #include "Misc/NumericFuncs.h"
-#include "Misc/XMLwrapper.h" ////////////////////////////////////////////////////////////////////TODO 5/25 : switch to XMLstore
 #include "Misc/XMLStore.h"
 
 using func::power;
@@ -58,7 +57,7 @@ void Resonance::defaults()
 
 
 // Set a point of resonance function with a value
-void Resonance::setpoint(int n, unsigned char p)
+void Resonance::setpoint(int n, uchar p)
 {
     if (n < 0 || n >= MAX_RESONANCE_POINTS)
         return;
@@ -284,14 +283,14 @@ float ResonanceLimits::getLimits(CommandBlock *getData)
     int control = getData->data.control;
     int insert = getData->data.insert;
 
-    unsigned char type = 0;
+    uchar type = 0;
     type |= TOPLEVEL::type::Integer;
 
     // resonance defaults
     int min = 0;
     int max = 1;
     int def = 0;
-    unsigned char learnable = TOPLEVEL::type::Learnable;
+    uchar learnable = TOPLEVEL::type::Learnable;
 
     if (insert == TOPLEVEL::insert::resonanceGraphInsert)
     {

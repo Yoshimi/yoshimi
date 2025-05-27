@@ -50,8 +50,8 @@ using std::list;
 
 class XMLtree;
 class XMLStore;
-class XMLwrapper;   /////////////////////////////////////////////////////////////////////////////TODO 4/25 : switch to XMLstore
 class SynthEngine;
+
 
 class Config
 {
@@ -114,8 +114,6 @@ class Config
         bool    isLV2;
         bool    isMultiFeed;        // can produce separate audio feeds for each part (Jack or LV2)
         uint    build_ID;
-        int     lastXMLmajor;
-        int     lastXMLminor;
         VerInfo loadedConfigVer;
         bool    incompatibleZynFile;
 
@@ -286,12 +284,10 @@ class Config
         bool initFromPersistentConfig();
         bool extractBaseParameters(XMLStore&);
         bool extractConfigData(XMLStore&);
-        bool extractConfigData_OBSOLETE(XMLwrapper& xml);////////////////////////////////////////////////////TODO 5/2025 : evaluate version  /////OOO
         void capturePatchState(XMLStore&);
         bool restorePatchState(XMLStore&);
-        void migrateLegacyPresetsList(XMLtree&);
         void addConfigXML(XMLStore& xml);
-        void addConfigXML_OBSOLETE(XMLwrapper& xml);/////////////////////////////////////////////////////////TODO 5/2025 : evaluate version  /////OOO
+        void migrateLegacyPresetsList(XMLtree&);
         void saveJackSession();
 
         string findHtmlManual();

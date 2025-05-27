@@ -40,7 +40,6 @@
 #include <algorithm>
 
 #include "Misc/XMLStore.h"
-#include "Misc/XMLwrapper.h" ////////////////////////////////////////////////////////////////////TODO 5/25 : switch to XMLstore
 #include "Misc/Config.h"
 #include "Misc/Bank.h"
 #include "Misc/SynthEngine.h"

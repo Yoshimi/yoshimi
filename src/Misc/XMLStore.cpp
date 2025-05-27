@@ -75,9 +75,9 @@ namespace { // internal details of MXML integration
     }
 
 
-    const char *XMLStore_whitespace_callback(mxml_node_t* node, int where)
+    const char* XMLStore_whitespace_callback(mxml_node_t* node, int where)
     {
-        const char *name = mxmlGetElement(node);
+        const char* name = mxmlGetElement(node);
 
         if (where == MXML_WS_BEFORE_OPEN && name && !strncmp(name, "?xml", 4))
             return NULL;
@@ -168,7 +168,6 @@ string renderXmlType(TOPLEVEL::XML type)
         case TOPLEVEL::XML::MLearn:
             return "Midi Learn";
         case TOPLEVEL::XML::MasterConfig:
-        case TOPLEVEL::XML::MasterUpdate:
             return "Config Base";
         case TOPLEVEL::XML::Config:
             return "Config Instance";
@@ -238,7 +237,7 @@ struct XMLtree::Node
         void addRef()
         {
             uint refCnt = mxmlRetain(mxmlElm());
-            assert(refCnt > 1);
+            assert(refCnt > 1);    (void)refCnt;
         }
 
         void unref()
@@ -664,7 +663,7 @@ XMLStore::Metadata XMLStore::extractMetadata()
     else
         return Metadata{}; // marked as invalid
 }
-    ///////////////////////////////////////////////////////////////////////TODO 4/2025 : old code initialised base parameters in ctor -- must do that explicitly now --> Config::initData(xml)
+
 
 XMLtree XMLStore::accessTop()
 {
@@ -854,7 +853,7 @@ bool XMLStore::saveXMLfile(string filename, Logger const& log, uint gzipCompress
             if (gzipCompressionLevel == 0)
             {
                 if (not saveText(xmldata, filename))
-                    log("XML: Failed to save xml file " + filename + "(uncompressed)", _SYS_::LogNotSerious);
+                    log("XML: Failed to save xml file \""+filename+"\"(uncompressed)", _SYS_::LogNotSerious);
                 else
                     success = true;
             }

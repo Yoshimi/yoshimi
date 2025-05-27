@@ -29,7 +29,6 @@
 
 #include "Params/OscilParameters.h"
 #include "Misc/SynthEngine.h"
-#include "Misc/XMLwrapper.h" ////////////////////////////////////////////////////////////////////TODO 5/25 : switch to XMLstore
 #include "Misc/XMLStore.h"
 
 

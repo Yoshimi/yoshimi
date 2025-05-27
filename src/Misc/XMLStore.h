@@ -42,7 +42,13 @@ using std::optional;
 
 class SynthEngine;
 
-/** Structured data subtree, which can be loaded and stored as XML */
+
+/**
+ * Structured data subtree,
+ * which can be loaded and stored as XML.
+ * @note this is a smart-pointer, delegating to
+ *       MXML ref-count based memory management.
+ */
 class XMLtree
 {
     struct Node;
@@ -74,16 +80,16 @@ class XMLtree
         string getAttrib(string name);
         uint   getAttrib_uint(string name);
 
-        void addPar_int(string const& name, int val);            // add simple parameter element: with attribute name, value
+        void addPar_int (string const& name, int val);           // add simple parameter element: with attribute name, value
         void addPar_uint(string const& name, uint val);          // add unsigned integer parameter: name, value
         void addPar_frac(string const& name, float val);         // add value both as integral and as float persisted as exact bitstring
         void addPar_real(string const& name, float val);         // add floating-point both textually and as exact bitstring
         void addPar_bool(string const& name, bool val);
-        void addPar_str(string const& name, string const&);      // add string parameter (name and string)
+        void addPar_str (string const& name, string const&);     // add string parameter (name and string)
 
-        int  getPar_int(string const& name, int defaultVal, int min, int max);
-        int  getPar_127(string const& name, int defaultVal);     // value limited to [0 ... 127]
-        int  getPar_255(string const& name, int defaultVal);     // value limited to [0 ... 255]
+        int  getPar_int (string const& name, int defaultVal, int min, int max);
+        int  getPar_127 (string const& name, int defaultVal);    // value limited to [0 ... 127]
+        int  getPar_255 (string const& name, int defaultVal);    // value limited to [0 ... 255]
         uint getPar_uint(string const& name, uint defaultVal, uint min = 0, uint max = std::numeric_limits<uint>::max());
 
         float getPar_frac(string const& name, float defaultVal, float min, float max);  // restore exact fractional value, fall-back to integral(legacy)
@@ -98,15 +104,20 @@ class XMLtree
 
 
 
-/** Maintain tree structured data, which can be stored and retrieved from XML */
+/**
+ * Maintain tree-structured data,
+ * which can be stored and retrieved from XML
+ * @remark this is a lightweight value object,
+ *         can be moved and stored in local vars.
+ */
 class XMLStore
 {
     XMLtree root;
 
     public:
-        XMLStore(TOPLEVEL::XML type, bool zynCompat =false);
-        XMLStore(string filename, Logger const& log);
-        XMLStore(const char* xml);
+        XMLStore(TOPLEVEL::XML type, bool zynCompat =false);       // can be created empty
+        XMLStore(string filename, Logger const& log);              // can be created by loading XML
+        XMLStore(const char* xml);                                 // can be created from buffer with XML data
 
         // can be moved
         XMLStore(XMLStore&&)                 = default;
@@ -119,8 +130,8 @@ class XMLStore
         bool empty()              const { return not bool(root); }
 
 
-        char* render();                                           // rendered XML into malloc() char buffer (NULL terminated)
-        bool saveXMLfile(string filename, Logger const& log       // render XML and store to file, possibly compressed, return true on success
+        char* render();                                            // rendered XML into malloc() char buffer (NULL terminated)
+        bool saveXMLfile(string filename, Logger const& log        // render XML and store to file, possibly compressed, return true on success
                         ,uint gzipCompressionLevel =0);
 
 
@@ -143,7 +154,7 @@ class XMLStore
 
         struct Features;
 
-        // opens a file and parse only the "information" data on it
+        // opens a file without parsing the XML; just grep some meta information
         static Features checkfileinformation(std::string const& filename, Logger const& log);
 
     private:
@@ -153,7 +164,7 @@ class XMLStore
 };
 
 /** used to classify instruments
- * @wee XMLStore::checkfileinformation()
+ * @see XMLStore::checkfileinformation()
  */
 struct XMLStore::Features
 {
@@ -166,11 +177,8 @@ struct XMLStore::Features
 
 
 /** Helper for diagnostics */
-string renderXmlType(TOPLEVEL::XML);
 TOPLEVEL::XML parseXMLtype(string const&);
+string renderXmlType(TOPLEVEL::XML);
 
 
-/////////////////////////////////////////////////////////////////////////////////////////////////WIP Prototype 4/25 - throw away when done!!!!!
-void run_XMLStoreTest(SynthEngine&);
-/////////////////////////////////////////////////////////////////////////////////////////////////WIP Prototype 4/25 - throw away when done!!!!!
 #endif /*XML_STORE_H*/

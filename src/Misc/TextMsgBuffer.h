@@ -57,11 +57,12 @@ class TextMsgBuffer
         sem_t lock;
         std::list<std::string> buffer;
 
-        TextMsgBuffer() :
-            lock{},
-            buffer{}
+        TextMsgBuffer()
+            : lock{}
+            , buffer{}
         {
             sem_init(&lock, 0, 1);
+            initBuffer();
         }
 
         ~TextMsgBuffer()
@@ -79,14 +80,16 @@ class TextMsgBuffer
 #ifdef MAX_MSG
     int count;
 #endif
-        void init();
         void clear();
         int push(std::string text);
         std::string fetch(int pos, bool remove = true);
+
+    private:
+        void initBuffer();
 };
 
 
-inline void TextMsgBuffer::init()
+inline void TextMsgBuffer::initBuffer()
 {
     for (int i = 0; i < NO_MSG; ++i)
         buffer.push_back("");

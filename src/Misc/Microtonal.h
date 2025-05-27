@@ -32,7 +32,6 @@
 #include "Misc/NumericFuncs.h"
 
 class SynthEngine;
-class XMLwrapper;   /////////////////////////////////////////////////////////////////////////////TODO 4/25 : switch to XMLstore
 class XMLtree;
 
 using std::string;

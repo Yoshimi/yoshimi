@@ -30,7 +30,6 @@
 
 #include "Misc/Config.h"
 #include "Misc/XMLStore.h"
-#include "Misc/XMLwrapper.h" ////////////////////////////////////////////////////////////////////TODO 5/25 : switch to XMLstore
 #include "Misc/Microtonal.h"
 #include "Misc/SynthEngine.h"
 #include "Misc/NumericFuncs.h"

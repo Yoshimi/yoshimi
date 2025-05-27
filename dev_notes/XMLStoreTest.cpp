@@ -19,7 +19,7 @@
 */
 
 /* ============================================================================================== */
-/* ==================== TODO : 4/25 This is a Prototype : Throw-away when done ================== */
+/* ================ 4/25 This is a demonstration how to read/write XML data ===================== */
 
 #include "Misc/XMLStore.h"
 
@@ -69,7 +69,7 @@ void run_XMLStoreTest(SynthEngine& synth)
     cout <<"ExactBitstring float.epsilon "<< func::asExactBitstring(std::numeric_limits<float>::epsilon())<<endl;
     cout <<"ExactBitstring float +inf    "<< func::asExactBitstring(INFINITY)<<endl;
     cout <<"ExactBitstring float nan     "<< func::asExactBitstring(NAN)<<endl;
-    
+
     cout <<"ExactBitstring 0.0           "<< func::asExactBitstring(0.0)<<endl;
     cout <<"ExactBitstring 1.01          "<< func::asExactBitstring(1.01)<<endl;
     cout <<"ExactBitstring -1.01         "<< func::asExactBitstring(-1.01)<<endl;
@@ -89,7 +89,7 @@ void run_XMLStoreTest(SynthEngine& synth)
     cout <<"read Bitstring  0x7F800000 : "<< func::bitstring2float("0x7F800000")<<endl;
     cout <<"read Bitstring  0x7FC00000 : "<< func::bitstring2float("0x7FC00000")<<endl;
     cout << endl;
-    
+
     cout <<"Verify Version info..." << endl;
     CHECK(VerInfo("").maj           == 0 );
     CHECK(VerInfo("").min           == 0 );
@@ -112,7 +112,7 @@ void run_XMLStoreTest(SynthEngine& synth)
     CHECK(VerInfo("x1.2.3.4.5").maj == 1 );
     CHECK(VerInfo("x1.2.3.4.5").min == 2 );
     CHECK(VerInfo("x1.2.3.4.5").rev == 3 );
-    
+
     CHECK(VerInfo("1.2.3")     == VerInfo(1,2,3))
     CHECK(VerInfo("xx1.2.3uu") == VerInfo(1,2,3))
     CHECK(VerInfo("1.2")       == VerInfo(1,2,0))
@@ -120,7 +120,8 @@ void run_XMLStoreTest(SynthEngine& synth)
     CHECK(VerInfo("5") < VerInfo("6"))
     CHECK(VerInfo("5") < VerInfo("5.1"))
     CHECK(VerInfo("5") < VerInfo("5.0.1"))
-    
+
+
     // the following code is a simplified version of loading the base config
     string location = file::configDir();
     string baseConfig = location + "/" + YOSHIMI + EXTEN::config;

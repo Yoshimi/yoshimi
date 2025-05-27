@@ -32,7 +32,6 @@
 
 #include "Params/LFOParams.h"
 #include "Misc/NumericFuncs.h"
-#include "Misc/XMLwrapper.h" ////////////////////////////////////////////////////////////////////TODO 5/25 : switch to XMLstore
 #include "Misc/XMLStore.h"
 
 using func::power;
@@ -118,7 +117,7 @@ void LFOParams::getfromXML(XMLtree& xmlLFO)
     paramsChanged();
 }
 
-float LFOlimit::getLFOlimits(CommandBlock *getData)
+float LFOlimit::getLFOlimits(CommandBlock* getData)
 {
     float value = getData->data.value;
     int request = int(getData->data.type & TOPLEVEL::type::Default);

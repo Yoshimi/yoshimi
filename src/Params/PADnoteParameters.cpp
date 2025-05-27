@@ -34,7 +34,6 @@
 #include <iostream>
 
 #include "Misc/XMLStore.h"
-#include "Misc/XMLwrapper.h" ////////////////////////////////////////////////////////////////////TODO 5/25 : switch to XMLstore
 #include "DSP/FFTwrapper.h"
 #include "Synth/OscilGen.h"
 #include "Synth/Resonance.h"

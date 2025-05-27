@@ -45,7 +45,6 @@ class ADnote;
 class SUBnote;
 class PADnote;
 class Controller;
-class XMLwrapper;   /////////////////////////////////////////////////////////////////////////////TODO 5/25 : switch to XMLstore
 class Microtonal;
 class EffectMgr;
 class XMLtree;

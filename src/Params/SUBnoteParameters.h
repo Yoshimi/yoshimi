@@ -33,7 +33,6 @@
 #include "Params/ParamCheck.h"
 
 class SynthEngine;
-class XMLwrapper;   /////////////////////////////////////////////////////////////////////////////TODO 5/25 : switch to XMLstore
 class XMLtree;
 
 

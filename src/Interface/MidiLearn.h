@@ -34,7 +34,6 @@
 class SynthEngine;
 class DataText;
 class TextData;
-class XMLwrapper;   /////////////////////////////////////////////////////////////////////////////TODO 5/25 : switch to XMLstore
 class XMLStore;
 
 using std::string;
