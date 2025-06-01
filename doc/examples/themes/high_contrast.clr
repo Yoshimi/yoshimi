@@ -1,0 +1,124 @@
+Do not edit this. It may be overwritten.
+Instead, copy as template for other named themes.
+Don't add or remove lines between and including dashes.
+This would corrupt the colour map.
+------------------ data start marker
+0,255, Grey scale min-max (can be reversed) optional + R,G,B, (tint)
+50,255,255, Panels (R,G,B or #rrggbb)
+0,0,0, RESERVED
+186,198,211, Knob shadow (#bac6d3)
+231,235,239, Knob highlight (#e7ebef)
+40,40,40, Knob ring
+80,220,255, Knob ring lit
+40,40,40, Knob pointer default
+225,120,90, Knob pointer changed
+0,0,0, Slider track
+0,140,0, Slider peg default
+255,90,90, Slider peg changed
+127,127,127, Keyboard slider backgrounds
+63,127,255, Keyboard mod wheel fill
+0,0,0, RESERVED
+110,180,175, Link buttons
+180,180,200, Inverse link buttons
+63,145,255, Action buttons
+160,160,140, Close button
+220,0,0, Warning type button
+250,150,90, Warning background patch
+255,0,0, Warning text
+0,0,255, Inverse warning text
+255,255,255, General text background
+0,0,0, General text
+255,255,255, Inverse text
+0,0,255, About window heading text
+0,255,0, Midilearn activity indicator
+191,255,255, Midilearn text background
+0,0,255, Learnable text
+0,0,255, Solo selected
+0,180,180, Midi/Solo release
+255,0,0, Midi ignored
+0,109,191, Copy/Paste background
+255,255,255, Copy/Paste text
+255,255,255, Alert/Query background
+0,0,255, Alert/Query mark (!?)
+255,255,210, Tooltip background
+180,180,180, Tooltip grid
+50,50,50, Tooltip major grid
+0,0,255, Tooltip curve
+0,0,0, Tooltip text
+150,150,150, Tooltip faint text
+0,0,0, Bank/Instrument text
+0,145,255, VU 1dB marker
+63,218,255, VU 5dB marker
+140,180,220, VU 10dB marker
+63,182,255, VU level
+255,255,0, VU rms
+255,254,254, VU_text
+255,0,0,VU overload
+240,250,230, Filer favourites background
+0,0,0, RESERVED
+0,255,0, Bank/Instrument select lit
+255,0,255, Bank/instrument rename lit
+255,255,0, Bank/Instrument add/save lit
+255,0,0, Bank/Instrument delete lit
+0,0,255, Bank/Instrument swap lit
+255,180,0, Bank import lit
+180,240,255, Bank export lit
+255,100,255, Current bank highlight
+160,140,250, Instrument being swapped
+0,0,255, Instrument original name
+0,0,0, RESERVED
+0,0,0, General graph background
+40,120,190, Waveform graph grid
+150,150,150, Resonance graph grid
+30,60,210, Harmonics graph grid
+130,255,130, Waveform graph line
+120,255,120, Waveform spectrum harmonic
+255,100,100, Formant graph line
+255,100,100, Resonance graph line
+0,0,225, Yoshimi instrument type
+240,250,250, Instrument info background
+255,250,235, Instrument background
+127,127,127, AddVoice tab off
+196,148,164, AddSynth background
+159,223,143, External voice
+143,191,223, External oscillator
+150,224,250, SubSynth background
+180,170,120, PadSynth background
+225,225,225, Padsynth harmonics background
+225,225,225, PadSynth profile equivalent background
+180,180,180, Padsynth profile grid
+90,90,90, Padsynth profile centre mark
+90,120,250, PadSynth profile equivalent markers
+0,0,0, RESERVED
+180,210,240, PadSynth profile fill
+0,0,120, PadSynth profile line
+150,150,150, PadSynth profile line disabled
+200,0,0, PadSynth spectrum harmonic
+255,0,0, PadSynth apply changes
+191,72,191, PadSynth building
+0,160,160, PadSynth pending
+255,255,0, PadSynth fading
+150,150,150, PadSynth built
+235,80,0, Pending button
+248,248,228, Occupied bank tile
+220,220,0, Formant filter marker
+120,120,0, Formant filter ghost marker
+0,182,191, Dynfilter filter insert
+0,50,110, EQ graph background
+80,120,160, EQ background disabled
+150,150,150, EQ graph grid
+210,210,210, EQ graph major grid
+255,255,140, EQ graph line
+200,200,80, EQ graph line disabled
+0,0,0, Effect preset
+0,0,255, Effect preset changed
+120,120,120, Unused bank tile
+255,255,255, Envelope control point
+0,255,255, Envelope control point selected
+225,225,00, Envelope sustain line
+255,225,225, Envelope line
+255,80,80, Envelope line selected
+=================== data end marker
+Add your own notes here:
+Copyright © 2024 Will J Godfrey
+Higher contrast theme

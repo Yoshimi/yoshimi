@@ -154,6 +154,7 @@ bool InterChange::Init()
         searchInst = searchBank = searchRoot = 0;
         return true;
     }
+    static bitset<64> partsChanged(0);
 }
 
 #ifdef GUI_FLTK
@@ -2113,6 +2114,21 @@ bool InterChange::commandSendReal(CommandBlock& cmd)
 
     uchar type    = cmd.data.type;
     uchar control = cmd.data.control;
+    if(npart < NUM_MIDI_PARTS && (type & TOPLEVEL::type::Write))
+    {
+        partsChanged.set(npart);
+        std::cout<< std::endl;
+        for (int i = 0; i < 64; ++i)
+        {
+            if (partsChanged.test(i))
+                std::cout << "i";
+            else
+                std::cout << "0";
+            if ((i & 15) == 15)
+                std::cout<< std::endl;
+        }
+        std::cout << " part " << int(npart) << " write" << std::endl;
+    }
     if ((cmd.data.source & TOPLEVEL::action::muteAndLoop) == TOPLEVEL::action::lowPrio)
     {
         return true; // indirect transfer

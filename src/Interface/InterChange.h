@@ -39,6 +39,7 @@
 #include <list>
 #include <memory>
 #include <string>
+#include <bitset>
 
 class DataText;
 class MasterUI;
@@ -49,6 +50,7 @@ class PADnoteParameters;
 extern std::string singlePath;
 extern int startInstance;
 
+using std::bitset;
 
 /* compile time function log2 as per
    https://hbfs.wordpress.com/2016/03/22/log2-with-c-metaprogramming          */
@@ -139,6 +141,7 @@ class InterChange : private DataText
         int indirectPart  (CommandBlock&, uchar& newMsg, bool& guiTo, std::string& text);
         std::string formatScales(std::string text);
         std::string formatKeys(std::string text);
+        std::bitset<64> partsChanged;
 
         unsigned int swapRoot1;
         unsigned int swapBank1;
