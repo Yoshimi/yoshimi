@@ -573,6 +573,7 @@ namespace MAIN // usage MAIN::control::volume
         volume,
         partNumber = 14,
         availableParts,
+        partsChanged,
         panLawType,
         detune = 32,
         keyShift = 35,

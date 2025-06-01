@@ -123,6 +123,8 @@ class InterChange : private DataText
         float returnLimits(CommandBlock&);
         void Log(std::string const& msg);
 
+        std::bitset<64> partsChanged;
+
         std::atomic<bool> syncWrite;
         std::atomic<bool> lowPrioWrite;
 
@@ -141,7 +143,6 @@ class InterChange : private DataText
         int indirectPart  (CommandBlock&, uchar& newMsg, bool& guiTo, std::string& text);
         std::string formatScales(std::string text);
         std::string formatKeys(std::string text);
-        std::bitset<64> partsChanged;
 
         unsigned int swapRoot1;
         unsigned int swapBank1;

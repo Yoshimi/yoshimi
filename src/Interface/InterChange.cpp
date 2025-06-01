@@ -127,6 +127,8 @@ InterChange::InterChange(SynthEngine& synthInstance)
     cameFrom = envControl::input;
     undoMarker.data.part = TOPLEVEL::section::undoMark;
 
+    static bitset<64> partsChanged(0);
+
     sem_init(&sortResultsThreadSemaphore, 0, 0);
 }
 
@@ -154,7 +156,6 @@ bool InterChange::Init()
         searchInst = searchBank = searchRoot = 0;
         return true;
     }
-    static bitset<64> partsChanged(0);
 }
 
 #ifdef GUI_FLTK
@@ -897,6 +898,7 @@ int InterChange::indirectMain(CommandBlock& cmd, uchar &newMsg, bool &guiTo, str
                 synth.part[value]->reset(value);
                 synth.getRuntime().sessionSeen[TOPLEVEL::XML::Instrument] = false;
                 cmd.data.source &= ~TOPLEVEL::action::lowPrio;
+                partsChanged.reset(value);
             }
             break;
 
@@ -907,6 +909,7 @@ int InterChange::indirectMain(CommandBlock& cmd, uchar &newMsg, bool &guiTo, str
                 doClearPartInstrument(value);
                 synth.getRuntime().sessionSeen[TOPLEVEL::XML::Instrument] = false;
                 cmd.data.source &= ~TOPLEVEL::action::lowPrio;
+                partsChanged.reset(value);
             }
             break;
 
@@ -926,9 +929,11 @@ int InterChange::indirectMain(CommandBlock& cmd, uchar &newMsg, bool &guiTo, str
         }
         case MAIN::control::masterReset:
             synth.resetAll(0);
+            partsChanged = 0;
             break;
         case MAIN::control::masterResetAndMlearn:
             synth.resetAll(1);
+            partsChanged = 0;
             break;
         case MAIN::control::openManual: // display user guide
         {
@@ -2118,16 +2123,17 @@ bool InterChange::commandSendReal(CommandBlock& cmd)
     {
         partsChanged.set(npart);
         std::cout<< std::endl;
-        for (int i = 0; i < 64; ++i)
+        //std::cout << std::bitset<64>(partsChanged) << std::endl;
+        for (int i = 0; i < 64; ++i) // easier to reasd this way!
         {
             if (partsChanged.test(i))
-                std::cout << "i";
+                std::cout << "1";
             else
                 std::cout << "0";
             if ((i & 15) == 15)
                 std::cout<< std::endl;
         }
-        std::cout << " part " << int(npart) << " write" << std::endl;
+        std::cout << "latest part " << int(npart) << " write" << std::endl;
     }
     if ((cmd.data.source & TOPLEVEL::action::muteAndLoop) == TOPLEVEL::action::lowPrio)
     {
@@ -3449,6 +3455,9 @@ void InterChange::commandMain(CommandBlock& cmd)
             }
             else
                 value = synth.getRuntime().numAvailableParts;
+            break;
+        case MAIN::control::partsChanged: // read only
+            value = partsChanged.test(kititem);
             break;
         case MAIN::control::panLawType:
             if (write)

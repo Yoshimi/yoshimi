@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0308
+version 1.0403
 header_name {.h}
 code_name {.cc}
 comment {PartUI.h} {not_in_source in_header
@@ -12,7 +12,7 @@ comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
 Copyright 2014-2023, Will Godfrey
-Copyright 2024 Kristian Amlie, Will Godfrey
+Copyright 2024-2025 Kristian Amlie, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU General Public
@@ -483,14 +483,23 @@ class PartUI {: {public Fl_Group, PartUI_}
              return;
          }
 
+         bool fullClear = false;
          if (Fl::event_state(FL_CTRL))
          {
              if (choice(synth, "", "Yes", "No", "Set entire part " + std::to_string(npart + 1) + " controls to default values ?") > 1)
-                 send_data(TOPLEVEL::action::forceUpdate, MAIN::control::defaultPart, npart, TOPLEVEL::type::Integer, TOPLEVEL::section::main);
+                 fullClear = true;
+         }
+
+         if (synth->interchange.partsChanged.test(npart) && (choice(synth, "", "Yes", "No", "Instrument has been edited. Overwrite ?") < 2))
+         {
              return;
          }
-         if (choice(synth, "", "Yes", "No", "Set part " + std::to_string(npart + 1) + " instrument to 'Simple Sound' ?") > 1)
-                send_data(TOPLEVEL::action::forceUpdate, MAIN::control::defaultInstrument, npart, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
+
+         if (fullClear)
+             send_data(TOPLEVEL::action::forceUpdate, MAIN::control::defaultPart, npart, TOPLEVEL::type::Integer, TOPLEVEL::section::main);
+         else
+             send_data(TOPLEVEL::action::forceUpdate, MAIN::control::defaultInstrument, npart, TOPLEVEL::type::Integer, TOPLEVEL::section::main);
+        ;}
           tooltip {Revert to default instrument
  +Ctrl, clear entire part} xywh {283 327 100 26} box PLASTIC_UP_BOX color 89 labelfont 1 labelcolor 64
         }
@@ -709,7 +718,7 @@ class PartUI {: {public Fl_Group, PartUI_}
             uchar effNum = inseffectui->effNum();
             uchar effType = o->value();
             send_data(TOPLEVEL::action::forceUpdate, PART::control::effectType, effType, TOPLEVEL::type::Integer, npart, UNUSED, effNum, TOPLEVEL::insert::partEffectSelect);}
-        tooltip {Effect Type} xywh {86 8 92 22} box UP_BOX down_box BORDER_BOX labelsize 11 labelcolor 64 textfont 1 textsize 12 textcolor 64
+        tooltip {Effect Type} xywh {86 8 92 22} down_box BORDER_BOX labelsize 11 labelcolor 64 textfont 1 textsize 12 textcolor 64
         code0 {o->add("No Effect");o->add("Reverb");o->add("Echo");o->add("Chorus");o->add("Phaser");o->add("AlienWah");o->add("Distortion");o->add("EQ");o->add("DynFilter");}
         code1 {o->value(0); // initially "No Effect"}
       } {}

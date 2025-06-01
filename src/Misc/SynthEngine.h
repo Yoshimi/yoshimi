@@ -37,6 +37,7 @@
 #include <vector>
 #include <list>
 #include <map>
+#include <bitset>
 
 #include "Misc/RandomGen.h"
 #include "Misc/Microtonal.h"
