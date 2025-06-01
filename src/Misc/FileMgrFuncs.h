@@ -28,6 +28,7 @@
 #include <cstring>
 #include <string>
 #include <vector>
+#include <array>
 #include <list>
 #include <sstream>
 #include <fstream>
@@ -570,7 +571,7 @@ inline void dir2string(string &wanted, string currentDir, string exten, int opt 
 }
 
 
-inline string saveGzipped(char *data, string const& filename, int compression)
+inline string saveGzipped(const char* data, string const& filename, int compression)
 {
     char options[10];
     snprintf(options, 10, "wb%d", compression);
@@ -579,9 +580,9 @@ inline string saveGzipped(char *data, string const& filename, int compression)
     gzfile = gzopen(filename.c_str(), options);
     if (gzfile == NULL)
         return "gzopen() == NULL";
-    gzputs(gzfile, data);
+    int res = gzputs(gzfile, data);
     gzclose(gzfile);
-    return "";
+    return res<0? "Failure writing compressed data": "";
 }
 
 
@@ -611,7 +612,36 @@ inline bool saveText(string const& text, string const& filename)
 }
 
 
-inline char * loadGzipped(string const& _filename, string * report)
+inline string loadGzipped(string const& filename, string& report)
+{
+    const int BUF_SIZE = 4096;
+    stringstream readStream;
+    gzFile gzf  = gzopen(filename.c_str(), "rb");
+    if (not gzf)
+        report = ("Failed to open file " + filename + " for load: " + string(strerror(errno)));
+    else
+    {
+        int readFlag{1};
+        while (readFlag > 0)
+        {
+            std::array<char, BUF_SIZE+1> fetchBuf{0};
+            readFlag = gzread(gzf, fetchBuf.data(), BUF_SIZE);
+            if (readFlag > 0)
+                readStream << fetchBuf.data();
+        }
+        if (readFlag < 0)
+        {
+            int errnum{0};
+            report = ("Read error in zlib: " + string(gzerror(gzf, &errnum)));
+            if (errnum == Z_ERRNO)
+                report = ("Filesystem error: " + string(strerror(errno)));
+        }
+        gzclose(gzf);
+    }
+    return readStream.str();
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////TODO 4/25 : old version --> obsolete after switch to XMLStore
+inline char * loadGzipped_OBSOLETE_(string const& _filename, string * report)
 {
     string filename = _filename;
     char *data = NULL;
@@ -658,6 +688,7 @@ inline char * loadGzipped(string const& _filename, string * report)
     //*report = "it looks like we successfully loaded" + filename;
     return data;
 }
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////TODO 4/25 : old version --> obsolete after switch to XMLStore
 
 /*
  * This is used for text files, preserving individual lines. These can

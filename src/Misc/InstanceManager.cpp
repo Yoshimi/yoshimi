@@ -342,10 +342,13 @@ bool InstanceManager::Instance::startUp(PluginCreator pluginCreator)
             runtime().Log("SynthEngine init failed",_SYS_::LogError);
         else
         {
-            if (isPrimary())
-                synth->loadHistory();
             // discover persistent bank file structure
             synth->installBanks();
+            if (isPrimary())
+            {
+                synth->loadHistory();
+                synth->getRuntime().maybeMigrateConfig();
+            }
             //
             // Note: the following launches or connects to the processing threads
             if (not client->start())
@@ -451,8 +454,8 @@ uint InstanceManager::requestNewInstance(uint desiredID)
     if (groom->instanceCnt() < MAX_INSTANCES)
         return groom->createInstance(desiredID).getID();
 
-    groom->getPrimary().runtime().LogError("Maximum number("+asString(MAX_INSTANCES)
-                                          +") of Synth-Engine instances exceeded.");
+    groom->getPrimary().runtime().Log("[ERROR] Maximum number("+asString(MAX_INSTANCES)
+                                     +") of Synth-Engine instances exceeded.", _SYS_::LogError);
     return 0;
 }
 

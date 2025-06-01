@@ -50,23 +50,23 @@ namespace {// Implementation helpers
 }
 
 
-OscilGen::OscilGen(fft::Calc& fft_, Resonance *res_, SynthEngine *_synth, OscilParameters *params_) :
-    params(params_),
-    synth(_synth),
-    fft(fft_),
-    tmpsmps{fft_.tableSize()},
-    outoscilSpectrum(fft.spectrumSize()),
-    oscilSpectrum(fft.spectrumSize()),
-    oscilupdate(*params),
-    res(res_),
-    randseed(1),
-    basePrng{},
-    harmonicPrng{}
+OscilGen::OscilGen(fft::Calc& fft_, Resonance* res_, SynthEngine* _synth, OscilParameters* params_)
+    : params{params_}
+    , synth{_synth}
+    , fft{fft_}
+    , tmpsmps{fft_.tableSize()}
+    , outoscilSpectrum{fft.spectrumSize()}
+    , oscilSpectrum{fft.spectrumSize()}
+    , oscilupdate{*params}
+    , res{res_}
+    , randseed{1}
+    , basePrng{}
+    , harmonicPrng{}
 {
     genDefaults();
 }
 
-void OscilGen::changeParams(OscilParameters *params_)
+void OscilGen::changeParams(OscilParameters* params_)
 {
     params = params_;
     oscilupdate.changeParams(*params);

@@ -151,7 +151,7 @@ return(nearestpoint);} {}
     float scale = lx / 500.0f;
     fl_line_style(0, int(1 * scale));
     int ly = h();
-    if (env->Pfreemode==0)
+    if (not env->Pfreemode)
         env->converttofree();
     size_t npoints=env->Penvpoints;
 
@@ -369,7 +369,7 @@ class EnvelopeUI {: {public Fl_Group,PresetsUI_}
       Fl_Check_Button freemodebutton {
         label FreeMode
         callback {//
-        if (env->Pfreemode != 0)
+        if (env->Pfreemode)
         {
             bool answer = choice(synth, "", "Yes", "No", "Disable the free mode of the Envelope?") > 1;
             if (!answer)
@@ -397,7 +397,7 @@ class EnvelopeUI {: {public Fl_Group,PresetsUI_}
 
         send_data(TOPLEVEL::action::forceUpdate, group, curpoint, value, TOPLEVEL::type::Write, TOPLEVEL::insert::envelopePointAdd, offset);}
         xywh {112 155 80 20} box PLASTIC_THIN_UP_BOX color 228 labelsize 11 labelcolor 64
-        code0 {if (env->Pfreemode==0) o->hide();}
+        code0 {if (not env->Pfreemode) o->hide();}
       }
       Fl_Button deletepoint {
         label {Delete point}
@@ -412,7 +412,7 @@ class EnvelopeUI {: {public Fl_Group,PresetsUI_}
 
 send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Write, TOPLEVEL::insert::envelopePointDelete);}
         xywh {200 155 80 20} box PLASTIC_THIN_UP_BOX color 228 labelsize 11 labelcolor 64
-        code0 {if (env->Pfreemode==0) o->hide();}
+        code0 {if (not env->Pfreemode) o->hide();}
       }
       Fl_Counter sustaincounter {
         label Sust
@@ -420,7 +420,7 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
         send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::sustainPoint, o->value(), TOPLEVEL::type::Write);}
         tooltip {Sustain (0 is disabled)} xywh {315 158 40 15} type Simple selection_color 64 labelsize 11 labelcolor 64 align 4 minimum 0 maximum 127 step 1 textfont 1 textsize 12 textcolor 64
         code0 {o->value(env->Penvsustain);}
-        code1 {if (env->Pfreemode==0) o->hide();}
+        code1 {if (not env->Pfreemode) o->hide();}
         code2 {o->maximum(env->Penvpoints-2);}
       }
       Fl_Dial envstretchdial {
@@ -429,7 +429,7 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
         send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::stretch, lrint(o->value()), TOPLEVEL::type::Write);}
         tooltip {Envelope stretch (on lower notes make the envelope longer)} xywh {380 153 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 4 maximum 127 step 1
         code0 {o->value(env->Penvstretch);}
-        code1 {if (env->Pfreemode==0) o->hide();}
+        code1 {if (not env->Pfreemode) o->hide();}
         code2 {o->setValueType(VC_EnvStretch);}
         class WidgetPDial
       }
@@ -439,7 +439,7 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
         send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::linearEnvelope, o->value(), TOPLEVEL::type::Write);}
         tooltip {Linear Envelope} xywh {415 151 30 15} down_box DOWN_BOX selection_color 64 labelsize 10 labelcolor 64
         code0 {o->value(env->Plinearenvelope);}
-        code1 {if ((env->Pfreemode==0)||(env->Envmode>2)) o->hide();}
+        code1 {if ((not env->Pfreemode) or (env->Envmode>2)) o->hide();}
         class Fl_Check_Button2
       }
       Fl_Check_Button forcedreleasecheck {
@@ -448,7 +448,7 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
         send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::forcedRelease, o->value(), TOPLEVEL::type::Write);}
         tooltip {Forced Release} xywh {415 165 40 15} down_box DOWN_BOX selection_color 64 labelsize 10 labelcolor 64
         code0 {o->value(env->Pforcedrelease);}
-        code1 {if (env->Pfreemode==0) o->hide();}
+        code1 {if (not env->Pfreemode) o->hide();}
         class Fl_Check_Button2
       }
       Fl_Button freecopy {
@@ -1245,31 +1245,31 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
     freemodebutton->value(env->Pfreemode);
 
     sustaincounter->value(env->Penvsustain);
-    if (env->Pfreemode==0)
+    if (not env->Pfreemode)
         sustaincounter->hide();
     else
         sustaincounter->show();
     sustaincounter->maximum(env->Penvpoints-2);
 
     envstretchdial->value(env->Penvstretch);
-    if (env->Pfreemode==0)
+    if (not env->Pfreemode)
         envstretchdial->hide();
     else
         envstretchdial->show();
 
     linearenvelopecheck->value(env->Plinearenvelope);
-    if ((env->Pfreemode==0)||(env->Envmode>2))
+    if ((not env->Pfreemode) or (env->Envmode>2))
         linearenvelopecheck->hide();
     else
         linearenvelopecheck->show();
 
     forcedreleasecheck->value(env->Pforcedrelease);
-    if (env->Pfreemode==0)
+    if (not env->Pfreemode)
         forcedreleasecheck->hide();
 
     freeedit->redraw();
 
-    if (env->Pfreemode==0)
+    if (not env->Pfreemode)
     {
         switch(env->Envmode)
         {
@@ -1408,7 +1408,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
     This is to ensure that resizing will have the correct starting size and position
     even if a part was loaded specifying the freemode form.
 */
-    //if (env->Pfreemode==0)
+    //if (not env->Pfreemode)
     {
         switch(env->Envmode)
         {

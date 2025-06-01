@@ -149,7 +149,7 @@ SUBnote::SUBnote(SUBnote const& orig)
         freqEnvelope.reset(new Envelope{*orig.freqEnvelope});
     if (orig.bandWidthEnvelope)
         bandWidthEnvelope.reset(new Envelope{*orig.bandWidthEnvelope});
-    if (pars.PGlobalFilterEnabled != 0)
+    if (pars.PGlobalFilterEnabled)
     {
         globalFilterL.reset(new Filter{*orig.globalFilterL});
         globalFilterR.reset(new Filter{*orig.globalFilterR});
@@ -475,11 +475,11 @@ void SUBnote::filterVarRun(SUBnote::bpfilter &filter, float *smps)
 void SUBnote::initparameters(float freq)
 {
     ampEnvelope.reset(new Envelope{pars.AmpEnvelope, freq, &synth});
-    if (pars.PFreqEnvelopeEnabled != 0)
+    if (pars.PFreqEnvelopeEnabled)
         freqEnvelope.reset(new Envelope{pars.FreqEnvelope, freq, &synth});
-    if (pars.PBandWidthEnvelopeEnabled != 0)
+    if (pars.PBandWidthEnvelopeEnabled)
         bandWidthEnvelope.reset(new Envelope{pars.BandWidthEnvelope, freq, &synth});
-    if (pars.PGlobalFilterEnabled != 0)
+    if (pars.PGlobalFilterEnabled)
     {
         globalFilterL.reset(new Filter{*pars.GlobalFilter, synth});
         /* TODO

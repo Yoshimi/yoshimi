@@ -46,7 +46,7 @@ file (GLOB yoshimi_misc_files
     ../Misc/SynthEngine.cpp ../Misc/SynthEngine.h
     ../Misc/Part.cpp ../Misc/Part.h../Misc/TestInvoker.h ../Misc/TestSequence.h
     ../Misc/WavFile.cpp ../Misc/WavFile.h ../Misc/WaveShapeSamples.h
-    ../Misc/XMLwrapper.cpp ../Misc/XMLwrapper.h)
+    ../Misc/XMLStore.cpp ../Misc/XMLStore.h)
 file (GLOB yoshimi_interface_files
     ../Interface/GuiDataExchange.cpp ../Interface/GuiDataExchange.h
     ../Interface/InterfaceAnchor.h

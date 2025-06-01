@@ -29,6 +29,7 @@
 #include "Misc/SynthEngine.h"
 #include "Params/SUBnoteParameters.h"
 #include "Misc/NumericFuncs.h"
+#include "Misc/XMLStore.h"
 
 using func::setAllPan;
 using func::power;
@@ -71,8 +72,8 @@ void SUBnoteParameters::defaults()
     PDetune = 8192;
     PCoarseDetune = 0;
     PDetuneType = 1;
-    PFreqEnvelopeEnabled = 0;
-    PBandWidthEnvelopeEnabled = 0;
+    PFreqEnvelopeEnabled = false;
+    PBandWidthEnvelopeEnabled = false;
 
     POvertoneSpread.type = 0;
     POvertoneSpread.par1 = 0;
@@ -87,7 +88,7 @@ void SUBnoteParameters::defaults()
     }
     Phmag[0] = 127;
 
-    PGlobalFilterEnabled = 0;
+    PGlobalFilterEnabled = false;
     PGlobalFilterVelocityScale = 64;
     PGlobalFilterVelocityScaleFunction = 64;
 
@@ -119,97 +120,85 @@ void SUBnoteParameters::setPan(char pan, unsigned char panLaw)
 }
 
 
-void SUBnoteParameters::add2XML(XMLwrapper& xml)
+void SUBnoteParameters::add2XML(XMLtree& xmlSubSynth)
 {
-    // currently not used
-    // bool yoshiFormat = synth.usingYoshiType;
-    xml.information.SUBsynth_used = 1;
+    xmlSubSynth.addPar_int("num_stages"       , Pnumstages);
+    xmlSubSynth.addPar_int("harmonic_mag_type", Phmagtype);
+    xmlSubSynth.addPar_int("start"            , Pstart);
 
-    xml.addpar("num_stages",Pnumstages);
-    xml.addpar("harmonic_mag_type",Phmagtype);
-    xml.addpar("start",Pstart);
-
-    xml.beginbranch("HARMONICS");
-    for (int i=0; i<MAX_SUB_HARMONICS; i++)
+    XMLtree xmlHarmonics = xmlSubSynth.addElm("HARMONICS");
+    for (uint i=0; i<MAX_SUB_HARMONICS; i++)
     {
-        if ((Phmag[i]==0) && (xml.minimal)) continue;
-        xml.beginbranch("HARMONIC",i);
-        xml.addpar("mag",Phmag[i]);
-        xml.addpar("relbw",Phrelbw[i]);
-        xml.endbranch();
+        if (Phmag[i]==0 and not synth.getRuntime().xmlmax)
+            continue;
+        XMLtree xmlHarm = xmlHarmonics.addElm("HARMONIC",i);
+        xmlHarm.addPar_int("mag"  , Phmag[i]);
+        xmlHarm.addPar_int("relbw", Phrelbw[i]);
     }
-    xml.endbranch();
 
-    xml.beginbranch("AMPLITUDE_PARAMETERS");
-        xml.addparbool("stereo", (Pstereo) ? 1 : 0);
-        xml.addpar("volume",PVolume);
-        // new yoshi type
-        xml.addpar("pan_pos", PPanning);
-        xml.addparbool("random_pan", PRandom);
-        xml.addpar("random_width", PWidth);
+    XMLtree xmlAmp = xmlSubSynth.addElm("AMPLITUDE_PARAMETERS");
+        xmlAmp.addPar_bool("stereo", Pstereo);
+        xmlAmp.addPar_int ("volume", PVolume);
+        // Yoshimi format for random panning
+        xmlAmp.addPar_int ("pan_pos"     , PPanning);
+        xmlAmp.addPar_bool("random_pan"  , PRandom);
+        xmlAmp.addPar_int ("random_width", PWidth);
 
-        // legacy
+        // support legacy format
         if (PRandom)
-            xml.addpar("panning", 0);
+            xmlAmp.addPar_int("panning", 0);
         else
-            xml.addpar("panning",PPanning);
+            xmlAmp.addPar_int("panning", PPanning);
 
-        xml.addpar("velocity_sensing",PAmpVelocityScaleFunction);
-        xml.beginbranch("AMPLITUDE_ENVELOPE");
-            AmpEnvelope->add2XML(xml);
-        xml.endbranch();
-    xml.endbranch();
+        xmlAmp.addPar_int ("velocity_sensing", PAmpVelocityScaleFunction);
 
-    xml.beginbranch("FREQUENCY_PARAMETERS");
-        xml.addparbool("fixed_freq",Pfixedfreq);
-        xml.addpar("fixed_freq_et",PfixedfreqET);
-        xml.addpar("bend_adjust", PBendAdjust);
-        xml.addpar("offset_hz", POffsetHz);
+        XMLtree xmlEnv = xmlAmp.addElm("AMPLITUDE_ENVELOPE");
+            AmpEnvelope->add2XML(xmlEnv);
 
-        xml.addpar("detune",PDetune);
-        xml.addpar("coarse_detune",PCoarseDetune);
-        xml.addpar("overtone_spread_type", POvertoneSpread.type);
-        xml.addpar("overtone_spread_par1", POvertoneSpread.par1);
-        xml.addpar("overtone_spread_par2", POvertoneSpread.par2);
-        xml.addpar("overtone_spread_par3", POvertoneSpread.par3);
-        xml.addpar("detune_type",PDetuneType);
+    XMLtree xmlFreq = xmlSubSynth.addElm("FREQUENCY_PARAMETERS");
+        xmlFreq.addPar_bool("fixed_freq"   , Pfixedfreq);
+        xmlFreq.addPar_int ("fixed_freq_et", PfixedfreqET);
+        xmlFreq.addPar_int ("bend_adjust"  , PBendAdjust);
+        xmlFreq.addPar_int ("offset_hz"    , POffsetHz);
 
-        xml.addpar("bandwidth",Pbandwidth);
-        xml.addpar("bandwidth_scale",Pbwscale);
+        xmlFreq.addPar_int ("detune"              , PDetune);
+        xmlFreq.addPar_int ("coarse_detune"       , PCoarseDetune);
+        xmlFreq.addPar_int ("overtone_spread_type", POvertoneSpread.type);
+        xmlFreq.addPar_int ("overtone_spread_par1", POvertoneSpread.par1);
+        xmlFreq.addPar_int ("overtone_spread_par2", POvertoneSpread.par2);
+        xmlFreq.addPar_int ("overtone_spread_par3", POvertoneSpread.par3);
+        xmlFreq.addPar_int ("detune_type"         , PDetuneType);
 
-        xml.addparbool("freq_envelope_enabled",PFreqEnvelopeEnabled);
-        if ((PFreqEnvelopeEnabled!=0)||(!xml.minimal))
+        xmlFreq.addPar_int ("bandwidth"           , Pbandwidth);
+        xmlFreq.addPar_int ("bandwidth_scale"     , Pbwscale);
+
+        xmlFreq.addPar_bool("freq_envelope_enabled", PFreqEnvelopeEnabled);
+        if (PFreqEnvelopeEnabled or synth.getRuntime().xmlmax)
         {
-            xml.beginbranch("FREQUENCY_ENVELOPE");
-            FreqEnvelope->add2XML(xml);
-            xml.endbranch();
+            XMLtree xmlEnv = xmlFreq.addElm("FREQUENCY_ENVELOPE");
+                FreqEnvelope->add2XML(xmlEnv);
         }
 
-        xml.addparbool("band_width_envelope_enabled",PBandWidthEnvelopeEnabled);
-        if ((PBandWidthEnvelopeEnabled!=0)||(!xml.minimal))
+        xmlFreq.addPar_bool("band_width_envelope_enabled", PBandWidthEnvelopeEnabled);
+        if (PBandWidthEnvelopeEnabled or synth.getRuntime().xmlmax)
         {
-            xml.beginbranch("BANDWIDTH_ENVELOPE");
-                BandWidthEnvelope->add2XML(xml);
-            xml.endbranch();
+            XMLtree xmlEnv = xmlFreq.addElm("BANDWIDTH_ENVELOPE");
+                BandWidthEnvelope->add2XML(xmlEnv);
         }
-    xml.endbranch();
 
-    xml.beginbranch("FILTER_PARAMETERS");
-        xml.addparbool("enabled",PGlobalFilterEnabled);
-        if ((PGlobalFilterEnabled!=0)||(!xml.minimal))
+    XMLtree xmlFilterParams = xmlSubSynth.addElm("FILTER_PARAMETERS");
+        xmlFilterParams.addPar_bool("enabled", PGlobalFilterEnabled);
+        if (PGlobalFilterEnabled or synth.getRuntime().xmlmax)
         {
-            xml.beginbranch("FILTER");
-                GlobalFilter->add2XML(xml);
-            xml.endbranch();
+            XMLtree xmlFilter = xmlFilterParams.addElm("FILTER");
+                GlobalFilter->add2XML(xmlFilter);
 
-            xml.addpar("filter_velocity_sensing",PGlobalFilterVelocityScaleFunction);
-            xml.addpar("filter_velocity_sensing_amplitude",PGlobalFilterVelocityScale);
+            xmlFilterParams.addPar_int("filter_velocity_sensing",   PGlobalFilterVelocityScaleFunction);
+            xmlFilterParams.addPar_int("filter_velocity_sensing_amplitude", PGlobalFilterVelocityScale);
 
-            xml.beginbranch("FILTER_ENVELOPE");
-                GlobalFilterEnvelope->add2XML(xml);
-            xml.endbranch();
+            XMLtree xmlEnv = xmlFilterParams.addElm("FILTER_ENVELOPE");
+                GlobalFilterEnvelope->add2XML(xmlEnv);
         }
-        xml.endbranch();
 }
 
 
@@ -280,114 +269,105 @@ void SUBnoteParameters::updateFrequencyMultipliers()
 }
 
 
-void SUBnoteParameters::getfromXML(XMLwrapper& xml)
+void SUBnoteParameters::getfromXML(XMLtree& xmlSubSynth)
 {
-    Pnumstages=xml.getpar127("num_stages",Pnumstages);
-    Phmagtype=xml.getpar127("harmonic_mag_type",Phmagtype);
-    Pstart=xml.getpar127("start",Pstart);
+    assert(xmlSubSynth);
+    Pnumstages = xmlSubSynth.getPar_127("num_stages"       ,Pnumstages);
+    Phmagtype  = xmlSubSynth.getPar_127("harmonic_mag_type",Phmagtype);
+    Pstart     = xmlSubSynth.getPar_127("start"            ,Pstart);
 
-    if (xml.enterbranch("HARMONICS"))
+    if (XMLtree xmlHarmonics = xmlSubSynth.getElm("HARMONICS"))
     {
-        Phmag[0]=0;
-        for (int i=0; i<MAX_SUB_HARMONICS; i++)
-        {
-            if (xml.enterbranch("HARMONIC",i)==0) continue;
-            Phmag[i]=xml.getpar127("mag",Phmag[i]);
-            Phrelbw[i]=xml.getpar127("relbw",Phrelbw[i]);
-            xml.exitbranch();
-        }
-        xml.exitbranch();
+        Phmag[0]=0; // default if disabled...
+
+        for (uint i=0; i < MAX_SUB_HARMONICS; i++)
+            if (XMLtree xmlHarm = xmlHarmonics.getElm("HARMONIC",i))
+            {
+                Phmag[i]  =xmlHarm.getPar_127("mag"  ,Phmag[i]);
+                Phrelbw[i]=xmlHarm.getPar_127("relbw",Phrelbw[i]);
+            }
     }
 
-    if (xml.enterbranch("AMPLITUDE_PARAMETERS"))
+    if (XMLtree xmlAmp = xmlSubSynth.getElm("AMPLITUDE_PARAMETERS"))
     {
-        int xpar = xml.getparbool("stereo", (Pstereo) ? 1 : 0);
-        Pstereo = (xpar != 0) ? true : false;
-        PVolume=xml.getpar127("volume",PVolume);
-        int test = xml.getpar127("random_width", UNUSED);
-        if (test < 64) // new Yoshi type
-        {
-            PWidth = test;
-            setPan(xml.getpar127("pan_pos",PPanning), synth.getRuntime().panLaw);
-            PRandom = xml.getparbool("random_pan", PRandom);
+        Pstereo = xmlAmp.getPar_bool("stereo", Pstereo);
+        PVolume = xmlAmp.getPar_127 ("volume", PVolume);
+        int val = xmlAmp.getPar_127 ("random_width", UNUSED);
+        if (val < 64)
+        {// new Yoshimi format
+            PWidth = val;
+            setPan(xmlAmp.getPar_127("pan_pos",PPanning), synth.getRuntime().panLaw);
+            PRandom = xmlAmp.getPar_bool("random_pan", PRandom);
         }
-        else // legacy
-        {
-            setPan(xml.getpar127("panning",PPanning), synth.getRuntime().panLaw);
+        else
+        {// legacy
+            setPan(xmlAmp.getPar_127("panning",PPanning), synth.getRuntime().panLaw);
             if (PPanning == 0)
             {
                 PPanning = 64;
                 PRandom = true;
                 PWidth = 63;
             }
+            else
+                PRandom = false;
         }
+        PAmpVelocityScaleFunction=xmlAmp.getPar_127("velocity_sensing",PAmpVelocityScaleFunction);
 
-        PAmpVelocityScaleFunction=xml.getpar127("velocity_sensing",PAmpVelocityScaleFunction);
-        if (xml.enterbranch("AMPLITUDE_ENVELOPE"))
-        {
-            AmpEnvelope->getfromXML(xml);
-            xml.exitbranch();
-        }
-        xml.exitbranch();
+        if (XMLtree xmlEnv = xmlAmp.getElm("AMPLITUDE_ENVELOPE"))
+            AmpEnvelope->getfromXML(xmlEnv);
+        else
+            AmpEnvelope->defaults();
     }
 
-    if (xml.enterbranch("FREQUENCY_PARAMETERS"))
+    if (XMLtree xmlFreq = xmlSubSynth.getElm("FREQUENCY_PARAMETERS"))
     {
-        Pfixedfreq=xml.getparbool("fixed_freq",Pfixedfreq);
-        PfixedfreqET=xml.getpar127("fixed_freq_et",PfixedfreqET);
-        PBendAdjust  = xml.getpar127("bend_adjust", PBendAdjust);
-        POffsetHz  = xml.getpar127("offset_hz", POffsetHz);
+        Pfixedfreq   = xmlFreq.getPar_bool("fixed_freq"  ,Pfixedfreq);
+        PfixedfreqET = xmlFreq.getPar_127("fixed_freq_et",PfixedfreqET);
+        PBendAdjust  = xmlFreq.getPar_127("bend_adjust"  ,PBendAdjust);
+        POffsetHz    = xmlFreq.getPar_127("offset_hz"    ,POffsetHz);
 
-        PDetune=xml.getpar("detune",PDetune,0,16383);
-        PCoarseDetune=xml.getpar("coarse_detune",PCoarseDetune,0,16383);
+        PDetune      = xmlFreq.getPar_int("detune"       ,PDetune,      0,16383);
+        PCoarseDetune= xmlFreq.getPar_int("coarse_detune",PCoarseDetune,0,16383);
+        PDetuneType  = xmlFreq.getPar_127("detune_type"  ,PDetuneType);
+
+        Pbandwidth   = xmlFreq.getPar_127("bandwidth"    ,Pbandwidth);
+        Pbwscale     = xmlFreq.getPar_127("bandwidth_scale",Pbwscale);
         POvertoneSpread.type =
-            xml.getpar127("overtone_spread_type", POvertoneSpread.type);
+            xmlFreq.getPar_127("overtone_spread_type", POvertoneSpread.type);
         POvertoneSpread.par1 =
-            xml.getpar("overtone_spread_par1", POvertoneSpread.par1, 0, 255);
+            xmlFreq.getPar_int("overtone_spread_par1", POvertoneSpread.par1, 0, 255);
         POvertoneSpread.par2 =
-            xml.getpar("overtone_spread_par2", POvertoneSpread.par2, 0, 255);
+            xmlFreq.getPar_int("overtone_spread_par2", POvertoneSpread.par2, 0, 255);
         POvertoneSpread.par3 =
-            xml.getpar("overtone_spread_par3", POvertoneSpread.par3, 0, 255);
+            xmlFreq.getPar_int("overtone_spread_par3", POvertoneSpread.par3, 0, 255);
         updateFrequencyMultipliers();
-        PDetuneType=xml.getpar127("detune_type",PDetuneType);
 
-        Pbandwidth=xml.getpar127("bandwidth",Pbandwidth);
-        Pbwscale=xml.getpar127("bandwidth_scale",Pbwscale);
+        PFreqEnvelopeEnabled=xmlFreq.getPar_bool("freq_envelope_enabled",PFreqEnvelopeEnabled);
+        if (XMLtree xmlEnv = xmlFreq.getElm("FREQUENCY_ENVELOPE"))
+            FreqEnvelope->getfromXML(xmlEnv);
+        else
+            FreqEnvelope->defaults();
 
-        PFreqEnvelopeEnabled=xml.getparbool("freq_envelope_enabled",PFreqEnvelopeEnabled);
-        if (xml.enterbranch("FREQUENCY_ENVELOPE"))
-        {
-            FreqEnvelope->getfromXML(xml);
-            xml.exitbranch();
-        }
-
-        PBandWidthEnvelopeEnabled=xml.getparbool("band_width_envelope_enabled",PBandWidthEnvelopeEnabled);
-        if (xml.enterbranch("BANDWIDTH_ENVELOPE"))
-        {
-            BandWidthEnvelope->getfromXML(xml);
-            xml.exitbranch();
-        }
-        xml.exitbranch();
+        PBandWidthEnvelopeEnabled=xmlFreq.getPar_bool("band_width_envelope_enabled",PBandWidthEnvelopeEnabled);
+        if (XMLtree xmlEnv = xmlFreq.getElm("BANDWIDTH_ENVELOPE"))
+            BandWidthEnvelope->getfromXML(xmlEnv);
+        else
+            BandWidthEnvelope->defaults();
     }
 
-    if (xml.enterbranch("FILTER_PARAMETERS"))
+    if (XMLtree xmlFilterParams = xmlSubSynth.getElm("FILTER_PARAMETERS"))
     {
-        PGlobalFilterEnabled=xml.getparbool("enabled",PGlobalFilterEnabled);
-        if (xml.enterbranch("FILTER"))
-        {
-            GlobalFilter->getfromXML(xml);
-            xml.exitbranch();
-        }
+        PGlobalFilterEnabled  = xmlFilterParams.getPar_bool("enabled",PGlobalFilterEnabled);
+        if (XMLtree xmlFilter = xmlFilterParams.getElm("FILTER"))
+            GlobalFilter->getfromXML(xmlFilter);
 
-        PGlobalFilterVelocityScaleFunction=xml.getpar127("filter_velocity_sensing",PGlobalFilterVelocityScaleFunction);
-        PGlobalFilterVelocityScale=xml.getpar127("filter_velocity_sensing_amplitude",PGlobalFilterVelocityScale);
+        PGlobalFilterVelocityScaleFunction=xmlFilterParams.getPar_127("filter_velocity_sensing",PGlobalFilterVelocityScaleFunction);
+        PGlobalFilterVelocityScale        =xmlFilterParams.getPar_127("filter_velocity_sensing_amplitude",PGlobalFilterVelocityScale);
 
-        if (xml.enterbranch("FILTER_ENVELOPE"))
-        {
-            GlobalFilterEnvelope->getfromXML(xml);
-            xml.exitbranch();
-        }
-        xml.exitbranch();
+        if (XMLtree xmlEnv = xmlFilterParams.getElm("FILTER_ENVELOPE"))
+            GlobalFilterEnvelope->getfromXML(xmlEnv);
+        else
+            GlobalFilterEnvelope->defaults();
     }
 }
 

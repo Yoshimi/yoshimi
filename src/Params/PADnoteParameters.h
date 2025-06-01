@@ -47,10 +47,10 @@
 using std::unique_ptr;
 using std::vector;
 
-class XMLwrapper;
+class XMLtree;
 class OscilParameters;
-class Resonance;
 class EnvelopeParams;
+class Resonance;
 class LFOParams;
 class FilterParams;
 
@@ -183,8 +183,8 @@ class PADnoteParameters : public ParamBase
         void reseed(int value);
         void setPan(char pan, uchar panLaw);
 
-        void add2XML(XMLwrapper& xml);
-        void getfromXML(XMLwrapper& xml);
+        void add2XML(XMLtree&);
+        void getfromXML(XMLtree&);
         float getLimits(CommandBlock *getData);
         float getBandwithInCent(); // convert Pbandwith setting into cents
 

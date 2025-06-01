@@ -259,16 +259,16 @@ class ADnote
         // Voice parameters
         struct ADnoteVoice {
             bool enabled;
-            int voice;              // the voice used as source.
-            int noiseType;          // (sound/noise)
-            int filterBypass;
-            int delayTicks;
+            int  voice;             // the voice used as source.
+            int  noiseType;         // (sound/noise)
+            bool filterBypass;
+            int  delayTicks;
             SampleHolder oscilSmp;  // Waveform of the Voice. Shared with sub voices.
-            int phaseOffset;        // PWM emulation
+            int  phaseOffset;       // PWM emulation
 
             // Frequency parameters
-            int fixedFreq;          // if the frequency is fixed to 440 Hz
-            int fixedFreqET;        // if the "fixed" frequency varies according to the note (ET)
+            bool fixedFreq;         // if the frequency is fixed to 440 Hz
+            int  fixedFreqET;       // if the "fixed" frequency varies according to the note (ET)
 
             float detune;           // cents = basefreq * VoiceDetune
             float fineDetune;
@@ -301,14 +301,14 @@ class ADnote
 
             // Modulator parameters
             FMTYPE fmEnabled;
-            bool fmRingToSide;
-            unsigned char fmFreqFixed;
+            bool   fmRingToSide;
+            bool   fmFreqFixed;
             int    fmVoice;
-            Samples voiceOut;          // Voice Output used by other voices if use this as modulator
-            SampleHolder fmSmp;        // Wave of the Voice. Shared by sub voices.
+            Samples voiceOut;            // Voice Output used by other voices if use this as modulator
+            SampleHolder fmSmp;          // Wave of the Voice. Shared by sub voices.
             int    fmPhaseOffset;
             float  fmVolume;
-            bool fmDetuneFromBaseOsc;  // Whether we inherit the base oscillator's detuning
+            bool   fmDetuneFromBaseOsc;  // Whether we inherit the base oscillator's detuning
             float  fmDetune; // in cents
             unique_ptr<Envelope> fmFreqEnvelope;
             unique_ptr<Envelope> fmAmpEnvelope;

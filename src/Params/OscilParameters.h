@@ -27,8 +27,13 @@
 #ifndef OSCIL_PARAMETERS_H
 #define OSCIL_PARAMETERS_H
 
+#include "globals.h"
 #include "ParamCheck.h"
 #include "DSP/FFTwrapper.h"
+
+class SynthEngine;
+class XMLtree;
+
 
 class OscilParameters : public ParamBase
 {
@@ -37,8 +42,8 @@ class OscilParameters : public ParamBase
 
         void defaults()  override;
 
-        void add2XML(XMLwrapper& xml);
-        void getfromXML(XMLwrapper& xml);
+        void add2XML(XMLtree&);
+        void getfromXML(XMLtree&);
         float getLimits(CommandBlock *getData);
 
         void updatebasefuncSpectrum(fft::Spectrum const& src);

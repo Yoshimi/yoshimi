@@ -29,21 +29,21 @@
 #ifndef CONTROLLER_H
 #define CONTROLLER_H
 
-class XMLwrapper;
-
 class SynthEngine;
+class XMLtree;
+
 
 class Controller
 {
     public:
        ~Controller() = default;
-        Controller(SynthEngine *_synth);
+        Controller(SynthEngine* _synth);
 
         void resetall();
-
-        void add2XML(XMLwrapper& xml);
         void defaults();
-        void getfromXML(XMLwrapper& xml);
+
+        void add2XML(XMLtree&);
+        void getfromXML(XMLtree&);
 
         // Controllers functions
         void setpitchwheel(int value);
@@ -63,7 +63,7 @@ class Controller
         void setPanDepth(char par) { panning.depth = par;}
         bool initportamento(float oldfreq, float newfreq, bool in_progress); // returns true if portamento's preconditions are met
         void updateportamento(); // update portamento values
-        float getLimits(CommandBlock *getData);
+        float getLimits(CommandBlock* getData);
 
         // Controllers values
         struct { // Pitch Wheel
@@ -163,8 +163,7 @@ class Controller
             uchar depth;
         } resonancebandwidth;
 private:
-        SynthEngine *synth;
+        SynthEngine* synth;
 };
 
-#endif
-
+#endif /*CONTROLLER_H*/

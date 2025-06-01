@@ -464,8 +464,8 @@ void ADnote::construct(size_t unison_total_size)
 
         // If used as a sub voice, enable exactly one voice, the requested
         // one. If not, enable voices that are enabled in settings.
-        if (!(adpars.VoicePar[nvoice].Enabled
-              && (subVoiceNr == -1 || nvoice == subVoiceNr)))
+        if (not (adpars.VoicePar[nvoice].Enabled
+                and (subVoiceNr == -1 or nvoice == subVoiceNr)))
         {
             NoteVoicePar[nvoice].enabled = false;
             continue; // the voice is disabled
@@ -744,7 +744,7 @@ void ADnote::legatoFadeIn(Note note_)
         for (int i = 0; i < NUM_VOICES; ++i)
         {
             adpars.VoicePar[i].OscilSmp->newrandseed();
-            auto &extoscil = adpars.VoicePar[i].Pextoscil;
+            int extoscil = adpars.VoicePar[i].Pextoscil;
             if (extoscil != -1 && !adpars.GlobalPar.Hrandgrouping)
                 adpars.VoicePar[extoscil].OscilSmp->newrandseed();
         }
@@ -992,9 +992,9 @@ void ADnote::initParameters()
                 oscposhi[nvoice][k] = (oscposhi[nvoice][k] + oscposhi_start) % synth.oscilsize;
         }
 
-        if (adpars.VoicePar[nvoice].PFMFreqEnvelopeEnabled != 0)
+        if (adpars.VoicePar[nvoice].PFMFreqEnvelopeEnabled)
             NoteVoicePar[nvoice].fmFreqEnvelope.reset(new Envelope{adpars.VoicePar[nvoice].FMFreqEnvelope, note.freq, &synth});
-        if (adpars.VoicePar[nvoice].PFMAmpEnvelopeEnabled != 0)
+        if (adpars.VoicePar[nvoice].PFMAmpEnvelopeEnabled)
             NoteVoicePar[nvoice].fmAmpEnvelope.reset(new Envelope{adpars.VoicePar[nvoice].FMAmpEnvelope, note.freq, &synth});
     }
 
@@ -1164,7 +1164,7 @@ void ADnote::computeNoteParameters()
                 vc = adpars.VoicePar[nvoice].Pextoscil;
             adpars.VoicePar[vc].OscilSmp->getWave(NoteVoicePar[nvoice].oscilSmp,
                                                    getVoiceBaseFreq(nvoice),
-                                                   adpars.VoicePar[nvoice].Presonance != 0);
+                                                   adpars.VoicePar[nvoice].Presonance);
 
             // I store the first elements to the last position for speedups
             NoteVoicePar[nvoice].oscilSmp.fillInterpolationBuffer();
@@ -1469,7 +1469,7 @@ float ADnote::getVoiceBaseFreq(int nvoice)
     if (subVoiceNr == -1)
         detune += noteGlobal.detune / 100.0f;
 
-    if (!NoteVoicePar[nvoice].fixedFreq)
+    if (not NoteVoicePar[nvoice].fixedFreq)
         return note.freq * power<2>(detune / 12.0f);
     else // fixed freq is enabled
     {
@@ -2543,7 +2543,7 @@ void ADnote::noteout(float *outl, float *outr)
         if (outl != NULL)
         {
             // Add the voice that do not bypass the filter to out.
-            if (!NoteVoicePar[nvoice].filterBypass) // no bypass
+            if (not NoteVoicePar[nvoice].filterBypass) // no bypass
             {
                 if (stereo)
                 {

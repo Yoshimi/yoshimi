@@ -53,7 +53,7 @@ class Part;
 class EffectMgr;
 struct EffectDTO;
 struct EqGraphDTO;
-class XMLwrapper;
+class XMLStore;
 class Controller;
 class TextMsgBuffer;
 class InterfaceAnchor;
@@ -96,7 +96,7 @@ class SynthEngine
         void postBootHook(bool);
 
         bool savePatchesXML(string filename);
-        void add2XML(XMLwrapper& xml);
+        void add2XML(XMLStore&);
         string manualname();
         void defaults();
 
@@ -106,28 +106,28 @@ class SynthEngine
         bool loadPatchSetAndUpdate(string filename);
         bool installBanks();
         bool saveBanks();
-        void newHistory(string name, int group);
-        void addHistory(string const& name, int group);
-        std::vector<string>& getHistory(int group);
+        void newHistory(string name, uint group);
+        void addHistory(string const& name, uint group);
+        std::vector<string>& getHistory(uint group);
         void setHistoryLock(int group, bool status);
         bool getHistoryLock(int group);
         string lastItemSeen(int group);
         bool loadHistory();
         bool saveHistory();
 
-        bool getfromXML(XMLwrapper& xml);
+        bool getfromXML(XMLStore&);
 
         void NoteOn(uchar chan, uchar note, uchar velocity);
         void NoteOff(uchar chan, uchar note);
-        int RunChannelSwitch(uchar chan, int value);
-        void SetController(uchar chan, int CCtype, short int par);
+        int  RunChannelSwitch(uchar chan, int value);
+        void SetController(uchar chan, int CCtype, short par);
         void SetZynControls(bool in_place);
-        int setRootBank(int root, int bank, bool inplace = false);
-        int setProgramByName(CommandBlock&);
-        int setProgramFromBank(CommandBlock&, bool inplace = false);
+        int  setRootBank(int root, int bank, bool inplace = false);
+        int  setProgramByName(CommandBlock&);
+        int  setProgramFromBank(CommandBlock&, bool inplace = false);
         bool setProgram(string const& fname, int npart);
-        int ReadBankRoot();
-        int ReadBank();
+        int  ReadBankRoot();
+        int  ReadBank();
         void SetPartChanForVector(uchar npart, uchar nchan);
         void SetPartPortamento(int npart, bool state);
         bool ReadPartPortamento(int npart);
@@ -140,14 +140,14 @@ class SynthEngine
         void ListVectors(std::list<string>& msg_buf);
         bool SingleVector(std::list<string>& msg_buf, int chan);
         void ListSettings(std::list<string>& msg_buf);
-        int SetSystemValue(int type, int value);
-        int LoadNumbered(uchar group, uchar entry);
+        int  SetSystemValue(int type, int value);
+        int  LoadNumbered(uchar group, uchar entry);
         bool vectorInit(int dHigh, uchar chan, int par);
         void vectorSet(int dHigh, uchar chan, int par);
         void ClearNRPNs();
         void resetAll(bool andML);
         void ShutUp();
-        int MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_MIDI_PARTS + 1], int to_process = 0);
+        int  MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_MIDI_PARTS + 1], int to_process = 0);
         void partonoffLock(uint npart, int what);
         void partonoffWrite(uint npart, int what);
         char partonoffRead(uint npart);
@@ -160,12 +160,11 @@ class SynthEngine
         uchar legatoPart;
 
         bool masterMono;
-        bool fileCompatible;
 
         float getLimits(CommandBlock *getData);
         float getVectorLimits(CommandBlock *getData);
         float getConfigLimits(CommandBlock *getData);
-        void CBtest(CommandBlock *candidate, bool miscmsg = false);
+        void  CBtest(CommandBlock *candidate, bool miscmsg = false);
 
 
         Part *part[NUM_MIDI_PARTS];
@@ -319,5 +318,4 @@ class SynthEngine
         void setReproducibleState(int value);
         void swapTestPADtable();
 };
-
-#endif
+#endif /*SYNTHENGINE_H*/

@@ -36,7 +36,6 @@
 #include "Params/ParamCheck.h"
 #include "Synth/Resonance.h"
 #include "Synth/OscilGen.h"
-#include "Misc/XMLwrapper.h"
 #include "DSP/FFTwrapper.h"
 
 enum FMTYPE { NONE, MORPH, RING_MOD, PHASE_MOD, FREQ_MOD, PW_MOD };
@@ -44,6 +43,8 @@ enum FMTYPE { NONE, MORPH, RING_MOD, PHASE_MOD, FREQ_MOD, PW_MOD };
 extern int ADnote_unison_sizes[];
 
 class SynthEngine;
+class XMLtree;
+
 
 /*****************************************************************/
 /*                    GLOBAL PARAMETERS                          */
@@ -58,8 +59,8 @@ struct ADnoteGlobalParam {
     uchar  PDetuneType;   // detune type
     uchar  PBandwidth;    // how much the relative fine detunes of the voices are changed
 
-    EnvelopeParams *FreqEnvelope;  // Frequency Envelope
-    LFOParams      *FreqLfo;       // Frequency LFO
+    EnvelopeParams* FreqEnvelope;  // Frequency Envelope
+    LFOParams*      FreqLfo;       // Frequency LFO
 
     // Amplitude global parameters
     char  PPanning; // 1 - left, 64 - center, 127 - right
@@ -74,8 +75,8 @@ struct ADnoteGlobalParam {
     uchar PPunchStretch;
     uchar PPunchVelocitySensing;
 
-    EnvelopeParams *AmpEnvelope;
-    LFOParams      *AmpLfo;
+    EnvelopeParams* AmpEnvelope;
+    LFOParams*      AmpLfo;
 
     // Adjustment factor for anti-pop fadein
     uchar Fadein_adjustment;
@@ -92,7 +93,7 @@ struct ADnoteGlobalParam {
 
 
 struct ADnoteVoiceParam { // Voice parameters
-    uchar Enabled;
+    bool  Enabled;
     uchar Unison_size;              // How many subvoices are used in this voice
     uchar Unison_frequency_spread;  // How subvoices are spread
     uchar Unison_phase_randomness;  // How much phase randomisation
@@ -103,18 +104,18 @@ struct ADnoteVoiceParam { // Voice parameters
                                     // 0 = none, 1 = random, 2 = 50%, 3 = 33%, 4 = 25%
     uchar Type;                     // Type of the voice 0 = Sound, 1 = Noise
     uchar PDelay;                   // Voice Delay
-    uchar Presonance;               // If resonance is enabled for this voice
-    short Pextoscil;                // What external oscil should I use,
-    short PextFMoscil;              // -1 for internal POscil & POscilFM
+    bool  Presonance;               // this voice uses a resonance filter
+    int   Pextoscil;                // What external oscil to use...
+    int   PextFMoscil;              // -1 for internal POscil & POscilFM
                                     // it is not allowed that the externoscil,
                                     // externFMoscil => current voice
     uchar Poscilphase, PFMoscilphase; // oscillator phases
-    uchar Pfilterbypass;            // filter bypass
-    OscilParameters *POscil;
-    OscilGen        *OscilSmp;
+    bool  Pfilterbypass;            // filter bypass
+    OscilParameters* POscil;
+    OscilGen*        OscilSmp;
 
     // Frequency parameters
-    uchar Pfixedfreq;           // If the base frequency is fixed to 440 Hz
+    bool  Pfixedfreq;           // If the base frequency is fixed to 440 Hz
     uchar PfixedfreqET;         // Equal temperate (this is used only if the
                                 // Pfixedfreq is enabled). If this parameter is 0,
                                 // the frequency is fixed (to 440 Hz); if this
@@ -127,11 +128,11 @@ struct ADnoteVoiceParam { // Voice parameters
     uchar PBendAdjust;           // Pitch Bend
     uchar POffsetHz;
 
-    uchar PFreqEnvelopeEnabled;  // Frequency Envelope
+    bool  PFreqEnvelopeEnabled;  // Frequency Envelope
     EnvelopeParams *FreqEnvelope;
 
-    uchar PFreqLfoEnabled;       // Frequency LFO
-    LFOParams *FreqLfo;
+    bool  PFreqLfoEnabled;       // Frequency LFO
+    LFOParams* FreqLfo;
 
     // Amplitude parameters
     uchar PPanning;              //  1 - left, 64 - center, 127 - right
@@ -145,21 +146,21 @@ struct ADnoteVoiceParam { // Voice parameters
 
     uchar PAmpVelocityScaleFunction; // Velocity sensing
 
-    uchar PAmpEnvelopeEnabled;   // Amplitude Envelope
+    bool  PAmpEnvelopeEnabled;   // Amplitude Envelope
     EnvelopeParams *AmpEnvelope;
 
-    uchar PAmpLfoEnabled;        // Amplitude LFO
-    LFOParams *AmpLfo;
+    bool  PAmpLfoEnabled;        // Amplitude LFO
+    LFOParams* AmpLfo;
 
     // Filter parameters
-    uchar PFilterEnabled;        // Voice Filter
-    FilterParams *VoiceFilter;
+    bool  PFilterEnabled;        // Voice Filter
+    FilterParams* VoiceFilter;
 
-    uchar PFilterEnvelopeEnabled;// Filter Envelope
-    EnvelopeParams *FilterEnvelope;
+    bool  PFilterEnvelopeEnabled;// Filter Envelope
+    EnvelopeParams* FilterEnvelope;
 
-    uchar PFilterLfoEnabled;     // LFO Envelope
-    LFOParams *FilterLfo;
+    bool  PFilterLfoEnabled;     // LFO Envelope
+    LFOParams* FilterLfo;
 
     uchar PFilterVelocityScale;
     uchar PFilterVelocityScaleFunction;
@@ -172,11 +173,11 @@ struct ADnoteVoiceParam { // Voice parameters
     // Modulator parameters
     uchar PFMEnabled;            // 0 = off, 1 = Morph, 2 = RM, 3 = PM, 4 = FM, 5 = PWM
     bool  PFMringToSide;         // allow carrier through
-    short PFMVoice;              // Voice that I use as modullator instead of POscilFM.
+    short PFMVoice;              // Voice that I use as modulator instead of POscilFM.
                                  // It is -1 if I use POscilFM(default).
                                  // It may not be equal or bigger than current voice
-    OscilParameters *POscilFM;   // Modullator oscillator
-    OscilGen        *FMSmp;
+    OscilParameters* POscilFM;   // Modulator oscillator
+    OscilGen       * FMSmp;
 
     uchar  PFMVolume;                // Modulator Volume
     uchar  PFMVolumeDamp;            // Modulator damping at higher frequencies
@@ -185,10 +186,10 @@ struct ADnoteVoiceParam { // Voice parameters
     ushort PFMDetune;                // Fine Detune of the Modulator
     ushort PFMCoarseDetune;          // Coarse Detune of the Modulator
     uchar  PFMDetuneType;            // The detune type
-    uchar  PFMFixedFreq;             // FM base freq fixed at 440Hz
-    uchar  PFMFreqEnvelopeEnabled;   // Frequency Envelope of the Modulator
+    bool   PFMFixedFreq;             // FM base freq fixed at 440Hz
+    bool   PFMFreqEnvelopeEnabled;   // Frequency Envelope of the Modulator
     EnvelopeParams*  FMFreqEnvelope;
-    uchar  PFMAmpEnvelopeEnabled;    // Frequency Envelope of the Modulator
+    bool   PFMAmpEnvelopeEnabled;    // Frequency Envelope of the Modulator
     EnvelopeParams*  FMAmpEnvelope;
 };
 
@@ -200,26 +201,22 @@ class ADnoteParameters : public ParamBase
        ~ADnoteParameters() override;
         void defaults()    override;
         void voiceDefaults(int n) {defaults(n);};
-        void add2XML(XMLwrapper& xml);
-        void getfromXML(XMLwrapper& xml);
-        float getLimits(CommandBlock *getData);
+        void add2XML(XMLtree&);
+        void add2XML_voice(XMLtree&, const uint nvoice);
+        void getfromXML(XMLtree&);
+        void getfromXML_voice(XMLtree&, const uint nvoice);
+        float getLimits(CommandBlock* getData);
         float getBandwidthDetuneMultiplier();
         float getUnisonFrequencySpreadCents(int nvoice);
         void setGlobalPan(char pan, uchar panLaw);
         void setVoicePan(int voice, char pan, uchar panLaw);
         ADnoteGlobalParam GlobalPar;
         ADnoteVoiceParam VoicePar[NUM_VOICES];
-        /*
-         * didn't want to make the following two public but could find
-         * no other way to access them from UnifiedPresets.
-         * Will.
-         */
-        void add2XMLsection(XMLwrapper& xml, int n);
-        void getfromXMLsection(XMLwrapper& xml, int n);
+
         static int ADnote_unison_sizes[15];
 
     private:
-        void defaults(int n); // n is the nvoice
+        void defaults(const uint nvoice);
         void enableVoice(int nvoice);
         void killVoice(int nvoice);
 

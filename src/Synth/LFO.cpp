@@ -48,14 +48,14 @@ LFO::LFO(LFOParams *_lfopars, float _basefreq, SynthEngine *_synth):
 
     RecomputeFreq(); // need incx early
 
-    if (lfopars->Pcontinous == 0)
+    if (not lfopars->Pcontinous)
     { // pre-init phase
         if (lfopars->Pstartphase == 0)
             startPhase = synth->numRandom();
         else
             startPhase = fmodf(((float)((int)lfopars->Pstartphase - 64) / 127.0f + 1.0f), 1.0f);
 
-        if (lfopars->Pbpm != 0)
+        if (lfopars->Pbpm)
         {
             prevMonotonicBeat = synth->getMonotonicBeat();
             prevBpmFrac = getBpmFrac();
@@ -65,12 +65,12 @@ LFO::LFO(LFOParams *_lfopars, float _basefreq, SynthEngine *_synth):
                 startPhase += 1.0f;
         }
     }
-    else if (lfopars->Pbpm == 0)
+    else if (not lfopars->Pbpm)
     { // pre-init phase, synced to other notes
         startPhase = fmodf(synth->getLFOtime() * incx, 1.0f);
         startPhase = fmodf((((int)lfopars->Pstartphase - 64) / 127.0f + 1.0f + startPhase), 1.0f);
     }
-    else // Pcontinous == 1 && Pbpm == 1.
+    else // Pcontinous and Pbpm
         startPhase = fmodf((((int)lfopars->Pstartphase - 64) / 127.0f + 1.0f), 1.0f);
 
     x = startPhase;
@@ -119,7 +119,7 @@ inline void LFO::Recompute()
     freqrndenabled = (lfopars->Pfreqrand != 0);
     computenextincrnd();
 
-    if (lfopars->Pcontinous != 0 && lfopars->Pbpm != 0)
+    if (lfopars->Pcontinous and lfopars->Pbpm)
         // When we are BPM synced to the host, it's nice to have direct feedback
         // when changing phase. This works because we reset the phase completely
         // on every cycle.
@@ -249,7 +249,7 @@ float LFO::lfoout()
     if (lfoelapsed >= lfodelay)
     {
         float oldx = x;
-        if (lfopars->Pbpm == 0)
+        if (not lfopars->Pbpm)
         {
             float incxMult = incx * synth->sent_buffersize_f;
             // Limit the Frequency (or else...)
@@ -267,10 +267,10 @@ float LFO::lfoout()
             x = fmodf(x, 1.0f);
         }
         else
-        {
+        {// beat sync (Pbpm)
             std::pair<float, float> frac = getBpmFrac();
             float newBeat;
-            if (lfopars->Pcontinous == 0)
+            if (not lfopars->Pcontinous)
             {
                 if (frac != prevBpmFrac)
                 {

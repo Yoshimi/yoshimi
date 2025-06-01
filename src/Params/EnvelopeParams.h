@@ -29,9 +29,9 @@
 #include "globals.h"
 #include "Params/ParamCheck.h"
 
-class XMLwrapper;
-
 class SynthEngine;
+class XMLtree;
+
 
 class EnvelopeParams : public ParamBase
 {
@@ -48,13 +48,13 @@ class EnvelopeParams : public ParamBase
         void ASRinit_bw(float A_val, float A_dt, float R_val, float R_dt);
         void converttofree();
 
-        void add2XML(XMLwrapper& xml);
-        void getfromXML(XMLwrapper& xml);
+        void add2XML(XMLtree&);
+        void getfromXML(XMLtree&);
 
         float getdt(size_t i);
 
         // MIDI Parameters
-        uchar Pfreemode;               // 1 if it is in free mode or 0 if it is in ADSR or ASR mode (comment from original author)
+        bool   Pfreemode;              // arbitrary envelope allowed (false for ADSR or ASR mode)
         size_t Penvpoints;             // stays < MAX_ENVELOPE_POINTS
         size_t Penvsustain;            // 0 means disabled  -- see Envelope::envout()
         float Penvdt[MAX_ENVELOPE_POINTS];
@@ -64,7 +64,7 @@ class EnvelopeParams : public ParamBase
         uchar Plinearenvelope;         // if the amplitude envelope is linear
 
         float PA_dt, PD_dt, PR_dt,
-                      PA_val, PD_val, PS_val, PR_val;
+              PA_val, PD_val, PS_val, PR_val;
 
         int Envmode; // 1 for ADSR parameters (linear amplitude)
                      // 2 for ADSR_dB parameters (dB amplitude)
@@ -80,7 +80,7 @@ class EnvelopeParams : public ParamBase
         uchar Dforcedrelease;
         uchar Dlinearenvelope;
         float DA_dt, DD_dt, DR_dt,
-                      DA_val, DD_val, DS_val, DR_val;
+              DA_val, DD_val, DS_val, DR_val;
 };
 
 class envelopeLimit

@@ -29,7 +29,7 @@
 #include <string>
 
 #include "Misc/Config.h"
-#include "Misc/XMLwrapper.h"
+#include "Misc/XMLStore.h"
 #include "Misc/Microtonal.h"
 #include "Misc/SynthEngine.h"
 #include "Misc/NumericFuncs.h"
@@ -740,210 +740,199 @@ string Microtonal::map2kbm()
 }
 
 
-void Microtonal::add2XML(XMLwrapper& xml)
+void Microtonal::add2XML(XMLtree& xmlMicrotonal)
 {
-    xml.addparstr("name", Pname);
-    xml.addparstr("comment", Pcomment);
+    xmlMicrotonal.addPar_bool("enabled", Penabled);
+    xmlMicrotonal.addPar_str ("name"   , Pname);
+    xmlMicrotonal.addPar_str ("comment", Pcomment);
 
-    xml.addparbool("invert_up_down", Pinvertupdown);
-    xml.addpar("invert_up_down_center", Pinvertupdowncenter);
+    xmlMicrotonal.addPar_bool("invert_up_down", Pinvertupdown);
+    xmlMicrotonal.addPar_int ("invert_up_down_center", Pinvertupdowncenter);
 
-    xml.addparbool("enabled", Penabled);
-    xml.addparcombi("global_fine_detune", Pglobalfinedetune);
+    xmlMicrotonal.addPar_frac("global_fine_detune", Pglobalfinedetune);
 
-    xml.addpar("a_note", PrefNote);
-    xml.addparreal("a_freq", PrefFreq);
+    xmlMicrotonal.addPar_int ("a_note", PrefNote);
+    xmlMicrotonal.addPar_real("a_freq", PrefFreq);
 
-    if (!Penabled && xml.minimal)
+    if (not (Penabled or synth->getRuntime().xmlmax))
         return;
 
-    xml.beginbranch("SCALE");
-        xml.addpar("scale_shift", Pscaleshift);
-        xml.addpar("first_key", Pfirstkey);
-        xml.addpar("last_key", Plastkey);
-        xml.addpar("middle_note", Pmiddlenote);
+    XMLtree xmlScale = xmlMicrotonal.addElm("SCALE");
+        xmlScale.addPar_int("scale_shift", Pscaleshift);
+        xmlScale.addPar_int("first_key"  , Pfirstkey);
+        xmlScale.addPar_int("last_key"   , Plastkey);
+        xmlScale.addPar_int("middle_note", Pmiddlenote);
 
-        xml.beginbranch("OCTAVE");
-        xml.addpar("octave_size", octavesize);
-        for (size_t i = 0; i < octavesize; ++i)
-        {
-            xml.beginbranch("DEGREE", i);
-            if (octave[i].type == 1)
+        XMLtree xmlOctave = xmlScale.addElm("OCTAVE");
+            xmlOctave.addPar_int("octave_size", octavesize);
+            for (uint i = 0; i < octavesize; ++i)
             {
-                xml.addparstr("cents_text",octave[i].text);
-                xml.addparreal("cents", octave[i].tuning);
-                /*
-                 * This is downgraded to preserve compatibility
-                 * with both Zyn and older Yoshi versions
-                 */
+                XMLtree xmlDegree = xmlOctave.addElm("DEGREE", i);
+                if (octave[i].type == 1)
+                {
+                    xmlDegree.addPar_str ("cents_text", octave[i].text);
+                    xmlDegree.addPar_real("cents"     , octave[i].tuning);
+                    /*
+                     * This is downgraded to preserve compatibility
+                     * with both Zyn and older Yoshi versions
+                     */
+                }
+                if (octave[i].type == 2)
+                {
+                    xmlDegree.addPar_str("cents_text" , octave[i].text);
+                    xmlDegree.addPar_int("numerator"  , octave[i].x1);
+                    xmlDegree.addPar_int("denominator", octave[i].x2);;
+                }
+                xmlDegree.addPar_str("comment", octave[i].comment);
             }
-            if (octave[i].type == 2)
-            {
-                xml.addparstr("cents_text",octave[i].text);
-                xml.addpar("numerator", octave[i].x1);
-                xml.addpar("denominator", octave[i].x2);;
-            }
-            xml.addparstr("comment" , octave[i].comment);
-            xml.endbranch();
-        }
-        xml.endbranch();
 
-        xml.beginbranch("KEYBOARD_MAPPING");
-        xml.addpar("map_size", Pmapsize);
-        xml.addpar("formal_octave_size", PformalOctaveSize);
-        xml.addpar("mapping_enabled", Pmappingenabled);
-        for (int i = 0; i < Pmapsize; ++i)
-        {
-            xml.beginbranch("KEYMAP", i);
-            xml.addpar("degree", Pmapping[i]);
-            xml.addparstr("comment", PmapComment[i]);
-            xml.endbranch();
-        }
-        xml.endbranch();
-    xml.endbranch();
+        XMLtree xmlKeyboard = xmlScale.addElm("KEYBOARD_MAPPING");
+            xmlKeyboard.addPar_int("map_size"          , Pmapsize);
+            xmlKeyboard.addPar_int("formal_octave_size", PformalOctaveSize);
+            xmlKeyboard.addPar_int("mapping_enabled"   , Pmappingenabled);
+            for (uint i = 0; i < uint(Pmapsize); ++i)
+            {
+                XMLtree xmlKeymap = xmlKeyboard.addElm("KEYMAP", i);
+                xmlKeymap.addPar_int("degree" , Pmapping[i]);
+                xmlKeymap.addPar_str("comment", PmapComment[i]);
+            }
 }
 
 
-int Microtonal::getfromXML(XMLwrapper& xml)
+int Microtonal::getfromXML(XMLtree& xmlMicrotonal)
 {
-    int err = 0;
-    Pname = xml.getparstr("name");
-    Pcomment = xml.getparstr("comment");
+    int errorResult{0};
+    Penabled = xmlMicrotonal.getPar_bool("enabled", Penabled);
+    Pname    = xmlMicrotonal.getPar_str("name");
+    Pcomment = xmlMicrotonal.getPar_str("comment");
 
-    Pinvertupdown       =xml.getparbool("invert_up_down", Pinvertupdown);
-    Pinvertupdowncenter = xml.getpar127("invert_up_down_center", Pinvertupdowncenter);
+    Pinvertupdown       = xmlMicrotonal.getPar_bool("invert_up_down", Pinvertupdown);
+    Pinvertupdowncenter = xmlMicrotonal.getPar_127 ("invert_up_down_center", Pinvertupdowncenter);
 
-    Penabled=xml.getparbool("enabled", Penabled);
-    setglobalfinedetune(xml.getparcombi("global_fine_detune", Pglobalfinedetune, 0, 127));
+    setglobalfinedetune(xmlMicrotonal.getPar_frac("global_fine_detune", Pglobalfinedetune, 0, 127));
 
-    PrefNote = xml.getpar127("a_note", PrefNote);
-    PrefFreq = xml.getparreal("a_freq", PrefFreq, 1.0, 10000.0);
+    PrefNote = xmlMicrotonal.getPar_127 ("a_note", PrefNote);
+    PrefFreq = xmlMicrotonal.getPar_real("a_freq", PrefFreq, 1.0, 10000.0);
 
-    if (xml.enterbranch("SCALE"))
+    if (XMLtree xmlScale = xmlMicrotonal.getElm("SCALE"))
     {
-        Pscaleshift = xml.getpar127("scale_shift", Pscaleshift);
-        Pfirstkey   = xml.getpar127("first_key", Pfirstkey);
-        Plastkey    = xml.getpar127("last_key", Plastkey);
-        Pmiddlenote = xml.getpar127("middle_note", Pmiddlenote);
+        Pscaleshift = xmlScale.getPar_127("scale_shift", Pscaleshift);
+        Pfirstkey   = xmlScale.getPar_127("first_key", Pfirstkey);
+        Plastkey    = xmlScale.getPar_127("last_key", Plastkey);
+        Pmiddlenote = xmlScale.getPar_127("middle_note", Pmiddlenote);
 
-        if (xml.enterbranch("OCTAVE"))
+        if (XMLtree xmlOctave = xmlScale.getElm("OCTAVE"))
         {
-            octavesize = xml.getpar127("octave_size", octavesize);
-            for (size_t i = 0; i < octavesize; ++i)
+            octavesize = xmlOctave.getPar_127("octave_size", octavesize);
+            for (uint i = 0; i < octavesize; ++i)
             {
                 octave[i].text = "";
-                if (!xml.enterbranch("DEGREE", i))
-                    continue;
-                string text = xml.getparstr("cents_text");
-                octave[i].x2 = 0;
-                if (text > " ")
+                if (XMLtree xmlDegree = xmlOctave.getElm("DEGREE", i))
                 {
-                    octave[i].text = reformatline(text);
-                    octave[i].tuning = pow(2.0, stod(text) / 1200.0);
-                }
-                else
-                {
-                    octave[i].text = "";
-                    octave[i].tuning = xml.getparreal("cents", octave[i].tuning);
-                }
-                octave[i].x1 = xml.getpar("numerator", octave[i].x1, 0, INT_MAX);
-                octave[i].x2 = xml.getpar("denominator", octave[i].x2, 0, INT_MAX);
-
-                if (octave[i].x2)
-                {
-                    octave[i].text = text;
-                    octave[i].type = 2;
-                    octave[i].tuning = double(octave[i].x1) / octave[i].x2;
-                }
-                else
-                {
-                    octave[i].type = 1;
-                    //populate fields for display
-                    double x = (log(octave[i].tuning) / LOG_2) * 1200.0;
-                    octave[i].x1 = int(floor(x));
-                    // this is a fudge to get round wierd values of x2
-                    // it's only used if we don't have the text stored
-                    double tmp = fmod(x, 1.0);
-                    if (tmp < 0.0001)
-                        octave[i].x2 = 0;
-                    else if (tmp > 0.9999)
+                    string spec = xmlDegree.getPar_str("cents_text");
+                    octave[i].x2 = 0;
+                    if (spec > " ")
                     {
-                        octave[i].x2 = 0;
-                        octave[i].x1 += 1;
+                        octave[i].text = reformatline(spec);
+                        octave[i].tuning = pow(2.0, stod(spec) / 1200.0);
                     }
                     else
-                        octave[i].x2 = int(floor(tmp * 1e6));
+                    {
+                        octave[i].text = "";
+                        octave[i].tuning = xmlDegree.getPar_real("cents", octave[i].tuning);
+                    }
+                    octave[i].x1 = xmlDegree.getPar_int("numerator", octave[i].x1, 0, INT_MAX);
+                    octave[i].x2 = xmlDegree.getPar_int("denominator", octave[i].x2, 0, INT_MAX);
 
-                    //octave[i].x2 = int(floor(fmod(x, 1.0) * 1e6));
-                }
-                octave[i].comment = "";
-                octave[i].comment = xml.getparstr("comment");
-                xml.exitbranch();
-            }
-            xml.exitbranch();
-        }
+                    if (octave[i].x2 != 0u)
+                    {
+                        octave[i].text = spec;
+                        octave[i].type = 2;
+                        octave[i].tuning = double(octave[i].x1) / octave[i].x2;
+                    }
+                    else
+                    {
+                        octave[i].type = 1;
+                        //populate fields for display
+                        double x = (log(octave[i].tuning) / LOG_2) * 1200.0;
+                        octave[i].x1 = int(floor(x));
+                        // this is a fudge to get round weird values of x2
+                        // it's only used if we don't have the text stored
+                        double tmp = fmod(x, 1.0);
+                        if (tmp < 0.0001)
+                            octave[i].x2 = 0;
+                        else if (tmp > 0.9999)
+                        {
+                            octave[i].x2 = 0;
+                            octave[i].x1 += 1;
+                        }
+                        else
+                            octave[i].x2 = int(floor(tmp * 1e6));
 
-        if (xml.enterbranch("KEYBOARD_MAPPING"))
+                        //octave[i].x2 = int(floor(fmod(x, 1.0) * 1e6));
+                    }
+                    octave[i].comment = xmlDegree.getPar_str("comment");
+                } //DEGREE
+            } //for
+        } //OCTAVE
+
+        if (XMLtree xmlKeyboard = xmlScale.getElm("KEYBOARD_MAPPING"))
         {
-            Pmapsize          = xml.getpar127("map_size", Pmapsize);
-            PformalOctaveSize = xml.getpar127("formal_octave_size", PformalOctaveSize);
-            Pmappingenabled   = xml.getpar127("mapping_enabled", Pmappingenabled);
-            for (int i = 0; i < Pmapsize; ++i)
+            Pmapsize          = xmlKeyboard.getPar_127("map_size", Pmapsize);
+            PformalOctaveSize = xmlKeyboard.getPar_127("formal_octave_size", PformalOctaveSize);
+            Pmappingenabled   = xmlKeyboard.getPar_127("mapping_enabled", Pmappingenabled);
+            for (uint i = 0; i < uint(Pmapsize); ++i)
             {
-                if (!xml.enterbranch("KEYMAP", i))
-                    continue;
-                Pmapping[i] = xml.getpar("degree", Pmapping[i], -1, 127);
-                PmapComment[i] = xml.getparstr("comment");
-                if (Pmapping[i] >= Pmapsize)
+                if (XMLtree xmlKeymap = xmlKeyboard.getElm("KEYMAP", i))
                 {
-                    err = SCALES::errors::valueTooBig;
-                    break;
+                    Pmapping[i] = xmlKeymap.getPar_int("degree", Pmapping[i], -1, 127);
+                    PmapComment[i] = xmlKeymap.getPar_str("comment");
+                    if (Pmapping[i] >= Pmapsize)
+                    {
+                        errorResult = SCALES::errors::valueTooBig;
+                        break;
+                    }
                 }
-                xml.exitbranch();
             }
-            xml.exitbranch();
-        }
-        xml.exitbranch();
+        } //KEYBOARD_MAPPING
     }
-    return err;
+    return errorResult;
 }
 
 
 bool Microtonal::saveXML(string const& filename)
 {
-    synth->getRuntime().xmlType = TOPLEVEL::XML::Scale;
-    auto xml{std::make_unique<XMLwrapper>(*synth)};
+    bool zynCompat = true;
+    XMLStore xml{TOPLEVEL::XML::Scale, zynCompat};
 
-    xml->beginbranch("MICROTONAL");
-    add2XML(*xml);
-    xml->endbranch();
+    XMLtree xmlMicrotonal = xml.addElm("MICROTONAL");
+    this->add2XML(xmlMicrotonal);
 
-    bool result = xml->saveXMLfile(filename);
-    return result;
+    return xml.saveXMLfile(filename
+                          ,synth->getRuntime().getLogger()
+                          ,synth->getRuntime().gzipCompression);
 }
 
 
 int Microtonal::loadXML(string const& filename)
 {
-    int err = 0;
-    auto xml{std::make_unique<XMLwrapper>(*synth)};
-    if (!xml->loadXMLfile(filename))
-    {
-        return 1;
-    }
-    if (!xml->enterbranch("MICROTONAL"))
-    {
-        synth->getRuntime().Log(filename + " is not a scale file", _SYS_::LogError);
-        return 1;
-    }
-    err = getfromXML(*xml);
-    if (err != 0)
-    {
-        return err;
-    }
-    xml->exitbranch();
-    synth->setAllPartMaps();
-    return 0;
+    auto& logg = synth->getRuntime().getLogger();
+    XMLStore xml{filename, logg};
+    postLoadCheck(xml,*synth);
+    if (not xml)
+        logg("Microtonal: failed to read XML file \""+filename+"\"");
+    else
+        if (XMLtree xmlMicro = xml.getElm("MICROTONAL"))
+        {
+            int err = getfromXML(xmlMicro);
+            if (err != 0)
+                return err;
+            synth->setAllPartMaps();
+            return 0;
+        }
+        else
+            logg("Microtonal: \""+filename+"\" is not a scale file", _SYS_::LogError);
+    return 1;
 }
 
 float Microtonal::getLimits(CommandBlock *getData)

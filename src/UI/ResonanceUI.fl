@@ -601,7 +601,7 @@ class ResonanceUI {: PresetsUI_
   }
   Function {refresh()} {} {
     code {//
-    if (_SYS_::F2B(respar->Penabled))
+    if (respar->Penabled)
     {
         enabled->value(1);
         editor->activate();

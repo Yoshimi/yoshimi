@@ -26,6 +26,7 @@
 
 #include <iostream>
 
+#include "Misc/XMLStore.h"
 #include "Misc/SynthEngine.h"
 #include "Effects/EffectMgr.h"
 #include "Effects/EQ.h"
@@ -266,67 +267,57 @@ void EffectMgr::setdryonly(bool value)
 }
 
 
-void EffectMgr::add2XML(XMLwrapper& xml)
+void EffectMgr::add2XML(XMLtree& xmlEffect)
 {
-    xml.addpar("type", geteffect());
+    xmlEffect.addPar_int("type", geteffect());
 
-    if (!efx || !geteffect())
+    if (!efx or 0 == geteffect())
         return;
-    xml.addpar("preset", efx->Ppreset);
 
-    xml.beginbranch("EFFECT_PARAMETERS");
-    for (int n = 0; n < 128; ++n)
-    {   // \todo evaluate who should oversee saving and loading of parameters
-        int par = geteffectpar(n);
-        if (par == 0)
-            continue;
-        xml.beginbranch("par_no", n);
-        xml.addpar("par", par);
-        xml.endbranch();
-    }
-    if (filterpars)
-    {
-        xml.beginbranch("FILTER");
-        filterpars->add2XML(xml);
-        xml.endbranch();
-    }
-    xml.endbranch();
+    xmlEffect.addPar_int("preset", efx->Ppreset);
+    XMLtree xmlParams = xmlEffect.addElm("EFFECT_PARAMETERS");
+        for (uint n = 0; n < 128; ++n)
+        {   // \todo evaluate who should oversee saving and loading of parameters
+            uchar paramVal = geteffectpar(n);
+            if (paramVal == 0)
+                continue;
+            XMLtree xmlPar = xmlParams.addElm("par_no", n);
+            xmlPar.addPar_int("par", paramVal);
+        }
+        if (filterpars)
+        {
+            XMLtree xmlFilter = xmlParams.addElm("FILTER");
+            filterpars->add2XML(xmlFilter);
+        }
 }
 
 
-void EffectMgr::getfromXML(XMLwrapper& xml)
+void EffectMgr::getfromXML(XMLtree& xmlEffect)
 {
-    changeeffect(xml.getpar127("type", geteffect())); // not convinced this is OK?
-    if (!efx || !geteffect())
-        return;
-    changepreset(xml.getpar127("preset", efx->Ppreset));
+    assert(xmlEffect);
+    // Instantiate Effect implementation according to the given effect-type
+    changeeffect(xmlEffect.getPar_127("type", geteffect()));
+    if (!efx or 0 == geteffect())
+        return;   // disabled; no further settings to retrieve
 
-    bool isChanged = false;
-    if (xml.enterbranch("EFFECT_PARAMETERS"))
+    bool isChanged{false};
+    changepreset(xmlEffect.getPar_127("preset", efx->Ppreset));
+    if (XMLtree xmlParams = xmlEffect.getElm("EFFECT_PARAMETERS"))
     {
-        for (int n = 0; n < 128; ++n)
+        for (uint n = 0; n < 128; ++n)
         {
-            int par = geteffectpar(n); // find default
+            uchar defaultVal = geteffectpar(n); // find default
             seteffectpar(n, 0); // erase effect parameter
-            if (xml.enterbranch("par_no", n) == 0)
-                continue;
-            seteffectpar(n, xml.getpar127("par", par));
-            if (par != geteffectpar(n))
+            if (XMLtree xmlPar = xmlParams.getElm("par_no", n))
             {
-                isChanged = true;
+                seteffectpar(n, xmlPar.getPar_127("par", int(defaultVal)));
+                isChanged |= (defaultVal != geteffectpar(n));
             }
-            xml.exitbranch();
         }
         seteffectpar(-1, isChanged);
         if (filterpars)
-        {
-            if (xml.enterbranch("FILTER"))
-            {
-                filterpars->getfromXML(xml);
-                xml.exitbranch();
-            }
-        }
-        xml.exitbranch();
+            if (XMLtree xmlFilter = xmlParams.getElm("FILTER"))
+                filterpars->getfromXML(xmlFilter);
     }
     cleanup();
 }

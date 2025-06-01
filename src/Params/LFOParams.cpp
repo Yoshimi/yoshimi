@@ -27,10 +27,12 @@
 */
 
 #include <sys/types.h>
+#include <cassert>
 #include <cmath>
 
 #include "Params/LFOParams.h"
 #include "Misc/NumericFuncs.h"
+#include "Misc/XMLStore.h"
 
 using func::power;
 
@@ -38,7 +40,7 @@ using func::power;
 LFOParams::LFOParams(float Pfreq_, float Pintensity_,
                      float Pstartphase_, uchar PLFOtype_,
                      float Prandomness_, float Pdelay_,
-                     uchar Pcontinous_, int fel_, SynthEngine& _synth) :
+                     bool  Pcontinous_, int fel_, SynthEngine& _synth) :
     ParamBase(_synth),
     fel(fel_),
     Dfreq(Pfreq_),
@@ -57,15 +59,15 @@ LFOParams::LFOParams(float Pfreq_, float Pintensity_,
 void LFOParams::defaults()
 {
     setPfreq(Dfreq << Cshift2I);
-    Pintensity = Dintensity;
+    Pintensity  = Dintensity;
     Pstartphase = Dstartphase;
-    PLFOtype = DLFOtype;
+    PLFOtype    = DLFOtype;
     Prandomness = Drandomness;
-    Pdelay = Ddelay;
-    Pcontinous = Dcontinous;
-    Pbpm = LFOSWITCH::BPM;
-    Pfreqrand = LFODEF::freqRnd.def;
-    Pstretch = LFODEF::stretch.def;
+    Pdelay      = Ddelay;
+    Pcontinous  = Dcontinous;
+    Pbpm        = LFOSWITCH::BPM;
+    Pfreqrand   = LFODEF::freqRnd.def;
+    Pstretch    = LFODEF::stretch.def;
 }
 
 
@@ -77,52 +79,50 @@ void LFOParams::setPfreq(int32_t n)
 }
 
 
-void LFOParams::add2XML(XMLwrapper& xml)
+void LFOParams::add2XML(XMLtree& xmlLFO)
 {
     float freqF = float(PfreqI) / float(Fmul2I);
-    if (Pbpm)
-        // Save quantized, so that we can make the scale finer in the future, if
-        // necessary.
+    if (Pbpm)// Save quantised, so that we can make the scale finer in the future, if necessary.
         freqF = func::quantizedLFOfreqBPM(freqF);
-    xml.addpar("freqI", freqF * float(Fmul2I));
-    xml.addparreal("freq", freqF);
-    xml.addparcombi("intensity", Pintensity);
-    xml.addparcombi("start_phase", Pstartphase);
-    xml.addpar("lfo_type", PLFOtype);
-    xml.addparcombi("randomness_amplitude", Prandomness);
-    xml.addparcombi("randomness_frequency", Pfreqrand);
-    xml.addparcombi("delay", Pdelay);
-    xml.addparcombi("stretch", Pstretch);
-    xml.addparbool("continous",    Pcontinous);
-    xml.addparbool("bpm", Pbpm);
+
+    xmlLFO.addPar_int ("freqI", freqF * float(Fmul2I));
+    xmlLFO.addPar_real("freq",  freqF);
+    xmlLFO.addPar_frac("intensity"           , Pintensity);
+    xmlLFO.addPar_frac("start_phase"         , Pstartphase);
+    xmlLFO.addPar_int ("lfo_type"            , PLFOtype);
+    xmlLFO.addPar_frac("randomness_amplitude", Prandomness);
+    xmlLFO.addPar_frac("randomness_frequency", Pfreqrand);
+    xmlLFO.addPar_frac("delay"               , Pdelay);
+    xmlLFO.addPar_frac("stretch"             , Pstretch);
+    xmlLFO.addPar_bool("continous"           , Pcontinous);
+    xmlLFO.addPar_bool("bpm"                 , Pbpm);
 }
 
 
-void LFOParams::getfromXML(XMLwrapper& xml)
+void LFOParams::getfromXML(XMLtree& xmlLFO)
 {
-    //PfreqI = xml.getpar("freqI", -1, 0, Fmul2I);
-    //if (PfreqI == -1)
-    PfreqI = xml.getparreal("freq", Pfreq, 0.0, 1.0) * float(Fmul2I);
+    assert(xmlLFO);
+    PfreqI = xmlLFO.getPar_real("freq", Pfreq, 0.0, 1.0) * float(Fmul2I);
     setPfreq(PfreqI);
 
-    Pintensity = xml.getparcombi("intensity", Pintensity,0,127);
-    Pstartphase = xml.getparcombi("start_phase", Pstartphase,0,127);
-    PLFOtype = xml.getpar127("lfo_type", PLFOtype);
-    Prandomness = xml.getparcombi("randomness_amplitude", Prandomness,0,127);
-    Pfreqrand = xml.getparcombi("randomness_frequency", Pfreqrand,0,127);
-    Pdelay = xml.getparcombi("delay", Pdelay,0,127);
-    Pstretch = xml.getparcombi("stretch", Pstretch,0,127);
-    Pcontinous = xml.getparbool("continous", Pcontinous);
-    Pbpm = xml.getparbool("bpm", Pbpm);
+    Pintensity  = xmlLFO.getPar_frac("intensity"           , Pintensity ,0,127);
+    Pstartphase = xmlLFO.getPar_frac("start_phase"         , Pstartphase,0,127);
+    PLFOtype    = xmlLFO.getPar_127 ("lfo_type"            , PLFOtype);
+    Prandomness = xmlLFO.getPar_frac("randomness_amplitude", Prandomness,0,127);
+    Pfreqrand   = xmlLFO.getPar_frac("randomness_frequency", Pfreqrand  ,0,127);
+    Pdelay      = xmlLFO.getPar_frac("delay"               , Pdelay     ,0,127);
+    Pstretch    = xmlLFO.getPar_frac("stretch"             , Pstretch   ,0,127);
+    Pcontinous  = xmlLFO.getPar_bool("continous"           , Pcontinous);
+    Pbpm        = xmlLFO.getPar_bool("bpm"                 , Pbpm);
     paramsChanged();
 }
 
-float LFOlimit::getLFOlimits(CommandBlock *getData)
+float LFOlimit::getLFOlimits(CommandBlock* getData)
 {
     float value = getData->data.value;
     int request = int(getData->data.type & TOPLEVEL::type::Default);
     int control = getData->data.control;
-    int engine = getData->data.engine;
+    int engine  = getData->data.engine;
     int insertType = getData->data.parameter;
 
     uchar type = 0;

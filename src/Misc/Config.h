@@ -33,7 +33,9 @@
 #include <deque>
 #include <list>
 
+#include "Misc/Log.h"
 #include "Misc/Alloc.h"
+#include "Misc/VerInfo.h"
 #include "Misc/InstanceManager.h"
 #include "MusicIO/MusicClient.h"
 #ifdef GUI_FLTK
@@ -46,8 +48,10 @@ using std::bitset;
 using std::string;
 using std::list;
 
-class XMLwrapper;
+class XMLtree;
+class XMLStore;
 class SynthEngine;
+
 
 class Config
 {
@@ -74,14 +78,18 @@ class Config
         void announce();
         void usage();
         void Log(string const& msg, char tostderr = _SYS_::LogNormal);
-        void LogError(string const& msg);
         void flushLog();
+        /** provide a Logger to delegate to this Config / runtime */
+        Logger const& getLogger(){ return logHandler; }
         bool loadPresetsList();
         bool savePresetsList();
-        bool saveMasterConfig();
-        bool saveInstanceConfig();
         void loadConfig();
         bool updateConfig(int control, int value);
+        void initBaseConfig(XMLStore&);
+        void verifyVersion(XMLStore const&);
+        void maybeMigrateConfig();
+        bool saveMasterConfig();
+        bool saveInstanceConfig();
         bool saveSessionData(string sessionfile);
         int  saveSessionData(char** dataBuffer);
         bool restoreSessionData(string sessionfile);
@@ -106,9 +114,11 @@ class Config
         bool    isLV2;
         bool    isMultiFeed;        // can produce separate audio feeds for each part (Jack or LV2)
         uint    build_ID;
-        int     lastXMLmajor;
-        int     lastXMLminor;
-        bool    oldConfig;
+        VerInfo loadedConfigVer;
+        bool    incompatibleZynFile;
+
+        static const VerInfo VER_YOSHI_CURR, VER_ZYN_COMPAT;
+        static bool is_compatible (VerInfo const&);
 
         static bool        showSplash;
         static bool        singlePath;
@@ -164,7 +174,7 @@ class Config
         bool          historyLock[TOPLEVEL::XML::ScalaMap + 1];
         int           xmlType;
         uchar         instrumentFormat;
-        int           enableProgChange;
+        bool          enableProgChange;
         bool          toConsole;
         int           consoleTextSize;
         bool          hideErrors;
@@ -272,11 +282,12 @@ class Config
         void defaultPresets();
         void buildConfigLocation();
         bool initFromPersistentConfig();
-        bool extractBaseParameters(XMLwrapper& xml);
-        bool extractConfigData(XMLwrapper& xml);
-        void capturePatchState(XMLwrapper& xml);
-        bool restorePatchState(XMLwrapper& xml);
-        void addConfigXML(XMLwrapper& xml);
+        bool extractBaseParameters(XMLStore&);
+        bool extractConfigData(XMLStore&);
+        void capturePatchState(XMLStore&);
+        bool restorePatchState(XMLStore&);
+        void addConfigXML(XMLStore& xml);
+        void migrateLegacyPresetsList(XMLtree&);
         void saveJackSession();
 
         string findHtmlManual();
@@ -288,10 +299,16 @@ class Config
         const string programcommand;
         string jackSessionDir;
         string baseConfig;
+        string presetList;
         string presetDir;
+
+        Logger logHandler;
 
         friend class YoshimiLV2Plugin;
 };
 
-#endif /*CONFIG_H*/
+/** Convenience function to verify Metadata of loaded XML files */
+void postLoadCheck(XMLStore const&, SynthEngine&);
 
+
+#endif /*CONFIG_H*/

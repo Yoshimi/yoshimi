@@ -23,10 +23,9 @@
 
 #include <string>
 #include <vector>
+#include <cmath>
 
 #include "globals.h"
-#include "Misc/XMLwrapper.h"
-#include "Misc/SynthEngine.h"
 #include "Interface/TextLists.h"
 
 using std::vector;
@@ -39,21 +38,39 @@ inline string listpos(int count, int human)
 
 
 class SynthEngine;
+class XMLStore;
+class XMLtree;
+
 
 class UnifiedPresets
 {
         SynthEngine& synth;
-        CommandBlock& cmd;
 
+        const uchar type;
+        const uchar npart;
+        const uchar kitItem;
+        const uchar engineType;
+        const uchar parameter;
+        const uchar offset;
+        const uchar insert;
+        const uchar mesgID;
+
+        int listFunction;  // used to select the extension or the friendly name in listing
         vector<string> presetList;
-        int human;  // used to select the extension or the friendly name in listing
 
     public:
-        UnifiedPresets(SynthEngine& synthInstance, CommandBlock& cmdData)
+        UnifiedPresets(SynthEngine& synthInstance, CommandBlock& cmd)
             : synth{synthInstance}
-            , cmd{cmdData}
+            , type{cmd.data.type}
+            , npart{cmd.data.part}
+            , kitItem{cmd.data.kit}
+            , engineType{cmd.data.engine}
+            , parameter{cmd.data.parameter}
+            , offset{cmd.data.offset}
+            , insert{cmd.data.insert}
+            , mesgID{cmd.data.miscmsg}
+            , listFunction(lrint(cmd.data.value))
             , presetList{}
-            , human{0}
             { };
 
         // shall not be copied nor moved
@@ -70,12 +87,14 @@ class UnifiedPresets
         void remove();
         void list(string dirname, string& name);
         string findPresetType();
-        string accessXML   (XMLwrapper&, bool isLoad);
-        string resonanceXML(XMLwrapper&, bool isLoad);
-        string oscilXML    (XMLwrapper&, bool isLoad);
-        string filterXML   (XMLwrapper&, bool isLoad);
-        string lfoXML      (XMLwrapper&, bool isLoad);
-        string envelopeXML (XMLwrapper&, bool isLoad);
+        string accessXML   (XMLStore&, bool isLoad);
+        string synthXML    (XMLtree&, bool isLoad);
+        string effectXML   (XMLtree&, bool isLoad);
+        string resonanceXML(XMLtree&, bool isLoad);
+        string oscilXML    (XMLtree&, bool isLoad);
+        string filterXML   (XMLtree&, bool isLoad);
+        string lfoXML      (XMLtree&, bool isLoad);
+        string envelopeXML (XMLtree&, bool isLoad);
 
         string listpos(int count) const;
 };

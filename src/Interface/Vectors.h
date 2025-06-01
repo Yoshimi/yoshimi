@@ -24,8 +24,8 @@
 
 #include "globals.h"
 
-class XMLwrapper;
 class SynthEngine;
+class XMLtree;
 
 using std::string;
 
@@ -34,19 +34,19 @@ class Vectors
 {
     public:
         Vectors(SynthEngine*);
-        ~Vectors();
         CommandBlock data;//commandData;
 
         uchar loadVectorAndUpdate(uchar baseChan, string const& name);
         uchar loadVector(uchar baseChan, string const& name, bool full);
-        uchar extractVectorData(uchar baseChan, XMLwrapper& xml, string const& name);
+        uchar extractVectorData(uchar baseChan, XMLtree&, string const& name);
 
         uchar saveVector(uchar baseChan, string const& name, bool full);
-        bool insertVectorData(uchar baseChan, bool full, XMLwrapper& xml, string const& name);
+        bool  insertVectorData(uchar baseChan, bool full, XMLtree&, string const& name);
 
         float getVectorLimits(CommandBlock *getData);
 
-        SynthEngine *synth;
+    private:
+        SynthEngine& synth;
 };
 
 #endif /*VECTORS_H*/

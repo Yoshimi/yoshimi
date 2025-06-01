@@ -32,31 +32,32 @@
 #include <sys/types.h>
 
 #include "globals.h"
-#include "Misc/XMLwrapper.h"
 #include "Params/ParamCheck.h"
 
 class SynthEngine;
+class XMLtree;
+
 
 class LFOParams : public ParamBase
 {
     public:
         LFOParams(float Pfreq_, float Pintensity_, float Pstartphase_,
                   uchar PLFOtype_, float Prandomness_,
-                  float Pdelay_, uchar Pcontinous, int fel_, SynthEngine&);
+                  float Pdelay_, bool Pcontinous, int fel_, SynthEngine&);
 
         void defaults() override;
 
-        void add2XML(XMLwrapper& xml);
+        void add2XML(XMLtree&);
         void setPfreq(int32_t n);
-        void getfromXML(XMLwrapper& xml);
+        void getfromXML(XMLtree& xml);
         void setPintensity(float n) { Pintensity = n; paramsChanged(); }
         void setPstartphase(float n){ Pstartphase = n; }
         void setPLFOtype(uchar n)   { PLFOtype = n; paramsChanged(); }
         void setPrandomness(float n){ Prandomness = n; paramsChanged(); }
         void setPfreqrand(float n)  { Pfreqrand = n; paramsChanged(); }
         void setPdelay(float n)     { Pdelay = n; }
-        void setPbpm(uchar n)       { Pbpm = n; }
-        void setPcontinous(uchar n) { Pcontinous = n; paramsChanged(); }
+        void setPbpm(bool b)        { Pbpm = b; }
+        void setPcontinous(bool b)  { Pcontinous = b; paramsChanged(); }
         void setPstretch(float n)   { Pstretch = n; paramsChanged(); }
 
         // MIDI Parameters
@@ -68,8 +69,8 @@ class LFOParams : public ParamBase
         float Prandomness;
         float Pfreqrand;
         float Pdelay;
-        uchar Pbpm;
-        uchar Pcontinous;
+        bool  Pbpm;
+        bool  Pcontinous;
         float Pstretch;
 
         int fel;     // kind of LFO - 0 frequency, 1 amplitude, 2 filter
@@ -82,13 +83,13 @@ class LFOParams : public ParamBase
         uchar DLFOtype;
         uchar Drandomness;
         uchar Ddelay;
-        uchar Dcontinous;
+        bool  Dcontinous;
 };
 
 class LFOlimit
 {
     public:
-        float getLFOlimits(CommandBlock *getData);
+        float getLFOlimits(CommandBlock* getData);
 };
 
 /*

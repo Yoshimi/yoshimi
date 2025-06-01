@@ -21,7 +21,7 @@
 #include <string>
 #include <memory>
 
-#include "Misc/XMLwrapper.h"
+#include "Misc/XMLStore.h"
 #include "Misc/SynthEngine.h"
 #include "Misc/TextMsgBuffer.h"
 #include "Misc/FileMgrFuncs.h"
@@ -50,13 +50,10 @@ using std::to_string;
  */
 string UnifiedPresets::handleStoreLoad()
 {
-    int type = cmd.data.type;
-    int value = cmd.data.value;
-    human = value; // used for listing. 'value may change before it is read
-    if (type == TOPLEVEL::type::List && human > 0)
+    if (type == TOPLEVEL::type::List && listFunction > 0)
     {
         string group{findPresetType()};
-        if (human == 2)
+        if (listFunction == 2)
         {
             /* here we abuse the list routines in order to find out
              * if  there is a clipboard entry for this preset group
@@ -68,13 +65,13 @@ string UnifiedPresets::handleStoreLoad()
             }
         }
         /*
-         * sending a message here was doubling the number of messages
-         * but only one was actually being read!
+         * Skip this invocation without actual processing;
+         * seemingly a command message is sent here redundantly...?
          */
-        value = UNUSED;
-        return findPresetType(); // human friendly extension
+        return findPresetType(); // listFunction != 2  ==> use human friendly id
     }
 
+    // when command.value == 1 ==> use the technical id from presetgroups array
     string name{findPresetType()};
     if (name.empty())
     {
@@ -101,7 +98,7 @@ string UnifiedPresets::handleStoreLoad()
         }
         else if (type & TOPLEVEL::type::Paste)
         {
-            if (human == 0)
+            if (listFunction == 0)
                 load();
             else
                 remove();
@@ -110,23 +107,19 @@ string UnifiedPresets::handleStoreLoad()
     return name;
 }
 
+/**
+ * Access the `presetgroups` array (fixed definition in TextLists.cpp)
+ * @note uses the hidden parameter listFunction to select which column to pick
+ * @remark if listFunction = 2 we want to get the extension not the friendly name
+ */
 string UnifiedPresets::listpos(int count)  const
 {
- // If human = 2 we want to get the extension not the friendly name
-    int test = 0;
-    if (human == 1)
-        test = 1;
-    return presetgroups[count * 2 + test];
+    uint fieldOffset{listFunction == 1? 1u : 0u};
+    return presetgroups[count * 2 + fieldOffset];
 }
 
 string UnifiedPresets::findPresetType()
 {
-    int npart = cmd.data.part;
-    int kitItem = cmd.data.kit;
-    int engineType = cmd.data.engine;
-    int insert = cmd.data.insert;
-    int parameter = cmd.data.parameter;
-    int offset = cmd.data.offset;
     string name = "";
 
     if (npart != TOPLEVEL::section::systemEffects && npart != TOPLEVEL::section::insertEffects && npart > TOPLEVEL::section::part64)
@@ -207,7 +200,7 @@ string UnifiedPresets::findPresetType()
             name = listpos(15);//"Padsyth";
             break;
         case PART::engine::subSynth:
-            name = listpos(16);//presetgroups[32+human];//"Psubsyth";
+            name = listpos(16);//presetgroups[32+listFunction];//"Psubsyth";
             break;
         case PART::engine::padSynth:
             name = listpos(17);//"Ppadsyth";
@@ -242,171 +235,112 @@ void UnifiedPresets::list(string dirname, string& name)
 }
 
 
-string UnifiedPresets::accessXML(XMLwrapper& xml, bool isLoad)
+string UnifiedPresets::accessXML(XMLStore& xml, bool isLoad)
 {
-    int npart = cmd.data.part;
-    int kitItem = cmd.data.kit;
-    int engineType = cmd.data.engine;
-    int insert = cmd.data.insert;
+    XMLtree xmlTop = xml.accessTop();
 
+    if (kitItem >= EFFECT::type::none and kitItem < EFFECT::type::count
+            and not (kitItem == EFFECT::type::dynFilter and insert == TOPLEVEL::insert::filterGroup)
+       )                                    // ^^^^^^^  passed on to filterGroup rather
+        return effectXML(xmlTop, isLoad);
+
+    switch (insert)
+    {
+        case TOPLEVEL::insert::resonanceGroup:
+            return resonanceXML(xmlTop, isLoad);
+
+        case TOPLEVEL::insert::oscillatorGroup:
+            return oscilXML(xmlTop, isLoad);
+
+        case TOPLEVEL::insert::filterGroup:
+            return filterXML(xmlTop, isLoad);
+
+        case TOPLEVEL::insert::LFOgroup:
+            return lfoXML(xmlTop, isLoad);
+
+        case TOPLEVEL::insert::envelopeGroup:
+            return envelopeXML(xmlTop, isLoad);
+
+        default:
+            return synthXML(xmlTop, isLoad);
+    }
+}
+
+
+string UnifiedPresets::synthXML(XMLtree& xmlTop, bool isLoad)
+{
     string name;
-
-    if (kitItem == EFFECT::type::dynFilter && insert == TOPLEVEL::insert::filterGroup)
-    {
-        ; // passed on to filters
-    }
-    else if (kitItem >= EFFECT::type:: none && kitItem < EFFECT::type::count)
-    {
-        {
-            EffectMgr *sectionType;
-            if (npart == TOPLEVEL::section::systemEffects)
-            {
-                sectionType = synth.sysefx[engineType];
-            }
-            else if (npart == TOPLEVEL::section::insertEffects)
-            {
-                sectionType = synth.insefx[engineType];
-            }
-            else
-            {
-                sectionType = synth.part[npart]->partefx[engineType];
-            }
-            name = "Peffect";
-
-            if (isLoad)
-            {
-                sectionType->defaults();
-                xml.enterbranch(name);
-                sectionType->getfromXML(xml);
-                xml.exitbranch();
-                synth.pushEffectUpdate(npart);
-            }
-            else
-            {
-                xml.beginbranch(name);
-                sectionType->add2XML(xml);
-                xml.endbranch();
-            }
-        }
-    }
-
-    if (name.empty())
-    {
-
-        switch (insert)
-        {
-            case TOPLEVEL::insert::resonanceGroup:
-            {
-                name = resonanceXML(xml, isLoad);
-            }
-            break;
-
-            case TOPLEVEL::insert::oscillatorGroup:
-            {
-                name = oscilXML(xml, isLoad);
-            }
-            break;
-
-            case TOPLEVEL::insert::filterGroup:
-            {
-                name = filterXML(xml, isLoad);
-            }
-            break;
-
-            case TOPLEVEL::insert::LFOgroup:
-            {
-                name = lfoXML(xml, isLoad);
-            }
-            break;
-
-            case TOPLEVEL::insert::envelopeGroup:
-            {
-                name = envelopeXML(xml, isLoad);
-            }
-            break;
-        }
-    }
-    if (!name.empty())
-        return name;
 
     if (engineType == PART::engine::addSynth)
     {
         name = "Padsyth";
-        ADnoteParameters *sectionType = synth.part[npart]->kit[kitItem].adpars;
+        ADnoteParameters* addPars = synth.part[npart]->kit[kitItem].adpars;
 
         if (isLoad)
         {
-            sectionType->defaults();
-            xml.enterbranch(name);
-            sectionType->getfromXML(xml);
-            xml.exitbranch();
+            addPars->defaults();
+            XMLtree xmlAddSynth = xmlTop.getElm(name);
+            addPars->getfromXML(xmlAddSynth);
         }
         else
         {
-            xml.beginbranch(name);
-            sectionType->add2XML(xml);
-            xml.endbranch();
+            XMLtree xmlAddSynth = xmlTop.addElm(name);
+            addPars->add2XML(xmlAddSynth);
         }
     }
 
     else if (engineType >= PART::engine::addVoice1)
     {
         name = "Padsythn";
-        ADnoteParameters *sectionType = synth.part[npart]->kit[kitItem].adpars;
+        ADnoteParameters* addPars = synth.part[npart]->kit[kitItem].adpars;
         size_t voice = engineType - PART::engine::addVoice1;
 
         if (isLoad)
         {
-            sectionType->voiceDefaults(voice);
-            xml.enterbranch(name);
-            sectionType->getfromXMLsection(xml, voice);
-            xml.exitbranch();
+            addPars->voiceDefaults(voice);
+            XMLtree xmlVoice = xmlTop.getElm(name);
+            addPars->getfromXML_voice(xmlVoice, voice);
         }
         else
         {
-            xml.beginbranch(name);
-            sectionType->add2XMLsection(xml, voice);
-            xml.endbranch();
+            XMLtree xmlVoice = xmlTop.addElm(name);
+            addPars->add2XML_voice(xmlVoice, voice);
         }
     }
 
     else if (engineType == PART::engine::subSynth)
     {
         name = "Psubsyth";
-        SUBnoteParameters *sectionType = synth.part[npart]->kit[kitItem].subpars;
+        SUBnoteParameters* subPars = synth.part[npart]->kit[kitItem].subpars;
 
         if (isLoad)
         {
-            sectionType->defaults();
-            xml.enterbranch(name);
-            sectionType->getfromXML(xml);
-            xml.endbranch();
+            subPars->defaults();
+            XMLtree xmlSubSynth = xmlTop.getElm(name);
+            subPars->getfromXML(xmlSubSynth);
         }
         else
         {
-            xml.beginbranch(name);
-            sectionType->add2XML(xml);
-            xml.endbranch();
+            XMLtree xmlSubSynth = xmlTop.addElm(name);
+            subPars->add2XML(xmlSubSynth);
         }
     }
 
     else if (engineType == PART::engine::padSynth)
     {
         name = "Ppadsyth";
-        PADnoteParameters * sectionType = synth.part[npart]->kit[kitItem].padpars;
+        PADnoteParameters* padPars = synth.part[npart]->kit[kitItem].padpars;
 
         if (isLoad)
         {
-            sectionType->defaults();
-            xml.enterbranch(name);
-            sectionType->getfromXML(xml);
-            xml.exitbranch();
+            padPars->defaults();
+            XMLtree xmlPadSynth = xmlTop.getElm(name);
+            padPars->getfromXML(xmlPadSynth);
         }
         else
         {
-            xml.beginbranch(name);
-            sectionType->add2XML(xml);
-            xml.endbranch();
+            XMLtree xmlPadSynth = xmlTop.addElm(name);
+            padPars->add2XML(xmlPadSynth);
         }
     }
 
@@ -414,185 +348,175 @@ string UnifiedPresets::accessXML(XMLwrapper& xml, bool isLoad)
 }
 
 
-string UnifiedPresets::resonanceXML(XMLwrapper& xml, bool isLoad)
+string UnifiedPresets::effectXML(XMLtree& xmlTop, bool isLoad)
 {
-    int npart = cmd.data.part;
-    int kitItem = cmd.data.kit;
-    int engineType = cmd.data.engine;
-    string name{"Presonance"};
-    Resonance* sectionType;
+    EffectMgr* effect{nullptr};
 
+    if (npart == TOPLEVEL::section::systemEffects)
+    {
+        effect = synth.sysefx[engineType];
+    }
+    else if (npart == TOPLEVEL::section::insertEffects)
+    {
+        effect = synth.insefx[engineType];
+    }
+    else
+    {
+        effect = synth.part[npart]->partefx[engineType];
+    }
+    string name{"Peffect"};
+
+    if (isLoad)
+    {
+        effect->defaults();
+        XMLtree xmlEffect = xmlTop.getElm(name);
+        effect->getfromXML(xmlEffect);
+        synth.pushEffectUpdate(npart);
+    }
+    else
+    {
+        XMLtree xmlEffect = xmlTop.addElm(name);
+        effect->add2XML(xmlEffect);
+    }
+    return name;
+}
+
+
+string UnifiedPresets::resonanceXML(XMLtree& xmlTop, bool isLoad)
+{
+    string name{"Presonance"};
+
+    Resonance* reson{nullptr};
     if (engineType == PART::engine::addSynth)
-    {
-        sectionType = synth.part[npart]->kit[kitItem].adpars->GlobalPar.Reson;
-    }
-    else if (engineType == PART::engine::padSynth)
-    {
-        sectionType = synth.part[npart]->kit[kitItem].padpars->resonance.get();
-    }
+        reson = synth.part[npart]->kit[kitItem].adpars->GlobalPar.Reson;
+    else
+    if (engineType == PART::engine::padSynth)
+        reson = synth.part[npart]->kit[kitItem].padpars->resonance.get();
     else
         return "";
 
     if (isLoad)
     {
-        xml.enterbranch(name);
-        sectionType->getfromXML(xml);
-        xml.exitbranch();
+        XMLtree xmlRes = xmlTop.getElm(name);
+        reson->getfromXML(xmlRes);
     }
     else
     {
-        xml.beginbranch(name);
-        sectionType->add2XML(xml);
-        xml.endbranch();
+        XMLtree xmlRes = xmlTop.addElm(name);
+        reson->add2XML(xmlRes);
     }
 
     return name;
 }
 
 
-string UnifiedPresets::oscilXML(XMLwrapper& xml, bool isLoad)
+string UnifiedPresets::oscilXML(XMLtree& xmlTop, bool isLoad)
 {
-    int npart = cmd.data.part;
-    int kitItem = cmd.data.kit;
-    int engineType = cmd.data.engine;
     string name{"Poscilgen"};
 
-    OscilParameters *sectionType;
+    OscilParameters* oscPars{nullptr};
 
     if (engineType >= (PART::engine::addVoice1))
     {
+        uint voiceID = engineType - PART::engine::addVoice1;
+        // engine is encoded as: addSynth, subSynth, padSynth, addVoice1...+NUM_VOICES, addMod1....+NUM_VOICES
         if (engineType >= PART::engine::addMod1)
         {
-            engineType -= NUM_VOICES;
-            sectionType = synth.part[npart]->kit[kitItem].adpars->VoicePar[engineType - PART::engine::addVoice1].POscilFM;
+            voiceID -= NUM_VOICES;
+            oscPars = synth.part[npart]->kit[kitItem].adpars->VoicePar[voiceID].POscilFM;
         }
         else
         {
-            sectionType = synth.part[npart]->kit[kitItem].adpars->VoicePar[engineType - PART::engine::addVoice1].POscil;
+            oscPars = synth.part[npart]->kit[kitItem].adpars->VoicePar[voiceID].POscil;
         }
     }
     else if (engineType == PART::engine::padSynth)
     {
-        sectionType = synth.part[npart]->kit[kitItem].padpars->POscil.get();
+        oscPars = synth.part[npart]->kit[kitItem].padpars->POscil.get();
     }
     else
         return "";
 
     if (isLoad)
     {
-        xml.enterbranch(name);
-        sectionType->getfromXML(xml);
-        xml.exitbranch();
+        XMLtree xmlOscil = xmlTop.getElm(name);
+        oscPars->getfromXML(xmlOscil);
     }
     else
     {
-        xml.beginbranch(name);
-        sectionType->add2XML(xml);
-        xml.endbranch();
+        XMLtree xmlOscil = xmlTop.addElm(name);
+        oscPars->add2XML(xmlOscil);
     }
 
     return name;
 }
 
 
-string UnifiedPresets::filterXML(XMLwrapper& xml, bool isLoad)
+string UnifiedPresets::filterXML(XMLtree& xmlTop, bool isLoad)
 {
-    int npart = cmd.data.part;
-    int kitItem = cmd.data.kit;
-    int engineType = cmd.data.engine;
-    int offset = cmd.data.offset;
-    string name;
-    if (offset == UNUSED)
-    {
-        name = "Pfilter";
-    }
-    else
-    {
-        name = "Pfiltern";
-    }
-
-    FilterParams *sectionType;
+    FilterParams* filterPars{nullptr};
 
     // top level
     if (npart == TOPLEVEL::section::systemEffects)
     {
-        sectionType = synth.sysefx[0]->filterpars;
+        filterPars = synth.sysefx[0]->filterpars;
     }
     else if (npart == TOPLEVEL::section::insertEffects)
     {
-        sectionType = synth.insefx[0]->filterpars;
+        filterPars = synth.insefx[0]->filterpars;
     }
 
     // part level
     else if (kitItem == EFFECT::type::dynFilter)
     {
-        sectionType = synth.part[npart]->partefx[0]->filterpars;
+        filterPars = synth.part[npart]->partefx[0]->filterpars;
     }
     else if (engineType == PART::engine::addSynth)
     {
-        sectionType = synth.part[npart]->kit[kitItem].adpars->GlobalPar.GlobalFilter;
+        filterPars = synth.part[npart]->kit[kitItem].adpars->GlobalPar.GlobalFilter;
     }
     else if (engineType >= PART::engine::addVoice1)
     {
-        sectionType = synth.part[npart]->kit[kitItem].adpars->VoicePar[engineType - PART::engine::addVoice1].VoiceFilter;
+        filterPars = synth.part[npart]->kit[kitItem].adpars->VoicePar[engineType - PART::engine::addVoice1].VoiceFilter;
     }
     else if (engineType == PART::engine::subSynth)
     {
-        sectionType = synth.part[npart]->kit[kitItem].subpars->GlobalFilter;
+        filterPars = synth.part[npart]->kit[kitItem].subpars->GlobalFilter;
     }
     else if (engineType == PART::engine::padSynth)
     {
-        sectionType = synth.part[npart]->kit[kitItem].padpars->GlobalFilter.get();
+        filterPars = synth.part[npart]->kit[kitItem].padpars->GlobalFilter.get();
     }
     else
-    {
         return "";
-    }
+
+    string name{offset == UNUSED? "Pfilter" : "Pfiltern"};
 
     if (isLoad)
     {
+        XMLtree xmlFilter = xmlTop.getElm(name);
         if (offset == UNUSED)
-        {
-            xml.enterbranch(name);
-            sectionType->getfromXML(xml);
-            xml.exitbranch();
-        }
+            filterPars->getfromXML(xmlFilter);
         else
-        {
-            xml.enterbranch(name);
-            sectionType->getfromXMLsection(xml, offset);
-            xml.exitbranch();
-        }
+            filterPars->getfromXML_vowel(xmlFilter, offset);
     }
     else
     {
+        XMLtree xmlFilter = xmlTop.addElm(name);
         if (offset == UNUSED)
-        {
-            xml.beginbranch(name);
-            sectionType->add2XML(xml);
-            xml.endbranch();
-        }
+            filterPars->add2XML(xmlFilter);
         else
-        {
-            xml.beginbranch(name);
-            sectionType->add2XMLsection(xml, offset);
-            xml.endbranch();
-        }
+            filterPars->add2XML_vowel(xmlFilter, offset);
     }
 
     return name;
 }
 
 
-string UnifiedPresets::lfoXML(XMLwrapper& xml, bool isLoad)
+string UnifiedPresets::lfoXML(XMLtree& xmlTop, bool isLoad)
 {
-    int npart = cmd.data.part;
-    int kitItem = cmd.data.kit;
-    int engineType = cmd.data.engine;
-    int parameter = cmd.data.parameter;
-
     string name;
-    LFOParams *sectionType = NULL;
+    LFOParams* LFOpars{nullptr};
 
     if (engineType == PART::engine::addSynth)
     {
@@ -600,15 +524,15 @@ string UnifiedPresets::lfoXML(XMLwrapper& xml, bool isLoad)
         {
             case 0:
                 name = "Plfoamplitude";
-                sectionType = synth.part[npart]->kit[kitItem].adpars->GlobalPar.AmpLfo;
+                LFOpars = synth.part[npart]->kit[kitItem].adpars->GlobalPar.AmpLfo;
             break;
             case 1:
                 name = "Plfofrequency";
-                sectionType = synth.part[npart]->kit[kitItem].adpars->GlobalPar.FreqLfo;
+                LFOpars = synth.part[npart]->kit[kitItem].adpars->GlobalPar.FreqLfo;
             break;
             case 2:
                 name = "Plfofilter";
-                sectionType = synth.part[npart]->kit[kitItem].adpars->GlobalPar.FilterLfo;
+                LFOpars = synth.part[npart]->kit[kitItem].adpars->GlobalPar.FilterLfo;
             break;
         }
     }
@@ -618,15 +542,15 @@ string UnifiedPresets::lfoXML(XMLwrapper& xml, bool isLoad)
         {
             case 0:
                 name = "Plfoamplitude";
-                sectionType = synth.part[npart]->kit[kitItem].adpars->VoicePar[engineType - PART::engine::addVoice1].AmpLfo;
+                LFOpars = synth.part[npart]->kit[kitItem].adpars->VoicePar[engineType - PART::engine::addVoice1].AmpLfo;
             break;
             case 1:
                 name = "Plfofrequency";
-                sectionType = synth.part[npart]->kit[kitItem].adpars->VoicePar[engineType - PART::engine::addVoice1].FreqLfo;
+                LFOpars = synth.part[npart]->kit[kitItem].adpars->VoicePar[engineType - PART::engine::addVoice1].FreqLfo;
             break;
             case 2:
                 name = "Plfofilter";
-                sectionType = synth.part[npart]->kit[kitItem].adpars->VoicePar[engineType - PART::engine::addVoice1].FilterLfo;
+                LFOpars = synth.part[npart]->kit[kitItem].adpars->VoicePar[engineType - PART::engine::addVoice1].FilterLfo;
             break;
         }
     }
@@ -636,15 +560,15 @@ string UnifiedPresets::lfoXML(XMLwrapper& xml, bool isLoad)
         {
             case 0:
                 name = "Plfoamplitude";
-                sectionType = synth.part[npart]->kit[kitItem].padpars->AmpLfo.get();
+                LFOpars = synth.part[npart]->kit[kitItem].padpars->AmpLfo.get();
             break;
             case 1:
                 name = "Plfofrequency";
-                sectionType = synth.part[npart]->kit[kitItem].padpars->FreqLfo.get();
+                LFOpars = synth.part[npart]->kit[kitItem].padpars->FreqLfo.get();
             break;
             case 2:
                 name = "Plfofilter";
-                sectionType = synth.part[npart]->kit[kitItem].padpars->FilterLfo.get();
+                LFOpars = synth.part[npart]->kit[kitItem].padpars->FilterLfo.get();
             break;
         }
     }
@@ -654,45 +578,38 @@ string UnifiedPresets::lfoXML(XMLwrapper& xml, bool isLoad)
 
     if (isLoad)
     {
-        xml.enterbranch(name);
-        sectionType->getfromXML(xml);
-        xml.exitbranch();
+        XMLtree xmlLFO = xmlTop.getElm(name);
+        LFOpars->getfromXML(xmlLFO);
     }
     else
     {
-        xml.beginbranch(name);
-        sectionType->add2XML(xml);
-        xml.endbranch();
+        XMLtree xmlLFO = xmlTop.addElm(name);
+        LFOpars->add2XML(xmlLFO);
     }
 
     return name;
 }
 
 
-string UnifiedPresets::envelopeXML(XMLwrapper& xml, bool isLoad)
+string UnifiedPresets::envelopeXML(XMLtree& xmlTop, bool isLoad)
 {
-    int npart = cmd.data.part;
-    int kitItem = cmd.data.kit;
-    int engineType = cmd.data.engine;
-    int parameter = cmd.data.parameter;
-
     string name;
-    EnvelopeParams* sectionType{nullptr};
+    EnvelopeParams* envPars{nullptr};
     if (engineType == PART::engine::addSynth)
     {
         switch (parameter)
         {
             case 0:
                 name = "Penvamplitude";
-                sectionType = synth.part[npart]->kit[kitItem].adpars->GlobalPar.AmpEnvelope;
+                envPars = synth.part[npart]->kit[kitItem].adpars->GlobalPar.AmpEnvelope;
             break;
             case 1:
                 name = "Penvfrequency";
-                sectionType = synth.part[npart]->kit[kitItem].adpars->GlobalPar.FreqEnvelope;
+                envPars = synth.part[npart]->kit[kitItem].adpars->GlobalPar.FreqEnvelope;
             break;
             case 2:
                 name = "Penvfilter";
-                sectionType = synth.part[npart]->kit[kitItem].adpars->GlobalPar.FilterEnvelope;
+                envPars = synth.part[npart]->kit[kitItem].adpars->GlobalPar.FilterEnvelope;
             break;
         }
     }
@@ -703,15 +620,15 @@ string UnifiedPresets::envelopeXML(XMLwrapper& xml, bool isLoad)
         {
             case 0:
                 name = "Penvamplitude";
-                sectionType = synth.part[npart]->kit[kitItem].adpars->VoicePar[engineType - PART::engine::addVoice1].AmpEnvelope;
+                envPars = synth.part[npart]->kit[kitItem].adpars->VoicePar[engineType - PART::engine::addVoice1].AmpEnvelope;
             break;
             case 1:
                 name = "Penvfrequency";
-                sectionType = synth.part[npart]->kit[kitItem].adpars->VoicePar[engineType - PART::engine::addVoice1].FreqEnvelope;
+                envPars = synth.part[npart]->kit[kitItem].adpars->VoicePar[engineType - PART::engine::addVoice1].FreqEnvelope;
             break;
             case 2:
                 name = "Penvfilter";
-                sectionType = synth.part[npart]->kit[kitItem].adpars->VoicePar[engineType - PART::engine::addVoice1].FilterEnvelope;
+                envPars = synth.part[npart]->kit[kitItem].adpars->VoicePar[engineType - PART::engine::addVoice1].FilterEnvelope;
             break;
         }
     }
@@ -722,19 +639,19 @@ string UnifiedPresets::envelopeXML(XMLwrapper& xml, bool isLoad)
         {
             case 0:
                 name = "Penvamplitude";
-                sectionType = synth.part[npart]->kit[kitItem].subpars->AmpEnvelope;
+                envPars = synth.part[npart]->kit[kitItem].subpars->AmpEnvelope;
             break;
             case 1:
                 name = "Penvfrequency";
-                sectionType = synth.part[npart]->kit[kitItem].subpars->FreqEnvelope;
+                envPars = synth.part[npart]->kit[kitItem].subpars->FreqEnvelope;
             break;
             case 2:
                 name = "Penvfilter";
-                sectionType = synth.part[npart]->kit[kitItem].subpars->GlobalFilterEnvelope;
+                envPars = synth.part[npart]->kit[kitItem].subpars->GlobalFilterEnvelope;
             break;
             case 3:
                 name = "Penvbandwidth";
-                sectionType = synth.part[npart]->kit[kitItem].subpars->BandWidthEnvelope;
+                envPars = synth.part[npart]->kit[kitItem].subpars->BandWidthEnvelope;
             break;
         }
     }
@@ -745,15 +662,15 @@ string UnifiedPresets::envelopeXML(XMLwrapper& xml, bool isLoad)
         {
             case 0:
                 name = "Penvamplitude";
-                sectionType = synth.part[npart]->kit[kitItem].padpars->AmpEnvelope.get();
+                envPars = synth.part[npart]->kit[kitItem].padpars->AmpEnvelope.get();
             break;
             case 1:
                 name = "Penvfrequency";
-                sectionType = synth.part[npart]->kit[kitItem].padpars->FreqEnvelope.get();
+                envPars = synth.part[npart]->kit[kitItem].padpars->FreqEnvelope.get();
             break;
             case 2:
                 name = "Penvfilter";
-                sectionType = synth.part[npart]->kit[kitItem].padpars->FilterEnvelope.get();
+                envPars = synth.part[npart]->kit[kitItem].padpars->FilterEnvelope.get();
             break;
         }
     }
@@ -763,64 +680,70 @@ string UnifiedPresets::envelopeXML(XMLwrapper& xml, bool isLoad)
 
     if (isLoad)
     {
-        xml.enterbranch(name);
-        sectionType->getfromXML(xml);
-        xml.exitbranch();
+        XMLtree xmlEnv = xmlTop.getElm(name);
+        envPars->getfromXML(xmlEnv);
     }
     else
     {
-        xml.beginbranch(name);
-        sectionType->add2XML(xml);
-        xml.endbranch();
+        XMLtree xmlEnv = xmlTop.addElm(name);
+        envPars->add2XML(xmlEnv);
     }
 
     return name;
 }
+
 
 
 void UnifiedPresets::save()
 {
-    synth.getRuntime().xmlType = TOPLEVEL::XML::Presets;
-    auto xml{std::make_unique<XMLwrapper>(synth, false)};
-    string type{accessXML(*xml, false)};
+    auto& logger{synth.getRuntime().getLogger()};
+    bool zynCompat = true;  // for some unclear reason preset/clipboard data is marked as Zyn compatible
+                            // (this was discussed 4/2025 and we were not sure what to do about it)
+    XMLStore xml{TOPLEVEL::XML::Presets, zynCompat};
+    string type = accessXML(xml, false);
     if (type.empty())
-        synth.getRuntime().Log("Unrecognised preset type");
+        logger("Unrecognised preset type");
+    else
+    if (not xml)
+        logger("no data retrieved; nothing to store.");
     else
     {
+        string filename;
         string dirname;
-        string name = synth.textMsgBuffer.fetch(cmd.data.miscmsg);
+        string name = synth.textMsgBuffer.fetch(mesgID);
         if (name.empty())
         {
             dirname = file::localDir() + "/clipboard";
             if (file::createDir(dirname))
-                synth.getRuntime().Log("Failed to open clipboard directory");
+                logger("Failed to open clipboard directory");
             else
-                xml->saveXMLfile(dirname + "/section." + type + EXTEN::presets);
+                filename = dirname + "/section." + type + EXTEN::presets;
         }
         else
         {
             dirname = synth.getRuntime().presetsDirlist[synth.getRuntime().presetsRootID];
-            xml->saveXMLfile(dirname + "/" + name + "." + type + EXTEN::presets);
+            filename = dirname + "/" + name + "." + type + EXTEN::presets;
         }
+        if (not filename.empty())
+            xml.saveXMLfile(filename, logger, synth.getRuntime().gzipCompression);
     }
 }
 
 
 void UnifiedPresets::load()
 {
-    synth.getRuntime().xmlType = TOPLEVEL::XML::Presets;
     string type{findPresetType()};
-    auto xml{std::make_unique<XMLwrapper>(synth, false)};
-    string name = synth.textMsgBuffer.fetch(cmd.data.miscmsg);
+    string name = synth.textMsgBuffer.fetch(mesgID);
     string dirname;
     string prefix;
+    auto& logger{synth.getRuntime().getLogger()};
 
     if (name.empty())
     {
         dirname = file::localDir() + "/clipboard";
         if (file::createDir(dirname))
         {
-            synth.getRuntime().Log("Failed to open clipboard directory");
+            logger("Failed to open clipboard directory");
         }
         else
         {
@@ -836,20 +759,24 @@ void UnifiedPresets::load()
 
     if (file::isRegularFile(prefix + type + EXTEN::presets) == 0)
     {
-        synth.getRuntime().Log("Can't match " + filename + " here.");
+        logger("Can't match " + filename + " here.");
         return;
     }
 
-    xml->loadXMLfile(filename);
-    accessXML(*xml, true);
+    XMLStore xml{filename, logger};
+    postLoadCheck(xml,synth);
+    if (xml)
+        accessXML(xml, true);
+    else
+        logger("Warning: could not read/parse preset file \""+filename+"\"");
 }
 
 
 void UnifiedPresets::remove()
 {
-    human = 0; // we need the extension this time.
+    listFunction = 0; // cause findPresetType() to pick the extension (not the description)
     string type = findPresetType();
-    string name = synth.textMsgBuffer.fetch(cmd.data.miscmsg);
+    string name = synth.textMsgBuffer.fetch(mesgID);
     string dirname = synth.getRuntime().presetsDirlist[synth.getRuntime().presetsRootID];
     string filename = dirname + "/" + name + "." + type + EXTEN::presets;
     file::deleteFile(filename);

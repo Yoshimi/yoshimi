@@ -28,12 +28,13 @@
 #ifndef SUB_NOTE_PARAMETERS_H
 #define SUB_NOTE_PARAMETERS_H
 
-#include "Misc/XMLwrapper.h"
 #include "Params/EnvelopeParams.h"
 #include "Params/FilterParams.h"
 #include "Params/ParamCheck.h"
 
 class SynthEngine;
+class XMLtree;
+
 
 class SUBnoteParameters : public ParamBase
 {
@@ -44,8 +45,8 @@ class SUBnoteParameters : public ParamBase
         void defaults()  override;
 
         void  setPan(char pan, uchar panLaw);
-        void  add2XML(XMLwrapper& xml);
-        void  getfromXML(XMLwrapper& xml);
+        void  add2XML(XMLtree&);
+        void  getfromXML(XMLtree&);
         float getLimits(CommandBlock* getData);
         void  updateFrequencyMultipliers();
 
@@ -65,16 +66,16 @@ class SUBnoteParameters : public ParamBase
         ushort PCoarseDetune;
         uchar  PDetuneType;
 
-        uchar           PFreqEnvelopeEnabled;
+        bool            PFreqEnvelopeEnabled;
         EnvelopeParams* FreqEnvelope;
-        uchar           PBandWidthEnvelopeEnabled;
+        bool            PBandWidthEnvelopeEnabled;
         EnvelopeParams* BandWidthEnvelope;
 
         uchar PBendAdjust; // Pitch Bend
         uchar POffsetHz;
 
         // Filter Parameters (Global)
-        uchar PGlobalFilterEnabled;
+        bool  PGlobalFilterEnabled;
         FilterParams* GlobalFilter;
         uchar PGlobalFilterVelocityScale;
         uchar PGlobalFilterVelocityScaleFunction;

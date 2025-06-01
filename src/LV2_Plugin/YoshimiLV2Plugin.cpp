@@ -548,7 +548,7 @@ LV2_State_Status YoshimiLV2Plugin::stateSave(LV2_State_Store_Function store, LV2
     features = feat;
     // suppress warnings - may use later
 
-    char *data = NULL;
+    char* data{nullptr};
     int sz = runtime().saveSessionData(&data);
 
     store(handle, _yoshimi_state_id, data, sz, _atom_string_id, LV2_STATE_IS_POD | LV2_STATE_IS_PORTABLE);

@@ -29,10 +29,11 @@
 
 #include "globals.h"
 #include "DSP/FFTwrapper.h"
-#include "Misc/XMLwrapper.h"
 #include "Params/ParamCheck.h"
 
 class SynthEngine;
+class XMLtree;
+
 
 class Resonance : public ParamBase
 {
@@ -47,8 +48,8 @@ class Resonance : public ParamBase
         void interpolatepeaks(int type);
         void randomize(int type);
 
-        void add2XML(XMLwrapper& xml);
-        void getfromXML(XMLwrapper& xml);
+        void add2XML(XMLtree&);
+        void getfromXML(XMLtree&);
 
         float getfreqpos(float freq);
         float getfreqx(float x);
@@ -58,7 +59,7 @@ class Resonance : public ParamBase
         void sendcontroller(ushort ctl, float par);
 
         // parameters
-        uchar Penabled;                         // if the resonance is enabled
+        bool  Penabled;                         // if the resonance is enabled
         uchar Prespoints[MAX_RESONANCE_POINTS]; // how many points define the resonance function
         float PmaxdB;                           // how many dB the signal may be amplified
         float Pcenterfreq,Poctavesfreq;         // the center frequency of the res. func., and the number of octaves

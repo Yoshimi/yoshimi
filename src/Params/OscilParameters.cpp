@@ -27,8 +27,10 @@
 
 #include <math.h>
 
+#include "Params/OscilParameters.h"
 #include "Misc/SynthEngine.h"
-#include "Params/OscilParameters.h" // **** RHL ****
+#include "Misc/XMLStore.h"
+
 
 OscilParameters::OscilParameters(fft::Calc const& fft, SynthEngine& _synth)
     : ParamBase{_synth}
@@ -90,60 +92,58 @@ void OscilParameters::defaults()
     Padaptiveharmonicspar = 50;
 }
 
-void OscilParameters::add2XML(XMLwrapper& xml)
+void OscilParameters::add2XML(XMLtree& xml)
 {
-    xml.addpar("harmonic_mag_type", Phmagtype);
+    xml.addPar_int("harmonic_mag_type", Phmagtype);
 
-    xml.addpar("base_function", Pcurrentbasefunc);
-    xml.addpar("base_function_par", Pbasefuncpar);
-    xml.addpar("base_function_modulation", Pbasefuncmodulation);
-    xml.addpar("base_function_modulation_par1", Pbasefuncmodulationpar1);
-    xml.addpar("base_function_modulation_par2", Pbasefuncmodulationpar2);
-    xml.addpar("base_function_modulation_par3", Pbasefuncmodulationpar3);
+    xml.addPar_int("base_function"                , Pcurrentbasefunc);
+    xml.addPar_int("base_function_par"            , Pbasefuncpar);
+    xml.addPar_int("base_function_modulation"     , Pbasefuncmodulation);
+    xml.addPar_int("base_function_modulation_par1", Pbasefuncmodulationpar1);
+    xml.addPar_int("base_function_modulation_par2", Pbasefuncmodulationpar2);
+    xml.addPar_int("base_function_modulation_par3", Pbasefuncmodulationpar3);
 
-    xml.addpar("modulation", Pmodulation);
-    xml.addpar("modulation_par1", Pmodulationpar1);
-    xml.addpar("modulation_par2", Pmodulationpar2);
-    xml.addpar("modulation_par3", Pmodulationpar3);
+    xml.addPar_int("modulation"     , Pmodulation);
+    xml.addPar_int("modulation_par1", Pmodulationpar1);
+    xml.addPar_int("modulation_par2", Pmodulationpar2);
+    xml.addPar_int("modulation_par3", Pmodulationpar3);
 
-    xml.addpar("wave_shaping", Pwaveshaping);
-    xml.addpar("wave_shaping_function", Pwaveshapingfunction);
+    xml.addPar_int("wave_shaping"              , Pwaveshaping);
+    xml.addPar_int("wave_shaping_function"     , Pwaveshapingfunction);
+    xml.addPar_int("filter_before_wave_shaping", Pfilterbeforews);
 
-    xml.addpar("filter_type", Pfiltertype);
-    xml.addpar("filter_par1", Pfilterpar1);
-    xml.addpar("filter_par2", Pfilterpar2);
-    xml.addpar("filter_before_wave_shaping", Pfilterbeforews);
+    xml.addPar_int("filter_type"               , Pfiltertype);
+    xml.addPar_int("filter_par1"               , Pfilterpar1);
+    xml.addPar_int("filter_par2"               , Pfilterpar2);
 
-    xml.addpar("spectrum_adjust_type", Psatype);
-    xml.addpar("spectrum_adjust_par", Psapar);
+    xml.addPar_int("spectrum_adjust_type"      , Psatype);
+    xml.addPar_int("spectrum_adjust_par"       , Psapar);
 
-    xml.addpar("rand", Prand);
-    xml.addpar("amp_rand_type", Pamprandtype);
-    xml.addpar("amp_rand_power", Pamprandpower);
+    xml.addPar_int("rand"                      , Prand);
+    xml.addPar_int("amp_rand_type"             , Pamprandtype);
+    xml.addPar_int("amp_rand_power"            , Pamprandpower);
 
-    xml.addpar("harmonic_shift", Pharmonicshift);
-    xml.addparbool("harmonic_shift_first", Pharmonicshiftfirst);
+    xml.addPar_int("harmonic_shift"            , Pharmonicshift);
+    xml.addPar_bool("harmonic_shift_first"     , Pharmonicshiftfirst);
 
-    xml.addpar("adaptive_harmonics", Padaptiveharmonics);
-    xml.addpar("adaptive_harmonics_base_frequency", Padaptiveharmonicsbasefreq);
-    xml.addpar("adaptive_harmonics_power", Padaptiveharmonicspower);
-    xml.addpar("adaptive_harmonics_par", Padaptiveharmonicspar);
+    xml.addPar_int("adaptive_harmonics"        , Padaptiveharmonics);
+    xml.addPar_int("adaptive_harmonics_base_frequency", Padaptiveharmonicsbasefreq);
+    xml.addPar_int("adaptive_harmonics_power"  , Padaptiveharmonicspower);
+    xml.addPar_int("adaptive_harmonics_par"    , Padaptiveharmonicspar);
 
-    xml.beginbranch("HARMONICS");
-        for (int n = 0; n < MAX_AD_HARMONICS; ++n)
+    XMLtree xmlHarmonics = xml.addElm("HARMONICS");
+        for (uint n = 0; n < MAX_AD_HARMONICS; ++n)
         {
-            if (Phmag[n] == 64 && Phphase[n] == 64)
+            if (Phmag[n] == 64 and Phphase[n] == 64)
                 continue;
-            xml.beginbranch("HARMONIC", n + 1);
-                xml.addpar("mag", Phmag[n]);
-                xml.addpar("phase", Phphase[n]);
-            xml.endbranch();
+            XMLtree xmlHarm = xmlHarmonics.addElm("HARMONIC", n+1);
+                xmlHarm.addPar_int("mag"  , Phmag[n]);
+                xmlHarm.addPar_int("phase", Phphase[n]);
         }
-    xml.endbranch();
 
     if (Pcurrentbasefunc == OSCILLATOR::wave::user)
     {
-        float max = 0.0;
+        float max{0.0};
         for (size_t i = 0; i < basefuncSpectrum.size(); ++i)
         {
             if (max < fabsf(basefuncSpectrum.c(i)))
@@ -154,94 +154,83 @@ void OscilParameters::add2XML(XMLwrapper& xml)
         if (max < 0.00000001)
             max = 1.0;
 
-        xml.beginbranch("BASE_FUNCTION");
+        XMLtree xmlBaseFunc = xml.addElm("BASE_FUNCTION");
             for (size_t i = 1; i < basefuncSpectrum.size(); ++i)
             {
                 float xc = basefuncSpectrum.c(i) / max;
                 float xs = basefuncSpectrum.s(i) / max;
-                if (fabsf(xs) > 0.00001 && fabsf(xs) > 0.00001)
+                if (fabsf(xs) > 0.00001 and fabsf(xs) > 0.00001)
                 {
-                    xml.beginbranch("BF_HARMONIC", i);
-                        xml.addparreal("cos", xc);
-                        xml.addparreal("sin", xs);
-                    xml.endbranch();
+                    XMLtree xmlHarm = xmlBaseFunc.addElm("BF_HARMONIC", i);
+                        xmlHarm.addPar_real("cos", xc);
+                        xmlHarm.addPar_real("sin", xs);
                 }
             }
-        xml.endbranch();
     }
 }
 
 
-void OscilParameters::getfromXML(XMLwrapper& xml)
+void OscilParameters::getfromXML(XMLtree& xml)
 {
+    assert(xml);
+    Phmagtype = xml.getPar_127("harmonic_mag_type", Phmagtype);
 
-    Phmagtype = xml.getpar127("harmonic_mag_type", Phmagtype);
+    Pcurrentbasefunc = xml.getPar_127("base_function", Pcurrentbasefunc);
+    Pbasefuncpar     = xml.getPar_127("base_function_par", Pbasefuncpar);
 
-    Pcurrentbasefunc = xml.getpar127("base_function", Pcurrentbasefunc);
-    Pbasefuncpar = xml.getpar127("base_function_par", Pbasefuncpar);
+    Pbasefuncmodulation     = xml.getPar_127("base_function_modulation"     , Pbasefuncmodulation);
+    Pbasefuncmodulationpar1 = xml.getPar_127("base_function_modulation_par1", Pbasefuncmodulationpar1);
+    Pbasefuncmodulationpar2 = xml.getPar_127("base_function_modulation_par2", Pbasefuncmodulationpar2);
+    Pbasefuncmodulationpar3 = xml.getPar_127("base_function_modulation_par3", Pbasefuncmodulationpar3);
 
-    Pbasefuncmodulation = xml.getpar127("base_function_modulation", Pbasefuncmodulation);
-    Pbasefuncmodulationpar1 = xml.getpar127("base_function_modulation_par1", Pbasefuncmodulationpar1);
-    Pbasefuncmodulationpar2 = xml.getpar127("base_function_modulation_par2", Pbasefuncmodulationpar2);
-    Pbasefuncmodulationpar3 = xml.getpar127("base_function_modulation_par3", Pbasefuncmodulationpar3);
+    Pmodulation             = xml.getPar_127("modulation"              , Pmodulation);
+    Pmodulationpar1         = xml.getPar_127("modulation_par1"         , Pmodulationpar1);
+    Pmodulationpar2         = xml.getPar_127("modulation_par2"         , Pmodulationpar2);
+    Pmodulationpar3         = xml.getPar_127("modulation_par3"         , Pmodulationpar3);
 
-    Pmodulation = xml.getpar127("modulation", Pmodulation);
-    Pmodulationpar1 = xml.getpar127("modulation_par1", Pmodulationpar1);
-    Pmodulationpar2 = xml.getpar127("modulation_par2", Pmodulationpar2);
-    Pmodulationpar3 = xml.getpar127("modulation_par3", Pmodulationpar3);
+    Pwaveshaping            = xml.getPar_127("wave_shaping"            , Pwaveshaping);
+    Pwaveshapingfunction    = xml.getPar_127("wave_shaping_function"   , Pwaveshapingfunction);
+    Pfilterbeforews         = xml.getPar_127("filter_before_wave_shaping", Pfilterbeforews);
 
-    Pwaveshaping = xml.getpar127("wave_shaping", Pwaveshaping);
-    Pwaveshapingfunction = xml.getpar127("wave_shaping_function", Pwaveshapingfunction);
+    Pfiltertype             = xml.getPar_127("filter_type"             , Pfiltertype);
+    Pfilterpar1             = xml.getPar_127("filter_par1"             , Pfilterpar1);
+    Pfilterpar2             = xml.getPar_127("filter_par2"             , Pfilterpar2);
 
-    Pfiltertype = xml.getpar127("filter_type", Pfiltertype);
-    Pfilterpar1 = xml.getpar127("filter_par1", Pfilterpar1);
-    Pfilterpar2 = xml.getpar127("filter_par2", Pfilterpar2);
-    Pfilterbeforews = xml.getpar127("filter_before_wave_shaping", Pfilterbeforews);
+    Prand                   = xml.getPar_127("rand"                    , Prand);
+    Pamprandtype            = xml.getPar_127("amp_rand_type"           , Pamprandtype);
+    Pamprandpower           = xml.getPar_127("amp_rand_power"          , Pamprandpower);
 
-    Psatype = xml.getpar127("spectrum_adjust_type", Psatype);
-    Psapar = xml.getpar127("spectrum_adjust_par", Psapar);
+    Psatype                 = xml.getPar_127("spectrum_adjust_type"    , Psatype);
+    Psapar                  = xml.getPar_127("spectrum_adjust_par"     , Psapar);
 
-    Prand = xml.getpar127("rand", Prand);
-    Pamprandtype = xml.getpar127("amp_rand_type", Pamprandtype);
-    Pamprandpower = xml.getpar127("amp_rand_power", Pamprandpower);
+    Pharmonicshift          = xml.getPar_int ("harmonic_shift"         , Pharmonicshift, -64, 64);
+    Pharmonicshiftfirst     = xml.getPar_bool("harmonic_shift_first"   , Pharmonicshiftfirst);
 
-    Pharmonicshift = xml.getpar("harmonic_shift", Pharmonicshift, -64, 64);
-    Pharmonicshiftfirst = xml.getparbool("harmonic_shift_first", Pharmonicshiftfirst);
+    Padaptiveharmonics      = xml.getPar_int ("adaptive_harmonics"     , Padaptiveharmonics     , 0, 127);
+    Padaptiveharmonicsbasefreq=xml.getPar_int("adaptive_harmonics_base_frequency", Padaptiveharmonicsbasefreq,0,255);
+    Padaptiveharmonicspower = xml.getPar_int("adaptive_harmonics_power", Padaptiveharmonicspower, 0, 200);
+    Padaptiveharmonicspar   = xml.getPar_int("adaptive_harmonics_par"  , Padaptiveharmonicspar  , 0, 100);
 
-    Padaptiveharmonics = xml.getpar("adaptive_harmonics", Padaptiveharmonics, 0, 127);
-    Padaptiveharmonicsbasefreq = xml.getpar("adaptive_harmonics_base_frequency", Padaptiveharmonicsbasefreq,0,255);
-    Padaptiveharmonicspower = xml.getpar("adaptive_harmonics_power", Padaptiveharmonicspower, 0, 200);
-    Padaptiveharmonicspar = xml.getpar("adaptive_harmonics_par", Padaptiveharmonicspar, 0, 100);
-
-    if (xml.enterbranch("HARMONICS"))
+    if (XMLtree xmlHarmonics = xml.getElm("HARMONICS"))
     {
         Phmag[0] = 64;
         Phphase[0] = 64;
-        for (int n = 0; n < MAX_AD_HARMONICS; ++n)
-        {
-            if (xml.enterbranch("HARMONIC",n + 1) == 0)
-                continue;
-            Phmag[n] = xml.getpar127("mag", 64);
-            Phphase[n] = xml.getpar127("phase", 64);
-
-            xml.exitbranch();
-        }
-        xml.exitbranch();
+        for (uint n = 0; n < MAX_AD_HARMONICS; ++n)
+            if (XMLtree xmlHarm = xmlHarmonics.getElm("HARMONIC", n+1))
+            {
+                Phmag[n]   = xmlHarm.getPar_127("mag"  , 64);
+                Phphase[n] = xmlHarm.getPar_127("phase", 64);
+            }
     }
 
-    if (xml.enterbranch("BASE_FUNCTION"))
+    if (XMLtree xmlBaseFunc = xml.getElm("BASE_FUNCTION"))
     {
-        for (size_t i = 1; i < basefuncSpectrum.size(); ++i)
-        {
-            if (xml.enterbranch("BF_HARMONIC", i))
+        for (uint i = 1; i < basefuncSpectrum.size(); ++i)
+            if (XMLtree xmlHarm = xmlBaseFunc.getElm("BF_HARMONIC", i))
             {
-                basefuncSpectrum.c(i) = xml.getparreal("cos", 0.0);
-                basefuncSpectrum.s(i) = xml.getparreal("sin", 0.0);
-
-                xml.exitbranch();
+                basefuncSpectrum.c(i) = xmlHarm.getPar_real("cos", 0.0);
+                basefuncSpectrum.s(i) = xmlHarm.getPar_real("sin", 0.0);
             }
-        }
-        xml.exitbranch();
 
         float max = 0.0;
 
@@ -267,6 +256,7 @@ void OscilParameters::getfromXML(XMLwrapper& xml)
 
     paramsChanged();
 }
+
 
 float OscilParameters::getLimits(CommandBlock *getData)
 {

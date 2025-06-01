@@ -293,7 +293,7 @@ class PartKitItem {: {public Fl_Group}
   }
   Function {init(Part *part_, int n_, int npart_, PartUI_ *partui_)} {} {
     code {//
-    synth = part_->getSynthEngine();
+    synth = & part_->getSynthEngine();
     part = part_;
     n = n_;
     npart = npart_;
@@ -2184,7 +2184,7 @@ class PartUI {: {public Fl_Group, PartUI_}
   }
   Function {init(Part *part_,int npart_,BankUI *bankui_)} {} {
     code {//
-    synth = part_->getSynthEngine();
+    synth = & part_->getSynthEngine();
     bankui = bankui_;
     part = part_;
     npart = npart_;

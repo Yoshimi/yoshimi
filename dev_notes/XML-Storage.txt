@@ -1,0 +1,113 @@
+
+Handling structured data stored as XML
+--------------------------------------
+
+NOTE: In spring 2025, XML handling was reworked, because the project was confronted
+      with the necessity to support Version 3.x and 4.x of lib-MXML, which are
+      incompatible on API and ABI level.
+
+Yoshimi maintaines a large amount of _stuctured data_ persistently,
+stored as (optionally gzip-compressed) XML files.
+
+- Configuration
+- Instance state
+- complete »Patch state«
+- Instruments
+- Presets
+- Microtonal scales
+- MIDI-learn data
+
+The actual XML handling relies on lib-MXML (»Mini-XML)
+https://www.msweet.org/mxml/ written by Michael R. Sweet
+
+The access to the details of this storage format handling
+is structured into several layers of abstraction (See XMLStore.h|cpp)
+
+- XMLStore is the access point to setup a storage with structured data,
+  and to load or save such a _data tree_ into XML format persistently.
+
+- XMLtree is a smart-pointer (with automatic memory managment),
+  referring to some location in a data tree. It provides functions
+  to add _XML attributes_ and _Yoshimi data parameters,_ including
+  the flexible handling of defaults and migration from older versions.
+
+- XMLtree::Node is the abstracted access to low-level XML manipulation
+  functions, an can only be used from within class XMLtree; it inherits
+  from a _policy base class_ -- which allows to accommodate differences
+  in the API of lib-MXML versions
+
+- the C-functions of lib-MXML are used for all access to actual data,
+  for navigation in the tree, parsing and pretty-printing and memory management.
+
+The client code from the Yoshimi core has to deal only with XMLStore and XMLtree
+objects; both are lightweight _value objects_ and can be moved (not copied).
+They can be placed into local variables on the stack (no need for a heap alloc).
+Since they rely on the ref-count by MXML, they clean-up automatically when
+going out of scope.
+
+Class XMLStore holds a `Metadata` record to maintain the version numer
+of the data format, which is identical to the version number of the code base
+managing the data. An ZynAddSubFX compatibility mode is provided, while the
+Yoshimi-native format uses a different XML DOCTYPE and a different root element.
+Each XML store is marked with an »XML type« to indicate which kind of data
+storage it manages. See the Enum `TOPLEVEL::XML` in `globals.h`
+
+Usage Patterns
+~~~~~~~~~~~~~~
+
+Store data
+^^^^^^^^^^
+
+- create a new XMLStore marked for a specific XML-type
+
+    XMLStore xml{TOPLEVEL::XML::Config};
+
+- add a top-level data element
+
+    XMLtree conf = xml.addElm("CONFIGURATION");
+
+- add parameters to this node
+
+    conf.addPar_int ("sound_buffer_size"  , buffersize);
+    conf.addPar_bool("hide_system_errors" , hideErrors);
+    conf.addPar_str ("linux_jack_server"  , jackServer);
+
+- add a nested sub-node to the tree
+
+    XMLtree xmlKit = conf.addElm("INSTRUMENT_KIT");
+    xmlKit.addPar_int("kit_mode", Pkitmode);
+
+- save the data tree created thus far
+
+    auto& logger = synth.getRuntime().getLogger();
+    uint compLev = synth.getRuntime().gzipCompression;
+    bool success = xml.saveXMLfile(configFile, logger, compLev);
+
+Load data
+^^^^^^^^^
+
+- create a XMLStore instance from an XML file
+
+     XMLStore xml{configFile, getLogger()};
+     bool success = not xml.empty();
+
+- enter a top-level node in the data tree loaded
+
+    XMLtree conf = xml.getElm("CONFIGURATION");
+    if (not conf)
+        Log("ERROR ....");
+
+- retrieve parameter data
+
+    oscilsize  = conf.getPar_int ("oscil_size", oscilsize, MIN_OSCIL_SIZE, MAX_OSCIL_SIZE);
+    hideErrors = conf.getPar_bool("hide_system_errors", hideErrors);
+    jackServer = conf.getPar_str ("linux_jack_server");
+
+- optionally enter a nested node
+
+    if (XMLtree xmlKit = xmlInstrument.getElm("INSTRUMENT_KIT"))
+    {
+        Pkitmode = xmlKit.getPar_127("kit_mode", Pkitmode);
+    }
+
+

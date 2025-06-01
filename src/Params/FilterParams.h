@@ -36,8 +36,9 @@
 using func::power;
 using func::decibel;
 
-class XMLwrapper;
 class SynthEngine;
+class XMLtree;
+
 
 class FilterParams : public ParamBase
 {
@@ -46,10 +47,10 @@ class FilterParams : public ParamBase
 
         void defaults()  override;
 
-        void add2XML(XMLwrapper& xml);
-        void add2XMLsection(XMLwrapper& xml, int n);
-        void getfromXML(XMLwrapper& xml);
-        void getfromXMLsection(XMLwrapper& xml, int n);
+        void add2XML(XMLtree&);
+        void add2XML_vowel(XMLtree&, const uint nvowel);
+        void getfromXML(XMLtree&);
+        void getfromXML_vowel(XMLtree&, const uint nvowel);
 
 
         void getfromFilterParams(FilterParams *pars);

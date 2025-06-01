@@ -27,14 +27,15 @@
 #include "Misc/FileMgrFuncs.h"
 #include "Misc/FormatFuncs.h"
 #include "Misc/TextMsgBuffer.h"
-#include "Misc/XMLwrapper.h"
 #include "Misc/SynthEngine.h"
+#include "Misc/XMLStore.h"
 
 #include <list>
 #include <vector>
 #include <string>
 #include <thread>
 #include <iostream>
+#include <algorithm>
 
 #include <chrono>
 
@@ -252,7 +253,7 @@ int MidiLearn::findEntry(list<LearnBlock>& midi_list, int lastpos, ushort CC, uc
         if ((it->chan >= 16 || chan == it->chan) && CC == it->CC)
         {
             if (show)
-                synth.getRuntime().Log("Found line " + findName(it) + "  at " + to_string(newpos)); // a test!
+                synth.getRuntime().Log("Found line " + findName(*it) + "  at " + to_string(newpos)); // a test!
             block.chan    = it->chan;
             block.CC      = it->CC;
             block.min_in  = it->min_in;
@@ -282,7 +283,7 @@ void MidiLearn::listLine(int lineNo)
 {
     list<LearnBlock>::iterator it = midi_list.begin();
     int found = 0;
-    if (midi_list.size() == 0)
+    if (midi_list.empty())
     {
         synth.getRuntime().Log("No learned lines");
         return;
@@ -333,16 +334,14 @@ void MidiLearn::listLine(int lineNo)
                 + chan
                 + "  Min " + asString(float(it->min_in / 2.0f)) + "%"
                 + "  Max " + asString(float(it->max_in / 2.0f)) + "%"
-                + limit + block + nrpn + "  " + findName(it));
+                + limit + block + nrpn + "  " + findName(*it));
     }
 }
 
 
 void MidiLearn::listAll(list<string>& msg_buf)
 {
-    list<LearnBlock>::iterator it = midi_list.begin();
-    int lineNo = 0;
-    if (midi_list.size() == 0)
+    if (midi_list.empty())
     {
         msg_buf.push_back("No learned lines");
         return;
@@ -350,21 +349,22 @@ void MidiLearn::listAll(list<string>& msg_buf)
     string CCtype;
     int CC;
     msg_buf.push_back("Midi learned:");
-    while (it != midi_list.end())
+
+    uint lineNo{0};
+    for (LearnBlock& block : midi_list)
     {
-        CC = it->CC;
+        CC = block.CC;
         if (CC < 0xff)
             CCtype = to_string(CC);
         else
             CCtype = asHexString((CC >> 7) & 0x7f) + asHexString(CC & 0x7f) + " h";
         string chan = "  Chan ";
-        if ((it->chan) >= NUM_MIDI_CHANNELS)
+        if ((block.chan) >= NUM_MIDI_CHANNELS)
             chan += "All";
         else
-            chan += to_string(int(it->chan + 1));
+            chan += to_string(uint(block.chan + 1));
 
-        msg_buf.push_back("Line " + to_string(lineNo + 1) + "  CC " + CCtype + chan + "  " + findName(it));
-        ++ it;
+        msg_buf.push_back("Line " + to_string(lineNo + 1) + "  CC " + CCtype + chan + "  " + findName(block));
         ++ lineNo;
     }
 }
@@ -638,7 +638,7 @@ void MidiLearn::generalOperations(CommandBlock& cmd)
 
         it = midi_list.begin();
         int lineNo = 0;
-        if (midi_list.size() > 0)
+        if (not midi_list.empty())
         { // CC is priority
             while (CC > it->CC && it != midi_list.end())
             { // find start of group
@@ -665,10 +665,10 @@ void MidiLearn::generalOperations(CommandBlock& cmd)
 }
 
 
-string MidiLearn::findName(list<LearnBlock>::iterator it)
+string MidiLearn::findName(LearnBlock& block)
 {
     CommandBlock cmd;
-    memcpy(cmd.bytes, it->frame.bytes, sizeof(CommandBlock));
+    memcpy(cmd.bytes, block.frame.bytes, sizeof(CommandBlock));
     cmd.data.value = 0;
     cmd.data.source = 0;
     return resolveAll(synth, cmd, false);
@@ -720,7 +720,7 @@ void MidiLearn::insertLine(ushort CC, uchar chan)
     list<LearnBlock>::iterator it;
     it = midi_list.begin();
     int lineNo = 0;
-    if (midi_list.size() > 0)
+    if (not midi_list.empty())
     { // CC is priority
         while (CC > it->CC && it != midi_list.end()) // CC is priority
         { // find start of group
@@ -807,34 +807,31 @@ void MidiLearn::updateGui(int opp)
     if (opp >= MIDILEARN::control::hideGUI) // just sending back gui message
         return;
 
-    int lineNo = 0;
-    list<LearnBlock>::iterator it;
-    it = midi_list.begin();
 /*
 using std::chrono::steady_clock;
 using Dur = std::chrono::duration<double, std::micro>;
 auto start = steady_clock::now();
 */
-    while (it != midi_list.end())
+    uint lineNo{0};
+    for (LearnBlock& block : midi_list)
     {
-        ushort newCC = (it->CC) & MIDI::CC::maxNRPN;
+        ushort newCC = (block.CC) & MIDI::CC::maxNRPN;
         cmd.data.value     = lineNo;
-        cmd.data.type      = it->status;
+        cmd.data.type      = block.status;
         cmd.data.source    = TOPLEVEL::action::toAll;
         cmd.data.control   = MIDILEARN::control::CCorChannel;
         cmd.data.kit       = (newCC & 0xff);
-        cmd.data.engine    = it->chan;
-        cmd.data.insert    = it->min_in;
-        cmd.data.parameter = it->max_in;
-        cmd.data.miscmsg   = textMsgBuffer.push(findName(it));
+        cmd.data.engine    = block.chan;
+        cmd.data.insert    = block.min_in;
+        cmd.data.parameter = block.max_in;
+        cmd.data.miscmsg   = textMsgBuffer.push(findName(block));
         writeToGui(cmd);
-        if (it->status & 8)
+        if (block.status & 8)
         { // status used in case NRPN is < 0x100
             cmd.data.control = MIDILEARN::control::nrpnDetected; // it's an NRPN
             cmd.data.engine = (newCC >> 8);
             writeToGui(cmd);
         }
-        ++it;
         ++lineNo;
         if (lineNo & 32)
             sleep_for(10us); // allow message list to clear a bit
@@ -843,8 +840,8 @@ auto start = steady_clock::now();
 Dur duration = steady_clock::now () - start;
 std::cout << "MidiLearn->GUI: Δt = " << duration.count() << "µs" << std::endl;
 */
-    if (synth.getRuntime().showLearnedCC == true && !midi_list.empty()) // open the gui editing window
-    {
+    if (synth.getRuntime().showLearnedCC == true and not midi_list.empty())
+    {// open the gui editing window...
         cmd.data.control = MIDILEARN::control::sendRefreshRequest;
         writeToGui(cmd);
     }
@@ -853,177 +850,178 @@ std::cout << "MidiLearn->GUI: Δt = " << duration.count() << "µs" << std::endl;
 
 bool MidiLearn::saveList(string const& name)
 {
+    auto& logg = synth.getRuntime().getLogger();
     if (name.empty())
-    {
-        synth.getRuntime().Log("No filename");
-        return false;
-    }
-
-    if (midi_list.size() == 0)
-    {
-        synth.getRuntime().Log("No Midi Learn list");
-        return false;
-    }
-
-    string file = setExtension(name, EXTEN::mlearn);
-    synth.getRuntime().xmlType = TOPLEVEL::XML::MLearn;
-    auto xml{std::make_unique<XMLwrapper>(synth, true)};
-    bool ok = insertMidiListData(*xml);
-    if (xml->saveXMLfile(file))
-        synth.addHistory(file, TOPLEVEL::XML::MLearn);
+        logg("MidiLearn: no filename given.");
+    else
+    if (midi_list.empty())
+        logg("MidiLearn: nothing to save", _SYS_::LogNotSerious);
     else
     {
-        synth.getRuntime().Log("Failed to save data to " + file);
-        ok = false;
+        string file = setExtension(name, EXTEN::mlearn);
+        auto compress = synth.getRuntime().gzipCompression;
+        XMLStore xml{TOPLEVEL::XML::MLearn};
+
+        this->insertMidiListData(xml);
+        if (xml and xml.saveXMLfile(file, logg, compress))
+        {
+            synth.addHistory(file, TOPLEVEL::XML::MLearn);
+            return true;
+        }
+        else
+            logg("MidiLearn: Failed to save data to \""+file+"\"");
     }
-    return ok;
+
+    return false;
 }
 
 
-bool MidiLearn::insertMidiListData(XMLwrapper& xml)
+/** @note when no LearnBlock are captured,
+ *   nothing will be added to the XMLStore */
+void MidiLearn::insertMidiListData(XMLStore& xml)
 {
-    if (midi_list.size() == 0)
-        return false;
-    int ID = 0;
-    list<LearnBlock>::iterator it;
-    it = midi_list.begin();
-    xml.beginbranch("MIDILEARN");
-        while (it != midi_list.end())
+    if (midi_list.empty()) return;
+
+    uint ID{0};
+    XMLtree xmlLearn = xml.addElm("MIDILEARN");
+        for (LearnBlock& block : midi_list)
         {
-            xml.beginbranch("LINE", ID);
-            xml.addparbool("Mute", (it->status & 4) > 0);
-            xml.addparbool("NRPN", (it->status & 8) > 0);
-            xml.addparbool("7_bit", (it->status & 16) > 0);
-            xml.addpar("Midi_Controller", it->CC & 0x7fff);
-            /*
-             * Clear out top bit - NRPN marker
-             * Yoshimi NRPNs are internally stored as
-             * integers in 'CC', not MIDI 14 bit pairs.
-             * A high bit marker is added to identify these.
-             * For user display they are split and shown as
-             * MSB and LSB.
-             */
-            xml.addpar("Midi_Channel",  it->chan);
-            xml.addparreal("Midi_Min",  it->min_in / 1.575f);
-            xml.addparreal("Midi_Max",  it->max_in / 1.575f);
-            xml.addparbool("Limit",    (it->status & 2) > 0);
-            xml.addparbool("Block",    (it->status & 1) > 0);
-            xml.addpar("Convert_Min",   it->min_out);
-            xml.addpar("Convert_Max",   it->max_out);
-            xml.beginbranch("COMMAND");
-                xml.addpar("Type",      it->frame.data.type);
-                xml.addpar("Control",   it->frame.data.control);
-                xml.addpar("Part",      it->frame.data.part);
-                xml.addpar("Kit_Item",  it->frame.data.kit);
-                xml.addpar("Engine",    it->frame.data.engine);
-                xml.addpar("Insert",    it->frame.data.insert);
-                xml.addpar("Parameter", it->frame.data.parameter);
-                xml.addpar("Secondary_Parameter", it->frame.data.offset);
-                xml.addparstr("Command_Name",findName(it));
-                xml.endbranch();
-            xml.endbranch();
-            ++it;
+            XMLtree xmlLine = xmlLearn.addElm("LINE", ID);
+                xmlLine.addPar_bool("Mute"          ,(block.status & 4) > 0);
+                xmlLine.addPar_bool("NRPN"          ,(block.status & 8) > 0);
+                xmlLine.addPar_bool("7_bit"         ,(block.status & 16) > 0);
+                xmlLine.addPar_int("Midi_Controller", block.CC & 0x7fff);
+                /*
+                 * Clear out top bit - NRPN marker
+                 * Yoshimi NRPNs are internally stored as
+                 * integers in 'CC', not MIDI 14 bit pairs.
+                 * A high bit marker is added to identify these.
+                 * For user display they are split and shown as
+                 * MSB and LSB.
+                 */
+                xmlLine.addPar_int ("Midi_Channel", block.chan);
+                xmlLine.addPar_real("Midi_Min"    , block.min_in / 1.575f);
+                xmlLine.addPar_real("Midi_Max"    , block.max_in / 1.575f);
+                xmlLine.addPar_bool("Limit"       ,(block.status & 2) > 0);
+                xmlLine.addPar_bool("Block"       ,(block.status & 1) > 0);
+                xmlLine.addPar_int ("Convert_Min" , block.min_out);
+                xmlLine.addPar_int ("Convert_Max" , block.max_out);
+                XMLtree xmlCmd = xmlLine.addElm("COMMAND");
+                    xmlCmd.addPar_int("Type"      , block.frame.data.type);
+                    xmlCmd.addPar_int("Control"   , block.frame.data.control);
+                    xmlCmd.addPar_int("Part"      , block.frame.data.part);
+                    xmlCmd.addPar_int("Kit_Item"  , block.frame.data.kit);
+                    xmlCmd.addPar_int("Engine"    , block.frame.data.engine);
+                    xmlCmd.addPar_int("Insert"    , block.frame.data.insert);
+                    xmlCmd.addPar_int("Parameter" , block.frame.data.parameter);
+                    xmlCmd.addPar_int("Secondary_Parameter", block.frame.data.offset);
+                    xmlCmd.addPar_str("Command_Name"       , findName(block));
+
             ++ID;
         }
-    xml.endbranch(); // MIDILEARN
-    return true;
 }
 
 
 bool MidiLearn::loadList(string const& name)
 {
+    auto& logg = synth.getRuntime().getLogger();
     if (name.empty())
+        logg("MidiLearn: no filename given.");
+    else
     {
-        synth.getRuntime().Log("No filename");
-        return false;
+        string file{setExtension(name, EXTEN::mlearn)};
+        if (not isRegularFile(file))
+            logg("MidiLearn: unable to find \""+file+"\"");
+        else
+        {
+            XMLStore xml{file, logg};
+            postLoadCheck(xml,synth);
+            if (xml and extractMidiListData(xml))
+            {
+                synth.addHistory(file, TOPLEVEL::XML::MLearn);
+                return true;
+            }
+            else
+                logg("MidiLearn: failed to load XML data from \""+file+"\"");
+        }
     }
-    string file{setExtension(name, EXTEN::mlearn)};
-    if (!isRegularFile(file))
-    {
-        synth.getRuntime().Log("Can't find " + file);
-        return false;
-    }
-
-    auto xml{std::make_unique<XMLwrapper>(synth, true)};
-    xml->loadXMLfile(file);
-    bool ok = extractMidiListData(true,  *xml);
-    if (!ok)
-        return false;
-    synth.addHistory(file, TOPLEVEL::XML::MLearn);
-    return true;
+    return false;
 }
 
 
-bool MidiLearn::extractMidiListData(bool full,  XMLwrapper& xml)
+bool MidiLearn::extractMidiListData(XMLStore& xml)
 {
     midi_list.clear();
-    if (!xml.enterbranch("MIDILEARN"))
-    {
-        if (full)
-            synth.getRuntime().Log("Extract Data, no MIDILEARN branch");
-        return false;
-    }
-    LearnBlock entry;
-    CommandBlock cmd;
-    midi_list.clear();
-    int ID = 0;
-    int status;
-    uint ident;
+    XMLtree xmlLearn = xml.getElm("MIDILEARN");
+    if (not xmlLearn)
+        return false; // notify caller: missing data
+
+    uint ID{0};
     while (true)
     {
-        status = 0;
-        ident = 0;
-        if (!xml.enterbranch("LINE", ID))
-            break;
+        XMLtree xmlLine = xmlLearn.getElm("LINE", ID);
+        if (not xmlLine)
+            break; // End-of-data detected
         else
         {
-            if (xml.getparbool("Mute", 0))
+            uint ident{0};
+            uint status{0};
+            LearnBlock entry;
+            if (xmlLine.getPar_bool("Mute", 0))
                 status |= 4;
-            if (xml.getparbool("NRPN", 0))
+            if (xmlLine.getPar_bool("NRPN", 0))
             {
                 ident = MIDI::CC::identNRPN; // set top bit for NRPN indication
                 status |= 8;
             }
-            if (xml.getparbool("7_bit",0))
+            if (xmlLine.getPar_bool("7_bit",0))
                 status |= 16;
 
-            entry.CC = ident | xml.getpar("Midi_Controller", 0, 0, MIDI::CC::maxNRPN);
+            entry.CC = ident | xmlLine.getPar_int("Midi_Controller", 0, 0, MIDI::CC::maxNRPN);
 
-            entry.chan = xml.getpar127("Midi_Channel", 0);
+            entry.chan = xmlLine.getPar_127("Midi_Channel", 0);
 
-            int min = int((xml.getparreal("Midi_Min", 200.0f) * 1.575f) + 0.1f);
-            entry.min_in = min;
+            float midiMin = xmlLine.getPar_real("Midi_Min", 200.0f);
+            entry.min_in = uchar(std::clamp(0.1f + (midiMin * 1.575f), 0.0f,255.0f));   //NOTE 5/2025 seems confusing.... 1.575*200 ≡ 315, which is beyond the range of uchar; added a std::clamp to make this explicit
 
-            int max = int((xml.getparreal("Midi_Max", 200.0f) * 1.575f) + 0.1f);
-            entry.max_in = max;
+            float midiMax = xmlLine.getPar_real("Midi_Max", 200.0f);
+            entry.max_in = uchar(std::clamp(0.1f + (midiMax * 1.575f), 0.0f,255.0f));
 
-            if (xml.getparbool("Limit",0))
+            if (xmlLine.getPar_bool("Limit",0))
                 status |= 2;
-            if (xml.getparbool("Block",0))
+            if (xmlLine.getPar_bool("Block",0))
                 status |= 1;
-            entry.min_out = xml.getpar("Convert_Min", 0, -16384, 16383);
-            entry.max_out = xml.getpar("Convert_Max", 0, -16384, 16383);
-            xml.enterbranch("COMMAND");
-                entry.frame.data.type      = xml.getpar255("Type", 0); // ??
-                entry.frame.data.control   = xml.getpar255("Control", 0);
-                entry.frame.data.part      = xml.getpar255("Part", 0);
-                entry.frame.data.kit       = xml.getpar255("Kit_Item", 0);
-                entry.frame.data.engine    = xml.getpar255("Engine", 0);
-                entry.frame.data.insert    = xml.getpar255("Insert", 0);
-                entry.frame.data.parameter = xml.getpar255("Parameter", 0);
-                entry.frame.data.offset    = xml.getpar255("Secondary_Parameter", 0);
+            entry.min_out = xmlLine.getPar_int("Convert_Min", 0, -16384, 16383);
+            entry.max_out = xmlLine.getPar_int("Convert_Max", 0, -16384, 16383);
 
+            XMLtree xmlCmd = xmlLine.getElm("COMMAND");
+                entry.frame.data.type      = xmlCmd.getPar_255("Type"     , 0);
+                entry.frame.data.control   = xmlCmd.getPar_255("Control"  , 0);
+                entry.frame.data.part      = xmlCmd.getPar_255("Part"     , 0);
+                entry.frame.data.kit       = xmlCmd.getPar_255("Kit_Item" , 0);
+                entry.frame.data.engine    = xmlCmd.getPar_255("Engine"   , 0);
+                entry.frame.data.insert    = xmlCmd.getPar_255("Insert"   , 0);
+                entry.frame.data.parameter = xmlCmd.getPar_255("Parameter", 0);
+                entry.frame.data.offset    = xmlCmd.getPar_255("Secondary_Parameter", 0);
+
+            // completed processing <LINE> element
+            entry.status = status;
+            midi_list.push_back(entry);
+            ++ ID;
+
+            /* --------------------- Diagnostics --------------------- */
+            CommandBlock cmd;
 if (DECODE_MODE)
 {
-                string test = xml.getparstr("Command_Name");
-                TextData::encodeAll(&synth, test, cmd);
+                string cmdName = xmlCmd.getPar_str("Command_Name");
+                TextData::encodeAll(&synth, cmdName, cmd);
 }
 if (DECODE_MODE >= 2)
 {
                 bool ok = true;
-                if (ID == 0)
+                if (ID == 1)
                     cout << endl;
-                cout << "line " << (ID + 1);
+                cout << "line " << (ID-1);
                 if (cmd.data.control != entry.frame.data.control)
                 {
                     ok = false;
@@ -1075,14 +1073,8 @@ if (DECODE_MODE & 1)
                 entry.frame.data.parameter = cmd.data.parameter;
                 entry.frame.data.offset    = cmd.data.offset;
 }
-                xml.exitbranch();
-            xml.exitbranch();
-            entry.status = status;
-            midi_list.push_back(entry);
-            ++ ID;
-        }
-    }
-    xml.exitbranch(); // MIDILEARN
+        }// <LINE>
+    }   // while
     return true;
 }
 

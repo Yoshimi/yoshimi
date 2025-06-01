@@ -35,158 +35,166 @@
 #include <map>
 
 using std::string;
-using std::map;
 
-typedef struct _InstrumentEntry
+
+/** Entry for one instrument in a bank,
+ *  with instrument metadata.
+ */
+struct InstrumentEntry
 {
     string name;
     string filename;
-    int type;
     bool used;
-    unsigned char PADsynth_used;
-    unsigned char ADDsynth_used;
-    unsigned char SUBsynth_used;
-    bool yoshiType;
-    _InstrumentEntry()
-        :name(""),
-         filename(""),
-         type(-1),
-         used(false),
-         PADsynth_used(0),
-         ADDsynth_used(0),
-         SUBsynth_used(0),
-         yoshiType(false)
-    {
+    int  instType;
+    bool yoshiFormat;
+    bool ADDsynth_used;
+    bool SUBsynth_used;
+    bool PADsynth_used;
 
-    }
+    InstrumentEntry()
+        : name{}
+        , filename{}
+        , used{false}
+        , instType{-1}
+        , yoshiFormat{false}
+        , ADDsynth_used{false}
+        , SUBsynth_used{false}
+        , PADsynth_used{false}
+        { }
+
     void clear()
     {
         used = false;
         name.clear();
         filename.clear();
-        PADsynth_used = 0;
-        ADDsynth_used = 0;
-        SUBsynth_used = 0;
-        yoshiType = false;
+        PADsynth_used = false;
+        ADDsynth_used = false;
+        SUBsynth_used = false;
+        yoshiFormat   = false;
     }
-} InstrumentEntry; // Contains the leafname of the instrument.
+};
 
-typedef map<int, InstrumentEntry> InstrumentEntryMap; // Maps instrument id to instrument entry.
+/** Maps instrument id to instrument entry. */
+using InstrumentEntryMap = std::map<int, InstrumentEntry> ;
 
-typedef struct _BankEntry
+/** Describes a Bank
+ *   - directory name
+ *   - instrument map for this directory
+ */
+struct BankEntry
 {
     string dirname;
     InstrumentEntryMap instruments;
-} BankEntry; // Contains the bank directory name and the instrument map of the bank.
+};
 
-typedef map<size_t, BankEntry> BankEntryMap; // Maps bank id to bank entry.
+/** Maps bank id to bank entry. */
+using BankEntryMap = std::map<size_t, BankEntry>;
 
-
-typedef struct _RootEntry
+/** Contains the root path and the bank map of the root. */
+struct RootEntry
 {
     string path;
-    BankEntryMap banks;
     size_t bankIdStep;
-    _RootEntry(): bankIdStep(1)
-    {}
-} RootEntry; // Contains the root path and the bank map of the root.
+    BankEntryMap banks;
 
-typedef map<size_t, RootEntry> RootEntryMap; // Maps root id to root entry.
+    RootEntry()
+        : path{}
+        , bankIdStep{1}
+        , banks{}
+        { }
+};
+
+/** Maps root id to root entry. */
+using RootEntryMap = std::map<size_t, RootEntry>;
+
 
 class SynthEngine;
+class XMLtree;
+
 
 class Bank
 {
     friend class SynthEngine;
 
     public:
-        Bank(SynthEngine *_synth);
-        int getType(unsigned int ninstrument, size_t bank, size_t root);
-        string getname(unsigned int ninstrument, size_t bank, size_t root);
-        string getnamenumbered(unsigned int ninstrument, size_t bank, size_t root);
-        int setInstrumentName(const string& name, int slot, size_t bank, size_t root);
-        bool moveInstrument(unsigned int ninstrument, const string& newname, int newslot, size_t oldBank, size_t newBank, size_t oldRoot, size_t newRoot);
-             // if newslot==-1 then this is ignored, else it will be put on that slot
+        Bank(SynthEngine&);
+        // shall not be copied nor moved
+        Bank(Bank&&)                 = delete;
+        Bank(Bank const&)            = delete;
+        Bank& operator=(Bank&&)      = delete;
+        Bank& operator=(Bank const&) = delete;
 
-        int engines_used(size_t rootID, size_t bankID, unsigned int ninstrument);
-        bool emptyslot(size_t rootID, size_t bankID, unsigned int ninstrument);
-        string clearslot(unsigned int ninstrument, size_t rootID, size_t bankID);
+        int getType(uint ninstrument, size_t bank, size_t root);
+        string getname(uint ninstrument, size_t bank, size_t root);
+        string getnamenumbered(uint ninstrument, size_t bank, size_t root);
+        int  setInstrumentName(string const& name, int slot, size_t bank, size_t root);
+        bool moveInstrument(uint ninstrument, string const& newname, int newslot, size_t oldBank, size_t newBank, size_t oldRoot, size_t newRoot);
+
+        int engines_used(size_t rootID, size_t bankID, uint ninstrument);
+        bool emptyslot(size_t rootID, size_t bankID, uint ninstrument);
+        string clearslot(uint ninstrument, size_t rootID, size_t bankID);
         bool savetoslot(size_t rootID, size_t bankID, int ninstrument, int npart);
-        string swapslot(unsigned int n1, unsigned int n2, size_t bank1, size_t bank2, size_t root1, size_t root2);
-        string swapbanks(unsigned int firstID, unsigned int secondID, size_t firstRoot, size_t secondRoot);
+        string swapslot(uint n1, uint n2, size_t bank1, size_t bank2, size_t root1, size_t root2);
+        string swapbanks(uint firstID, uint secondID, size_t firstRoot, size_t secondRoot);
         string getBankName(int bankID, size_t rootID);
-        bool isDuplicateBankName(size_t rootID, const string& name);
+        bool isDuplicateBankName(size_t rootID, string const& name);
         int getBankSize(int bankID, size_t rootID);
-        int changeBankName(size_t rootID, size_t bankID, const string& newName);
+        int changeBankName(size_t rootID, size_t bankID, string const& newName);
         void checkbank(size_t rootID, size_t banknum);
         bool loadbank(size_t rootID, size_t banknum);
-        string exportBank(const string& exportdir, size_t rootID, unsigned int bankID);
-        string importBank(string importdir, size_t rootID, unsigned int bankID);
-        bool isDuplicate(size_t rootID, size_t bankID, int pos, const string filename);
-        bool newIDbank(const string& newbankdir, unsigned int bankID, size_t rootID = 0xff);
-        bool newbankfile(const string& newbankdir, size_t rootID);
-        string removebank(unsigned int bankID, size_t rootID = 0xff);
+        string exportBank(string const& exportdir, size_t rootID, uint bankID);
+        string importBank(string importdir, size_t rootID, uint bankID);
+        bool isDuplicate(size_t rootID, size_t bankID, int pos, string filename);
+        bool newIDbank(string const& newbankdir, uint bankID, size_t rootID = 0xff);
+        bool newbankfile(string const& newbankdir, size_t rootID);
+        string removebank(uint bankID, size_t rootID = 0xff);
         bool removeRoot(size_t rootID);
         bool changeRootID(size_t oldID, size_t newID);
 
         bool setCurrentRootID(size_t newRootID);
-        unsigned int findFirstBank(size_t newRootID);
+        uint findFirstBank(size_t newRootID);
         bool setCurrentBankID(size_t newBankID, bool ignoreMissing = true);
-        size_t addRootDir(const string& newRootDir);
+        size_t addRootDir(string const& newRootDir);
         bool establishBanks(std::optional<string> bankFile);
         bool installRoots();
         bool installNewRoot(size_t rootID, string rootdir, bool reload = false);
-        void saveToConfigFile(XMLwrapper& xml);
-        void loadFromConfigFile(XMLwrapper& xml);
+        void saveToConfigFile(XMLtree&);
+        void loadFromConfigFile(XMLtree&);
 
         string getBankPath(size_t rootID, size_t bankID);
         string getRootPath(size_t rootID);
         string getFullPath(size_t rootID, size_t bankID, size_t ninstrument);
 
-        const BankEntryMap &getBanks(size_t rootID);
-        const RootEntryMap &getRoots();
-        const BankEntry &getBank(size_t bankID, size_t rootID = UNUSED);
+        const BankEntryMap& getBanks(size_t rootID);
+        const RootEntryMap& getRoots();
+        const BankEntry& getBank(size_t bankID, size_t rootID = UNUSED);
 
         string getBankFileTitle(size_t root, size_t bank);
         string getRootFileTitle(size_t root);
-        int InstrumentsInBanks;
-        int BanksInRoots;
-        int readVersion()
-            {return BanksVersion;}
-        void writeVersion(int version)
-            {BanksVersion = version;}
-        int BanksVersion;
         void checkLocalBanks();
-        size_t generateSingleRoot(const string& newRoot, bool clear = true);
+        size_t generateSingleRoot(string const& newRoot, bool clear = true);
+
+        uint getVersion() {return version; }
 
     private:
+        uint version;
+        uint banksInRoots;
+        uint instrumentsInBanks;
 
-        inline void splitNumFromName(int &num, string &name)
-        {
-            int chk = func::findSplitPoint(name);
-            if (chk > 0)
-            {
-                num = func::string2int(name.substr(0, chk)) - 1;
-
-                // remove "NNNN-" from instrument name
-                name = name.substr(chk + 1);
-            }
-        }
-
-        bool addtobank(size_t rootID, size_t bankID, int pos, const string filename, const string name);
-             // add an instrument to the bank, if pos is -1 try to find a position
-             // returns true if the instrument was added
-
-        void deletefrombank(size_t rootID, size_t bankID, unsigned int pos);
-        bool isOccupiedRoot(string rootCandidate);
-        bool isValidBank(string chkdir);
-
-        const string defaultinsname;
-        SynthEngine *synth;
+        const string defaultInsName;
+        string foundLocal;
 
         RootEntryMap  roots;
 
-        InstrumentEntry &getInstrumentReference(size_t rootID, size_t bankID, size_t ninstrument );
+        SynthEngine& synth;
+
+
+        bool addtobank(size_t rootID, size_t bankID, int pos, const string filename, const string name);
+        void deletefrombank(size_t rootID, size_t bankID, uint pos);
+        bool isOccupiedRoot(string rootCandidate);
+        bool isValidBank(string chkdir);
+
+        InstrumentEntry& getInstrumentReference(size_t rootID, size_t bankID, size_t ninstrument);
         void updateShare(string bankdirs[], string baseDir, string shareID);
         void checkShare(string sourceDir, string destinationDir);
         bool transferDefaultDirs(string bankdirs[]);
@@ -196,7 +204,6 @@ class Bank
 
         size_t getNewRootIndex();
         size_t getNewBankIndex(size_t rootID);
-        string foundLocal;
 };
 
 #endif /*BANK_H*/

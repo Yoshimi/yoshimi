@@ -701,7 +701,7 @@ void MidiDecode::setMidiBankOrRootDir(uint bank_or_root_num, bool in_place, bool
 
 void MidiDecode::setMidiProgram(uchar ch, int prg, bool in_place)
 {
-    if (!synth->getRuntime().enableProgChange)
+    if (not synth->getRuntime().enableProgChange)
         return;
     uint maxparts = synth->getRuntime().numAvailableParts;
     if (ch >= maxparts)
