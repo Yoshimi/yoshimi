@@ -735,7 +735,10 @@ int InterChange::indirectMain(CommandBlock& cmd, uchar &newMsg, bool &guiTo, str
             text = textMsgBuffer.fetch(result & NO_MSG);
             synth.getRuntime().lastBankPart = UNUSED;
             if (result < 0x1000)
+            {
+                partsChanged.reset(kititem);
                 text = "ed " + text;
+            }
             else
                 text = " FAILED " + text;
             newMsg = true;
@@ -770,6 +773,7 @@ int InterChange::indirectMain(CommandBlock& cmd, uchar &newMsg, bool &guiTo, str
             vectorClear(NUM_MIDI_CHANNELS);
             if (synth.loadPatchSetAndUpdate(text))
             {
+                partsChanged = 0;
                 synth.addHistory(setExtension(text, EXTEN::patchset), TOPLEVEL::XML::Patch);
                 text = "ed " + text;
             }
@@ -866,6 +870,7 @@ int InterChange::indirectMain(CommandBlock& cmd, uchar &newMsg, bool &guiTo, str
                 string defaultName = synth.getRuntime().defaultSession;
                 if ((text != defaultName)) // never include default state
                     synth.addHistory(text, TOPLEVEL::XML::State);
+                partsChanged = 0;
                 text = "ed " + text;
             }
             else

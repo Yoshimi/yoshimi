@@ -714,7 +714,11 @@ class MasterUI {: {public GuiUpdates}
             // for Alessandro
             string filename = setfiler("", "", false, TOPLEVEL::XML::State);
             if (!filename.empty())
+            {
+                if (instrumentsWarning("Still reset"))
+                  return;
                 setState(filename);
+            }
             else
                 refresh_master_ui(0x80 | (textMsgBuffer.push(" ") << 8));
             }
@@ -724,8 +728,9 @@ class MasterUI {: {public GuiUpdates}
             // for Alessandro
             string filename = setfiler("", "", true, TOPLEVEL::XML::State);
             if (!filename.empty())
-
-                send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedState, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(filename));
+                {
+                    send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedState, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(filename));
+                }
             }
             break;
         case 29: // default
@@ -736,12 +741,14 @@ class MasterUI {: {public GuiUpdates}
             break;
         case 30: // recent
             {
-            int xpos = masterwindow->x() + (masterwindow->w() * 0.616f);
-            if (xpos + paramsui->Recent->w() > masterwindow->x() + masterwindow->w())
-                xpos = masterwindow->x() + masterwindow->w() - paramsui->Recent->w();
-            paramsui->Recent->position(xpos,masterwindow->y()+20);
+                if (instrumentsWarning("Overwrite"))
+                    return;
+                int xpos = masterwindow->x() + (masterwindow->w() * 0.616f);
+                if (xpos + paramsui->Recent->w() > masterwindow->x() + masterwindow->w())
+                    xpos = masterwindow->x() + masterwindow->w() - paramsui->Recent->w();
+                paramsui->Recent->position(xpos,masterwindow->y()+20);
 
-            paramsui->Show(TOPLEVEL::XML::State);
+                paramsui->Show(TOPLEVEL::XML::State);
             }
             break;
 
@@ -3927,6 +3934,11 @@ Alan Calvert started the project}
   Function {do_load_instrument(string fname)} {} {
     code {//
     int npart = partui->npart;
+    if (synth->getGuiMaster()->instrumentSingleWarning(npart, " Overwrite"))
+    {
+        return;
+    }
+
     if ((npart & 0x30) == (panelgroup & 0x30))
     {
         int displaypart = npart & 0x0f;
@@ -3943,6 +3955,10 @@ Alan Calvert started the project}
         filename = setfiler("", "", false, TOPLEVEL::XML::Patch);
         if (filename.empty())
             return;
+    }
+    if (synth->getGuiMaster()->instrumentsWarning(" Overwrite"))
+    {
+        return;
     }
     send_data(TOPLEVEL::action::muteAndLoop | TOPLEVEL::action::forceUpdate, MAIN::control::loadNamedPatchset, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(filename));} {}
   }
