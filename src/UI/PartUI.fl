@@ -490,7 +490,7 @@ class PartUI {: {public Fl_Group, PartUI_}
                  fullClear = true;
          }
 
-         if (synth->interchange.partsChanged.test(npart) && (choice(synth, "", "Yes", "No", "Instrument has been edited. Overwrite ?") < 2))
+         if (synth->getGuiMaster()->instrumentSingleWarning(npart, " Still clear"))
          {
              return;
          }

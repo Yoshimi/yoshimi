@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0308
+version 1.0403
 header_name {.h}
 code_name {.cc}
 comment {MasterUI.h} {not_in_source in_header
@@ -11,7 +11,7 @@ comment {MasterUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014-2024, Will Godfrey & others
+Copyright 2014-2025, Will Godfrey & others
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU General Public
@@ -533,9 +533,9 @@ class MasterUI {: {public GuiUpdates}
 
                 synth->signalGuiWindowClosed();
             }}
-      xywh {9 24 385 525} type Double labelfont 13 labelsize 12 resizable
+      xywh {9 24 385 525} type Double labelfont 13 labelsize 12 hide resizable
       code0 {mainDW = 385; mainDH = 470;}
-      code1 {masterwindow->size_range(394, 500, 0, 0, 0, 0, 1);} visible
+      code1 {masterwindow->size_range(394, 500, 0, 0, 0, 0, 1);}
     } {
       Fl_Box keyHandle {
         label keyhandler
@@ -837,6 +837,9 @@ class MasterUI {: {public GuiUpdates}
           bool wasCtrl = (Fl::event_state(FL_CTRL) != 0);
           if (query("", "Yes", "No", "Set *ALL* dynamic values to their defaults?") > 1)
           {
+              if (instrumentsWarning("Still reset"))
+                  return;
+
               if (wasCtrl || (Fl::event_state(FL_CTRL) != 0))
                   send_data(TOPLEVEL::action::muteAndLoop | TOPLEVEL::action::forceUpdate, MAIN::control::masterResetAndMlearn, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main);
               else
@@ -4330,6 +4333,48 @@ bpmfallback->format(format);} {}
             masterwindow->resize(x, y, w, h);
             //std::cout << "Screen ratio " << ratio << std::endl;
             ;} {}
+  }
+  Function {instrumentsWarning(string message)} {return_type bool} {
+    code {//
+    bool result = false;
+    int count = 0;
+    string changed = "";
+    for (int i = 0; i < 64; ++i)
+    {
+        bool set = collect_readData(synth, 0, MAIN::control::partsChanged, TOPLEVEL::main, i);
+        if (set)
+        {
+            ++count;
+            changed = (changed + " " + to_string(i + 1));
+        }
+    }
+    if (count)
+    {
+        if (count == 1)
+            changed = ("Instrument in part " + changed + " has been edited. ");
+        else
+            changed = ("Instruments in parts " + changed + " have been edited. ");
+        changed = changed + message;
+        result = (query("", "Yes", "No", changed) < 2);
+    }
+    return result;
+    ;} {}
+  }
+  Function {instrumentSingleWarning(int npart, string message)} {return_type bool} {
+    code {//
+    bool result = false;
+    string changed = "";
+
+    bool set = collect_readData(synth, 0, MAIN::control::partsChanged, TOPLEVEL::main, npart);
+    if (set)
+    {
+        changed = (changed + " " + to_string(npart + 1));
+        changed = ("Instrument in part " + changed + " has been edited. ");
+        changed = changed + message;
+        result = (query("", "Yes", "No", changed) < 2);
+    }
+    return result;
+    ;} {}
   }
   Function {wincheck()} {} {
     code {//

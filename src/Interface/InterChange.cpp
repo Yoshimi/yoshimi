@@ -755,6 +755,7 @@ int InterChange::indirectMain(CommandBlock& cmd, uchar &newMsg, bool &guiTo, str
 
             if (ok)
             {
+                partsChanged.reset(value);
                 synth.getRuntime().sessionSeen[TOPLEVEL::XML::Instrument] = true;
                 synth.addHistory(setExtension(text, EXTEN::zynInst), TOPLEVEL::XML::Instrument);
                 synth.part[value]->PyoshiType = (saveType & 2);
@@ -780,6 +781,7 @@ int InterChange::indirectMain(CommandBlock& cmd, uchar &newMsg, bool &guiTo, str
         case MAIN::control::saveNamedPatchset:
             if (synth.savePatchesXML(text))
             {
+                partsChanged = 0;
                 synth.addHistory(setExtension(text, EXTEN::patchset), TOPLEVEL::XML::Patch);
                 text = "d " + text;
             }
@@ -876,6 +878,7 @@ int InterChange::indirectMain(CommandBlock& cmd, uchar &newMsg, bool &guiTo, str
             string filename = setExtension(text, EXTEN::state);
             if (synth.saveState(filename))
             {
+                partsChanged = 0;
                 string defaultName = synth.getRuntime().defaultSession;
                 if ((text != defaultName)) // never include default state
                     synth.addHistory(filename, TOPLEVEL::XML::State);
@@ -1055,6 +1058,7 @@ int InterChange::indirectBank(CommandBlock& cmd, uchar& newMsg, bool& guiTo, str
                 text = "FAILED Could not save " + text + " to " + to_string(insert + 1);
             else
             { // 0x80 on engine indicates it is a save not a load
+                partsChanged.reset(parameter);
                 if (synth.getRuntime().bankHighlight)
                     synth.getRuntime().lastBankPart = (insert << 15) | (kititem << 8) | engine | 0x80;
                 text = "" + to_string(insert + 1) +". " + text;
@@ -1404,7 +1408,10 @@ int InterChange::indirectConfig(CommandBlock& cmd, uchar& newMsg, bool& guiTo, s
             {
                 text = synth.getRuntime().configFile;
                 if (synth.getRuntime().saveInstanceConfig())
+                {
+                    partsChanged = 0;
                     text = "d " + text;
+                }
                 else
                     text = " FAILED " + text;
             }
@@ -2122,8 +2129,8 @@ bool InterChange::commandSendReal(CommandBlock& cmd)
     if(npart < NUM_MIDI_PARTS && (type & TOPLEVEL::type::Write))
     {
         partsChanged.set(npart);
+
         std::cout<< std::endl;
-        //std::cout << std::bitset<64>(partsChanged) << std::endl;
         for (int i = 0; i < 64; ++i) // easier to reasd this way!
         {
             if (partsChanged.test(i))
@@ -2133,7 +2140,7 @@ bool InterChange::commandSendReal(CommandBlock& cmd)
             if ((i & 15) == 15)
                 std::cout<< std::endl;
         }
-        std::cout << "latest part " << int(npart) << " write" << std::endl;
+        std::cout << "latest part " << int(npart + 1) << " write" << std::endl;
     }
     if ((cmd.data.source & TOPLEVEL::action::muteAndLoop) == TOPLEVEL::action::lowPrio)
     {
@@ -3126,6 +3133,7 @@ void InterChange::commandConfig(CommandBlock& cmd)
         case CONFIG::control::saveAllXMLdata:
             if (write)
             {
+                partsChanged = 0;
                 synth.getRuntime().xmlmax = value_bool;
                 synth.getRuntime().updateConfig(control, value_int);
             }
