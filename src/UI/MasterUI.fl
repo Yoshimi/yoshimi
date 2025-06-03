@@ -516,6 +516,10 @@ class MasterUI {: {public GuiUpdates}
     Fl_Window masterwindow {
       label {Yoshimi meets ZynAddSubFX}
       callback {//
+            if (instrumentsWarning("Still exit"))
+            {
+                return;
+            }
             bool close = true;
             bool force = Fl::event_state(FL_CTRL);
             if (close)
@@ -604,7 +608,7 @@ class MasterUI {: {public GuiUpdates}
             break;
         case 10: // load
             {
-                if (synth->getGuiMaster()->instrumentSingleWarning(npart, " Overwrite"))
+                if (instrumentSingleWarning(npart, "Overwrite"))
                 {
                     return;
                 }
@@ -638,7 +642,7 @@ class MasterUI {: {public GuiUpdates}
             break;
         case 12: // recent
             {
-                if (synth->getGuiMaster()->instrumentSingleWarning(npart, " Overwrite"))
+                if (instrumentSingleWarning(npart, "Overwrite"))
                 {
                     return;
                 }
@@ -658,7 +662,7 @@ class MasterUI {: {public GuiUpdates}
             partui->instrumentReset->do_callback();
             break;
         case 14: // search
-            if (synth->getGuiMaster()->instrumentSingleWarning(npart, " Overwrite"))
+            if (instrumentSingleWarning(npart, "Overwrite"))
             {
                 return;
             }
@@ -678,7 +682,7 @@ class MasterUI {: {public GuiUpdates}
             bankui->Showbank();
             break;
         case 18: // load
-            if (synth->getGuiMaster()->instrumentsWarning(" Overwrite"))
+            if (instrumentsWarning("Overwrite"))
             {
                 return;
             }
@@ -701,7 +705,7 @@ class MasterUI {: {public GuiUpdates}
             break;
         case 20: // recent
             {
-                if (synth->getGuiMaster()->instrumentsWarning(" Overwrite"))
+                if (instrumentsWarning("Overwrite"))
                 {
                     return;
                 }

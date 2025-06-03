@@ -490,7 +490,7 @@ class PartUI {: {public Fl_Group, PartUI_}
                  fullClear = true;
          }
 
-         if (synth->getGuiMaster()->instrumentSingleWarning(npart, " Still clear"))
+         if (synth->getGuiMaster()->instrumentSingleWarning(npart, "Still clear"))
          {
              return;
          }
