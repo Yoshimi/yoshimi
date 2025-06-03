@@ -11,7 +11,7 @@ comment {BankUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2010, Alan Calvert
-Copyright 2014-2024, Will Godfrey & others
+Copyright 2014-2025, Will Godfrey & others
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU General Public
@@ -1261,6 +1261,10 @@ class BankUI {: {public BankProcess_, RootProcess_}
         bool slotFilled = (thisname > "!");
         if ((what == 1 || what == 3) && mode == 1 && slotFilled)
         {
+            if (synth->getGuiMaster()->instrumentSingleWarning(synth->getGuiMaster()->npart, " Overwrite"))
+            {
+                return;
+            }
             send_data(TOPLEVEL::action::forceUpdate, MAIN::control::loadInstrumentFromBank, slot, TOPLEVEL::type::Integer, TOPLEVEL::section::main, synth->getGuiMaster()->npart);
             // Reads from slot
             if (synth->getGuiMaster()->virkeyboard->virkeyboardwindow->visible())

@@ -656,7 +656,7 @@ int InterChange::indirectScales(CommandBlock& cmd, uchar& newMsg, bool& guiTo, s
 
 int InterChange::indirectMain(CommandBlock& cmd, uchar &newMsg, bool &guiTo, string &text, float &valuef)
 {
-    bool write = (cmd.data.type & TOPLEVEL::type::Write);
+    bool write  = (cmd.data.type & TOPLEVEL::type::Write);
     int value   = cmd.data.value;
     int control = cmd.data.control;
     int kititem = cmd.data.kit;
@@ -716,6 +716,7 @@ int InterChange::indirectMain(CommandBlock& cmd, uchar &newMsg, bool &guiTo, str
             text = textMsgBuffer.fetch(result & NO_MSG);
             if (result < 0x1000)
             {
+                partsChanged.reset(kititem);
                 if (synth.getRuntime().bankHighlight)
                     synth.getRuntime().lastBankPart = (value << 15) | (synth.getRuntime().currentBank << 8) | synth.getRuntime().currentRoot;
                 else

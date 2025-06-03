@@ -604,9 +604,13 @@ class MasterUI {: {public GuiUpdates}
             break;
         case 10: // load
             {
-            string filename = setfiler("", "", false, TOPLEVEL::XML::Instrument);
-            if (!filename.empty())
-                do_load_instrument(filename);
+                if (synth->getGuiMaster()->instrumentSingleWarning(npart, " Overwrite"))
+                {
+                    return;
+                }
+                string filename = setfiler("", "", false, TOPLEVEL::XML::Instrument);
+                if (!filename.empty())
+                    do_load_instrument(filename);
             }
             break;
         case 11: // save
@@ -634,6 +638,10 @@ class MasterUI {: {public GuiUpdates}
             break;
         case 12: // recent
             {
+                if (synth->getGuiMaster()->instrumentSingleWarning(npart, " Overwrite"))
+                {
+                    return;
+                }
             int xpos = masterwindow->x() + (masterwindow->w() * 0.15f);
             if (xpos + paramsui->Recent->w() > masterwindow->x() + masterwindow->w())
                 xpos = masterwindow->x() + masterwindow->w() - paramsui->Recent->w();
@@ -650,6 +658,10 @@ class MasterUI {: {public GuiUpdates}
             partui->instrumentReset->do_callback();
             break;
         case 14: // search
+            if (synth->getGuiMaster()->instrumentSingleWarning(npart, " Overwrite"))
+            {
+                return;
+            }
         if (!fetchData(0, PART::control::enable, npart))
             {
                 alert(synth, "Active part disabled");
@@ -666,30 +678,38 @@ class MasterUI {: {public GuiUpdates}
             bankui->Showbank();
             break;
         case 18: // load
+            if (synth->getGuiMaster()->instrumentsWarning(" Overwrite"))
+            {
+                return;
+            }
              do_load_master("");
             break;
         case 19: // save
             {
-            bool valid = false;
-            for (int npart = 0; npart < NUM_MIDI_PARTS; npart ++)
+                bool valid = false;
+                for (int npart = 0; npart < NUM_MIDI_PARTS; npart ++)
                 if (synth->part[npart]->Pname != DEFAULT_NAME)
                 {
                     valid = true;
                     npart = NUM_MIDI_PARTS;
                 }
-            if (valid)
-                do_save_master();
-            else
-                query("", "", "", "Nothing to save!");
+                if (valid)
+                    do_save_master();
+                else
+                    query("", "", "", "Nothing to save!");
             }
             break;
         case 20: // recent
             {
-            int xpos = masterwindow->x() + (masterwindow->w() * 0.35f);
-            if (xpos + paramsui->Recent->w() > masterwindow->x() + masterwindow->w())
-                xpos = masterwindow->x() + masterwindow->w() - paramsui->Recent->w();
-            paramsui->Recent->position(xpos,masterwindow->y()+20);
-            paramsui->Show(TOPLEVEL::XML::Patch);
+                if (synth->getGuiMaster()->instrumentsWarning(" Overwrite"))
+                {
+                    return;
+                }
+                int xpos = masterwindow->x() + (masterwindow->w() * 0.35f);
+                if (xpos + paramsui->Recent->w() > masterwindow->x() + masterwindow->w())
+                    xpos = masterwindow->x() + masterwindow->w() - paramsui->Recent->w();
+                paramsui->Recent->position(xpos,masterwindow->y()+20);
+                paramsui->Show(TOPLEVEL::XML::Patch);
             }
             break;
 
@@ -711,23 +731,25 @@ class MasterUI {: {public GuiUpdates}
 
         case 27: // load
             {
-            // for Alessandro
-            string filename = setfiler("", "", false, TOPLEVEL::XML::State);
-            if (!filename.empty())
-            {
                 if (instrumentsWarning("Still reset"))
-                  return;
-                setState(filename);
-            }
-            else
-                refresh_master_ui(0x80 | (textMsgBuffer.push(" ") << 8));
+                {
+                     return;
+                }
+                // for Alessandro
+                string filename = setfiler("", "", false, TOPLEVEL::XML::State);
+                if (!filename.empty())
+                {
+                    setState(filename);
+                }
+                else
+                    refresh_master_ui(0x80 | (textMsgBuffer.push(" ") << 8));
             }
             break;
         case 28: // save
             {
             // for Alessandro
-            string filename = setfiler("", "", true, TOPLEVEL::XML::State);
-            if (!filename.empty())
+                string filename = setfiler("", "", true, TOPLEVEL::XML::State);
+                if (!filename.empty())
                 {
                     send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedState, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(filename));
                 }
@@ -761,16 +783,16 @@ class MasterUI {: {public GuiUpdates}
             break;
         case 34: // load
             {
-            filename = setfiler("", "", false, TOPLEVEL::XML::Scale);
-            if (!filename.empty())
-                do_load_scale(string(filename));
+                filename = setfiler("", "", false, TOPLEVEL::XML::Scale);
+                if (!filename.empty())
+                    do_load_scale(string(filename));
             }
             break;
         case 35: // save
             {
-            string filename = setfiler("", "", true, TOPLEVEL::XML::Scale);
-            if (!filename.empty())
-                send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedScale, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(filename));
+                string filename = setfiler("", "", true, TOPLEVEL::XML::Scale);
+                if (!filename.empty())
+                    send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedScale, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(filename));
             }
             break;
         case 36: // recent
@@ -857,14 +879,14 @@ class MasterUI {: {public GuiUpdates}
         Fl_Button mainstop {
           label {Stop!}
           callback {//
-    send_data(TOPLEVEL::action::muteAndLoop, MAIN::control::stopSound, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
+                send_data(TOPLEVEL::action::muteAndLoop, MAIN::control::stopSound, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
           tooltip {Cease all sound immediately!} xywh {7 30 66 24} box PLASTIC_UP_BOX color 89 labelfont 1 labelsize 11 labelcolor 64 align 16
         }
         Fl_Dial mastervolumedial {
           label Volume
           callback {//
-          o->selection_color(setKnob(o->value(),90));
-          send_data(0, MAIN::control::volume, o->value(), 0, TOPLEVEL::section::main);}
+                o->selection_color(setKnob(o->value(),90));
+                send_data(0, MAIN::control::volume, o->value(), 0, TOPLEVEL::section::main);}
           tooltip {Master Volume} xywh {330 43 40 40} box ROUND_UP_BOX color 29 labelsize 10 labelcolor 64 maximum 127
           code0 {o->setValueType(VC_MasterVolume);}
           code1 {o->value(synth->Pvolume);}
@@ -874,17 +896,17 @@ class MasterUI {: {public GuiUpdates}
         Fl_Button mainvirtkeyb {
           label {Virtual Key&board}
           callback {//
-          virkeyboard->ShowKbd();}
+                virkeyboard->ShowKbd();}
           tooltip {Virtual Keyboard} xywh {81 60 106 24} box GTK_THIN_UP_BOX color 198 labelsize 11 labelcolor 64
         }
         Fl_Button mixerpanel {
           label {Mixer &Panel}
           callback {//
-          if(panelwindow->visible())
-              return;
-          panelType &= 3;
-          changepanelstyle(panelType);
-          updatepanel();
+                if(panelwindow->visible())
+                    return;
+                panelType &= 3;
+                changepanelstyle(panelType);
+                updatepanel();
           ;}
           tooltip {Mixer Panel Window} xywh {81 30 106 24} box GTK_THIN_UP_BOX color 198 labelsize 11 labelcolor 64
         }
@@ -897,29 +919,30 @@ class MasterUI {: {public GuiUpdates}
         Fl_Button vectors {
           label {&Vectors}
           callback {//
-          vectorui->Show(synth);}
+                vectorui->Show(synth);}
           tooltip {Vector Setup Window} xywh {195 30 66 24} box GTK_THIN_UP_BOX color 198 labelsize 11 labelcolor 64
         }
         Fl_Button undo {
           label {&Undo}
           callback {//
-        send_data(0, MAIN::control::undo,  0, TOPLEVEL::type::Integer, TOPLEVEL::section::undoMark);}
+                send_data(0, MAIN::control::undo,  0, TOPLEVEL::type::Integer, TOPLEVEL::section::undoMark);}
           tooltip {Revert last change} xywh {195 60 66 24} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 64
         }
         Fl_Button redo {
           label {&Redo}
           callback {//
-        send_data(0, MAIN::control::redo,  0, TOPLEVEL::type::Integer, TOPLEVEL::section::undoMark);}
+                send_data(0, MAIN::control::redo,  0, TOPLEVEL::type::Integer, TOPLEVEL::section::undoMark);}
           tooltip {Re-apply last change} xywh {195 91 66 24} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 64
         }
       }
       Fl_Tabs sysinsgroup {
         label {System/Insert}
         callback {//
-        if (o->value() == SystemEffectsGrp)
-            showSysEfxUI();
-        else if (o->value() == InsertionEffectsGrp)
-            showInsEfxUI();}
+            if (o->value() == SystemEffectsGrp)
+                showSysEfxUI();
+            else if (o->value() == InsertionEffectsGrp)
+                showInsEfxUI();
+            ;}
         xywh {3 148 379 68} box PLASTIC_UP_BOX color 44 selection_color 223 labeltype NO_LABEL labelsize 12 labelcolor 64 align 5
       } {
         Fl_Group SystemEffectsGrp {
@@ -1078,11 +1101,11 @@ class MasterUI {: {public GuiUpdates}
           Fl_Dial partVol {
             label Volume
             callback {//
-            if (npart >= panelgroup && npart < (panelgroup + NUM_MIDI_CHANNELS))
-                o->selection_color(setKnob(o->value(),96));
-            setPanelPartVolWidget(npart % NUM_MIDI_CHANNELS, o->value());
+                if (npart >= panelgroup && npart < (panelgroup + NUM_MIDI_CHANNELS))
+                    o->selection_color(setKnob(o->value(),96));
+                setPanelPartVolWidget(npart % NUM_MIDI_CHANNELS, o->value());
 
-            send_data(0, PART::control::volume, o->value(), TOPLEVEL::type::Integer, npart);}
+                send_data(0, PART::control::volume, o->value(), TOPLEVEL::type::Integer, npart);}
             xywh {340 356 32 32} labelsize 10 labelcolor 64 maximum 127 step 1
             code0 {o->value(fetchData(0, PART::control::volume, npart));}
             code1 {o->setValueType(VC_PartVolume);}
@@ -1092,9 +1115,9 @@ class MasterUI {: {public GuiUpdates}
           Fl_Dial partPan {
             label Panning
             callback {//
-            o->selection_color(setKnob(o->value(),64));
+                o->selection_color(setKnob(o->value(),64));
 
-            send_data(TOPLEVEL::action::forceUpdate, PART::control::panning, o->value(), TOPLEVEL::type::Integer, npart);}
+                send_data(TOPLEVEL::action::forceUpdate, PART::control::panning, o->value(), TOPLEVEL::type::Integer, npart);}
             xywh {292 356 32 32} labelsize 10 labelcolor 64 maximum 127 step 1
             code0 {o->value(fetchData(0, PART::control::panning, npart));}
             code1 {o->setValueType(VC_PanningStd);}
@@ -1165,17 +1188,18 @@ class MasterUI {: {public GuiUpdates}
           Fl_Spinner partMidiCh {
             label Midi
             callback {//
-          int tmp = int(o->value()) -1;
-          if (tmp >= NUM_MIDI_CHANNELS)
-          {
-              tmp &= (NUM_MIDI_CHANNELS - 1);
-              o->value(tmp +1);
-          }
-          o->textcolor(gen_text);
-          if (npart >= panelgroup && npart < (panelgroup + NUM_MIDI_CHANNELS))
-              setPanelPartMidiWidget(npart % NUM_MIDI_CHANNELS, tmp);
+                int tmp = int(o->value()) -1;
+                if (tmp >= NUM_MIDI_CHANNELS)
+                {
+                    tmp &= (NUM_MIDI_CHANNELS - 1);
+                    o->value(tmp +1);
+                }
+                o->textcolor(gen_text);
+                if (npart >= panelgroup && npart < (panelgroup + NUM_MIDI_CHANNELS))
+                    setPanelPartMidiWidget(npart % NUM_MIDI_CHANNELS, tmp);
 
-          send_data(0, PART::control::midiChannel, tmp, TOPLEVEL::type::Integer, npart);}
+                send_data(0, PART::control::midiChannel, tmp, TOPLEVEL::type::Integer, npart);
+                ;}
             tooltip {MIDI channel for this part} xywh {35 381 40 19} color 7 labelsize 12 labelcolor 64 maximum 16 textsize 11 textcolor 64
             code0 {int num = fetchData(0,  PART::control::midiChannel, npart); o->value(num + 1); if (num < NUM_MIDI_CHANNELS) o->textcolor(gen_text); else o->textcolor(gen_opp_text);}
             class WidgetSpinner
@@ -3934,10 +3958,6 @@ Alan Calvert started the project}
   Function {do_load_instrument(string fname)} {} {
     code {//
     int npart = partui->npart;
-    if (synth->getGuiMaster()->instrumentSingleWarning(npart, " Overwrite"))
-    {
-        return;
-    }
 
     if ((npart & 0x30) == (panelgroup & 0x30))
     {
@@ -3956,10 +3976,7 @@ Alan Calvert started the project}
         if (filename.empty())
             return;
     }
-    if (synth->getGuiMaster()->instrumentsWarning(" Overwrite"))
-    {
-        return;
-    }
+
     send_data(TOPLEVEL::action::muteAndLoop | TOPLEVEL::action::forceUpdate, MAIN::control::loadNamedPatchset, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(filename));} {}
   }
   Function {do_save_master()} {} {
