@@ -50,8 +50,6 @@ class PADnoteParameters;
 extern std::string singlePath;
 extern int startInstance;
 
-using std::bitset;
-
 /* compile time function log2 as per
    https://hbfs.wordpress.com/2016/03/22/log2-with-c-metaprogramming          */
 static constexpr size_t log2
@@ -122,8 +120,6 @@ class InterChange : private DataText
         void testLimits(CommandBlock&);
         float returnLimits(CommandBlock&);
         void Log(std::string const& msg);
-
-        std::bitset<64> partsChanged;
 
         std::atomic<bool> syncWrite;
         std::atomic<bool> lowPrioWrite;
@@ -209,6 +205,7 @@ class InterChange : private DataText
         int searchInst;
         int searchBank;
         int searchRoot;
+        std::bitset<64> partsChanged;
 };
 
 #endif

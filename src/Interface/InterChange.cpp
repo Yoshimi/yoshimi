@@ -117,7 +117,8 @@ InterChange::InterChange(SynthEngine& synthInstance)
     swapInstrument1(UNUSED),
     searchInst(0),
     searchBank(0),
-    searchRoot(0)
+    searchRoot(0),
+    partsChanged{}
 {
     noteSeen = false;
     undoLoopBack = false;
@@ -126,8 +127,6 @@ InterChange::InterChange(SynthEngine& synthInstance)
     undoStart = false;
     cameFrom = envControl::input;
     undoMarker.data.part = TOPLEVEL::section::undoMark;
-
-    static bitset<64> partsChanged(0);
 
     sem_init(&sortResultsThreadSemaphore, 0, 0);
 }
@@ -2132,17 +2131,18 @@ bool InterChange::commandSendReal(CommandBlock& cmd)
 
     uchar type    = cmd.data.type;
     uchar control = cmd.data.control;
+    uchar engine = cmd.data.engine;
     if(npart < NUM_MIDI_PARTS && (type & TOPLEVEL::type::Write))
     {
         partsChanged.set(npart);
 
         std::cout<< std::endl;
-        for (int i = 0; i < 64; ++i) // easier to reasd this way!
+        for (int i = 0; i < 64; ++i) // easier to read this way!
         {
             if (partsChanged.test(i))
                 std::cout << "1";
             else
-                std::cout << "0";
+                    std::cout << "0";
             if ((i & 15) == 15)
                 std::cout<< std::endl;
         }
@@ -2155,7 +2155,6 @@ bool InterChange::commandSendReal(CommandBlock& cmd)
 
     uchar kititem = cmd.data.kit;
     uchar effSend = cmd.data.kit;
-    uchar engine  = cmd.data.engine;
     uchar insert  = cmd.data.insert;
 
     bool isGui = ((cmd.data.source & TOPLEVEL::action::noAction) == TOPLEVEL::action::fromGUI);

@@ -118,6 +118,7 @@ class CmdInterpreter
         int commandPart(Parser& input, unsigned char controlType);
         int commandTest(Parser& input, unsigned char controlType);
         int commandReadnSet(Parser& input, unsigned char controlType);
+        bool checkOnePart(SynthEngine *synth, uchar npart);
         void presetsControl(float value, unsigned char type, unsigned char section, unsigned char kitNumber, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char offset = UNUSED,unsigned char miscmsg = UNUSED);
         Reply processSrcriptFile(const string& filename, bool toplevel = true);
 

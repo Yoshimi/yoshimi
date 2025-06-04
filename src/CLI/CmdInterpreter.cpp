@@ -7162,4 +7162,25 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
 }
 
 
+bool  CmdInterpreter::checkOnePart(SynthEngine *synth, uchar npart)
+{
+    CommandBlock checkData;
+    checkData.data.value = 0;
+    checkData.data.type = 0;
+    checkData.data.control = MAIN::control::partsChanged;
+    checkData.data.part = TOPLEVEL::section::main;
+    checkData.data.kit = npart;
+    checkData.data.engine = UNUSED;
+    checkData.data.insert = UNUSED;
+    checkData.data.parameter = UNUSED;
+    checkData.data.insert = UNUSED;
+    bool changed = synth->interchange.readAllData(checkData);
+    if (changed)
+    {
+        changed = query("part has been editied. Overwrite");
+    }
+    return changed;
+}
+
+
 }//(End)namespace cli
