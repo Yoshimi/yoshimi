@@ -86,6 +86,7 @@ class CmdInterpreter
         void defaults();
         void resetInstance(unsigned int newInstance);
         bool query(string text);
+        bool testPartsChanged(string message, int partNum = UNUSED);
         void helpLoop(list<string>& msg, string *commands, int indent, bool single = false);
         char helpList(Parser& input, unsigned int local);
         void copypasteList(string name);

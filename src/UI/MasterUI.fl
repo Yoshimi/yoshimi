@@ -735,7 +735,7 @@ class MasterUI {: {public GuiUpdates}
 
         case 27: // load
             {
-                if (instrumentsWarning("Still reset"))
+                if (instrumentsWarning("Overwrite"))
                 {
                      return;
                 }

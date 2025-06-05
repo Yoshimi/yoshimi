@@ -538,6 +538,10 @@ class BankUI {: {public BankProcess_, RootProcess_}
         int result = o->value();
         if (result < 0)
             return;
+        if (synth->getGuiMaster()->instrumentSingleWarning(synth->getGuiMaster()->npart, "Overwrite"))
+        {
+            return;
+        }
         string line = string(o->text(result));
         int root = string2int(line.substr(0, 3));
         int bank = string2int(line.substr(5, 3));
