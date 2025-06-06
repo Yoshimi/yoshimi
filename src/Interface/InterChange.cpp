@@ -801,6 +801,11 @@ int InterChange::indirectMain(CommandBlock& cmd, uchar &newMsg, bool &guiTo, str
                 cmd.data.insert = tmp;
                 synth.addHistory(setExtension(text, EXTEN::vector), TOPLEVEL::XML::Vector);
                 text = "ed " + text + " to chan " + to_string(int(tmp + 1));
+                for (int i = 0; i < NUM_MIDI_PARTS; i+= NUM_MIDI_CHANNELS)
+                {
+                    partsChanged.reset(tmp + i);
+                }
+            synth.CBtest(&cmd);
             }
             else
                 text = " FAILED " + text;
@@ -819,6 +824,10 @@ int InterChange::indirectMain(CommandBlock& cmd, uchar &newMsg, bool &guiTo, str
             {
                 synth.addHistory(setExtension(text, EXTEN::vector), TOPLEVEL::XML::Vector);
                 text = "d " + text;
+                for (int i = 0; i < NUM_MIDI_PARTS; i+= NUM_MIDI_CHANNELS)
+                {
+                    partsChanged.reset(insert + i);
+                }
             }
             else
             {

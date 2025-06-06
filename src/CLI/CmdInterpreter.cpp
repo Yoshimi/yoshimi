@@ -591,7 +591,8 @@ bool CmdInterpreter::query(string text)
 bool CmdInterpreter::testPartsChanged(string message, int partNum)
 {
     string replyMsg = "";
-    bool found = false;
+    //bool found = false;
+    int count = 0;
     if (partNum >= NUM_MIDI_PARTS)
     {
         for (int i = 0; i < NUM_MIDI_PARTS; ++ i)
@@ -599,28 +600,30 @@ bool CmdInterpreter::testPartsChanged(string message, int partNum)
             if (readControl(synth, 0, MAIN::control::partsChanged, TOPLEVEL::section::main, i))
             {
                 replyMsg = (replyMsg + " " + to_string(i + 1));
-                found = true;
+                //found = true;
+                ++ count;
             }
         }
     }
     else if (readControl(synth, 0, MAIN::control::partsChanged, TOPLEVEL::section::main, partNum))
     {
         replyMsg =  " " + to_string(partNum + 1);
-        found = true;
+        //found = true;
+        ++ count;
     }
-    if (not found)
+    if (count == 0)
         return true;
 
-    if (replyMsg.size() > 2)
+    if (count > 1)
         replyMsg = "Instruments in parts " + replyMsg + " have been edited. ";
     else
         replyMsg = "Instrument in part " + replyMsg + " has been edited. ";
     replyMsg += message;
     if (synth->getRuntime().toConsole)
         cout << replyMsg << "? (y / {other})" << endl;
-    found = query(replyMsg);
+    //found = query(replyMsg);
 
-    return found;
+    return query(replyMsg);
 }
 
 
@@ -6834,7 +6837,6 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
         }
         if (input.matchnMove(2, "vector"))
         {
-            string loadChan;
             unsigned char ch;
             if (input.matchnMove(1, "channel"))
             {
@@ -6846,17 +6848,40 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
                 }
                 else
                     ch = chan;
-                loadChan = "channel " + asString(ch + 1);
             }
             else
             {
-                ch = UNUSED;
-                loadChan = "source channel";
+                ch = chan;
             }
-            if (ch != UNUSED && ch >= NUM_MIDI_CHANNELS)
+            if (ch >= NUM_MIDI_CHANNELS)
                 return Reply{REPLY::range_msg};
+
             if (input.isAtEnd())
                 return Reply{REPLY::name_msg};
+
+            int count = 0;
+            string replyMsg = "";
+            for (int i = ch; i < (ch + NUM_MIDI_PARTS); i += NUM_MIDI_CHANNELS)
+            {
+                if (readControl(synth, 0, MAIN::control::partsChanged, TOPLEVEL::section::main, i))
+                {
+                    replyMsg = (replyMsg + " " + to_string(i + 1));
+                    ++ count;
+                }
+            }
+            if (count)
+            {
+                if (count > 1)
+                    replyMsg = "Instruments in parts " + replyMsg + " have been edited";
+                else
+                    replyMsg = "Instrument in part " + replyMsg + " has been edited";
+                replyMsg += ". Overwrite";
+                if (synth->getRuntime().toConsole)
+                    cout << replyMsg << "? (y / {other})" << endl;
+                if (not query(replyMsg))
+                    return Reply::DONE;
+            }
+
             string name;
             if (input.nextChar('@'))
             {
@@ -6875,8 +6900,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
                 if (name == "")
                     return Reply{REPLY::name_msg};
             }
-            if (not testPartsChanged("Overwrite"))
-                return REPLY::done_msg;
+
             sendDirect(synth, TOPLEVEL::action::muteAndLoop, 0, TOPLEVEL::type::Write, MAIN::control::loadNamedVector, TOPLEVEL::section::main, UNUSED, UNUSED, ch, UNUSED, UNUSED, textMsgBuffer.push(name));
             return Reply::DONE;
         }

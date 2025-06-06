@@ -386,7 +386,9 @@ void TextData::encodePart(string& source, CommandBlock& allData)
     else if (findAndStep(source, "Panning"))
         ctl = PART::control::panning;
     else if (findAndStep(source, "Volume"))
+    {
         ctl = PART::control::volume;
+    }
     else if (findAndStep(source, "Humanise"))
     {
         if (findAndStep(source, "Pitch"))

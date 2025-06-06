@@ -634,7 +634,7 @@ namespace PART // usage PART::control::volume
         enableSub,
         enablePad,
         enableKitLine,
-        volume,
+        volume = 6,
         velocitySense,
         panning,
         velocityOffset,
