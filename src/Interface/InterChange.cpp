@@ -2144,7 +2144,7 @@ bool InterChange::commandSendReal(CommandBlock& cmd)
     if(npart < NUM_MIDI_PARTS && (type & TOPLEVEL::type::Write))
     {
         partsChanged.set(npart);
-
+/*
         std::cout<< std::endl;
         for (int i = 0; i < 64; ++i) // easier to read this way!
         {
@@ -2156,7 +2156,9 @@ bool InterChange::commandSendReal(CommandBlock& cmd)
                 std::cout<< std::endl;
         }
         std::cout << "latest part " << int(npart + 1) << " write" << std::endl;
+        */
     }
+
     if ((cmd.data.source & TOPLEVEL::action::muteAndLoop) == TOPLEVEL::action::lowPrio)
     {
         return true; // indirect transfer

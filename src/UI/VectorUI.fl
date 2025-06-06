@@ -899,6 +899,28 @@ switch (res)
         if (fname.empty())
             return;
     }
+
+    string replyMsg = "";
+    int count = 0;
+    for (int i = BaseChan; i < (BaseChan + NUM_MIDI_PARTS); i += NUM_MIDI_CHANNELS)
+    {
+        if (collect_readData(synth, 0, MAIN::control::partsChanged, TOPLEVEL::section::main, i))
+        {
+            replyMsg = (replyMsg + " " + to_string(i + 1));
+            ++ count;
+        }
+    }
+    if (count)
+    {
+        if (count > 1)
+            replyMsg = "Instruments in parts " + replyMsg + " have been edited";
+        else
+            replyMsg = "Instrument in part " + replyMsg + " has been edited";
+        replyMsg += ". Overwrite?";
+        if (synth->getGuiMaster()->query("", "Yes", "No", replyMsg) < 2)
+            return;
+    }
+
     send_data(TOPLEVEL::action::muteAndLoop | TOPLEVEL::action::forceUpdate, MAIN::loadNamedVector, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, BaseChan, UNUSED, textMsgBuffer.push(fname));} {}
   }
   Function {saveVector()} {} {
