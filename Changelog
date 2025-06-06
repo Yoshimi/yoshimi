@@ -1,5 +1,9 @@
 yoshimi 2.3.3.3 M
 
+2025-6-6 Will
+bn 2387
+Merged in changed parts warnings from parts branch.
+
 2025-5-26 Will
 bn 2386
 Fixed Omni CLI off by one error and clarified messages.
