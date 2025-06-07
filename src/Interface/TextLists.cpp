@@ -124,7 +124,7 @@ std::string configlist [] = {
 
     "STate [s]",           "* autoload default at start (ON, {other})",
     "SIngle [s]",          "* force 2nd startup to open new instance instead (ON, {other})",
-    "Hide [s]",            "non-fatal errors (ON, {other})",
+    "Hide [s]",            "non-essential reports (ON, {other})",
     "Display [s]",         "GUI splash screen (ON, {other})",
     "Time [s]",            "add to instrument load message (ON, {other})",
     "Include [s]",         "XML headers on file load(Enable {other})",

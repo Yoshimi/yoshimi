@@ -284,7 +284,7 @@ fillThemes();
             class Fl_Check_Button2
           }
           Fl_Check_Button nonFatal {
-            label {Hide Non Fatal Errors}
+            label {Hide Non-essential Reports}
             callback {//
                         send_data(0, CONFIG::control::hideNonFatalErrors, o->value(), TOPLEVEL::type::Integer);}
             xywh {190 60 27 25} down_box DOWN_BOX selection_color 64 labelsize 12 labelcolor 64 align 4

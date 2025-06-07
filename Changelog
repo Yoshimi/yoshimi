@@ -1,6 +1,11 @@
 yoshimi 2.3.4 rc1
 
-2025-6-6 Will
+2025-6-7 Will
+bn 2389
+Changed wording of Hinde Non-fatal Errors to Hide Non-essential reports.
+Corrected accidentally changed Part label in globals.h
+
+2025-6-7 Will
 Tested LV2 for Ardour and Qtractor.
 Prepared background doccumentation.
 Further adjustments to user guide.
