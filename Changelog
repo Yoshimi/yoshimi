@@ -1,4 +1,14 @@
-yoshimi 2.3.3.3 M
+yoshimi 2.3.4 rc1
+
+2025-6-6 Will
+Tested LV2 for Ardour and Qtractor.
+Prepared background doccumentation.
+Further adjustments to user guide.
+
+2025-6-6 Will
+bn 2388
+Updated HTML user guide.
+Set version 2.3.4 rc1
 
 2025-6-6 Will
 bn 2387

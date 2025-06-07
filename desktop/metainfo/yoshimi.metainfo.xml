@@ -38,13 +38,16 @@
     Version 2.3.2 adds the ability to set different left/right repeat rates in the Echo effect.
     </p>
     <p>
-    Version 2.3.3 has improved memory management, extension to keyboard shortcuts, better configurastion control, and expands theme colour control, and adds realtime theme editing.
+    Version 2.3.3 has improved memory management, extension to keyboard shortcuts, better configuration control, and expands theme colour control, and adds realtime theme editing.
+    </p>
+    Version 2.3.3 A new 'Omni' made has been added. Warnings provided when overwriting edited  instruments. Revision of XML files for cross-compatibility with MXML versions.
+    <p>
     </p>
   </description>
    <launchable type="desktop-id">yoshimi.desktop</launchable>
 
   <releases>
-      <release type="stable" version="2.3.3.2" date="2024-12-03" />
+      <release type="stable" version="2.3.4" date="2025-06-09" />
   </releases>
   <provides>
     <binary>yoshimi</binary>

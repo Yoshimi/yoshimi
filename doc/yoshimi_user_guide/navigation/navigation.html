@@ -99,20 +99,25 @@
       Selecting one of these doesn't actually set the <em>path</em> field as you may be simply wanting to organise the list. Clicking on the <b>Set</b> button will do so and return you to the main filer view. Also, a <em>double</em> click on one of the items will set the path and return you to the main view.
       <br><br>
       Clicking on the <em>Set</em> button will always set the highlighted entry, so entering the view then immediately doing this is a quick way to set the default.
-      <br><br>
-    <b>Note</b>
-    <br>
-    &emsp;Each time Yoshimi is started, loading and saving external <em>instruments</em> will always offer the default location (as set here). At other times and with all other file types the most recently seen will be offered (unless the recently seen list is empty).
-    </p>
-    <p>
     <h2 style="text-align: center">Various filer headings</h2>
     <img src="images/tuning_import.png" alt="Filer Tuning" class="double">
     <img src="images/bank_root.png" alt="Filer Root" class="double">
     <img src="images/bank_export.png" alt="Filer Export" class="double">
     <img src="images/bank_import.png" alt="Filer Import" class="double">
+    <br><br>
     <b>Note</b>
     <br>
     &emsp;Neither 'Path to Bank Root dirs' nor 'Bank to Import' have a name field. This is because you are directly importing or registering a path <em>containing</em> the respective files, not the individual files. Therefore the path 'leaf' <em>is</em> the name. However, when <em>exporting</em> a bank, you will want to give it a name.
+    </p>
+    <p>
+    &emsp;Each time Yoshimi is started, loading and saving external <em>instruments</em> will always offer the default location (as set here). At other times and with all other file types the most recently seen will be offered (unless the recently seen list is empty).
+    <br>
+    &emsp;Instruments are special. If they are accidentally overwritten, there will be no way to recreate them exactly as they were. For this reason you will also see a warning message if you take any action that could destroy edited but unsaved instruments.<br>
+    Typically:<br>
+    &emsp; Instruments in parts 2 5 21 44 have been edited. Still exit?
+    <br>
+    Or when loading a single instrument:<br>
+    &emsp; Instrument in part 7 has been edited. Overwrite?
     </p>
     <p>
     <a href="../main.html">Next</a> (The Main Window)

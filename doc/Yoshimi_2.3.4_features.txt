@@ -1,0 +1,26 @@
+Version 2.3.4
+
+There is a new 'Omni' control. Any part can now be set to receive MIDI from all incoming channels. This has also triggered a significant change to the main window layout.
+
+You are now warned if any load or clear action could overwrite edited but unsaved instruments. These would be inpossible to recreate precisely. The same warning is given if you try to exit Yoshimi with unchanged instruments in place. All the part numbers with changed instruments are listed.
+Typically: Instruments in parts 2 5 33 52 have been edited. Still Exit?
+
+However, you are no longer warned about unsaved configuration changes, as these are now filed as they are made.
+
+There has been further updating of the underlying code structure. In particular a major effort has been made to enable recognition of MXML version 4.x as well as 3.x.
+
+We've also made smaller changes needed for FLTK 1.4.x compatibility.
+
+For improved consistency some yes/no configuration controls have had the stored setting swapped, so we advise checking these the first time you run version V2.3.4.
+
+Yoshimi source code is available from either:
+https://sourceforge.net/projects/yoshimi
+Or:
+https://github.com/Yoshimi/yoshimi
+
+Full build instructions are in 'INSTALL'.
+
+Our list archive is at:
+https://www.freelists.org/archive/yoshimi
+To post, email to:
+yoshimi@freelists.org
