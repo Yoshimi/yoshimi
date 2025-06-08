@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0308
+version 1.0403
 header_name {.h}
 code_name {.cpp}
 decl {\#include <cmath>} {public local
@@ -67,14 +67,15 @@ decl {\#include "Misc/TextMsgBuffer.h"
 }
 
 class ConfigUI {} {
-  Function {isLV2()} {return_type bool} {
-      code { return synth->getRuntime().isLV2; } {}
+  Function {isLV2()} {return_type bool
+  } {
+    code {return synth->getRuntime().isLV2;} {}
   }
   Function {make_window()} {} {
     Fl_Window configwindow {
       label {Yoshimi Settings}
       callback {close->do_callback();}
-      xywh {905 61 390 330} type Double hide resizable
+      xywh {578 67 390 330} type Double hide resizable
       code0 {o->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("Settings"), UNUSED, TOPLEVEL::windowTitle)).c_str());}
       code1 {if (isLV2()){jackTab->deactivate();alsaTab->deactivate();}}
       code2 {confDW = o->w();confDH = o->h();}
@@ -181,7 +182,7 @@ fillThemes();
       Fl_Group configTabs {
         xywh {5 5 385 298} labelcolor 64
       } {
-        Fl_Group mainTab {
+        Fl_Group mainTab {open
           xywh {5 25 382 277} box THIN_UP_BOX labelsize 12 labelcolor 64 hide
         } {
           Fl_Choice buff_size {
@@ -273,7 +274,7 @@ fillThemes();
           }
         }
         Fl_Group switchesTab {
-          xywh {5 25 382 277} box THIN_UP_BOX labelsize 12 labelcolor 64 hide
+          xywh {5 25 382 277} box THIN_UP_BOX labelsize 12 labelcolor 64
         } {
           Fl_Check_Button bankHighlight {
             label {Enable Bank Highlight}
@@ -281,6 +282,14 @@ fillThemes();
                         send_data(0, CONFIG::control::enableHighlight, o->value(), TOPLEVEL::type::Integer);}
             tooltip {Show the last patch fetched from or saved to a bank} xywh {190 40 27 25} down_box DOWN_BOX selection_color 64 labelsize 12 labelcolor 64 align 4
             code0 {o->value(synth->getRuntime().bankHighlight);}
+            class Fl_Check_Button2
+          }
+          Fl_Check_Button partReports {
+            label {Enable Part  Reports}
+            callback {//
+                        send_data(0, CONFIG::control::enablePartReports, o->value(), TOPLEVEL::type::Integer);}
+            tooltip {Show the last patch fetched from or saved to a bank} xywh {220 40 27 25} down_box DOWN_BOX selection_color 64 labelsize 12 labelcolor 64 align 8
+            code0 {o->value(synth->getRuntime().enablePartReports);}
             class Fl_Check_Button2
           }
           Fl_Check_Button nonFatal {
@@ -767,7 +776,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
         }
         Fl_Group themeTab {
           callback {//}
-          xywh {5 25 382 277} box THIN_UP_BOX
+          xywh {5 25 382 277} box THIN_UP_BOX hide
         } {
           Fl_Browser theme_browser {
             label Themes
@@ -908,7 +917,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
                 synth->getGuiMaster()->themeTrigger = true;
                 ;}
             xywh {256 250 102 20} down_box DOWN_BOX selection_color 64 labelsize 12 labelcolor 64
-                code0 {o->value(0);}
+            code0 {o->value(0);}
           }
         }
         Fl_Box patch1 {
@@ -1094,6 +1103,9 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
                     break;
                 case CONFIG::control::enableHighlight:
                     bankHighlight->value(value_bool);
+                    break;
+                case CONFIG::control::enablePartReports:
+                    partReports->value(value_bool);
                     break;
 
                 case CONFIG::control::historyLock:
@@ -2149,6 +2161,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
     Tab2->labelsize(size);
     handlePadSynthBuild->labelsize(size);
     bankHighlight->labelsize(size);
+    partReports->labelsize(size);
     setDefaultState->labelsize(size);
     nonFatal->labelsize(size);
     showSplash->labelsize(size);

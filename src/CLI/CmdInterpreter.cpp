@@ -3258,6 +3258,11 @@ int CmdInterpreter::commandConfig(Parser& input, unsigned char controlType)
         command = CONFIG::control::hideNonFatalErrors;
         value = (input.toggle() == 1);
     }
+    else if (input.matchnMove(1, "warn"))
+    {
+        command = CONFIG::control::enablePartReports;
+        value = (input.toggle() == 1);
+    }
     else if (input.matchnMove(1, "display"))
     {
         command = CONFIG::control::showSplash;

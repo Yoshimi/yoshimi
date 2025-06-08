@@ -2143,7 +2143,8 @@ bool InterChange::commandSendReal(CommandBlock& cmd)
     uchar engine = cmd.data.engine;
     if(npart < NUM_MIDI_PARTS && (type & TOPLEVEL::type::Write))
     {
-        partsChanged.set(npart);
+        if (synth.getRuntime().enablePartReports)
+            partsChanged.set(npart);
 /*
         std::cout<< std::endl;
         for (int i = 0; i < 64; ++i) // easier to read this way!
@@ -3108,7 +3109,16 @@ void InterChange::commandConfig(CommandBlock& cmd)
             }
             else
                 value = synth.getRuntime().gzipCompression;
-            break;
+        break;
+        case CONFIG::control::enablePartReports:
+            if (write)
+            {
+                synth.getRuntime().enablePartReports = value_bool;
+                synth.getRuntime().updateConfig(control, value);
+                if (not value_bool)
+                    partsChanged = 0;
+            }
+        break;
 
         case CONFIG::control::defaultStateStart:
             if (write)

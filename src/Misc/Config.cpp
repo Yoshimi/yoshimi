@@ -170,6 +170,7 @@ Config::Config(SynthEngine& synthInstance)
     , logXMLheaders{false}
     , xmlmax{false}
     , gzipCompression{3}
+    , enablePartReports{false}
     , samplerate{48000}
     , rateChanged{false}
     , buffersize{256}
@@ -571,6 +572,7 @@ void Config::initBaseConfig(XMLStore& xml)
             base.addPar_bool("enable_auto_instance" , autoInstance);
             base.addPar_uint("handle_padsynth_build", handlePadSynthBuild);
             base.addPar_int ("gzip_compression"     , gzipCompression);
+            base.addPar_bool("enable_part_reports" , enablePartReports);
             base.addPar_bool("banks_checked"        , banksChecked);
             base.addPar_uint("active_instances"     , activeInstances.to_ulong());
             base.addPar_str ("guide_version"        , guideVersion);
@@ -682,6 +684,7 @@ bool Config::updateConfig(int configKey, int value)
                 par(Cfg::enableAutoInstance ) = xmlBase.getPar_bool("enable_auto_instance",false);
                 par(Cfg::handlePadSynthBuild) = xmlBase.getPar_uint("handle_padsynth_build",1,0,2);
                 par(Cfg::XMLcompressionLevel) = xmlBase.getPar_int ("gzip_compression",3,0,9);
+                par(Cfg::enablePartReports  ) = xmlBase.getPar_bool("enable_part_reports",false);
                 par(Cfg::banksChecked       ) = xmlBase.getPar_bool("banks_checked",false);
 
                 // Alter the specific config value given
@@ -698,6 +701,7 @@ bool Config::updateConfig(int configKey, int value)
                 xmlBase.addPar_bool("enable_auto_instance" , par(Cfg::enableAutoInstance));
                 xmlBase.addPar_uint("handle_padsynth_build", par(Cfg::handlePadSynthBuild));
                 xmlBase.addPar_int ("gzip_compression"     , par(Cfg::XMLcompressionLevel));
+                xmlBase.addPar_int ("enable_part_reports" , par(Cfg::enablePartReports));
                 xmlBase.addPar_bool("banks_checked"        , par(Cfg::banksChecked));
 
                 // the following are system defined;
@@ -845,10 +849,11 @@ bool Config::extractBaseParameters(XMLStore& xml)
     if (autoInstance)
         activeInstances = bitset<32>{basePars.getPar_uint("active_instances", 0)};
     handlePadSynthBuild = basePars.getPar_uint("handle_padsynth_build", 1, 0, 2);  // 0 = blocking/muted, 1 = background thread (=default), 2 = auto-Apply on param change
-    gzipCompression = basePars.getPar_int("gzip_compression", gzipCompression, 0, 9);
-    banksChecked    = basePars.getPar_bool("banks_checked", banksChecked);
-    guideVersion    = basePars.getPar_str("guide_version");
-    manualFile      = basePars.getPar_str("manual");
+    gzipCompression   = basePars.getPar_int("gzip_compression", gzipCompression, 0, 9);
+    enablePartReports = basePars.getPar_bool("enable_part_reports",enablePartReports);
+    banksChecked      = basePars.getPar_bool("banks_checked", banksChecked);
+    guideVersion      = basePars.getPar_str("guide_version");
+    manualFile        = basePars.getPar_str("manual");
 
     migrateLegacyPresetsList(basePars);
     return true;

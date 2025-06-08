@@ -182,6 +182,7 @@ class Config
         bool          logXMLheaders;
         bool          xmlmax;
         uint          gzipCompression;
+        bool          enablePartReports;
         string        guideVersion;
 
         uint  samplerate;

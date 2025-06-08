@@ -1,8 +1,14 @@
-yoshimi 2.3.4 rc1
+yoshimi 2.3.4 rc2
+
+2025-6-7 Will
+bn 2390
+Implemented new control "Warn parts changed"
+    defaults to disabled.
+Set version 2.3.4 rc2
 
 2025-6-7 Will
 bn 2389
-Changed wording of Hinde Non-fatal Errors to Hide Non-essential reports.
+Changed wording of Hide Non-fatal Errors to Hide Non-essential reports.
 Corrected accidentally changed Part label in globals.h
 
 2025-6-7 Will

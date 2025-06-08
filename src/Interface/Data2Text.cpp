@@ -609,6 +609,9 @@ string DataText::resolveConfig(SynthEngine& synth, CommandBlock& cmd, bool addVa
         case CONFIG::control::XMLcompressionLevel:
             contstr = "XML compression";
             break;
+        case CONFIG::control::enablePartReports:
+            contstr = "part_changed_reports";
+            break;
         case CONFIG::control::reportsDestination:
             contstr = "Reports to ";
             if (addValue)
