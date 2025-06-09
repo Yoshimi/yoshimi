@@ -1422,10 +1422,7 @@ int InterChange::indirectConfig(CommandBlock& cmd, uchar& newMsg, bool& guiTo, s
             {
                 text = synth.getRuntime().configFile;
                 if (synth.getRuntime().saveInstanceConfig())
-                {
-                    partsChanged = 0;
                     text = "d " + text;
-                }
                 else
                     text = " FAILED " + text;
             }
@@ -3159,7 +3156,6 @@ void InterChange::commandConfig(CommandBlock& cmd)
         case CONFIG::control::saveAllXMLdata:
             if (write)
             {
-                partsChanged = 0;
                 synth.getRuntime().xmlmax = value_bool;
                 synth.getRuntime().updateConfig(control, value_int);
             }
