@@ -3,7 +3,8 @@ Version 2.3.4
 There is a new 'Omni' control. Any part can now be set to receive MIDI from all incoming channels. This has also triggered a significant change to the main window layout.
 
 You are now warned if any load or clear action could overwrite edited but unsaved instruments. These would be inpossible to recreate precisely. The same warning is given if you try to exit Yoshimi with unchanged instruments in place. All the part numbers with changed instruments are listed.
-Typically: Instruments in parts 2 5 33 52 have been edited. Still Exit?
+
+e.g. Instruments in parts 2 5 33 52 have been edited. Still Exit?
 
 However, you are no longer warned about unsaved configuration changes, as these are now filed as they are made.
 
