@@ -966,7 +966,9 @@ bool MidiLearn::extractMidiListData(XMLStore& xml)
         {
             uint ident{0};
             uint status{0};
-            LearnBlock entry;
+            midi_list.emplace_back();
+            LearnBlock& entry = midi_list.back();
+
             if (xmlLine.getPar_bool("Mute", 0))
                 status |= 4;
             if (xmlLine.getPar_bool("NRPN", 0))
@@ -1006,10 +1008,9 @@ bool MidiLearn::extractMidiListData(XMLStore& xml)
 
             // completed processing <LINE> element
             entry.status = status;
-            midi_list.push_back(entry);
             ++ ID;
 
-            /* --------------------- Diagnostics --------------------- */
+            /* -------------- decode and re-code command ------------- */
             CommandBlock cmd;
 if (DECODE_MODE)
 {
