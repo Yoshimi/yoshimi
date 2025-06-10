@@ -635,38 +635,38 @@ namespace PART // usage PART::control::volume
         enableSub,
         enablePad,
         enableKitLine,
-        volume = 5,
-        velocitySense,
-        panning,
-        velocityOffset,
-        midiChannel,
-        omni,
-        keyMode,
-        channelATset,
-        keyATset,
-        portamento,
         kitItemMute,
-        minNote,
-        maxNote,
-        minToLastKey,
-        maxToLastKey,
-        resetMinMaxKey,
-        kitEffectNum = 24,
-        maxNotes = 33,
-        keyShift = 35,
-        partToSystemEffect1 = 40,
-        partToSystemEffect2,
-        partToSystemEffect3,
-        partToSystemEffect4,
-        humanise = 48,
+        volume = 10,         // . |
+        velocitySense,       // . |
+        panning,             // . |
+        velocityOffset,      // . |
+        midiChannel,         // . |
+        omni,                // . |
+        keyMode,             // . |
+        channelATset,        // . |
+        keyATset,            // . |
+        minNote,             // . |
+        maxNote,             // .  > 20 not stored in instruments.
+        minToLastKey,        // . |
+        maxToLastKey,        // . |
+        resetMinMaxKey,      // . |
+        maxNotes,            // . |
+        keyShift,            // . |
+        partToSystemEffect1, // . |
+        partToSystemEffect2, // . |
+        partToSystemEffect3, // . |
+        partToSystemEffect4, // . |
+        effectNumber = 40,      //
+        portamento,
+        humanise = 50,
         humanvelocity,
         drumMode = 57,
         kitMode,
-        effectNumber = 64,
+        kitEffectNum = 64,
         effectType,
         effectDestination,
         effectBypass,
-        audioDestination = 120,
+        audioDestination = 120, //
 
     // start of controllers
         volumeRange = 128, // start marker (must be first)
@@ -709,6 +709,7 @@ namespace PART // usage PART::control::volume
         midiResonanceCenter,
         midiResonanceBandwidth,
     // end of midi controls
+
         instrumentEngines = 219,
         instrumentCopyright,
         instrumentComments,

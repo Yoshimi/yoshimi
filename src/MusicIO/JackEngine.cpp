@@ -3,6 +3,7 @@
 
     Copyright 2009-2011, Alan Calvert
     Copyright 2014-2019, Will Godfrey & others
+    Copyright 2025, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -136,7 +137,7 @@ bool JackEngine::openJackClient(string server)
     if (jackClient)
         return true;
     else
-        runtime().Log("Failed jack_client_open(), status: " + asHexString((int)jstatus), 1);
+        runtime().Log("Failed jack_client_open(), status: " + asHexString((int)jstatus), _SYS_::LogError);
     return false;
 }
 
@@ -245,7 +246,7 @@ void JackEngine::registerAudioPort(int partnum)
     {
         if (audio.ports [portnum] != NULL)
         {
-            runtime().Log("Jack port " + asString(partnum) + " already registered!", 2);
+            runtime().Log("Jack port " + asString(partnum) + " already registered!", _SYS_::LogNotSerious);
             return;
         }
         /* This has a hack to stop all enabled parts from resistering

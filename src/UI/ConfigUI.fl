@@ -288,7 +288,7 @@ fillThemes();
             label {Enable Part  Reports}
             callback {//
                         send_data(0, CONFIG::control::enablePartReports, o->value(), TOPLEVEL::type::Integer);}
-            tooltip {Show the last patch fetched from or saved to a bank} xywh {220 40 27 25} down_box DOWN_BOX selection_color 64 labelsize 12 labelcolor 64 align 8
+            tooltip {Warn if any instrument could be accidentally changed} xywh {220 40 27 25} down_box DOWN_BOX selection_color 64 labelsize 12 labelcolor 64 align 8
             code0 {o->value(synth->getRuntime().enablePartReports);}
             class Fl_Check_Button2
           }

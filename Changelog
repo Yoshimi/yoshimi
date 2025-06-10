@@ -1,4 +1,14 @@
-yoshimi 2.3.4
+yoshimi 2.3.4.1
+
+2025-6-10 Will + Hermann
+bn 2392
+Corrected tooltip for "Enable Part Reports".
+Corrected some log requests using numbers instead of labels.
+Fixed erroneous clearing of partsChanged flag on config changes.
+Fixed regression - MidiLearn not recognising older files.
+Re-ordered grouping of some part controls.
+Updated Control Data.
+Set bugfix release version 2.3.4.1
 
 2025-6-9 Will
 bn 2391

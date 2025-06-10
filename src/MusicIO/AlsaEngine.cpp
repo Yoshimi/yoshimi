@@ -2,7 +2,7 @@
     AlsaEngine.cpp
 
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2021, Will Godfrey & others
+    Copyright 2014-2025, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -398,7 +398,7 @@ bool AlsaEngine::prepHwparams()
                 NULL), "failed to get period size"))
         return false;
 
-    runtime().Log("Card Format is " + formattxt + " Endian " + asString(card_bits) +" Bit " + asString(card_chans) + " Channel" , 2);
+    runtime().Log("Card Format is " + formattxt + " Endian " + asString(card_bits) +" Bit " + asString(card_chans) + " Channel" ,_SYS_::LogNotSerious);
     if (ask_buffersize != audio.period_size)
     {
         runtime().Log("Asked for buffersize " + asString(ask_buffersize, 2)
