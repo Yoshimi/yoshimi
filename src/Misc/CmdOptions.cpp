@@ -54,6 +54,7 @@ namespace { // constants used in the implementation
         {"gui",               'I',  NULL,       0                  , "enable gui",  1},
         {"no-cmdline",        'c',  NULL,       0                  , "disable command line interface", 1},
         {"cmdline",           'C',  NULL,       0                  , "enable command line interface",  1},
+        {"fix-keys",          'F',  NULL,       0                  , "force keyboard to CLI if GUI enabled",  1},
         {"jack-audio",        'J',  "<server>", OPTION_ARG_OPTIONAL,  "use jack audio output", 0},
         {"jack-midi",         'j',  "<device>", OPTION_ARG_OPTIONAL,  "use jack midi input",   0},
         {"autostart-jack",    'k',  NULL,       0                  , "auto start jack server", 0},
@@ -94,6 +95,7 @@ namespace { // constants used in the implementation
             case 'b': recordOption(); break;     // buffer-size
             case 'c': recordToggle(); break;     // disable CLI
             case 'C': recordToggle(); break;     // enable CLIE
+            case 'F': recordToggle(); break;     // force keyboard to CLI
             case 'D': recordOption(); break;     // define bank root
             case 'i': recordToggle(); break;     // without GUI
             case 'I': recordToggle(); break;     // with GUI
@@ -177,6 +179,10 @@ void CmdOptions::applyTo (Config& config)  const
             case 'C':
                 config.cliChanged = true;
                 config.showCli = true;
+                break;
+
+            case 'F':
+                config.keysToCLI = true;
                 break;
 
             case 'D':

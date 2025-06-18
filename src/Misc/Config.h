@@ -197,6 +197,7 @@ class Config
         bool  showCli;
         bool  storedCli;
         bool  cliChanged;
+        bool  keysToCLI;
         bool  banksChecked;
         uchar panLaw;
         bool  configChanged;

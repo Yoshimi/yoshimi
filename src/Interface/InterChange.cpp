@@ -3098,6 +3098,9 @@ void InterChange::commandConfig(CommandBlock& cmd)
             else
                 value = Config::primary().showCLIcontext;
             break;
+        case CONFIG::control::fixKeysToCLI: // read only
+            value = synth.getRuntime().keysToCLI;
+            break;
         case CONFIG::control::XMLcompressionLevel:
             if (write)
             {

@@ -144,6 +144,9 @@ decl {using std::to_string;} {private global
 decl {int lineitem;} {public local
 }
 
+decl {bool keysFixed;} {public local
+}
+
 class FilerLine {: {public Fl_Group}
 } {
   Function {make_window()} {} {
@@ -431,13 +434,23 @@ class MasterUI {: {public GuiUpdates}
       make_window();
       partui->checkEngines();
       themeTrigger = 0;
-
+      bool LV2start = synth->getRuntime().isLV2;
+      if (LV2start)
+          keysFixed = false;
+      else
+      {
+          keysFixed = collect_readData(synth, 0, CONFIG::control::fixKeysToCLI, TOPLEVEL::config);
+          /*
+          * We only need to read this when the window is first opened by a CLI startup that uses
+          * the -F option and has the GUI enabled. This is the only time it is 'true'.
+          */
+      }
       bool foundWindows = Showmaster();
       if (current_ID > 0)
           foundWindows = true; //  not relevant for later windows
       loadWindowData();
       string starterror = "";
-      if (synth->getRuntime().isLV2)
+      if (LV2start)
       {
           masterwindow->label(synth->getWindowTitle().c_str());
       }
@@ -455,7 +468,7 @@ class MasterUI {: {public GuiUpdates}
       {
           // fake previously seen.
           saveWin(synth, 0, 0, masterwindow->x() + masterwindow->w() + 16, masterwindow->y(), true, "Midi-virtualkeyboard");
-          virkeyboard->ShowKbd();
+          virkeyboard->ShowKbd(keysFixed);
           panelwindow->resize(masterwindow->x(), masterwindow->y(), PANEL_SINGLE_X, PANEL_SINGLE_Y);
           saveWin(synth, panelwindow->w(), panelwindow->h(), panelwindow->x(), panelwindow->y(), panelType, "Mixer");
           string msg = "As this is a first time start, please check 'Yoshimi->Settings'. More information can be found in the manual.";
@@ -499,7 +512,7 @@ class MasterUI {: {public GuiUpdates}
             mixerpanel->do_callback();
             break;
         case DISPLAY_ROOT::keyboard:
-            virkeyboard->ShowKbd();
+            virkeyboard->ShowKbd(keysFixed);
             break;
         case DISPLAY_ROOT::settings:
             configui->Show(synth);
@@ -646,7 +659,12 @@ class MasterUI {: {public GuiUpdates}
         }
         checkSane(X, Y, W, H, aboutDW, aboutDH);
         aboutwindow->resize(X, Y, W, H);
-        aboutwindow->show();} {}
+        if (keysFixed)
+            aboutwindow->set_modal();
+        aboutwindow->show();
+        if (keysFixed)
+            aboutwindow->set_non_modal();
+        ;} {}
   }
   Function {Showmaster()} {return_type bool
   } {
@@ -659,9 +677,16 @@ class MasterUI {: {public GuiUpdates}
         fetchH = mainDH;
     }
     checkSane(fetchX, fetchY, fetchW, fetchH, mainDW, mainDH);
-
     masterwindow->resize(fetchX, fetchY, fetchW, fetchH);
-    masterwindow->show();
+
+    if(keysFixed)
+    {
+        masterwindow->set_modal();
+        masterwindow->show();
+        masterwindow->set_non_modal();
+    }
+    else
+        masterwindow->show();
     lastmainW = 0;
     mainRtext();
 
@@ -1063,7 +1088,7 @@ class MasterUI {: {public GuiUpdates}
         Fl_Button mainvirtkeyb {
           label {Virtual Key&board}
           callback {//
-                virkeyboard->ShowKbd();}
+                virkeyboard->ShowKbd(keysFixed);}
           tooltip {Virtual Keyboard} xywh {81 60 106 24} box GTK_THIN_UP_BOX color 198 labelsize 11 labelcolor 64
         }
         Fl_Button mixerpanel {
@@ -4441,9 +4466,9 @@ bpmfallback->format(format);} {}
         bankui->rootuiwindow->hide();
 
     if (lastSeen(synth, "Midi-virtualkeyboard"))
-        virkeyboard->ShowKbd();
+        virkeyboard->ShowKbd(keysFixed);
     else
-        virkeyboard->virkeyboardwindow->hide();
+        virkeyboard->Hide();
 
     if (lastSeen(synth, "Scales"))
         microtonalui->showScales();

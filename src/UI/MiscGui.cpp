@@ -309,9 +309,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                 switch (control)
                 {
                     case DISPLAY_LIST::show:
-                        synth->getGuiMaster()->aboutwindow->set_modal();
                         synth->getGuiMaster()->Show(DISPLAY_ROOT::about);
-                        synth->getGuiMaster()->aboutwindow->set_non_modal();
                         break;
                     case DISPLAY_LIST::hide:
                         synth->getGuiMaster()->Hide(DISPLAY_ROOT::about);
@@ -336,9 +334,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                 switch (control)
                 {
                     case DISPLAY_LIST::show:
-                        synth->getGuiMaster()->virkeyboard->virkeyboardwindow->set_modal();
                         synth->getGuiMaster()->Show(DISPLAY_ROOT::keyboard);
-                        synth->getGuiMaster()->virkeyboard->virkeyboardwindow->set_non_modal();
                         break;
                     case DISPLAY_LIST::hide:
                         synth->getGuiMaster()->Hide(DISPLAY_ROOT::keyboard);
@@ -351,9 +347,9 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                 switch (control)
                 {
                     case DISPLAY_LIST::show:
-                        synth->getGuiMaster()->configui->configwindow->set_modal();
+                        //synth->getGuiMaster()->configui->configwindow->set_modal();
                         synth->getGuiMaster()->configui->Show(synth);
-                        synth->getGuiMaster()->configui->configwindow->set_non_modal();
+                        //synth->getGuiMaster()->configui->configwindow->set_non_modal();
                         break;
                     case DISPLAY_LIST::hide:
                         synth->getGuiMaster()->configui->configwindow->hide();
@@ -404,9 +400,9 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                 switch (control)
                 {
                     case DISPLAY_LIST::show:
-                        synth->getGuiMaster()->panelwindow->set_modal();
+                        //synth->getGuiMaster()->panelwindow->set_modal();
                         synth->getGuiMaster()->Show(DISPLAY_ROOT::mixer);
-                        synth->getGuiMaster()->panelwindow->set_non_modal();
+                        //synth->getGuiMaster()->panelwindow->set_non_modal();
                         break;
                     case DISPLAY_LIST::hide:
                         synth->getGuiMaster()->Hide(DISPLAY_ROOT::mixer);
@@ -502,9 +498,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                 switch (control)
                 {
                     case DISPLAY_LIST::show:
-                        synth->getGuiMaster()->partui->instrumenteditwindow->set_modal();
                         synth->getGuiMaster()->partui->Show(0);
-                        synth->getGuiMaster()->partui->instrumenteditwindow->set_non_modal();
                         break;
                     case DISPLAY_LIST::hide:
                         synth->getGuiMaster()->partui->Hide(0);

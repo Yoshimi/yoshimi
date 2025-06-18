@@ -311,6 +311,7 @@ namespace CONFIG // usage CONFIG::control::oscillatorSize
         showSplash,
         enableCLI,
         exposeStatus, // CLI only
+        fixKeysToCLI, // CLI read only
         enableSinglePath,
         enableAutoInstance,
         handlePadSynthBuild,   // how to build PADSynth wavetable;

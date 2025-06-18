@@ -633,7 +633,7 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
         type |= TOPLEVEL::type::Write;
         collect_writeData(synth, value, action, type, control, TOPLEVEL::section::midiIn, kititem, engine);} {}
   }
-  Function {ShowKbd()} {} {
+  Function {ShowKbd(bool keysFixed)} {} {
     code {//
     int fetchX, fetchY, fetchW, fetchH, fetchO;
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Midi-virtualkeyboard");
@@ -645,7 +645,11 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
     checkSane(fetchX, fetchY, fetchW, fetchH, virtDW, virtDH);
 
     virkeyboardwindow->resize(fetchX, fetchY, fetchW, fetchH);
+    if (keysFixed)
+        virkeyboardwindow->set_modal();
     virkeyboardwindow->show();
+    if (keysFixed)
+        virkeyboardwindow->set_non_modal();
     virtSeen = true;
     lastvirtW = 0;} {}
   }
