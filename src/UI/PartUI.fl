@@ -690,7 +690,9 @@ class PartUI {: {public Fl_Group, PartUI_}
         instrumentkitlist->hide();
         kitSeen = false;
         if ((Fl::event_button() == 3))
-        synth->getGuiMaster()->partui->instrumenteditwindow->show();}
+            Showedit();
+        //synth->getGuiMaster()->partui->instrumenteditwindow->show();
+        ;}
         tooltip {Right click: also reopen previous} xywh {569 348 63 20} box THIN_UP_BOX color 196 labelcolor 64
       }
     }
@@ -773,7 +775,9 @@ class PartUI {: {public Fl_Group, PartUI_}
         fxSeen = false;
         partfx->hide();
         if ((Fl::event_button() == 3))
-            synth->getGuiMaster()->partui->instrumenteditwindow->show();}
+            //synth->getGuiMaster()->partui->instrumenteditwindow->show();
+            Showedit();
+        ;}
         tooltip {Right click: also reopen previous} xywh {307 136 60 20} box THIN_UP_BOX color 196 labelcolor 64
       }
     }
@@ -1341,7 +1345,8 @@ class PartUI {: {public Fl_Group, PartUI_}
         if ((Fl::event_button() == 3))
         {
             if (atSeen > 1)
-                instrumenteditwindow->show();
+                //instrumenteditwindow->show();
+                Showedit();
             else
                 ctlwindow->show();
         }
@@ -1808,7 +1813,8 @@ class PartUI {: {public Fl_Group, PartUI_}
             return;
         }
 
-        std::cout << "invalid paste" << std::endl;} {}
+        //std::cout << "invalid paste" << std::endl;
+        ;} {}
   }
   Function {PartUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {//
@@ -2385,7 +2391,11 @@ class PartUI {: {public Fl_Group, PartUI_}
 
     instrumenteditwindow->resize(fetchX, fetchY, fetchW, fetchH);
     lasteditW = 0;
+    if (keysFixed)
+        instrumenteditwindow->set_modal();
     instrumenteditwindow->show();
+    if (keysFixed)
+        instrumenteditwindow->set_non_modal();
     editSeen = true;} {}
   }
   Function {Showctl()} {} {
@@ -2465,7 +2475,11 @@ class PartUI {: {public Fl_Group, PartUI_}
     checkSane(fetchX, fetchY, fetchW, fetchH, kitDW, kitDH);
 
     instrumentkitlist->resize(fetchX, fetchY, fetchW, fetchH);
+    if (keysFixed)
+        instrumentkitlist->set_modal();
     instrumentkitlist->show();
+    if (keysFixed)
+        instrumentkitlist->set_non_modal();
     kitSeen = true;} {}
   }
   Function {Hide(int win)} {} {
@@ -2473,28 +2487,34 @@ class PartUI {: {public Fl_Group, PartUI_}
         switch(win)
         {
             case 0:
-                saveWin(synth, instrumenteditwindow->w(), instrumenteditwindow->h(), instrumenteditwindow->x(),instrumenteditwindow->y(), true, "Part-edit");
+                saveWin(synth, instrumenteditwindow->w(), instrumenteditwindow->h(), instrumenteditwindow->x(),instrumenteditwindow->y(), false, "Part-edit");
                 instrumenteditwindow->hide();
+                editSeen = false;
                 break;
             case 1:
                 saveWin(synth, instrumentkitlist->w(), instrumentkitlist->h(), instrumentkitlist->x(), instrumentkitlist->y(), false, "Part-kit");
                 instrumentkitlist->hide();
+                kitSeen = false;
                 break;
             case 2:
                 saveWin(synth, partfx->w(), partfx->h(),  partfx->x(),  partfx->y(), false, "Part-effects");
                 partfx->hide();
+                fxSeen = false;
                 break;
             case 3:
                 saveWin(synth, ctlwindow->w(), ctlwindow->h(), ctlwindow->x(), ctlwindow->y(), false, "Part-controllers");
                 ctlwindow->hide();
+                ctlSeen = false;
                 break;
             case 4:
                 saveWin(synth, aftertouchcontrol->w(), aftertouchcontrol->h(), aftertouchcontrol->x(), aftertouchcontrol->y(), false, "Part-aftertouch");
                 aftertouchcontrol->hide();
+                atSeen = false;
                 break;
             case 5:
                 saveWin(synth,  ctlmidi->w(),  ctlmidi->h(), ctlmidi->x(), ctlmidi->y(), false, "Part-ctlmidi");
                 ctlmidi->hide();
+                ctlmidiSeen = false;
                 break;
             default:
                 break;
@@ -2914,6 +2934,8 @@ class PartUI {: {public Fl_Group, PartUI_}
   decl {int *plgroup;} {private local
   }
   decl {int engine;} {private local
+  }
+  decl {bool keysFixed;} {public local
   }
   decl {bool partKitOn;} {public local
   }

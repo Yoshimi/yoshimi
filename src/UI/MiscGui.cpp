@@ -339,6 +339,18 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                     case DISPLAY_LIST::hide:
                         synth->getGuiMaster()->Hide(DISPLAY_ROOT::keyboard);
                         break;
+                    case DISPLAY_LIST::xpos:
+                        synth->getGuiMaster()->winStyle(DISPLAY_ROOT::keyboard, int(value), -1, -1, -1);
+                        break;
+                    case DISPLAY_LIST::ypos:
+                        synth->getGuiMaster()->winStyle(DISPLAY_ROOT::keyboard, -1, int(value), -1, -1);
+                        break;
+                    case DISPLAY_LIST::width:
+                        synth->getGuiMaster()->winStyle(DISPLAY_ROOT::keyboard, -1, -1, int(value), -1);
+                        break;
+                    case DISPLAY_LIST::height:
+                        synth->getGuiMaster()->winStyle(DISPLAY_ROOT::keyboard, -1, -1, -1, int(value));
+                        break;
                 }
                 break;
             }
@@ -347,9 +359,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                 switch (control)
                 {
                     case DISPLAY_LIST::show:
-                        //synth->getGuiMaster()->configui->configwindow->set_modal();
                         synth->getGuiMaster()->configui->Show(synth);
-                        //synth->getGuiMaster()->configui->configwindow->set_non_modal();
                         break;
                     case DISPLAY_LIST::hide:
                         synth->getGuiMaster()->configui->configwindow->hide();
@@ -400,9 +410,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                 switch (control)
                 {
                     case DISPLAY_LIST::show:
-                        //synth->getGuiMaster()->panelwindow->set_modal();
                         synth->getGuiMaster()->Show(DISPLAY_ROOT::mixer);
-                        //synth->getGuiMaster()->panelwindow->set_non_modal();
                         break;
                     case DISPLAY_LIST::hide:
                         synth->getGuiMaster()->Hide(DISPLAY_ROOT::mixer);
@@ -503,8 +511,21 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                     case DISPLAY_LIST::hide:
                         synth->getGuiMaster()->partui->Hide(0);
                         break;
+                    case DISPLAY_LIST::xpos:
+                        synth->getGuiMaster()->winStyle(DISPLAY_ROOT::edit, int(value), -1, -1, -1);
+                        break;
+                    case DISPLAY_LIST::ypos:
+                        synth->getGuiMaster()->winStyle(DISPLAY_ROOT::edit, -1, int(value), -1, -1);
+                        break;
+                    case DISPLAY_LIST::width:
+                        synth->getGuiMaster()->winStyle(DISPLAY_ROOT::edit, -1, -1, int(value), -1);
+                        break;
+                    case DISPLAY_LIST::height:
+                        synth->getGuiMaster()->winStyle(DISPLAY_ROOT::edit, -1, -1, -1, int(value));
+                        break;
                     default:
                         break;
+
                 }
                 break;
             }
@@ -518,6 +539,18 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                     case DISPLAY_LIST::hide:
                        synth->getGuiMaster()->partui->Hide(1);
                        break;
+                    case DISPLAY_LIST::xpos:
+                        synth->getGuiMaster()->winStyle(DISPLAY_ROOT::kit, int(value), -1, -1, -1);
+                        break;
+                    case DISPLAY_LIST::ypos:
+                        synth->getGuiMaster()->winStyle(DISPLAY_ROOT::kit, -1, int(value), -1, -1);
+                        break;
+                    case DISPLAY_LIST::width:
+                        synth->getGuiMaster()->winStyle(DISPLAY_ROOT::kit, -1, -1, int(value), -1);
+                        break;
+                    case DISPLAY_LIST::height:
+                        synth->getGuiMaster()->winStyle(DISPLAY_ROOT::kit, -1, -1, -1, int(value));
+                        break;
                     default:
                         break;
                 }

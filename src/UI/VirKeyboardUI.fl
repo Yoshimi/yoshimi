@@ -656,7 +656,8 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
   Function {Hide()} {open
   } {
     code {//
-    saveWin(synth, virkeyboardwindow->w(), virkeyboardwindow->h(), virkeyboardwindow->x(), virkeyboardwindow->y(), true, "Midi-virtualkeyboard");
+    saveWin(synth, virkeyboardwindow->w(), virkeyboardwindow->h(), virkeyboardwindow->x(), virkeyboardwindow->y(), false, "Midi-virtualkeyboard");
+    virtSeen = false;
     virkeyboardwindow->hide();} {}
   }
   Function {relaseallkeys()} {} {
@@ -703,9 +704,9 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
   }
   decl {std::string keyboardlabel;} {private local
   }
-  decl {int virtDW;} {private local
+  decl {int virtDW;} {public local
   }
-  decl {int virtDH;} {private local
+  decl {int virtDH;} {public local
   }
   decl {int lastvirtW;} {public local
   }

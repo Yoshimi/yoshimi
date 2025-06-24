@@ -432,8 +432,6 @@ class MasterUI {: {public GuiUpdates}
       Fl_Tooltip::color(tooltip_back);
       Fl_Tooltip::textcolor(tooltip_text);
       make_window();
-      partui->checkEngines();
-      themeTrigger = 0;
       bool LV2start = synth->getRuntime().isLV2;
       if (LV2start)
           keysFixed = false;
@@ -445,6 +443,10 @@ class MasterUI {: {public GuiUpdates}
           * the -F option and has the GUI enabled. This is the only time it is 'true'.
           */
       }
+      std::cout << "Keys " << int(keysFixed) << std::endl;
+      partui->keysFixed = keysFixed;
+      partui->checkEngines();
+      themeTrigger = 0;
       bool foundWindows = Showmaster();
       if (current_ID > 0)
           foundWindows = true; //  not relevant for later windows
@@ -509,7 +511,11 @@ class MasterUI {: {public GuiUpdates}
             Showmaster();
             break;
         case DISPLAY_ROOT::mixer:
+            if (keysFixed)
+                panelwindow->set_modal();
             mixerpanel->do_callback();
+            if (keysFixed)
+                panelwindow->set_non_modal();
             break;
         case DISPLAY_ROOT::keyboard:
             virkeyboard->ShowKbd(keysFixed);
@@ -546,8 +552,9 @@ class MasterUI {: {public GuiUpdates}
             break;
         case DISPLAY_ROOT::mixer:
         {
-            saveWin(synth, panelwindow->w(), panelwindow->h(), panelwindow->x(), panelwindow->y(), panelType, "Mixer");
-            panelwindow->hide();
+            //saveWin(synth, panelwindow->w(), panelwindow->h(), panelwindow->x(), panelwindow->y(), panelType, "Mixer");
+            //panelwindow->hide();
+            Panelclose->do_callback();
         }
             break;
         case DISPLAY_ROOT::keyboard:
@@ -595,11 +602,29 @@ class MasterUI {: {public GuiUpdates}
                 W = filerwindow->w();
                 H = filerwindow->h();
             break;
+            case DISPLAY_ROOT::keyboard:
+                X = virkeyboard->virkeyboardwindow->x();
+                Y = virkeyboard->virkeyboardwindow->y();
+                W = virkeyboard->virkeyboardwindow->w();
+                H = virkeyboard->virkeyboardwindow->h();
+            break;
             case DISPLAY_ROOT::settings:
                 X = configui->configwindow->x();
                 Y = configui->configwindow->y();
                 W = configui->configwindow->w();
                 H = configui->configwindow->h();
+            break;
+            case DISPLAY_ROOT::edit:
+                X = partui->instrumenteditwindow->x();
+                Y = partui->instrumenteditwindow->y();
+                W = partui->instrumenteditwindow->w();
+                H = partui->instrumenteditwindow->h();
+            break;
+            case DISPLAY_ROOT::kit:
+                X = partui->instrumentkitlist->x();
+                Y = partui->instrumentkitlist->y();
+                W = partui->instrumentkitlist->w();
+                H = partui->instrumentkitlist->h();
             break;
             default:
                 break;
@@ -640,9 +665,21 @@ class MasterUI {: {public GuiUpdates}
                 checkSane(X,Y,W,H,filerDW, filerDH, false, priority);
                 filerwindow->resize(X,Y,W,H);
                 break;
+            case DISPLAY_ROOT::keyboard:
+                checkSane(X,Y,W,H,virkeyboard->virtDW, virkeyboard->virtDH, false, priority);
+                virkeyboard->virkeyboardwindow->resize(X,Y,W,H);
+                break;
             case DISPLAY_ROOT::settings:
                 checkSane(X,Y,W,H,configui->confDW, configui->confDH, false, priority);
                 configui->configwindow->resize(X,Y,W,H);
+                break;
+            case DISPLAY_ROOT::edit:
+                checkSane(X,Y,W,H,partui->editDW, partui->editDH, false, priority);
+                partui->instrumenteditwindow->resize(X,Y,W,H);
+                break;
+            case DISPLAY_ROOT::kit:
+                checkSane(X,Y,W,H,partui->kitDW, partui->kitDH, false, priority);
+                partui->instrumentkitlist->resize(X,Y,W,H);
                 break;
             default:
                 break;
@@ -3066,7 +3103,7 @@ Alan Calvert started the project}
                 seen = true;
                 break;
 
-            case PART::control::drumMode: // we allow this to cayry on to PartUI
+            case PART::control::drumMode: // we allow this to carry on to PartUI
                 updateModepatch(value_bool != 0 && partKeymode->value() > 1);
                 break;
 
@@ -4468,7 +4505,7 @@ bpmfallback->format(format);} {}
     if (lastSeen(synth, "Midi-virtualkeyboard"))
         virkeyboard->ShowKbd(keysFixed);
     else
-        virkeyboard->Hide();
+        virkeyboard->virkeyboardwindow->hide();
 
     if (lastSeen(synth, "Scales"))
         microtonalui->showScales();

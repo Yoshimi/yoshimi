@@ -95,7 +95,7 @@ std::string toplist [] = {
     "  CLear <n>",              "restore instrument on part n to default settings",
     "DISplay",                  "manage graphic display (if enabled)",
     "  Hide",                   "current window",
-    "  View",                   "window (if enabled)",
+    "  Show",                   "window (if enabled)",
     "  Xposition",              "window (if visible)",
     "  Yposition",              "window (if visible)",
     "  SIze",                   "of window (if visible)",
