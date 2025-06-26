@@ -257,7 +257,9 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         resonanceGraphInsert,
         systemEffectSend,
         partEffectSelect,
-        kitGroup
+        kitGroup,
+        envelopePointChangeDt,
+        envelopePointChangeVal,
     };
 
     enum insertType : uchar {

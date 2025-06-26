@@ -910,19 +910,34 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
 
     //synth->CBtest(getData);
 
-    if (insert == TOPLEVEL::insert::envelopePointAdd || insert == TOPLEVEL::insert::envelopePointDelete || insert == TOPLEVEL::insert::envelopePointChange)
+    switch (insert)
     {
-        if (insert == TOPLEVEL::insert::envelopePointChange) // adjust point
-            freeedit->lastpoint = control;
-        else if (offset > 127) // delete point
-            freeedit->lastpoint -= 1;
-        else // add point
-            freeedit->lastpoint += 1;
+    case TOPLEVEL::insert::envelopePointAdd:
+    case TOPLEVEL::insert::envelopePointDelete:
+    case TOPLEVEL::insert::envelopePointChange:
+    case TOPLEVEL::insert::envelopePointChangeDt:
+    case TOPLEVEL::insert::envelopePointChangeVal:
+        switch (insert)
+        {
+        case TOPLEVEL::insert::envelopePointChange:
+        case TOPLEVEL::insert::envelopePointChangeDt:
+        case TOPLEVEL::insert::envelopePointChangeVal:
+            freeedit->lastpoint = control; // adjust point
+            break;
+        default:
+            if (offset > 127) // delete point
+                freeedit->lastpoint -= 1;
+            else // add point
+                freeedit->lastpoint += 1;
+            break;
+        }
         freeedit->redraw();
         envfree->redraw();
         sustaincounter->value(env->Penvsustain);
         sustaincounter->maximum(env->Penvpoints-2);
         return;
+    default:
+        break;
     }
 
     bool change = true;
