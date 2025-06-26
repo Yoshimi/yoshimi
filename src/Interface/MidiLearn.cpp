@@ -717,34 +717,51 @@ void MidiLearn::insertLine(ushort CC, uchar chan)
 
     memcpy(entry.frame.bytes, learnTransferBlock.bytes, sizeof(CommandBlock));
     entry.frame.data.type = type;
-    list<LearnBlock>::iterator it;
-    it = midi_list.begin();
-    int lineNo = 0;
-    if (not midi_list.empty())
-    { // CC is priority
-        while (CC > it->CC && it != midi_list.end()) // CC is priority
-        { // find start of group
-            ++it;
-            ++lineNo;
-        }
-        while (CC == it->CC && chan >= it->chan && it != midi_list.end())
-        { // insert at end of same channel
-            ++it;
-            ++lineNo;
-        }
+    uchar inserts[2];
+    int insert_count;
+    if (entry.frame.data.insert == TOPLEVEL::insert::envelopePointChange) {
+        // Special case for envelope points: We need to insert both axes. The
+        // user can decide afterwards if they want to keep both or remove one of
+        // them.
+        inserts[0] = TOPLEVEL::insert::envelopePointChangeDt;
+        inserts[1] = TOPLEVEL::insert::envelopePointChangeVal;
+        insert_count = 2;
+    } else {
+        inserts[0] = entry.frame.data.insert;
+        insert_count = 1;
     }
-    if (it == midi_list.end())
-        midi_list.push_back(entry);
-    else
-        midi_list.insert(it, entry);
+    for (int insert = 0; insert < insert_count; insert++) {
+        entry.frame.data.insert = inserts[insert];
 
-    uint CCh = entry.CC;
-    string CCtype;
-    if (CCh < 0xff)
-        CCtype = "CC " + to_string(CCh);
-    else
-        CCtype = "NRPN " + asHexString((CCh >> 7) & 0x7f) + " " + asHexString(CCh & 0x7f);
-    synth.getRuntime().Log("Learned " + CCtype + "  Chan " + to_string((int)entry.chan + 1) + "  " + learnedName);
+        list<LearnBlock>::iterator it;
+        it = midi_list.begin();
+        int lineNo = 0;
+        if (not midi_list.empty())
+        { // CC is priority
+            while (CC > it->CC && it != midi_list.end()) // CC is priority
+            { // find start of group
+                ++it;
+                ++lineNo;
+            }
+            while (CC == it->CC && chan >= it->chan && it != midi_list.end())
+            { // insert at end of same channel
+                ++it;
+                ++lineNo;
+            }
+        }
+        if (it == midi_list.end())
+            midi_list.push_back(entry);
+        else
+            midi_list.insert(it, entry);
+
+        uint CCh = entry.CC;
+        string CCtype;
+        if (CCh < 0xff)
+            CCtype = "CC " + to_string(CCh);
+        else
+            CCtype = "NRPN " + asHexString((CCh >> 7) & 0x7f) + " " + asHexString(CCh & 0x7f);
+        synth.getRuntime().Log("Learned " + CCtype + "  Chan " + to_string((int)entry.chan + 1) + "  " + learnedName);
+    }
     updateGui(MIDILEARN::control::limit);
     learning = false;
 }

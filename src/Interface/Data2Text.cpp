@@ -182,6 +182,8 @@ string DataText::resolveAll(SynthEngine& synth, CommandBlock& cmd, bool addValue
                 commandName = resolveEnvelope(cmd, addValue);
                 break;
             case TOPLEVEL::insert::envelopePointChange:
+            case TOPLEVEL::insert::envelopePointChangeDt:
+            case TOPLEVEL::insert::envelopePointChangeVal:
                 commandName = resolveEnvelope(cmd, addValue);
                 break;
             case TOPLEVEL::insert::oscillatorGroup:
@@ -227,6 +229,8 @@ string DataText::resolveAll(SynthEngine& synth, CommandBlock& cmd, bool addValue
                 commandName = resolveEnvelope(cmd, addValue);
                 break;
             case TOPLEVEL::insert::envelopePointChange:
+            case TOPLEVEL::insert::envelopePointChangeDt:
+            case TOPLEVEL::insert::envelopePointChangeVal:
                 commandName = resolveEnvelope(cmd, addValue);
                 break;
         }
@@ -254,6 +258,8 @@ string DataText::resolveAll(SynthEngine& synth, CommandBlock& cmd, bool addValue
                 commandName = resolveEnvelope(cmd, addValue);
                 break;
             case TOPLEVEL::insert::envelopePointChange:
+            case TOPLEVEL::insert::envelopePointChangeDt:
+            case TOPLEVEL::insert::envelopePointChangeVal:
                 commandName = resolveEnvelope(cmd, addValue);
                 break;
             case TOPLEVEL::insert::oscillatorGroup:
@@ -290,6 +296,8 @@ string DataText::resolveAll(SynthEngine& synth, CommandBlock& cmd, bool addValue
                 commandName = resolveEnvelope(cmd, addValue);
                 break;
             case TOPLEVEL::insert::envelopePointChange:
+            case TOPLEVEL::insert::envelopePointChangeDt:
+            case TOPLEVEL::insert::envelopePointChangeVal:
                 commandName = resolveEnvelope(cmd, addValue);
                 break;
             case TOPLEVEL::insert::resonanceGroup:
@@ -3177,17 +3185,24 @@ string DataText::resolveEnvelope(CommandBlock& cmd, bool)
             return ("Freemode add/remove is write only. Current points " + to_string(value));
         }
         if (insert == TOPLEVEL::insert::envelopePointAdd)
-            return ("Part " + to_string(int(npart + 1)) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env Added Freemode Point " + to_string(int(control & 0x3f)) + " X increment " + to_string(int(offset)) + " Y");
+            return ("Part " + to_string(int(npart + 1)) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env Added Freemode Point " + to_string(int(control & 0x3f) + 1) + " dt " + to_string(int(offset)));
         else
         {
             showValue = false;
-            return ("Part " + to_string(int(npart + 1)) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env Removed Freemode Point " +  to_string(int(control)) + "  Remaining " +  to_string(value));
+            return ("Part " + to_string(int(npart + 1)) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env Removed Freemode Point " +  to_string(int(control) + 1) + "  Remaining " +  to_string(value));
         }
     }
 
-    if (insert == TOPLEVEL::insert::envelopePointChange)
+    switch (insert)
     {
-        return ("Part " + to_string(int(npart + 1)) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env Freemode Point " +  to_string(int(control)) + " X increment " + to_string(int(offset)) + " Y");
+    case TOPLEVEL::insert::envelopePointChange:
+        return ("Part " + to_string(int(npart + 1)) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env Freemode Point " +  to_string(int(control) + 1) + " Time Value " + to_string(int(offset)));
+    case TOPLEVEL::insert::envelopePointChangeDt:
+        return ("Part " + to_string(int(npart + 1)) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env Freemode Point " +  to_string(int(control) + 1) + " Time");
+    case TOPLEVEL::insert::envelopePointChangeVal:
+        return ("Part " + to_string(int(npart + 1)) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env Freemode Point " +  to_string(int(control) + 1));
+    default:
+        break;
     }
 
     string contstr;

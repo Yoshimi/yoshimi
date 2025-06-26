@@ -308,6 +308,7 @@ float envelopeLimit::getEnvelopeLimits(CommandBlock *getData)
     else if (engine >= PART::engine::addVoice1 && engine < PART::engine::addMod1)
         engine = PART::engine::addVoice1;
     int parameter = getData->data.parameter;
+    int insert = getData->data.insert;
 
     unsigned char type = 0;
 
@@ -318,255 +319,272 @@ float envelopeLimit::getEnvelopeLimits(CommandBlock *getData)
     unsigned char learnable = TOPLEVEL::type::Learnable;
     type |= learnable;
 
-    if (control == ENVELOPEINSERT::control::enableFreeMode || control == ENVELOPEINSERT::control::edit)
-    {
-        max = 1;
-        type &= ~learnable;
-        def = 0;
-    }
-
-    switch (parameter)
-    {
-        case TOPLEVEL::insertType::amplitude:
+    switch (insert) {
+    case TOPLEVEL::insert::envelopeGroup:
+        if (control == ENVELOPEINSERT::control::enableFreeMode || control == ENVELOPEINSERT::control::edit)
         {
-            switch (control)
-            {
-                case ENVELOPEINSERT::control::attackTime:
-                    if (engine == PART::engine::addMod1)
-                        def = ENVDEF::modAmpAttackTime.def;
-                    else
-                        def = ENVDEF::ampAttackTime.def;
-                    break;
-                case ENVELOPEINSERT::control::decayTime:
-                    if (engine == PART::engine::addVoice1)
-                        def = ENVDEF::voiceAmpDecayTime.def;
-                    else if (engine == PART::engine::addMod1)
-                        def = ENVDEF::modAmpDecayTime.def;
-                    else
-                        def = ENVDEF::ampDecayTime.def;
-                    break;
-                case ENVELOPEINSERT::control::sustainLevel:
-                    def = ENVDEF::ampSustainValue.def;
-                    break;
-                case ENVELOPEINSERT::control::releaseTime:
-                    if (engine == PART::engine::addVoice1)
-                        def = ENVDEF::voiceAmpReleaseTime.def;
-                    else if (engine == PART::engine::addMod1)
-                        def = ENVDEF::modAmpReleaseTime.def;
-                    else
-                        def = ENVDEF::ampReleaseTime.def;
-                    break;
-                case ENVELOPEINSERT::control::stretch:
-                    def = ENVDEF::ampStretch.def;
-                    break;
-                case ENVELOPEINSERT::control::forcedRelease:
-                    type |= TOPLEVEL::type::Integer;
-                    def = ENVSWITCH::defForce;
-                    type &= ~learnable;
-                    break;
-                case ENVELOPEINSERT::control::linearEnvelope:
-                    type |= TOPLEVEL::type::Integer;
-                    max = 1;
-                    def = ENVSWITCH::defLinear;
-                    type &= ~learnable;
-                    break;
-                //case ENVELOPEINSERT::control::edit:
-                    //break;
-                case ENVELOPEINSERT::control::enableFreeMode:
-                    type |= TOPLEVEL::type::Integer;
-                    def = ENVSWITCH::defFreeMode;
-                    break;
-                case ENVELOPEINSERT::control::points:
-                    type |= TOPLEVEL::type::Integer;
-                    def = ENVDEF::count.def;
-                    break;
-                case ENVELOPEINSERT::control::sustainPoint:
-                    type &= ~learnable;
-                    def = ENVDEF::point.def;
-                    break;
-                default:
-                    type |= TOPLEVEL::type::Error;
-                    break;
-            }
-            break;
+            max = 1;
+            type &= ~learnable;
+            def = 0;
         }
 
-        case TOPLEVEL::insertType::frequency:
+        switch (parameter)
         {
-            switch (control)
+            case TOPLEVEL::insertType::amplitude:
             {
-                case ENVELOPEINSERT::control::attackLevel:
-                    if (engine == PART::engine::addMod1)
-                        def = ENVDEF::modFreqAtValue.def;
-                    else if (engine == PART::engine::addVoice1)
-                        def = ENVDEF::voiceFreqAtValue.def;
-                    else if (engine == PART::engine::subSynth)
-                        def = ENVDEF::subFreqAtValue.def;
-                    else
-                        def = ENVDEF::freqAttackValue.def;
-                    break;
-                case ENVELOPEINSERT::control::attackTime:
-                    if (engine == PART::engine::addMod1)
-                        def = ENVDEF::modFreqAtTime.def;
-                    else if (engine == PART::engine::addVoice1)
-                        def = ENVDEF::voiceFreqAtTime.def;
-                    else
-                        def = ENVDEF::freqAttackTime.def;
-                    break;
-                case ENVELOPEINSERT::control::releaseTime:
-                    if (engine == PART::engine::addMod1)
-                        def = ENVDEF::modFreqReleaseTime.def;
-                    else
-                        def = ENVDEF::freqReleaseTime.def;
-                    break;
-                case ENVELOPEINSERT::control::releaseLevel:
-                    if (engine == PART::engine::addMod1)
-                        def = ENVDEF::modFreqReleaseValue.def;
-                    else
-                        def = ENVDEF::freqReleaseValue.def;
-                    break;
-                case ENVELOPEINSERT::control::stretch:
-                    if (engine == PART::engine::subSynth)
-                        def = ENVDEF::subFreqStretch.def;
-                    else
-                        def = ENVDEF::freqStretch.def;
-                    break;
-                case ENVELOPEINSERT::control::forcedRelease:
-                    max = 1;
-                    def = ENVSWITCH::defForceFreq;
-                    type &= ~learnable;
-                    break;
-                //case ENVELOPEINSERT::control::edit:
-                    //break;
-                case ENVELOPEINSERT::control::enableFreeMode:
-                    def = ENVSWITCH::defFreeMode;
-                    break;
-                case ENVELOPEINSERT::control::points:
-                    def = ENVDEF::freqCount.def;
-                    break;
-                case ENVELOPEINSERT::control::sustainPoint:
-                    type &= ~learnable;
-                    def = ENVDEF::freqPoint.def;
-                    break;
-                default:
-                    type |= TOPLEVEL::type::Error;
-                    break;
-            }
-            break;
-        }
-
-        case TOPLEVEL::insertType::filter:
-        {
-            switch (control)
-            {
-                case ENVELOPEINSERT::control::attackLevel:
-                    if (engine == PART::engine::addVoice1)
-                        def = ENVDEF::voiceFiltAtValue.def;
-                    else
-                        def = ENVDEF::filtAttackValue.def;
-                    break;
-                case ENVELOPEINSERT::control::attackTime:
-                    if (engine == PART::engine::addVoice1)
-                        def = ENVDEF::voiceFiltAtTime.def;
-                    else
-                        def = ENVDEF::filtAttackTime.def;
-                    break;
-                case ENVELOPEINSERT::control::decayLevel:
-                    if (engine == PART::engine::addVoice1)
-                        def = ENVDEF::voiceFiltDeValue.def;
-                    else
-                        def = ENVDEF::filtDecayValue.def;
-                    break;
-                case ENVELOPEINSERT::control::decayTime:
-                    def = ENVDEF::filtDecayTime.def;
-                    break;
-                case ENVELOPEINSERT::control::releaseTime:
-                    if (engine == PART::engine::addVoice1)
-                        def = ENVDEF::voiceFiltRelTime.def;
-                    else
-                        def = ENVDEF::filtReleaseTime.def;
-                    break;
-                case ENVELOPEINSERT::control::releaseLevel:
-                    if (engine == PART::engine::addVoice1)
-                        def = ENVDEF::voiceFiltRelValue.def;
-                    else
-                        def = ENVDEF::filtReleaseValue.def;
-                    break;
-                case ENVELOPEINSERT::control::stretch:
-                    def = ENVDEF::filtStretch.def;
-                    break;
-                case ENVELOPEINSERT::control::forcedRelease:
-                    max = 1;
-                    if (engine == PART::engine::addVoice1)
-                        def = ENVSWITCH::defForceVoiceFilt;
-                    else
+                switch (control)
+                {
+                    case ENVELOPEINSERT::control::attackTime:
+                        if (engine == PART::engine::addMod1)
+                            def = ENVDEF::modAmpAttackTime.def;
+                        else
+                            def = ENVDEF::ampAttackTime.def;
+                        break;
+                    case ENVELOPEINSERT::control::decayTime:
+                        if (engine == PART::engine::addVoice1)
+                            def = ENVDEF::voiceAmpDecayTime.def;
+                        else if (engine == PART::engine::addMod1)
+                            def = ENVDEF::modAmpDecayTime.def;
+                        else
+                            def = ENVDEF::ampDecayTime.def;
+                        break;
+                    case ENVELOPEINSERT::control::sustainLevel:
+                        def = ENVDEF::ampSustainValue.def;
+                        break;
+                    case ENVELOPEINSERT::control::releaseTime:
+                        if (engine == PART::engine::addVoice1)
+                            def = ENVDEF::voiceAmpReleaseTime.def;
+                        else if (engine == PART::engine::addMod1)
+                            def = ENVDEF::modAmpReleaseTime.def;
+                        else
+                            def = ENVDEF::ampReleaseTime.def;
+                        break;
+                    case ENVELOPEINSERT::control::stretch:
+                        def = ENVDEF::ampStretch.def;
+                        break;
+                    case ENVELOPEINSERT::control::forcedRelease:
+                        type |= TOPLEVEL::type::Integer;
                         def = ENVSWITCH::defForce;
-                    type &= ~learnable;
-                    break;
-                //case ENVELOPEINSERT::control::edit:
-                    //break;
-                case ENVELOPEINSERT::control::enableFreeMode:
-                    def = ENVSWITCH::defFreeMode;
-                    break;
-                case ENVELOPEINSERT::control::points:
-                    def = ENVDEF::count.def;
-                    break;
-                case ENVELOPEINSERT::control::sustainPoint:
-                    type &= ~learnable;
-                    def = ENVDEF::point.def;
-                    break;
-                default:
-                    type |= TOPLEVEL::type::Error;
-                    break;
+                        type &= ~learnable;
+                        break;
+                    case ENVELOPEINSERT::control::linearEnvelope:
+                        type |= TOPLEVEL::type::Integer;
+                        max = 1;
+                        def = ENVSWITCH::defLinear;
+                        type &= ~learnable;
+                        break;
+                    //case ENVELOPEINSERT::control::edit:
+                        //break;
+                    case ENVELOPEINSERT::control::enableFreeMode:
+                        type |= TOPLEVEL::type::Integer;
+                        def = ENVSWITCH::defFreeMode;
+                        break;
+                    case ENVELOPEINSERT::control::points:
+                        type |= TOPLEVEL::type::Integer;
+                        def = ENVDEF::count.def;
+                        break;
+                    case ENVELOPEINSERT::control::sustainPoint:
+                        type &= ~learnable;
+                        def = ENVDEF::point.def;
+                        break;
+                    default:
+                        type |= TOPLEVEL::type::Error;
+                        break;
+                }
+                break;
             }
-            break;
-        }
-        case TOPLEVEL::insertType::bandwidth:
-        {
-            if (engine != PART::engine::subSynth)
+
+            case TOPLEVEL::insertType::frequency:
             {
-                type |= TOPLEVEL::type::Error;
-                return 1;
+                switch (control)
+                {
+                    case ENVELOPEINSERT::control::attackLevel:
+                        if (engine == PART::engine::addMod1)
+                            def = ENVDEF::modFreqAtValue.def;
+                        else if (engine == PART::engine::addVoice1)
+                            def = ENVDEF::voiceFreqAtValue.def;
+                        else if (engine == PART::engine::subSynth)
+                            def = ENVDEF::subFreqAtValue.def;
+                        else
+                            def = ENVDEF::freqAttackValue.def;
+                        break;
+                    case ENVELOPEINSERT::control::attackTime:
+                        if (engine == PART::engine::addMod1)
+                            def = ENVDEF::modFreqAtTime.def;
+                        else if (engine == PART::engine::addVoice1)
+                            def = ENVDEF::voiceFreqAtTime.def;
+                        else
+                            def = ENVDEF::freqAttackTime.def;
+                        break;
+                    case ENVELOPEINSERT::control::releaseTime:
+                        if (engine == PART::engine::addMod1)
+                            def = ENVDEF::modFreqReleaseTime.def;
+                        else
+                            def = ENVDEF::freqReleaseTime.def;
+                        break;
+                    case ENVELOPEINSERT::control::releaseLevel:
+                        if (engine == PART::engine::addMod1)
+                            def = ENVDEF::modFreqReleaseValue.def;
+                        else
+                            def = ENVDEF::freqReleaseValue.def;
+                        break;
+                    case ENVELOPEINSERT::control::stretch:
+                        if (engine == PART::engine::subSynth)
+                            def = ENVDEF::subFreqStretch.def;
+                        else
+                            def = ENVDEF::freqStretch.def;
+                        break;
+                    case ENVELOPEINSERT::control::forcedRelease:
+                        max = 1;
+                        def = ENVSWITCH::defForceFreq;
+                        type &= ~learnable;
+                        break;
+                    //case ENVELOPEINSERT::control::edit:
+                        //break;
+                    case ENVELOPEINSERT::control::enableFreeMode:
+                        def = ENVSWITCH::defFreeMode;
+                        break;
+                    case ENVELOPEINSERT::control::points:
+                        def = ENVDEF::freqCount.def;
+                        break;
+                    case ENVELOPEINSERT::control::sustainPoint:
+                        type &= ~learnable;
+                        def = ENVDEF::freqPoint.def;
+                        break;
+                    default:
+                        type |= TOPLEVEL::type::Error;
+                        break;
+                }
+                break;
             }
-            switch (control)
+
+            case TOPLEVEL::insertType::filter:
             {
-                case ENVELOPEINSERT::control::attackLevel:
-                    def = ENVDEF::subBandAttackValue.def;
-                    break;
-                case ENVELOPEINSERT::control::attackTime:
-                        def = ENVDEF::subBandAttackTime.def;
-                    break;
-                case ENVELOPEINSERT::control::releaseTime:
-                    def = ENVDEF::subBandReleaseTime.def;
-                    break;
-                case ENVELOPEINSERT::control::releaseLevel:
-                    def = ENVDEF::subBandReleaseValue.def;
-                    break;
-                case ENVELOPEINSERT::control::stretch:
-                    def = ENVDEF::subBandStretch.def;
-                    break;
-                case ENVELOPEINSERT::control::forcedRelease:
-                    max = 1;
-                    def = ENVSWITCH::defForceBand;
-                    type &= ~learnable;
-                    break;
-                //case ENVELOPEINSERT::control::edit:
-                    //break;
-                case ENVELOPEINSERT::control::enableFreeMode:
-                    def = ENVSWITCH::defFreeMode;
-                    break;
-                case ENVELOPEINSERT::control::points:
-                    def = ENVDEF::bandCount.def;
-                    break;
-                case ENVELOPEINSERT::control::sustainPoint:
-                    def = ENVDEF::bandPoint.def;
-                    break;
-                default:
-                    type |= TOPLEVEL::type::Error;
-                    break;
+                switch (control)
+                {
+                    case ENVELOPEINSERT::control::attackLevel:
+                        if (engine == PART::engine::addVoice1)
+                            def = ENVDEF::voiceFiltAtValue.def;
+                        else
+                            def = ENVDEF::filtAttackValue.def;
+                        break;
+                    case ENVELOPEINSERT::control::attackTime:
+                        if (engine == PART::engine::addVoice1)
+                            def = ENVDEF::voiceFiltAtTime.def;
+                        else
+                            def = ENVDEF::filtAttackTime.def;
+                        break;
+                    case ENVELOPEINSERT::control::decayLevel:
+                        if (engine == PART::engine::addVoice1)
+                            def = ENVDEF::voiceFiltDeValue.def;
+                        else
+                            def = ENVDEF::filtDecayValue.def;
+                        break;
+                    case ENVELOPEINSERT::control::decayTime:
+                        def = ENVDEF::filtDecayTime.def;
+                        break;
+                    case ENVELOPEINSERT::control::releaseTime:
+                        if (engine == PART::engine::addVoice1)
+                            def = ENVDEF::voiceFiltRelTime.def;
+                        else
+                            def = ENVDEF::filtReleaseTime.def;
+                        break;
+                    case ENVELOPEINSERT::control::releaseLevel:
+                        if (engine == PART::engine::addVoice1)
+                            def = ENVDEF::voiceFiltRelValue.def;
+                        else
+                            def = ENVDEF::filtReleaseValue.def;
+                        break;
+                    case ENVELOPEINSERT::control::stretch:
+                        def = ENVDEF::filtStretch.def;
+                        break;
+                    case ENVELOPEINSERT::control::forcedRelease:
+                        max = 1;
+                        if (engine == PART::engine::addVoice1)
+                            def = ENVSWITCH::defForceVoiceFilt;
+                        else
+                            def = ENVSWITCH::defForce;
+                        type &= ~learnable;
+                        break;
+                    //case ENVELOPEINSERT::control::edit:
+                        //break;
+                    case ENVELOPEINSERT::control::enableFreeMode:
+                        def = ENVSWITCH::defFreeMode;
+                        break;
+                    case ENVELOPEINSERT::control::points:
+                        def = ENVDEF::count.def;
+                        break;
+                    case ENVELOPEINSERT::control::sustainPoint:
+                        type &= ~learnable;
+                        def = ENVDEF::point.def;
+                        break;
+                    default:
+                        type |= TOPLEVEL::type::Error;
+                        break;
+                }
+                break;
             }
-            break;
+            case TOPLEVEL::insertType::bandwidth:
+            {
+                if (engine != PART::engine::subSynth)
+                {
+                    type |= TOPLEVEL::type::Error;
+                    return 1;
+                }
+                switch (control)
+                {
+                    case ENVELOPEINSERT::control::attackLevel:
+                        def = ENVDEF::subBandAttackValue.def;
+                        break;
+                    case ENVELOPEINSERT::control::attackTime:
+                            def = ENVDEF::subBandAttackTime.def;
+                        break;
+                    case ENVELOPEINSERT::control::releaseTime:
+                        def = ENVDEF::subBandReleaseTime.def;
+                        break;
+                    case ENVELOPEINSERT::control::releaseLevel:
+                        def = ENVDEF::subBandReleaseValue.def;
+                        break;
+                    case ENVELOPEINSERT::control::stretch:
+                        def = ENVDEF::subBandStretch.def;
+                        break;
+                    case ENVELOPEINSERT::control::forcedRelease:
+                        max = 1;
+                        def = ENVSWITCH::defForceBand;
+                        type &= ~learnable;
+                        break;
+                    //case ENVELOPEINSERT::control::edit:
+                        //break;
+                    case ENVELOPEINSERT::control::enableFreeMode:
+                        def = ENVSWITCH::defFreeMode;
+                        break;
+                    case ENVELOPEINSERT::control::points:
+                        def = ENVDEF::bandCount.def;
+                        break;
+                    case ENVELOPEINSERT::control::sustainPoint:
+                        def = ENVDEF::bandPoint.def;
+                        break;
+                    default:
+                        type |= TOPLEVEL::type::Error;
+                        break;
+                }
+                break;
+            }
         }
+        break;
+    case TOPLEVEL::insert::envelopePointChange:
+    case TOPLEVEL::insert::envelopePointChangeDt:
+    case TOPLEVEL::insert::envelopePointChangeVal:
+        break;
+
+    case TOPLEVEL::insert::envelopePointAdd:
+    case TOPLEVEL::insert::envelopePointDelete:
+        // temporary solution :(
+        min = 1;
+        max = 1;
+        def = 1;
+        type &= ~learnable;
+        break;
     }
 
     getData->data.type = type;

@@ -444,6 +444,8 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                 case TOPLEVEL::insert::envelopePointAdd:
                 case TOPLEVEL::insert::envelopePointDelete:
                 case TOPLEVEL::insert::envelopePointChange:
+                case TOPLEVEL::insert::envelopePointChangeDt:
+                case TOPLEVEL::insert::envelopePointChangeVal:
                     switch(parameter)
                     {
                         case TOPLEVEL::insertType::amplitude:
@@ -494,6 +496,8 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                 case TOPLEVEL::insert::envelopePointAdd:
                 case TOPLEVEL::insert::envelopePointDelete:
                 case TOPLEVEL::insert::envelopePointChange:
+                case TOPLEVEL::insert::envelopePointChangeDt:
+                case TOPLEVEL::insert::envelopePointChangeVal:
                     switch(parameter)
                     {
                         case TOPLEVEL::insertType::amplitude:
@@ -563,6 +567,8 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                         decode_envelope(synth, getData);
                         break;
                     case TOPLEVEL::insert::envelopePointChange:
+                    case TOPLEVEL::insert::envelopePointChangeDt:
+                    case TOPLEVEL::insert::envelopePointChangeVal:
                         decode_envelope(synth, getData);
                         break;
                     case TOPLEVEL::insert::oscillatorGroup:
@@ -610,6 +616,8 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                 case TOPLEVEL::insert::envelopePointAdd:
                 case TOPLEVEL::insert::envelopePointDelete:
                 case TOPLEVEL::insert::envelopePointChange:
+                case TOPLEVEL::insert::envelopePointChangeDt:
+                case TOPLEVEL::insert::envelopePointChangeVal:
                     switch(parameter)
                     {
                         case TOPLEVEL::insertType::amplitude:
