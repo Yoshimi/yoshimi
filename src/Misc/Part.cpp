@@ -299,7 +299,7 @@ void Part::setChannelAT(int type, int value)
         if (value > 0)
         {
             if (oldFilterQstate == -1)
-                oldFilterQstate = ctl->filtercutoff.data;
+                oldFilterQstate = ctl->filterq.data;
             float adjust = oldFilterQstate / 127.0f;
             if (type & PART::aftertouchType::filterQdown)
                 ctl->setfilterq(oldFilterQstate - (value * adjust));
