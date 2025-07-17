@@ -49,7 +49,7 @@ DataText::DataText()
     , textMsgBuffer{TextMsgBuffer::instance()}
     { }
 
-string DataText::withValue(string resolved, uchar type, bool showValue, bool addValue, float value)
+string DataText::withValue(string resolved, uchar type, bool showValue, bool addValue, float value, std::optional<float> extra_value)
 {
     if (!addValue)
         return resolved;
@@ -70,8 +70,15 @@ string DataText::withValue(string resolved, uchar type, bool showValue, bool add
             resolved += to_string(lrint(value));
         else
             resolved += to_string(value);
-        return resolved;
+        if (extra_value) {
+            resolved += " and ";
+            if (type & TOPLEVEL::type::Integer)
+                resolved += to_string(lrint(*extra_value));
+            else
+                resolved += to_string(*extra_value);
+        }
     }
+
 
     return resolved;
 }
@@ -89,7 +96,7 @@ string DataText::resolveAll(SynthEngine& synth, CommandBlock& cmd, bool addValue
     uchar engine  = cmd.data.engine;
     uchar insert  = cmd.data.insert;
     //   (parameter)
-    //   (offset)
+    uchar offset  = cmd.data.offset;
     //   (miscmsg)
 
     if (control == TOPLEVEL::control::textMessage) // special case for simple messages
@@ -177,11 +184,13 @@ string DataText::resolveAll(SynthEngine& synth, CommandBlock& cmd, bool addValue
             case TOPLEVEL::insert::envelopeGroup:
                 commandName = resolveEnvelope(cmd, addValue);
                 break;
-            case TOPLEVEL::insert::envelopePointAdd:
             case TOPLEVEL::insert::envelopePointDelete:
                 commandName = resolveEnvelope(cmd, addValue);
                 break;
+            case TOPLEVEL::insert::envelopePointAdd:
             case TOPLEVEL::insert::envelopePointChange:
+                commandName = resolveEnvelope(cmd, addValue);
+                return withValue(commandName, type, showValue, addValue, value, offset);
             case TOPLEVEL::insert::envelopePointChangeDt:
             case TOPLEVEL::insert::envelopePointChangeVal:
                 commandName = resolveEnvelope(cmd, addValue);
@@ -224,11 +233,13 @@ string DataText::resolveAll(SynthEngine& synth, CommandBlock& cmd, bool addValue
             case TOPLEVEL::insert::envelopeGroup:
                 commandName = resolveEnvelope(cmd, addValue);
                 break;
-            case TOPLEVEL::insert::envelopePointAdd:
             case TOPLEVEL::insert::envelopePointDelete:
                 commandName = resolveEnvelope(cmd, addValue);
                 break;
+            case TOPLEVEL::insert::envelopePointAdd:
             case TOPLEVEL::insert::envelopePointChange:
+                commandName = resolveEnvelope(cmd, addValue);
+                return withValue(commandName, type, showValue, addValue, value, offset);
             case TOPLEVEL::insert::envelopePointChangeDt:
             case TOPLEVEL::insert::envelopePointChangeVal:
                 commandName = resolveEnvelope(cmd, addValue);
@@ -253,11 +264,13 @@ string DataText::resolveAll(SynthEngine& synth, CommandBlock& cmd, bool addValue
             case TOPLEVEL::insert::envelopeGroup:
                 commandName = resolveEnvelope(cmd, addValue);
                 break;
-            case TOPLEVEL::insert::envelopePointAdd:
             case TOPLEVEL::insert::envelopePointDelete:
                 commandName = resolveEnvelope(cmd, addValue);
                 break;
+            case TOPLEVEL::insert::envelopePointAdd:
             case TOPLEVEL::insert::envelopePointChange:
+                commandName = resolveEnvelope(cmd, addValue);
+                return withValue(commandName, type, showValue, addValue, value, offset);
             case TOPLEVEL::insert::envelopePointChangeDt:
             case TOPLEVEL::insert::envelopePointChangeVal:
                 commandName = resolveEnvelope(cmd, addValue);
@@ -291,11 +304,13 @@ string DataText::resolveAll(SynthEngine& synth, CommandBlock& cmd, bool addValue
             case TOPLEVEL::insert::envelopeGroup:
                 commandName = resolveEnvelope(cmd, addValue);
                 break;
-            case TOPLEVEL::insert::envelopePointAdd:
             case TOPLEVEL::insert::envelopePointDelete:
                 commandName = resolveEnvelope(cmd, addValue);
                 break;
+            case TOPLEVEL::insert::envelopePointAdd:
             case TOPLEVEL::insert::envelopePointChange:
+                commandName = resolveEnvelope(cmd, addValue);
+                return withValue(commandName, type, showValue, addValue, value, offset);
             case TOPLEVEL::insert::envelopePointChangeDt:
             case TOPLEVEL::insert::envelopePointChangeVal:
                 commandName = resolveEnvelope(cmd, addValue);
@@ -3137,7 +3152,6 @@ string DataText::resolveEnvelope(CommandBlock& cmd, bool)
     uchar kititem = cmd.data.kit;
     uchar engine  = cmd.data.engine;
     uchar insert  = cmd.data.insert;
-    uchar offset  = cmd.data.offset;
     uchar insertParam = cmd.data.parameter;
 
     string env;
@@ -3185,7 +3199,7 @@ string DataText::resolveEnvelope(CommandBlock& cmd, bool)
             return ("Freemode add/remove is write only. Current points " + to_string(value));
         }
         if (insert == TOPLEVEL::insert::envelopePointAdd)
-            return ("Part " + to_string(int(npart + 1)) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env Added Freemode Point " + to_string(int(control & 0x3f) + 1) + " Time " + to_string(int(offset)));
+            return ("Part " + to_string(int(npart + 1)) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env Added Freemode Point " + to_string(int(control & 0x3f) + 1) + " Y and X");
         else
         {
             showValue = false;
@@ -3196,11 +3210,11 @@ string DataText::resolveEnvelope(CommandBlock& cmd, bool)
     switch (insert)
     {
     case TOPLEVEL::insert::envelopePointChange:
-        return ("Part " + to_string(int(npart + 1)) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env Freemode Point " +  to_string(int(control) + 1) + " Time Value " + to_string(int(offset)));
+        return ("Part " + to_string(int(npart + 1)) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env Freemode Point " +  to_string(int(control) + 1) + " Y and X");
     case TOPLEVEL::insert::envelopePointChangeDt:
-        return ("Part " + to_string(int(npart + 1)) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env Freemode Point " +  to_string(int(control) + 1) + " Time");
+        return ("Part " + to_string(int(npart + 1)) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env Freemode Point " +  to_string(int(control) + 1) + " X");
     case TOPLEVEL::insert::envelopePointChangeVal:
-        return ("Part " + to_string(int(npart + 1)) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env Freemode Point " +  to_string(int(control) + 1));
+        return ("Part " + to_string(int(npart + 1)) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env Freemode Point " +  to_string(int(control) + 1) + " Y");
     default:
         break;
     }

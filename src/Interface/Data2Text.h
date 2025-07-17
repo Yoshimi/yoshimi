@@ -22,6 +22,7 @@
 #ifndef DATATEXT_H
 #define DATATEXT_H
 
+#include <optional>
 #include <string>
 
 #include "globals.h"
@@ -44,7 +45,7 @@ class DataText
 
         std::string resolveAll(SynthEngine&, CommandBlock&, bool addValue);
     private:
-        std::string withValue(std::string resolved, uchar type, bool showValue, bool addValue, float value);
+        std::string withValue(std::string resolved, uchar type, bool showValue, bool addValue, float value, std::optional<float> extra_value = std::nullopt);
         std::string resolveVector(CommandBlock&, bool addValue);
         std::string resolveMicrotonal(CommandBlock&, bool addValue);
         std::string resolveConfig(SynthEngine&, CommandBlock&, bool addValue);

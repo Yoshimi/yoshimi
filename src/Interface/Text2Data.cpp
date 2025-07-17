@@ -1432,10 +1432,12 @@ void TextData::encodeEnvelope(string& source, CommandBlock& allData)
 
     if (findAndStep(source, "Freemode Point")) {
         if (findCharNum(source, ctl)) {
-            if (findAndStep(source, "Time"))
+            if (findAndStep(source, "X"))
                 allData.data.insert = TOPLEVEL::insert::envelopePointChangeDt;
-            else
+            else if (findAndStep(source, "Y"))
                 allData.data.insert = TOPLEVEL::insert::envelopePointChangeVal;
+            else
+                ctl = UNUSED;
         }
     } else {
         allData.data.insert = TOPLEVEL::insert::envelopeGroup;
