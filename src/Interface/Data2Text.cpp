@@ -3209,14 +3209,14 @@ string DataText::resolveEnvelope(CommandBlock& cmd, bool)
 
     switch (insert)
     {
-    case TOPLEVEL::insert::envelopePointChange:
-        return ("Part " + to_string(int(npart + 1)) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env Freemode Point " +  to_string(int(control) + 1) + " Y and X");
-    case TOPLEVEL::insert::envelopePointChangeDt:
-        return ("Part " + to_string(int(npart + 1)) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env Freemode Point " +  to_string(int(control) + 1) + " X");
-    case TOPLEVEL::insert::envelopePointChangeVal:
-        return ("Part " + to_string(int(npart + 1)) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env Freemode Point " +  to_string(int(control) + 1) + " Y");
-    default:
-        break;
+        case TOPLEVEL::insert::envelopePointChange:
+            return ("Part " + to_string(int(npart + 1)) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env Freemode Point " +  to_string(int(control) + 1) + " Y and X");
+        case TOPLEVEL::insert::envelopePointChangeDt:
+            return ("Part " + to_string(int(npart + 1)) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env Freemode Point " +  to_string(int(control) + 1) + " X");
+        case TOPLEVEL::insert::envelopePointChangeVal:
+            return ("Part " + to_string(int(npart + 1)) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env Freemode Point " +  to_string(int(control) + 1) + " Y");
+        default:
+            break;
     }
 
     string contstr;

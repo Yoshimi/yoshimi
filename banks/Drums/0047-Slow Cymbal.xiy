@@ -1,0 +1,962 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Yoshimi-data>
+<Yoshimi-data Yoshimi-major="2" Yoshimi-minor="3" Yoshimi-revision="4" Yoshimi-author="Alan Ernest Calvert">
+<INFORMATION>
+<string name="XMLtype">Instrument</string>
+<par_bool name="ADDsynth_used" value="no" />
+<par_bool name="SUBsynth_used" value="yes" />
+<par_bool name="PADsynth_used" value="no" />
+</INFORMATION>
+<INSTRUMENT>
+<INFO>
+<string name="name">Slow Cymbal</string>
+<string name="author">(c) Dario Straulino + Will Godfrey
+License: GPLv3</string>
+<string name="comments">Derived from Natural Drum Kit (HiHat Open 1)</string>
+<par name="type" value="15" />
+<string name="file">Slow Cymbal</string>
+</INFO>
+<INSTRUMENT_KIT>
+<par name="kit_mode" value="0" />
+<par_bool name="kit_crossfade" value="no" />
+<par name="kit_fadetype" value="0" />
+<par_bool name="drum_mode" value="no" />
+<INSTRUMENT_KIT_ITEM id="0">
+<par_bool name="enabled" value="yes" />
+<string name="name" />
+<par_bool name="muted" value="no" />
+<par name="min_key" value="0" />
+<par name="max_key" value="127" />
+<par name="send_to_instrument_effect" value="0" />
+<par_bool name="add_enabled" value="no" />
+<par_bool name="sub_enabled" value="yes" />
+<SUB_SYNTH_PARAMETERS>
+<par name="num_stages" value="1" />
+<par name="harmonic_mag_type" value="0" />
+<par name="start" value="1" />
+<HARMONICS>
+<HARMONIC id="0">
+<par name="mag" value="16" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="1">
+<par name="mag" value="26" />
+<par name="relbw" value="65" />
+</HARMONIC>
+<HARMONIC id="2">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="3">
+<par name="mag" value="127" />
+<par name="relbw" value="122" />
+</HARMONIC>
+<HARMONIC id="4">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="5">
+<par name="mag" value="9" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="6">
+<par name="mag" value="19" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="7">
+<par name="mag" value="78" />
+<par name="relbw" value="127" />
+</HARMONIC>
+<HARMONIC id="8">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="9">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="10">
+<par name="mag" value="16" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="11">
+<par name="mag" value="56" />
+<par name="relbw" value="106" />
+</HARMONIC>
+<HARMONIC id="12">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="13">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="14">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="15">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="16">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="17">
+<par name="mag" value="21" />
+<par name="relbw" value="85" />
+</HARMONIC>
+<HARMONIC id="18">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="19">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="20">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="21">
+<par name="mag" value="60" />
+<par name="relbw" value="96" />
+</HARMONIC>
+<HARMONIC id="22">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="23">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="24">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="25">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="26">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="27">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="28">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="29">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="30">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="31">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="32">
+<par name="mag" value="36" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="33">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="34">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="35">
+<par name="mag" value="74" />
+<par name="relbw" value="127" />
+</HARMONIC>
+<HARMONIC id="36">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="37">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="38">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="39">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="40">
+<par name="mag" value="48" />
+<par name="relbw" value="67" />
+</HARMONIC>
+<HARMONIC id="41">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="42">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="43">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="44">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="45">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="46">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="47">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="48">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="49">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="50">
+<par name="mag" value="86" />
+<par name="relbw" value="127" />
+</HARMONIC>
+<HARMONIC id="51">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="52">
+<par name="mag" value="59" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="53">
+<par name="mag" value="97" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="54">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="55">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="56">
+<par name="mag" value="106" />
+<par name="relbw" value="127" />
+</HARMONIC>
+<HARMONIC id="57">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="58">
+<par name="mag" value="61" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="59">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="60">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="61">
+<par name="mag" value="97" />
+<par name="relbw" value="65" />
+</HARMONIC>
+<HARMONIC id="62">
+<par name="mag" value="0" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="63">
+<par name="mag" value="127" />
+<par name="relbw" value="127" />
+</HARMONIC>
+</HARMONICS>
+<AMPLITUDE_PARAMETERS>
+<par_bool name="stereo" value="yes" />
+<par name="volume" value="100" />
+<par name="pan_pos" value="84" />
+<par_bool name="random_pan" value="no" />
+<par name="random_width" value="63" />
+<par name="panning" value="84" />
+<par name="velocity_sensing" value="90" />
+<AMPLITUDE_ENVELOPE>
+<par_bool name="free_mode" value="no" />
+<par name="env_points" value="4" />
+<par name="env_sustain" value="2" />
+<par name="env_stretch" value="0" />
+<par_bool name="forced_release" value="no" />
+<par_bool name="linear_envelope" value="no" />
+<par name="A_dt" value="36" exact_value="0x420E3D71" />
+<par name="D_dt" value="79" exact_value="0x429E0000" />
+<par name="R_dt" value="56" exact_value="0x42600000" />
+<par name="A_val" value="64" exact_value="0x42800000" />
+<par name="D_val" value="64" exact_value="0x42800000" />
+<par name="S_val" value="0" exact_value="0x00000000" />
+<par name="R_val" value="64" exact_value="0x42800000" />
+<POINT id="0">
+<par name="val" value="0" exact_value="0x00000000" />
+</POINT>
+<POINT id="1">
+<par name="dt" value="36" exact_value="0x420E3D71" />
+<par name="val" value="127" exact_value="0x42FE0000" />
+</POINT>
+<POINT id="2">
+<par name="dt" value="79" exact_value="0x429E0000" />
+<par name="val" value="0" exact_value="0x00000000" />
+</POINT>
+<POINT id="3">
+<par name="dt" value="56" exact_value="0x42600000" />
+<par name="val" value="0" exact_value="0x00000000" />
+</POINT>
+</AMPLITUDE_ENVELOPE>
+</AMPLITUDE_PARAMETERS>
+<FREQUENCY_PARAMETERS>
+<par_bool name="fixed_freq" value="yes" />
+<par name="fixed_freq_et" value="0" />
+<par name="bend_adjust" value="88" />
+<par name="offset_hz" value="64" />
+<par name="detune" value="8192" />
+<par name="coarse_detune" value="14336" />
+<par name="overtone_spread_type" value="0" />
+<par name="overtone_spread_par1" value="0" />
+<par name="overtone_spread_par2" value="0" />
+<par name="overtone_spread_par3" value="0" />
+<par name="detune_type" value="1" />
+<par name="bandwidth" value="0" />
+<par name="bandwidth_scale" value="64" />
+<par_bool name="freq_envelope_enabled" value="yes" />
+<FREQUENCY_ENVELOPE>
+<par_bool name="free_mode" value="no" />
+<par name="env_points" value="3" />
+<par name="env_sustain" value="1" />
+<par name="env_stretch" value="64" />
+<par_bool name="forced_release" value="yes" />
+<par_bool name="linear_envelope" value="no" />
+<par name="A_dt" value="57" exact_value="0x42640000" />
+<par name="D_dt" value="10" exact_value="0x41200000" />
+<par name="R_dt" value="57" exact_value="0x42640000" />
+<par name="A_val" value="68" exact_value="0x42880000" />
+<par name="D_val" value="64" exact_value="0x42800000" />
+<par name="S_val" value="64" exact_value="0x42800000" />
+<par name="R_val" value="69" exact_value="0x428A0000" />
+<POINT id="0">
+<par name="val" value="68" exact_value="0x42880000" />
+</POINT>
+<POINT id="1">
+<par name="dt" value="57" exact_value="0x42640000" />
+<par name="val" value="64" exact_value="0x42800000" />
+</POINT>
+<POINT id="2">
+<par name="dt" value="57" exact_value="0x42640000" />
+<par name="val" value="69" exact_value="0x428A0000" />
+</POINT>
+</FREQUENCY_ENVELOPE>
+<par_bool name="band_width_envelope_enabled" value="yes" />
+<BANDWIDTH_ENVELOPE>
+<par_bool name="free_mode" value="yes" />
+<par name="env_points" value="4" />
+<par name="env_sustain" value="2" />
+<par name="env_stretch" value="0" />
+<par_bool name="forced_release" value="yes" />
+<par_bool name="linear_envelope" value="no" />
+<par name="A_dt" value="80" exact_value="0x42A00000" />
+<par name="D_dt" value="10" exact_value="0x41200000" />
+<par name="R_dt" value="56" exact_value="0x42600000" />
+<par name="A_val" value="105" exact_value="0x42D20000" />
+<par name="D_val" value="64" exact_value="0x42800000" />
+<par name="S_val" value="64" exact_value="0x42800000" />
+<par name="R_val" value="64" exact_value="0x42800000" />
+<POINT id="0">
+<par name="val" value="107" exact_value="0x42D60000" />
+</POINT>
+<POINT id="1">
+<par name="dt" value="23" exact_value="0x41B80000" />
+<par name="val" value="101" exact_value="0x42CA0000" />
+</POINT>
+<POINT id="2">
+<par name="dt" value="80" exact_value="0x42A00000" />
+<par name="val" value="64" exact_value="0x42800000" />
+</POINT>
+<POINT id="3">
+<par name="dt" value="56" exact_value="0x42600000" />
+<par name="val" value="64" exact_value="0x42800000" />
+</POINT>
+</BANDWIDTH_ENVELOPE>
+</FREQUENCY_PARAMETERS>
+<FILTER_PARAMETERS>
+<par_bool name="enabled" value="no" />
+<FILTER>
+<par name="category" value="0" />
+<par name="type" value="2" />
+<par name="freq" value="80" exact_value="0x42A00000" />
+<par name="q" value="40" exact_value="0x42200000" />
+<par name="stages" value="0" />
+<par name="freq_track" value="64" exact_value="0x42800000" />
+<par_bool name="freqtrackoffset" value="no" />
+<par name="gain" value="64" exact_value="0x42800000" />
+<FORMANT_FILTER>
+<par name="num_formants" value="3" />
+<par name="formant_slowness" value="64" exact_value="0x42800000" />
+<par name="vowel_clearness" value="64" exact_value="0x42800000" />
+<par name="center_freq" value="64" />
+<par name="octaves_freq" value="64" />
+<VOWEL id="0">
+<FORMANT id="0">
+<par name="freq" value="46" exact_value="0x42380000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="1">
+<par name="freq" value="35" exact_value="0x420C0000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="2">
+<par name="freq" value="107" exact_value="0x42D60000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="3">
+<par name="freq" value="125" exact_value="0x42FA0000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="4">
+<par name="freq" value="100" exact_value="0x42C80000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="5">
+<par name="freq" value="87" exact_value="0x42AE0000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="6">
+<par name="freq" value="43" exact_value="0x422C0000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="7">
+<par name="freq" value="51" exact_value="0x424C0000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="8">
+<par name="freq" value="127" exact_value="0x42FE0000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="9">
+<par name="freq" value="40" exact_value="0x42200000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="10">
+<par name="freq" value="96" exact_value="0x42C00000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="11">
+<par name="freq" value="59" exact_value="0x426C0000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+</VOWEL>
+<VOWEL id="1">
+<FORMANT id="0">
+<par name="freq" value="117" exact_value="0x42EA0000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="1">
+<par name="freq" value="91" exact_value="0x42B60000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="2">
+<par name="freq" value="126" exact_value="0x42FC0000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="3">
+<par name="freq" value="58" exact_value="0x42680000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="4">
+<par name="freq" value="106" exact_value="0x42D40000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="5">
+<par name="freq" value="47" exact_value="0x423C0000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="6">
+<par name="freq" value="86" exact_value="0x42AC0000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="7">
+<par name="freq" value="106" exact_value="0x42D40000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="8">
+<par name="freq" value="82" exact_value="0x42A40000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="9">
+<par name="freq" value="89" exact_value="0x42B20000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="10">
+<par name="freq" value="68" exact_value="0x42880000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="11">
+<par name="freq" value="80" exact_value="0x42A00000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+</VOWEL>
+<VOWEL id="2">
+<FORMANT id="0">
+<par name="freq" value="93" exact_value="0x42BA0000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="1">
+<par name="freq" value="4" exact_value="0x40800000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="2">
+<par name="freq" value="6" exact_value="0x40C00000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="3">
+<par name="freq" value="10" exact_value="0x41200000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="4">
+<par name="freq" value="49" exact_value="0x42440000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="5">
+<par name="freq" value="87" exact_value="0x42AE0000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="6">
+<par name="freq" value="68" exact_value="0x42880000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="7">
+<par name="freq" value="103" exact_value="0x42CE0000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="8">
+<par name="freq" value="74" exact_value="0x42940000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="9">
+<par name="freq" value="27" exact_value="0x41D80000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="10">
+<par name="freq" value="102" exact_value="0x42CC0000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="11">
+<par name="freq" value="43" exact_value="0x422C0000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+</VOWEL>
+<VOWEL id="3">
+<FORMANT id="0">
+<par name="freq" value="68" exact_value="0x42880000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="1">
+<par name="freq" value="108" exact_value="0x42D80000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="2">
+<par name="freq" value="80" exact_value="0x42A00000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="3">
+<par name="freq" value="73" exact_value="0x42920000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="4">
+<par name="freq" value="107" exact_value="0x42D60000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="5">
+<par name="freq" value="77" exact_value="0x429A0000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="6">
+<par name="freq" value="57" exact_value="0x42640000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="7">
+<par name="freq" value="115" exact_value="0x42E60000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="8">
+<par name="freq" value="41" exact_value="0x42240000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="9">
+<par name="freq" value="21" exact_value="0x41A80000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="10">
+<par name="freq" value="86" exact_value="0x42AC0000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="11">
+<par name="freq" value="115" exact_value="0x42E60000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+</VOWEL>
+<VOWEL id="4">
+<FORMANT id="0">
+<par name="freq" value="2" exact_value="0x40000000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="1">
+<par name="freq" value="102" exact_value="0x42CC0000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="2">
+<par name="freq" value="85" exact_value="0x42AA0000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="3">
+<par name="freq" value="82" exact_value="0x42A40000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="4">
+<par name="freq" value="50" exact_value="0x42480000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="5">
+<par name="freq" value="32" exact_value="0x42000000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="6">
+<par name="freq" value="104" exact_value="0x42D00000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="7">
+<par name="freq" value="94" exact_value="0x42BC0000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="8">
+<par name="freq" value="101" exact_value="0x42CA0000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="9">
+<par name="freq" value="10" exact_value="0x41200000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="10">
+<par name="freq" value="124" exact_value="0x42F80000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="11">
+<par name="freq" value="83" exact_value="0x42A60000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+</VOWEL>
+<VOWEL id="5">
+<FORMANT id="0">
+<par name="freq" value="95" exact_value="0x42BE0000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="1">
+<par name="freq" value="126" exact_value="0x42FC0000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="2">
+<par name="freq" value="18" exact_value="0x41900000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="3">
+<par name="freq" value="65" exact_value="0x42820000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="4">
+<par name="freq" value="100" exact_value="0x42C80000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="5">
+<par name="freq" value="79" exact_value="0x429E0000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="6">
+<par name="freq" value="76" exact_value="0x42980000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="7">
+<par name="freq" value="48" exact_value="0x42400000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="8">
+<par name="freq" value="8" exact_value="0x41000000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="9">
+<par name="freq" value="51" exact_value="0x424C0000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="10">
+<par name="freq" value="102" exact_value="0x42CC0000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+<FORMANT id="11">
+<par name="freq" value="102" exact_value="0x42CC0000" />
+<par name="amp" value="127" exact_value="0x42FE0000" />
+<par name="q" value="64" exact_value="0x42800000" />
+</FORMANT>
+</VOWEL>
+<par name="sequence_size" value="3" />
+<par name="sequence_stretch" value="40" exact_value="0x42200000" />
+<par_bool name="sequence_reversed" value="no" />
+<SEQUENCE_POS id="0">
+<par name="vowel_id" value="0" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="1">
+<par name="vowel_id" value="1" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="2">
+<par name="vowel_id" value="2" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="3">
+<par name="vowel_id" value="3" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="4">
+<par name="vowel_id" value="4" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="5">
+<par name="vowel_id" value="5" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="6">
+<par name="vowel_id" value="0" />
+</SEQUENCE_POS>
+<SEQUENCE_POS id="7">
+<par name="vowel_id" value="1" />
+</SEQUENCE_POS>
+</FORMANT_FILTER>
+</FILTER>
+<par name="filter_velocity_sensing" value="64" />
+<par name="filter_velocity_sensing_amplitude" value="64" />
+<FILTER_ENVELOPE>
+<par_bool name="free_mode" value="no" />
+<par name="env_points" value="4" />
+<par name="env_sustain" value="2" />
+<par name="env_stretch" value="0" />
+<par_bool name="forced_release" value="yes" />
+<par_bool name="linear_envelope" value="no" />
+<par name="A_dt" value="40" exact_value="0x42200000" />
+<par name="D_dt" value="70" exact_value="0x428C0000" />
+<par name="R_dt" value="60" exact_value="0x42700000" />
+<par name="A_val" value="64" exact_value="0x42800000" />
+<par name="D_val" value="64" exact_value="0x42800000" />
+<par name="S_val" value="64" exact_value="0x42800000" />
+<par name="R_val" value="64" exact_value="0x42800000" />
+<POINT id="0">
+<par name="val" value="64" exact_value="0x42800000" />
+</POINT>
+<POINT id="1">
+<par name="dt" value="40" exact_value="0x42200000" />
+<par name="val" value="64" exact_value="0x42800000" />
+</POINT>
+<POINT id="2">
+<par name="dt" value="70" exact_value="0x428C0000" />
+<par name="val" value="64" exact_value="0x42800000" />
+</POINT>
+<POINT id="3">
+<par name="dt" value="60" exact_value="0x42700000" />
+<par name="val" value="64" exact_value="0x42800000" />
+</POINT>
+</FILTER_ENVELOPE>
+</FILTER_PARAMETERS>
+</SUB_SYNTH_PARAMETERS>
+<par_bool name="pad_enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="1">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="2">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="3">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="4">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="5">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="6">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="7">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="8">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="9">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="10">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="11">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="12">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="13">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="14">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="15">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+</INSTRUMENT_KIT>
+<INSTRUMENT_EFFECTS>
+<INSTRUMENT_EFFECT id="0">
+<EFFECT>
+<par name="type" value="0" />
+</EFFECT>
+<par_bool name="bypass" value="no" />
+<par name="route" value="0" />
+</INSTRUMENT_EFFECT>
+<INSTRUMENT_EFFECT id="1">
+<EFFECT>
+<par name="type" value="0" />
+</EFFECT>
+<par_bool name="bypass" value="no" />
+<par name="route" value="0" />
+</INSTRUMENT_EFFECT>
+<INSTRUMENT_EFFECT id="2">
+<EFFECT>
+<par name="type" value="0" />
+</EFFECT>
+<par_bool name="bypass" value="no" />
+<par name="route" value="0" />
+</INSTRUMENT_EFFECT>
+</INSTRUMENT_EFFECTS>
+<par name="key_mode" value="0" />
+<par name="channel_aftertouch" value="0" />
+<par name="key_aftertouch" value="0" />
+<par name="random_detune" value="0" />
+<par name="random_velocity" value="0" />
+<par_bool name="breath_disable" value="no" />
+</INSTRUMENT>
+<CONTROLLER>
+<par name="pitchwheel_bendrange" value="200" />
+<par_bool name="expression_receive" value="yes" />
+<par name="panning_depth" value="64" />
+<par name="filter_cutoff_depth" value="64" />
+<par name="filter_q_depth" value="64" />
+<par name="bandwidth_depth" value="64" />
+<par name="mod_wheel_depth" value="80" />
+<par_bool name="mod_wheel_exponential" value="no" />
+<par_bool name="fm_amp_receive" value="yes" />
+<par_bool name="volume_receive" value="yes" />
+<par name="volume_range" value="96" />
+<par_bool name="sustain_receive" value="yes" />
+<par_bool name="portamento_receive" value="yes" />
+<par name="portamento_time" value="64" />
+<par name="portamento_pitchthresh" value="3" />
+<par name="portamento_pitchthreshtype" value="1" />
+<par name="portamento_portamento" value="0" />
+<par name="portamento_updowntimestretch" value="64" />
+<par name="portamento_proportional" value="0" />
+<par name="portamento_proprate" value="80" />
+<par name="portamento_propdepth" value="90" />
+<par name="resonance_center_depth" value="64" />
+<par name="resonance_bandwidth_depth" value="64" />
+</CONTROLLER>
+</Yoshimi-data>
