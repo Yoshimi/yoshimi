@@ -39,6 +39,7 @@ using std::unique_ptr;
 class SUBnoteParameters;
 class Controller;
 class Envelope;
+class LFO;
 class Filter;
 
 class SynthEngine;
@@ -89,6 +90,7 @@ class SUBnote
         float randpanR;
 
         unique_ptr<Envelope> ampEnvelope;
+        unique_ptr<LFO>      ampLFO;
         unique_ptr<Envelope> freqEnvelope;
         unique_ptr<Envelope> bandWidthEnvelope;
         unique_ptr<Envelope> globalFilterEnvelope;

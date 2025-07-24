@@ -29,6 +29,7 @@
 #define SUB_NOTE_PARAMETERS_H
 
 #include "Params/EnvelopeParams.h"
+#include "Params/LFOParams.h"
 #include "Params/FilterParams.h"
 #include "Params/ParamCheck.h"
 
@@ -60,6 +61,7 @@ class SUBnoteParameters : public ParamBase
         float pangainR;         // ^^
         uchar PAmpVelocityScaleFunction;
         EnvelopeParams *AmpEnvelope;
+        LFOParams *AmpLfo;
 
         // Frequency Parameters
         ushort PDetune;
