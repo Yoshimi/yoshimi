@@ -28,6 +28,7 @@
 
 #include "Misc/SynthEngine.h"
 #include "Params/SUBnoteParameters.h"
+#include "Params/LFOParams.h"
 #include "Misc/NumericFuncs.h"
 #include "Misc/XMLStore.h"
 
@@ -39,8 +40,11 @@ SUBnoteParameters::SUBnoteParameters(SynthEngine& _synth) : ParamBase{_synth}
 {
     AmpEnvelope = new EnvelopeParams(64, 1, synth);
     AmpEnvelope->ADSRinit_dB(0, 40, 127, 25);
+
+    AmpLfo = new LFOParams(80, 0, 64, 0, 0, 0, false, 1, synth);
     FreqEnvelope = new EnvelopeParams(64, 0, synth);
     FreqEnvelope->ASRinit(30, 50, 64, 60);
+
     BandWidthEnvelope = new EnvelopeParams(64, 0, synth);
     BandWidthEnvelope->ASRinit_bw(100, 70, 64, 60);
 
@@ -93,6 +97,7 @@ void SUBnoteParameters::defaults()
     PGlobalFilterVelocityScaleFunction = 64;
 
     AmpEnvelope->defaults();
+    AmpLfo->defaults();
     FreqEnvelope->defaults();
     BandWidthEnvelope->defaults();
     GlobalFilter->defaults();

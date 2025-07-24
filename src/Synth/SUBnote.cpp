@@ -33,6 +33,7 @@
 #include "Params/Controller.h"
 #include "Synth/SUBnote.h"
 #include "Synth/Envelope.h"
+#include "Synth/LFO.h"
 #include "DSP/Filter.h"
 #include "Misc/SynthEngine.h"
 #include "Misc/SynthHelper.h"
