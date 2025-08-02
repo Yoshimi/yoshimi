@@ -481,7 +481,7 @@ string UnifiedPresets::filterXML(XMLtree& xmlTop, bool isLoad)
     }
     else if (engineType == PART::engine::subSynth)
     {
-        filterPars = synth.part[npart]->kit[kitItem].subpars->GlobalFilter;
+        filterPars = synth.part[npart]->kit[kitItem].subpars->GlobalFilter.get();
     }
     else if (engineType == PART::engine::padSynth)
     {
@@ -639,19 +639,19 @@ string UnifiedPresets::envelopeXML(XMLtree& xmlTop, bool isLoad)
         {
             case 0:
                 name = "Penvamplitude";
-                envPars = synth.part[npart]->kit[kitItem].subpars->AmpEnvelope;
+                envPars = synth.part[npart]->kit[kitItem].subpars->AmpEnvelope.get();
             break;
             case 1:
                 name = "Penvfrequency";
-                envPars = synth.part[npart]->kit[kitItem].subpars->FreqEnvelope;
+                envPars = synth.part[npart]->kit[kitItem].subpars->FreqEnvelope.get();
             break;
             case 2:
                 name = "Penvfilter";
-                envPars = synth.part[npart]->kit[kitItem].subpars->GlobalFilterEnvelope;
+                envPars = synth.part[npart]->kit[kitItem].subpars->GlobalFilterEnvelope.get();
             break;
             case 3:
                 name = "Penvbandwidth";
-                envPars = synth.part[npart]->kit[kitItem].subpars->BandWidthEnvelope;
+                envPars = synth.part[npart]->kit[kitItem].subpars->BandWidthEnvelope.get();
             break;
         }
     }

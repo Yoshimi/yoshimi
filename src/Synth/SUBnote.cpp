@@ -475,14 +475,14 @@ void SUBnote::filterVarRun(SUBnote::bpfilter &filter, float *smps)
 // Init Parameters
 void SUBnote::initparameters(float freq)
 {
-    ampEnvelope.reset(new Envelope{pars.AmpEnvelope, freq, &synth});
+    ampEnvelope.reset(new Envelope{pars.AmpEnvelope.get(), freq, &synth});
     if (pars.PFreqEnvelopeEnabled)
-        freqEnvelope.reset(new Envelope{pars.FreqEnvelope, freq, &synth});
+        freqEnvelope.reset(new Envelope{pars.FreqEnvelope.get(), freq, &synth});
     if (pars.PBandWidthEnvelopeEnabled)
-        bandWidthEnvelope.reset(new Envelope{pars.BandWidthEnvelope, freq, &synth});
+        bandWidthEnvelope.reset(new Envelope{pars.BandWidthEnvelope.get(), freq, &synth});
     if (pars.PGlobalFilterEnabled)
     {
-        globalFilterL.reset(new Filter{*pars.GlobalFilter, synth});
+        globalFilterL.reset(new Filter{*pars.GlobalFilter.get(), synth});
         /* TODO
          * Sort this properly it is a temporary fix to stop a segfault
          * with the following very specific settings:
@@ -492,8 +492,8 @@ void SUBnote::initparameters(float freq)
          * Subsynth Stereo disabled
          */
         //if (stereo)
-            globalFilterR.reset(new Filter{*pars.GlobalFilter, synth});
-        globalFilterEnvelope.reset(new Envelope{pars.GlobalFilterEnvelope, freq, &synth});
+            globalFilterR.reset(new Filter{*pars.GlobalFilter.get(), synth});
+        globalFilterEnvelope.reset(new Envelope{pars.GlobalFilterEnvelope.get(), freq, &synth});
     }
 }
 

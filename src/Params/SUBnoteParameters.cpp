@@ -32,24 +32,26 @@
 #include "Misc/NumericFuncs.h"
 #include "Misc/XMLStore.h"
 
+using std::make_unique;
+
 using func::setAllPan;
 using func::power;
 
 
 SUBnoteParameters::SUBnoteParameters(SynthEngine& _synth) : ParamBase{_synth}
 {
-    AmpEnvelope = new EnvelopeParams(64, 1, synth);
+    AmpEnvelope = make_unique<EnvelopeParams>(64, 1, synth);
     AmpEnvelope->ADSRinit_dB(0, 40, 127, 25);
 
-    AmpLfo = new LFOParams(80, 0, 64, 0, 0, 0, false, 1, synth);
-    FreqEnvelope = new EnvelopeParams(64, 0, synth);
+    AmpLfo = make_unique<LFOParams>(80, 0, 64, 0, 0, 0, false, 1, synth);
+    FreqEnvelope = make_unique<EnvelopeParams>(64, 0, synth);
     FreqEnvelope->ASRinit(30, 50, 64, 60);
 
-    BandWidthEnvelope = new EnvelopeParams(64, 0, synth);
+    BandWidthEnvelope = make_unique<EnvelopeParams>(64, 0, synth);
     BandWidthEnvelope->ASRinit_bw(100, 70, 64, 60);
 
-    GlobalFilter = new FilterParams(2, 80, 40, 0, synth);
-    GlobalFilterEnvelope = new EnvelopeParams(0, 1, synth);
+    GlobalFilter = make_unique<FilterParams>(2, 80, 40, 0, synth);
+    GlobalFilterEnvelope = make_unique<EnvelopeParams>(0, 1, synth);
     GlobalFilterEnvelope->ADSRinit_filter(64, 40, 64, 70, 60, 64);
     defaults();
 }
@@ -102,16 +104,6 @@ void SUBnoteParameters::defaults()
     BandWidthEnvelope->defaults();
     GlobalFilter->defaults();
     GlobalFilterEnvelope->defaults();
-}
-
-
-SUBnoteParameters::~SUBnoteParameters()
-{
-    delete AmpEnvelope;
-    delete FreqEnvelope;
-    delete BandWidthEnvelope;
-    delete GlobalFilter;
-    delete GlobalFilterEnvelope;
 }
 
 

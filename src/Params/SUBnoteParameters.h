@@ -28,6 +28,8 @@
 #ifndef SUB_NOTE_PARAMETERS_H
 #define SUB_NOTE_PARAMETERS_H
 
+#include <memory>
+
 #include "Params/EnvelopeParams.h"
 #include "Params/LFOParams.h"
 #include "Params/FilterParams.h"
@@ -41,7 +43,6 @@ class SUBnoteParameters : public ParamBase
 {
     public:
         SUBnoteParameters(SynthEngine&);
-       ~SUBnoteParameters()  override;
 
         void defaults()  override;
 
@@ -60,28 +61,28 @@ class SUBnoteParameters : public ParamBase
         float pangainL;         // derived from PPanning
         float pangainR;         // ^^
         uchar PAmpVelocityScaleFunction;
-        EnvelopeParams *AmpEnvelope;
-        LFOParams *AmpLfo;
+        std::unique_ptr<EnvelopeParams> AmpEnvelope;
+        std::unique_ptr<LFOParams> AmpLfo;
 
         // Frequency Parameters
         ushort PDetune;
         ushort PCoarseDetune;
         uchar  PDetuneType;
 
-        bool            PFreqEnvelopeEnabled;
-        EnvelopeParams* FreqEnvelope;
-        bool            PBandWidthEnvelopeEnabled;
-        EnvelopeParams* BandWidthEnvelope;
+        bool PFreqEnvelopeEnabled;
+        std::unique_ptr<EnvelopeParams> FreqEnvelope;
+        bool PBandWidthEnvelopeEnabled;
+        std::unique_ptr<EnvelopeParams> BandWidthEnvelope;
 
         uchar PBendAdjust; // Pitch Bend
         uchar POffsetHz;
 
         // Filter Parameters (Global)
         bool  PGlobalFilterEnabled;
-        FilterParams* GlobalFilter;
+        std::unique_ptr<FilterParams> GlobalFilter;
         uchar PGlobalFilterVelocityScale;
         uchar PGlobalFilterVelocityScaleFunction;
-        EnvelopeParams* GlobalFilterEnvelope;
+        std::unique_ptr<EnvelopeParams> GlobalFilterEnvelope;
 
         // Other Parameters
         uchar Pfixedfreq;   // If the base frequency is fixed to 440 Hz
