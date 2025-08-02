@@ -71,6 +71,8 @@ class SUBnoteParameters : public ParamBase
 
         bool PFreqEnvelopeEnabled;
         std::unique_ptr<EnvelopeParams> FreqEnvelope;
+        bool PFreqLfoEnabled;
+        std::unique_ptr<LFOParams> FreqLfo;
         bool PBandWidthEnvelopeEnabled;
         std::unique_ptr<EnvelopeParams> BandWidthEnvelope;
 
@@ -83,6 +85,7 @@ class SUBnoteParameters : public ParamBase
         uchar PGlobalFilterVelocityScale;
         uchar PGlobalFilterVelocityScaleFunction;
         std::unique_ptr<EnvelopeParams> GlobalFilterEnvelope;
+        std::unique_ptr<LFOParams> GlobalFilterLfo;
 
         // Other Parameters
         uchar Pfixedfreq;   // If the base frequency is fixed to 440 Hz

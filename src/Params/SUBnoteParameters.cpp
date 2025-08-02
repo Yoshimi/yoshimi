@@ -42,10 +42,11 @@ SUBnoteParameters::SUBnoteParameters(SynthEngine& _synth) : ParamBase{_synth}
 {
     AmpEnvelope = make_unique<EnvelopeParams>(64, 1, synth);
     AmpEnvelope->ADSRinit_dB(0, 40, 127, 25);
-
     AmpLfo = make_unique<LFOParams>(80, 0, 64, 0, 0, 0, false, 1, synth);
+
     FreqEnvelope = make_unique<EnvelopeParams>(64, 0, synth);
     FreqEnvelope->ASRinit(30, 50, 64, 60);
+    FreqLfo = make_unique<LFOParams>(70, 0, 64, 0, 0, 0, false, 0, synth);
 
     BandWidthEnvelope = make_unique<EnvelopeParams>(64, 0, synth);
     BandWidthEnvelope->ASRinit_bw(100, 70, 64, 60);
@@ -53,6 +54,7 @@ SUBnoteParameters::SUBnoteParameters(SynthEngine& _synth) : ParamBase{_synth}
     GlobalFilter = make_unique<FilterParams>(2, 80, 40, 0, synth);
     GlobalFilterEnvelope = make_unique<EnvelopeParams>(0, 1, synth);
     GlobalFilterEnvelope->ADSRinit_filter(64, 40, 64, 70, 60, 64);
+    GlobalFilterLfo = make_unique<LFOParams>(80, 0, 64, 0, 0, 0, false, 2, synth);
     defaults();
 }
 
@@ -101,9 +103,11 @@ void SUBnoteParameters::defaults()
     AmpEnvelope->defaults();
     AmpLfo->defaults();
     FreqEnvelope->defaults();
+    FreqLfo->defaults();
     BandWidthEnvelope->defaults();
     GlobalFilter->defaults();
     GlobalFilterEnvelope->defaults();
+    GlobalFilterLfo->defaults();
 }
 
 
@@ -152,6 +156,9 @@ void SUBnoteParameters::add2XML(XMLtree& xmlSubSynth)
         XMLtree xmlEnv = xmlAmp.addElm("AMPLITUDE_ENVELOPE");
             AmpEnvelope->add2XML(xmlEnv);
 
+        XMLtree xmlLfo = xmlAmp.addElm("AMPLITUDE_LFO");
+            AmpLfo->add2XML(xmlLfo);
+
     XMLtree xmlFreq = xmlSubSynth.addElm("FREQUENCY_PARAMETERS");
         xmlFreq.addPar_bool("fixed_freq"   , Pfixedfreq);
         xmlFreq.addPar_int ("fixed_freq_et", PfixedfreqET);
@@ -176,6 +183,13 @@ void SUBnoteParameters::add2XML(XMLtree& xmlSubSynth)
                 FreqEnvelope->add2XML(xmlEnv);
         }
 
+        xmlFreq.addPar_bool("freq_lfo_enabled", PFreqLfoEnabled);
+        if (PFreqLfoEnabled or synth.getRuntime().xmlmax)
+        {
+            XMLtree xmlLfo = xmlFreq.addElm("FREQUENCY_LFO");
+                FreqLfo->add2XML(xmlLfo);
+        }
+
         xmlFreq.addPar_bool("band_width_envelope_enabled", PBandWidthEnvelopeEnabled);
         if (PBandWidthEnvelopeEnabled or synth.getRuntime().xmlmax)
         {
@@ -195,6 +209,9 @@ void SUBnoteParameters::add2XML(XMLtree& xmlSubSynth)
 
             XMLtree xmlEnv = xmlFilterParams.addElm("FILTER_ENVELOPE");
                 GlobalFilterEnvelope->add2XML(xmlEnv);
+
+            XMLtree xmlLfo = xmlFilterParams.addElm("FILTER_LFO");
+                GlobalFilterEnvelope->add2XML(xmlLfo);
         }
 }
 
@@ -314,6 +331,11 @@ void SUBnoteParameters::getfromXML(XMLtree& xmlSubSynth)
             AmpEnvelope->getfromXML(xmlEnv);
         else
             AmpEnvelope->defaults();
+
+        if (XMLtree xmlLfo = xmlAmp.getElm("AMPLITUDE_LFO"))
+            AmpLfo->getfromXML(xmlLfo);
+        else
+            AmpLfo->defaults();
     }
 
     if (XMLtree xmlFreq = xmlSubSynth.getElm("FREQUENCY_PARAMETERS"))
@@ -345,6 +367,12 @@ void SUBnoteParameters::getfromXML(XMLtree& xmlSubSynth)
         else
             FreqEnvelope->defaults();
 
+        PFreqLfoEnabled=xmlFreq.getPar_bool("freq_lfo_enabled",PFreqLfoEnabled);
+        if (XMLtree xmlLfo = xmlFreq.getElm("FREQUENCY_LFO"))
+            FreqLfo->getfromXML(xmlLfo);
+        else
+            FreqLfo->defaults();
+
         PBandWidthEnvelopeEnabled=xmlFreq.getPar_bool("band_width_envelope_enabled",PBandWidthEnvelopeEnabled);
         if (XMLtree xmlEnv = xmlFreq.getElm("BANDWIDTH_ENVELOPE"))
             BandWidthEnvelope->getfromXML(xmlEnv);
@@ -365,6 +393,11 @@ void SUBnoteParameters::getfromXML(XMLtree& xmlSubSynth)
             GlobalFilterEnvelope->getfromXML(xmlEnv);
         else
             GlobalFilterEnvelope->defaults();
+
+        if (XMLtree xmlLfo = xmlFilterParams.getElm("FILTER_LFO"))
+            GlobalFilterLfo->getfromXML(xmlLfo);
+        else
+            GlobalFilterLfo->defaults();
     }
 }
 

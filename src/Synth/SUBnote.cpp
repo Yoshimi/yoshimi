@@ -146,8 +146,11 @@ SUBnote::SUBnote(SUBnote const& orig)
         numharmonics * sizeof(float));
 
     ampEnvelope.reset(new Envelope{*orig.ampEnvelope});
+    ampLFO.reset(new LFO{*orig.ampLFO});
     if (orig.freqEnvelope)
         freqEnvelope.reset(new Envelope{*orig.freqEnvelope});
+    if (orig.freqLFO)
+        freqLFO.reset(new LFO{*orig.freqLFO});
     if (orig.bandWidthEnvelope)
         bandWidthEnvelope.reset(new Envelope{*orig.bandWidthEnvelope});
     if (pars.PGlobalFilterEnabled)
@@ -155,6 +158,7 @@ SUBnote::SUBnote(SUBnote const& orig)
         globalFilterL.reset(new Filter{*orig.globalFilterL});
         globalFilterR.reset(new Filter{*orig.globalFilterR});
         globalFilterEnvelope.reset(new Envelope{*orig.globalFilterEnvelope});
+        globalFilterLFO.reset(new LFO{*orig.globalFilterLFO});
     }
 
     if (orig.lfilter)
@@ -476,8 +480,11 @@ void SUBnote::filterVarRun(SUBnote::bpfilter &filter, float *smps)
 void SUBnote::initparameters(float freq)
 {
     ampEnvelope.reset(new Envelope{pars.AmpEnvelope.get(), freq, &synth});
+    ampLFO.reset(new LFO{pars.AmpLfo.get(), freq, &synth});
     if (pars.PFreqEnvelopeEnabled)
         freqEnvelope.reset(new Envelope{pars.FreqEnvelope.get(), freq, &synth});
+    if (pars.PFreqLfoEnabled)
+        freqLFO.reset(new LFO{pars.FreqLfo.get(), freq, &synth});
     if (pars.PBandWidthEnvelopeEnabled)
         bandWidthEnvelope.reset(new Envelope{pars.BandWidthEnvelope.get(), freq, &synth});
     if (pars.PGlobalFilterEnabled)
@@ -494,6 +501,7 @@ void SUBnote::initparameters(float freq)
         //if (stereo)
             globalFilterR.reset(new Filter{*pars.GlobalFilter.get(), synth});
         globalFilterEnvelope.reset(new Envelope{pars.GlobalFilterEnvelope.get(), freq, &synth});
+        globalFilterLFO.reset(new LFO{pars.GlobalFilterLfo.get(), freq, &synth});
     }
 }
 
@@ -525,7 +533,7 @@ void SUBnote::computeallfiltercoefs()
 
     if (freqEnvelope != NULL)
     {
-        envfreq = freqEnvelope->envout() / 1200;
+        envfreq = freqEnvelope->envout() / 1200 + freqLFO->lfoout() / 12 * ctl.modwheel.relmod;
         envfreq = power<2>(envfreq);
     }
 
@@ -591,7 +599,7 @@ void SUBnote::computecurrentparameters()
         computeallfiltercoefs();
 
     // Envelope
-    newamplitude = volume * ampEnvelope->envout_dB();
+    newamplitude = volume * ampEnvelope->envout_dB() * ampLFO->amplfoout();
 
     // Filter
     if (globalFilterL != NULL)
@@ -604,7 +612,7 @@ void SUBnote::computecurrentparameters()
             (velF(note.vel, pars.PGlobalFilterVelocityScaleFunction) - 1);
         float filtercenterq = pars.GlobalFilter->getq();
         float filterFreqTracking = pars.GlobalFilter->getfreqtracking(note.freq);
-        float globalfilterpitch = filterCenterPitch + globalFilterEnvelope->envout();
+        float globalfilterpitch = filterCenterPitch + globalFilterEnvelope->envout() + globalFilterLFO->lfoout();
         float filterfreq = globalfilterpitch + ctl.filtercutoff.relfreq + filterFreqTracking;
         filterfreq = globalFilterL->getrealfreq(filterfreq);
 
