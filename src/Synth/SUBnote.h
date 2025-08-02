@@ -92,8 +92,10 @@ class SUBnote
         unique_ptr<Envelope> ampEnvelope;
         unique_ptr<LFO>      ampLFO;
         unique_ptr<Envelope> freqEnvelope;
+        unique_ptr<LFO>      freqLFO;
         unique_ptr<Envelope> bandWidthEnvelope;
         unique_ptr<Envelope> globalFilterEnvelope;
+        unique_ptr<LFO>      globalFilterLFO;
 
         unique_ptr<Filter> globalFilterL;
         unique_ptr<Filter> globalFilterR;
