@@ -2,6 +2,11 @@
 version 1.0403
 header_name {.h}
 code_name {.cc}
+snap {
+  ver 1
+  current_suite FLTK
+  current_preset 2
+}
 comment {SubNoteUI.h} {not_in_source in_header
 }
 
@@ -11,7 +16,7 @@ comment {SubNoteUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2015-2024, Will Godfrey & others
+Copyright 2015-2025, Will Godfrey & others
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU General Public
@@ -194,7 +199,7 @@ class SUBnoteUI {: {public PresetsUI_}
         saveWin(synth,o->w(), SUBparameters->h(),o->x(), o->y(), false, "SubSynth");
     subSeen = false;
     o->hide();}
-      xywh {252 135 805 551} type Double labelcolor 64 hide resizable
+      xywh {142 127 805 551} type Double labelcolor 64 hide resizable
       code0 {o->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("SubSynth"), npart, TOPLEVEL::windowTitle, kititem)).c_str());}
       code1 {subDW = o->w();subDH=o->h();}
       code2 {SUBparameters->size_range(subDW, subDH, 0, 0, 0, 0, 1);}
@@ -210,12 +215,18 @@ class SUBnoteUI {: {public PresetsUI_}
           code2 {new Fl_Box(0,0,3,o->h());}
         } {}
       }
-      Fl_Box {} {
-        xywh {9 6 275 60} box PLASTIC_UP_BOX color 223
-      }
       Fl_Group ampgrp {
         xywh {4 5 285 215} box THIN_UP_FRAME labelfont 1 labelsize 11 labelcolor 64 align 17
       } {
+        Fl_Group ampenv {
+          label {Yoshimi : SubSynth - Amplitude Envelope}
+          xywh {9 67 275 70} box FLAT_BOX color 51 labelcolor 64 align 144
+          code0 {o->init(pars->AmpEnvelope.get(), npart, kititem, PART::engine::subSynth, 0);}
+          class EnvelopeUI
+        } {}
+        Fl_Box {} {
+          xywh {9 6 275 63} box PLASTIC_UP_BOX color 223
+        }
         Fl_Dial vol {
           label Volume
           callback {//
@@ -265,15 +276,9 @@ class SUBnoteUI {: {public PresetsUI_}
           tooltip {Enable random panning} xywh {210 28 15 15} down_box DOWN_BOX color 48 selection_color 64 labelsize 11 labelcolor 64 align 1
           class Fl_Check_Button2
         }
-        Fl_Group ampenv {
-          label {Yoshimi : SubSynth - Amplitude Envelope}
-          xywh {9 65 275 70} box FLAT_BOX color 51 labelcolor 64 align 144
-          code0 {o->init(pars->AmpEnvelope.get(), npart, kititem, PART::engine::subSynth, 0);}
-          class EnvelopeUI
-        } {}
         Fl_Group amplfo {
           label {Amplitude LFO}
-          xywh {9 143 275 70} box FLAT_BOX color 51 labelcolor 64 align 144
+          xywh {9 140 275 75} box FLAT_BOX color 51 labelcolor 64 align 144
           code0 {o->init(synth, npart, kititem, PART::engine::subSynth,
 TOPLEVEL::insertType::amplitude);}
           class LFOUI
@@ -283,23 +288,23 @@ TOPLEVEL::insertType::amplitude);}
         }
         Fl_Box ampLabel {
           label AMPLITUDE
-          xywh {135 10 20 10} labelfont 1 labelsize 11 labelcolor 64
+          xywh {135 10 20 12} labelfont 1 labelsize 11 labelcolor 64
         }
       }
       Fl_Group freqsettingsui {
         label FREQUENCY
-        xywh {510 5 292 215} box THIN_UP_FRAME labelfont 1 labelsize 11 labelcolor 64 align 17
+        xywh {510 5 293 215} box THIN_UP_FRAME labelfont 1 labelsize 11 labelcolor 64 align 17
       } {
         Fl_Group freqenvelopegroup {
           label {Yoshimi : SubSynth - Frequency Envelope}
-          xywh {515 65 205 70} box FLAT_BOX color 51 align 144
+          xywh {515 67 205 70} box FLAT_BOX color 51 align 144
           code0 {o->init(pars->FreqEnvelope.get(), npart, kititem, PART::engine::subSynth, 1);}
           code1 {if (collect_readData(synth, 0, SUBSYNTH::control::enableFrequencyEnvelope, npart, kititem, PART::engine::subSynth) == 0) o->deactivate();}
           class EnvelopeUI
         } {}
         Fl_Group freqlfogroup {
           label {Frequency LFO}
-          xywh {515 143 280 70} box FLAT_BOX color 51 align 144
+          xywh {515 140 280 75} box FLAT_BOX color 51 align 144 deactivate
           code0 {o->init(synth, npart, kititem, PART::engine::subSynth,
 TOPLEVEL::insertType::amplitude);}
           class LFOUI
@@ -314,7 +319,20 @@ TOPLEVEL::insertType::amplitude);}
           o->show();
           freqsettingsui->redraw();
           send_data (0, SUBSYNTH::control::enableFrequencyEnvelope, o->value(), TOPLEVEL::type::Integer);}
-          xywh {515 67 34 12} down_box DOWN_BOX selection_color 64 labelfont 3 labelsize 10 labelcolor 226
+          xywh {515 69 34 12} down_box DOWN_BOX selection_color 64 labelfont 3 labelsize 10 labelcolor 226
+          class Fl_Check_Button2
+        }
+        Fl_Check_Button freqlfo {
+          label On
+          callback {//
+        if (o->value() == 0)
+            freqlfogroup->deactivate();
+        else
+            freqlfogroup->activate();
+        o->show();
+        freqsettingsui->redraw();
+        //send_data (0, SUBSYNTH::control::enableFreq, o->value(), TOPLEVEL::type::Integer);}
+          xywh {520 144 36 13} down_box DOWN_BOX selection_color 64 labelfont 3 labelsize 10 labelcolor 226
           class Fl_Check_Button2
         }
         Fl_Text_Display octavetext {
@@ -354,7 +372,7 @@ TOPLEVEL::insertType::amplitude);}
           else
               fixedfreqetdial->activate();
           send_data (0, SUBSYNTH::control::baseFrequencyAs440Hz, x, TOPLEVEL::type::Integer);}
-          tooltip {set the base frequency to 440Hz} xywh {690 24 48 15} down_box DOWN_BOX selection_color 64 labelfont 1 labelsize 10 labelcolor 64 align 24
+          tooltip {set the base frequency to 440Hz} xywh {693 24 48 15} down_box DOWN_BOX selection_color 64 labelfont 1 labelsize 10 labelcolor 64 align 24
           code0 {o->value(collect_readData(synth, 0, SUBSYNTH::control::baseFrequencyAs440Hz, npart, kititem, PART::engine::subSynth));}
           class Fl_Check_Button2
         }
@@ -363,7 +381,7 @@ TOPLEVEL::insertType::amplitude);}
           callback {//
           o->selection_color(setKnob(o->value(),0));
           send_data (0, SUBSYNTH::control::equalTemperVariation, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {How the frequency varies according to the keyboard (leftmost for fixed frequency)} xywh {745 21 20 20} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 8 maximum 127 step 1
+          tooltip {How the frequency varies according to the keyboard (leftmost for fixed frequency)} xywh {750 21 20 20} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 8 maximum 127 step 1
           code0 {o->setValueType(VC_FixedFreqET);}
           class WidgetPDial
         }
@@ -371,7 +389,7 @@ TOPLEVEL::insertType::amplitude);}
           callback {//
           o->selection_color(setSlider(o->value(),0));
           send_data (TOPLEVEL::action::forceUpdate, SUBSYNTH::control::detuneFrequency, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Fine Detune (cents)} xywh {561 47 234 15} type {Horz Knob} box THIN_DOWN_BOX labelcolor 64 minimum -8192 maximum 8191 step 1
+          tooltip {Fine Detune (cents)} xywh {561 47 236 15} type {Horz Knob} box THIN_DOWN_BOX labelcolor 64 minimum -8192 maximum 8191 step 1
           code0 {o->selection_color(setSlider(o->value(),0));}
           class mwheel_slider_rev
         }
@@ -380,7 +398,7 @@ TOPLEVEL::insertType::amplitude);}
           callback {//
 
           send_data (TOPLEVEL::action::forceUpdate, SUBSYNTH::control::detuneType, o->value() + 1, TOPLEVEL::type::Integer);}
-          xywh {725 78 70 15} down_box BORDER_BOX selection_color 64 labelsize 10 labelcolor 64 align 5 textfont 1 textsize 10 textcolor 64
+          xywh {725 78 73 15} down_box BORDER_BOX selection_color 64 labelsize 10 labelcolor 64 align 5 textfont 1 textsize 10 textcolor 64
           code0 {o->add("L35cents");o->add("L10cents");o->add("E100cents");o->add("E1200cents");}
         } {}
         Fl_Counter coarsedet {
@@ -412,7 +430,7 @@ TOPLEVEL::insertType::amplitude);}
       } {
         Fl_Group bandwidthenvelopegroup {
           label {Yoshimi : SubSynth - BandWidth Envelope}
-          xywh {295 65 210 70} box FLAT_BOX color 51 align 144
+          xywh {295 67 210 70} box FLAT_BOX color 51 align 144
           code0 {o->init(pars->BandWidthEnvelope.get(), npart, kititem, PART::engine::subSynth, 3);}
           code1 {if (collect_readData(synth, 0, SUBSYNTH::control::enableBandwidthEnvelope, npart, kititem, PART::engine::subSynth)==0) o->deactivate();}
           class EnvelopeUI
@@ -427,7 +445,7 @@ TOPLEVEL::insertType::amplitude);}
           o->show();
           bandwidthsettingsui->redraw();
           send_data (0, SUBSYNTH::control::enableBandwidthEnvelope, o->value(), TOPLEVEL::type::Integer);}
-          xywh {295 67 34 12} down_box DOWN_BOX selection_color 64 labelfont 3 labelsize 10 labelcolor 226
+          xywh {295 69 34 12} down_box DOWN_BOX selection_color 64 labelfont 3 labelsize 10 labelcolor 226
           class Fl_Check_Button2
         }
         Fl_Value_Slider bandwidth {
@@ -460,7 +478,7 @@ TOPLEVEL::insertType::amplitude);}
           callback {//
           o->selection_color(setKnob(o->value(),0));
           send_data (TOPLEVEL::action::forceUpdate, SUBSYNTH::control::overtoneParameter1, o->value(), TOPLEVEL::type::Integer);}
-          xywh {398 166 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 255 step 1
+          xywh {401 166 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 255 step 1
           class WidgetPDial
         }
         Fl_Dial spreadpar2 {
@@ -468,7 +486,7 @@ TOPLEVEL::insertType::amplitude);}
           callback {//
           o->selection_color(setKnob(o->value(),0));
           send_data (0, SUBSYNTH::control::overtoneParameter2, o->value(), TOPLEVEL::type::Integer);}
-          xywh {434 166 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 255 step 1
+          xywh {437 166 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 255 step 1
           class WidgetPDial
         }
         Fl_Dial spreadpar3 {
@@ -476,7 +494,7 @@ TOPLEVEL::insertType::amplitude);}
           callback {//
           o->selection_color(setKnob(o->value(),0));
           send_data (0, SUBSYNTH::control::overtoneForceHarmonics, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Move towards closest harmonic} xywh {470 166 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 255 step 1
+          tooltip {Move towards closest harmonic} xywh {473 166 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 255 step 1
           code0 {o->setValueType(VC_percent255);}
           class WidgetPDial
         }
@@ -485,29 +503,29 @@ TOPLEVEL::insertType::amplitude);}
         label {Overtone Positions}
         callback {//
           send_data (TOPLEVEL::action::forceUpdate, SUBSYNTH::control::overtonePosition, o->value(), TOPLEVEL::type::Integer);}
-        xywh {300 170 87 20} down_box BORDER_BOX selection_color 64 labelsize 11 labelcolor 64 align 2 textfont 1 textsize 11 textcolor 64
+        xywh {303 170 87 20} down_box BORDER_BOX selection_color 64 labelsize 11 labelcolor 64 align 2 textfont 1 textsize 11 textcolor 64
         code0 {o->add("Harmonic");o->add("ShiftU");o->add("ShiftL");o->add("PowerU");o->add("PowerL");o->add("Sine");o->add("Power");o->add("Shift");}
       } {}
       Fl_Group globalfiltergroup {
         label { FILTER }
-        xywh {510 221 292 265} box THIN_UP_FRAME labelfont 1 labelsize 11 labelcolor 64 align 17
+        xywh {510 221 293 265} box THIN_UP_FRAME labelfont 1 labelsize 11 labelcolor 64 align 17
         code0 {if (collect_readData(synth, 0, SUBSYNTH::control::enableFilter, npart, kititem, PART::engine::subSynth)==0) o->deactivate();}
       } {
         Fl_Group filterenv {
           label {Yoshimi : SubSynth - Filter Envelope}
-          xywh {517 329 275 70} box FLAT_BOX color 51 align 16
+          xywh {516 325 280 75} box FLAT_BOX color 51 align 16
           code0 {o->init(pars->GlobalFilterEnvelope.get(), npart, kititem, PART::engine::subSynth, 2);}
           class EnvelopeUI
         } {}
         Fl_Group filterui {
           label {Yoshimi : SubSynth - Filter}
-          xywh {517 246 275 75} box FLAT_BOX color 50 align 144
+          xywh {516 246 280 75} box FLAT_BOX color 50 align 144
           code0 {o->init(pars->GlobalFilter.get(),&pars->PGlobalFilterVelocityScale,&pars->PGlobalFilterVelocityScaleFunction, npart, kititem, 1);}
           class FilterUI
         } {}
         Fl_Group filterlfo {
           label {Filter LFO}
-          xywh {517 407 275 70} box FLAT_BOX color 51 align 144
+          xywh {516 405 280 75} box FLAT_BOX color 51 align 144
           code0 {o->init(synth, npart, kititem, PART::engine::subSynth,
 TOPLEVEL::insertType::filter);}
           class LFOUI
@@ -527,7 +545,7 @@ TOPLEVEL::insertType::filter);}
         class Fl_Check_Button2
       }
       Fl_Group {} {
-        xywh {574 486 228 35} box THIN_UP_FRAME
+        xywh {574 486 229 35} box THIN_UP_FRAME
       } {
         Fl_Counter filterstages {
           label {Filter Stages}
@@ -728,10 +746,13 @@ TOPLEVEL::insertType::filter);}
     if (dScale < 0.2f)
         dScale = 0.2f;
 
+    amplfo->lfoRtext(dScale);
     ampenv->envRtext(dScale);
     bandwidthenvelopegroup->envRtext(dScale);
+    filterlfo->lfoRtext(dScale);
     filterenv->envRtext(dScale);
     freqenvelopegroup->envRtext(dScale);
+    freqlfogroup->lfoRtext(dScale);
 
     filterui->filterRtext(dScale);
 
@@ -758,6 +779,7 @@ TOPLEVEL::insertType::filter);}
 
     freqsettingsui->labelsize(size11);
     freqee->labelsize(size);
+    freqlfo->labelsize(size);
     octavetext->labelsize(size);
         octave->textsize(size11);
     bend->labelsize(size);
