@@ -264,7 +264,7 @@ class SUBnoteUI {: {public PresetsUI_}
         Fl_Group ampenv {
           label {Yoshimi : SubSynth - Amplitude Envelope}
           xywh {9 65 275 70} box FLAT_BOX color 51 labelcolor 64 align 144
-          code0 {o->init(pars->AmpEnvelope, npart, kititem, PART::engine::subSynth, 0);}
+          code0 {o->init(pars->AmpEnvelope.get(), npart, kititem, PART::engine::subSynth, 0);}
           class EnvelopeUI
         } {}
         Fl_Group amplfo {
@@ -289,7 +289,7 @@ TOPLEVEL::insertType::amplitude);}
         Fl_Group freqenvelopegroup {
           label {Yoshimi : SubSynth - Frequency Envelope}
           xywh {515 65 205 70} box FLAT_BOX color 51 align 144
-          code0 {o->init(pars->FreqEnvelope, npart, kititem, PART::engine::subSynth, 1);}
+          code0 {o->init(pars->FreqEnvelope.get(), npart, kititem, PART::engine::subSynth, 1);}
           code1 {if (collect_readData(synth, 0, SUBSYNTH::control::enableFrequencyEnvelope, npart, kititem, PART::engine::subSynth) == 0) o->deactivate();}
           class EnvelopeUI
         } {}
@@ -409,7 +409,7 @@ TOPLEVEL::insertType::amplitude);}
         Fl_Group bandwidthenvelopegroup {
           label {Yoshimi : SubSynth - BandWidth Envelope}
           xywh {295 65 210 70} box FLAT_BOX color 51 align 144
-          code0 {o->init(pars->BandWidthEnvelope, npart, kititem, PART::engine::subSynth, 3);}
+          code0 {o->init(pars->BandWidthEnvelope.get(), npart, kititem, PART::engine::subSynth, 3);}
           code1 {if (collect_readData(synth, 0, SUBSYNTH::control::enableBandwidthEnvelope, npart, kititem, PART::engine::subSynth)==0) o->deactivate();}
           class EnvelopeUI
         } {}
@@ -492,13 +492,13 @@ TOPLEVEL::insertType::amplitude);}
         Fl_Group filterenv {
           label {Yoshimi : SubSynth - Filter Envelope}
           xywh {517 329 275 70} box FLAT_BOX color 51 align 16
-          code0 {o->init(pars->GlobalFilterEnvelope, npart, kititem, PART::engine::subSynth, 2);}
+          code0 {o->init(pars->GlobalFilterEnvelope.get(), npart, kititem, PART::engine::subSynth, 2);}
           class EnvelopeUI
         } {}
         Fl_Group filterui {
           label {Yoshimi : SubSynth - Filter}
           xywh {517 246 275 75} box FLAT_BOX color 50 align 144
-          code0 {o->init(pars->GlobalFilter,&pars->PGlobalFilterVelocityScale,&pars->PGlobalFilterVelocityScaleFunction, npart, kititem, 1);}
+          code0 {o->init(pars->GlobalFilter.get(),&pars->PGlobalFilterVelocityScale,&pars->PGlobalFilterVelocityScaleFunction, npart, kititem, 1);}
           class FilterUI
         } {}
         Fl_Group filterlfo {

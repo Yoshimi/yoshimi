@@ -6539,7 +6539,7 @@ void InterChange::commandFilter(CommandBlock& cmd)
     }
     else if (engine == PART::engine::subSynth)
     {
-        filterReadWrite(cmd, part.kit[kititem].subpars->GlobalFilter
+        filterReadWrite(cmd, part.kit[kititem].subpars->GlobalFilter.get()
                     , &part.kit[kititem].subpars->PGlobalFilterVelocityScale
                     , &part.kit[kititem].subpars->PGlobalFilterVelocityScaleFunction);
     }
@@ -6825,16 +6825,16 @@ void InterChange::commandEnvelope(CommandBlock& cmd)
         switch (insertParam)
         {
             case TOPLEVEL::insertType::amplitude:
-                envelopeReadWrite(cmd, part.kit[kititem].subpars->AmpEnvelope);
+                envelopeReadWrite(cmd, part.kit[kititem].subpars->AmpEnvelope.get());
                 break;
             case TOPLEVEL::insertType::frequency:
-                envelopeReadWrite(cmd, part.kit[kititem].subpars->FreqEnvelope);
+                envelopeReadWrite(cmd, part.kit[kititem].subpars->FreqEnvelope.get());
                 break;
             case TOPLEVEL::insertType::filter:
-                envelopeReadWrite(cmd, part.kit[kititem].subpars->GlobalFilterEnvelope);
+                envelopeReadWrite(cmd, part.kit[kititem].subpars->GlobalFilterEnvelope.get());
                 break;
             case TOPLEVEL::insertType::bandwidth:
-                envelopeReadWrite(cmd, part.kit[kititem].subpars->BandWidthEnvelope);
+                envelopeReadWrite(cmd, part.kit[kititem].subpars->BandWidthEnvelope.get());
                 break;
         }
     }
