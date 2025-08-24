@@ -1,5 +1,9 @@
 yoshimi 2.3.4.1 M
 
+2025-8-24 Jesper
+bn 2395
+Adjusted DynamicTooltip to handle tooltip font size changes.
+
 2025-7-23 Will
 bn 2394
 Added Slow Cymbal instrument to Drums bank.

@@ -94,6 +94,12 @@ void DynTooltip::hide()
 void DynTooltip::dynshow(float timeout)
 {
     if (timeout <= 0){
+
+        // Recalculate area of the description text, if the font size has changed
+        if (Fl_Tooltip::size() != currentFontSize) {
+            setTooltipText(tipText);
+        }
+
         Fl::remove_timeout(delayedShow, this);
         _recent = true;
         reposition();
@@ -145,7 +151,8 @@ void DynTooltip::setTooltipText(const string& tt_text)
     tipTextH = 0;
 
     /* Calculate & set dimensions of the tooltip text */
-    fl_font(Fl_Tooltip::font(), Fl_Tooltip::size());
+    currentFontSize = Fl_Tooltip::size();
+    fl_font(Fl_Tooltip::font(), currentFontSize);
     fl_measure(tipText.c_str(), tipTextW, tipTextH, 0);
 
     if (positioned)

@@ -64,6 +64,7 @@ class DynTooltip : private Fl_Menu_Window {
 
   float currentValue;
 
+  int currentFontSize;
   string tipText;
   string valueText;
 
