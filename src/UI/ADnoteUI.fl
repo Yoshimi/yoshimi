@@ -42,6 +42,7 @@ decl {\#include <FL/Fl_Box.H>
     \#include "UI/WidgetMWSlider.h"
     \#include "UI/WidgetCheckButton.h"
     \#include "UI/WidgetSpinner.h"
+    \#include "UI/ScaleTrackedWindow.h"
     \#include "FilterUI.h"
     \#include "PresetsUI.h"} {public global
 }
@@ -2168,6 +2169,7 @@ class ADnoteUI {: {public PresetsUI_}
       code0 {o->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("AddSynth Global"), npart, TOPLEVEL::windowTitle, kititem)).c_str());}
       code1 {addDW = 580; addDH = 405;}
       code2 {o->size_range(addDW, addDH, 0, 0, 0, 0, 1);}
+      class ScaleTrackedWindow
     } {
       Fl_Group globalfreq {
         label FREQUENCY
@@ -2518,6 +2520,7 @@ class ADnoteUI {: {public PresetsUI_}
       code0 {o->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("AddSynth Voice"), npart, TOPLEVEL::windowTitle, kititem)).c_str());}
       code1 {voiceDW = int(760 * 9 / 10); voiceDH = int(610 * 9 / 10);}
       code2 {o->size_range(voiceDW, voiceDH, 0, 0, 0, 0, 1);}
+      class ScaleTrackedWindow
     } {
       Fl_Group advoice {
         xywh {0 0 809 615} box BORDER_BOX
@@ -2623,6 +2626,7 @@ class ADnoteUI {: {public PresetsUI_}
       code0 {o->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("AddSynth Voice List"), npart, TOPLEVEL::windowTitle, kititem)).c_str());}
       code1 {listDW = 705; listDH = 260;}
       code2 {o->size_range(listDW,listDH,0,0,0,0,1);}
+      class ScaleTrackedWindow
     } {
       Fl_Text_Display listNo {
         label {No.}

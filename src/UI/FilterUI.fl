@@ -80,6 +80,9 @@ decl {\#include "MasterUI.h"} {private global
 decl {\#include "Misc/SynthEngine.h"} {public global
 }
 
+decl {\#include "UI/ScaleTrackedWindow.h"} {public global
+}
+
 decl {class FilterUI;} {public global
 }
 
@@ -583,6 +586,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
       label {Formant Filter Parameters}
       callback {formClose->do_callback();}
       xywh {186 150 700 205} type Double labelfont 1 labelsize 12 hide resizable
+      class ScaleTrackedWindow
       code0 {formantDW = o->w(); formantDH = o->h();}
       code1 {o->size_range(formantDW, formantDH, 0, 0, 0, 0, 1);}
     } {

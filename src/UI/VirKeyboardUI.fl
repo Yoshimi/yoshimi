@@ -64,6 +64,9 @@ decl {\#include "UI/WidgetSpinner.h"} {public local
 decl {\#include "UI/WidgetMWSlider.h"} {public local
 }
 
+decl {\#include "UI/ScaleTrackedWindow.h"} {public local
+}
+
 decl {const int keyspos[12]={0,-1,1,-2,2,3,-4,4,-5,5,-6,6};} {private local
 }
 
@@ -363,6 +366,7 @@ class VirKeyboard {} {
       tooltip {+ Shift to hold or release keys} xywh {1092 64 650 130} type Double hide resizable
       code0 {virtDW = o->w(); virtDH = o->h();}
       code1 {o->size_range(virtDW, virtDH, 0, 0, 0, 0, 1);}
+      class ScaleTrackedWindow
     } {
       Fl_Box virkeys {
         label Keyboard

@@ -62,6 +62,9 @@ decl {\#include "Misc/FormatFuncs.h"
     using func::asString;} {private local
 }
 
+decl {\#include "UI/ScaleTrackedWindow.h"} {public global
+}
+
 decl {\#include "Misc/TextMsgBuffer.h"
 
     namespace { // Implementation details...
@@ -353,6 +356,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       code1 {o->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("Edit"), npart, TOPLEVEL::windowTitle)).c_str());}
       code2 {editDW = 395; editDH = 385;}
       code3 {o->size_range(editDW, editDH, 0, 0, 0, 0, 1);}
+      class ScaleTrackedWindow
     } {
       Fl_Group {} {
         xywh {0 222 395 162} box GTK_THIN_UP_BOX
@@ -601,6 +605,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       code0 {o->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("Kit List"), npart, TOPLEVEL::windowTitle)).c_str());}
       code2 {kitDW = o->w(); kitDH = o->h();}
       code3 {o->size_range(kitDW, kitDH, 0, 0, 0, 0, 1);}
+      class ScaleTrackedWindow
     } {
       Fl_Group kitlist {
         xywh {4 20 662 324} box THIN_UP_FRAME
@@ -703,6 +708,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       code0 {o->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("Effects"), npart, TOPLEVEL::windowTitle)).c_str());}
       code1 {fxDW = o->w(); fxDH = o->h();}
       code2 {o->size_range(fxDW, fxDH, 0, 0, 0, 0, 1);}
+      class ScaleTrackedWindow
     } {
       Fl_Spinner inseffnocounter {
         callback {//
@@ -785,6 +791,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       code0 {o->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("MIDI Controls"), npart, TOPLEVEL::windowTitle)).c_str());}
       code1 {midiDW = o->w(); midiDH = o->h();}
       code2 {o->size_range(midiDW, midiDH, 0, 0, 0, 0, 1);}
+      class ScaleTrackedWindow
     } {
       Fl_Dial modulation {
         label Modulation
@@ -854,9 +861,11 @@ class PartUI {: {public Fl_Group, PartUI_}
       label Controllers
       callback {ctlclose->do_callback();}
       xywh {418 167 505 130} type Double hide resizable
+      class ScaleTrackedWindow
       code0 {o->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("Controllers"), npart, TOPLEVEL::windowTitle)).c_str());}
       code1 {ctlDW = o->w(); ctlDH = o->h();}
       code2 {o->size_range(ctlDW, ctlDH, 0, 0, 0, 0, 1);}
+      class ScaleTrackedWindow
     } {
       Fl_Dial volrng {
         label {Vol Rng}
@@ -1139,6 +1148,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       code0 {o->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("Aftertouch"), npart, TOPLEVEL::windowTitle)).c_str());}
       code1 {atDW = o->w(); atDH = o->h();}
       code2 {o->size_range(atDW, atDH, 0, 0, 0, 0, 1);}
+      class ScaleTrackedWindow
     } {
       Fl_Box {} {
         xywh {9 5 228 171} box ENGRAVED_FRAME

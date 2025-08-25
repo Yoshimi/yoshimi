@@ -278,6 +278,7 @@ class PADnoteUI {: {public PresetsUI_}
       label {PAD synth Parameters}
       callback {padClose->do_callback();}
       xywh {464 151 580 440} type Double hide resizable
+      class ScaleTrackedWindow
       code0 {o->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("PadSynth"), npart, TOPLEVEL::windowTitle, kititem)).c_str());}
       code1 {padDW = o->w(); padDH = o->h();}
       code2 {padnotewindow->size_range(padDW, padDH, 0, 0, 0, 0, 1);}

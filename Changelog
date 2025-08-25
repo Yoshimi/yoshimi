@@ -1,5 +1,9 @@
 yoshimi 2.3.4.1 M
 
+2025-8-24 Jesper
+bn 2395
+Added scale tracking and tooltip size adjustment based on window under cursor.
+
 2025-7-23 Will
 bn 2394
 Added Slow Cymbal instrument to Drums bank.

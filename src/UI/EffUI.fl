@@ -1604,6 +1604,7 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
       label {Yoshimi : Filter Parameters for DynFilter Effect}
       callback {filterclose->do_callback();}
       xywh {1109 779 285 110} type Double hide resizable
+      class ScaleTrackedWindow
       code0 {filtDW = o->w(); filtDH = o->h();}
       code1 {o->size_range(filtDW, filtDH, 0, 0, 0, 0, 1);}
       code2 {o->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("DynFilter"), npart, TOPLEVEL::windowTitle,UNUSED, effNum())).c_str());}
