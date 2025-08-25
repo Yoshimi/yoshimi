@@ -36,6 +36,8 @@
 
 #include <UI/MiscGui.h>
 
+#include "ScaleTrackedWindow.h"
+
 #define MAX_TEXT_WIDTH 280
 
 
@@ -55,7 +57,6 @@ static void resetRecent(void*){
 
 DynTooltip::DynTooltip():Fl_Menu_Window(1,1)
 {
-
     tipText.clear();
     valueText.clear();
 
@@ -81,6 +82,7 @@ DynTooltip::~DynTooltip(){
     Fl::remove_timeout(resetRecent);
 }
 
+
 /*
    Overrides standard hide/show from Fl_Widget
    to update flags and set tooltip position
@@ -94,6 +96,12 @@ void DynTooltip::hide()
 void DynTooltip::dynshow(float timeout)
 {
     if (timeout <= 0){
+
+        // Recalculate tooltip text dimensions if the tooltip text size has changed
+        if (textSize != Fl_Tooltip::size()) {
+            setTooltipText(tipText);
+        }
+
         Fl::remove_timeout(delayedShow, this);
         _recent = true;
         reposition();
@@ -144,8 +152,9 @@ void DynTooltip::setTooltipText(const string& tt_text)
     tipTextW = MAX_TEXT_WIDTH;
     tipTextH = 0;
 
+    textSize = Fl_Tooltip::size();
     /* Calculate & set dimensions of the tooltip text */
-    fl_font(Fl_Tooltip::font(), Fl_Tooltip::size());
+    fl_font(Fl_Tooltip::font(), textSize);
     fl_measure(tipText.c_str(), tipTextW, tipTextH, 0);
 
     if (positioned)

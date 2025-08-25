@@ -47,6 +47,7 @@ decl {\#include "UI/MiscGui.h"
     \#include "UI/WidgetMWSlider.h"
     \#include "UI/WidgetSpinner.h"
     \#include "UI/WidgetCheckButton.h"
+    \#include "UI/ScaleTrackedWindow.h"
     \#include "Params/Controller.h"} {public global
 }
 
@@ -360,6 +361,7 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
       code0 {send_data(TOPLEVEL::action::lowPrio, MIDILEARN::control::sendRefreshRequest, 0, 3);}
       code1 {learnDW = o->w(); learnDH = o->h();}
       code2 {o->size_range(learnDW, learnDH, 0, 0, 0, 0, 1);}
+      class ScaleTrackedWindow
     } {
       Fl_Scroll kitlist {
         tooltip {Editor for all learned controllers.

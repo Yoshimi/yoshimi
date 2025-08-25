@@ -44,6 +44,9 @@ decl {\#include "UI/WidgetCheckButton.h"} {public global
 decl {\#include "UI/WidgetSpinner.h"} {public global
 }
 
+decl {\#include "UI/ScaleTrackedWindow.h"} {public global
+}
+
 decl {\#include "Misc/Bank.h"} {private local
 }
 
@@ -76,6 +79,7 @@ class ConfigUI {} {
       label {Yoshimi Settings}
       callback {close->do_callback();}
       xywh {578 67 390 330} type Double hide resizable
+      class ScaleTrackedWindow
       code0 {o->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("Settings"), UNUSED, TOPLEVEL::windowTitle)).c_str());}
       code1 {if (isLV2()){jackTab->deactivate();alsaTab->deactivate();}}
       code2 {confDW = o->w();confDH = o->h();}
@@ -952,6 +956,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
       label Presets
       callback {pClose->do_callback();}
       xywh {6 437 460 270} type Double hide resizable
+      class ScaleTrackedWindow
       code0 {o->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("Presets"), UNUSED, TOPLEVEL::windowTitle)).c_str());}
       code1 {preDW = o->w();preDH = o->h();}
       code2 {o->size_range(preDW, preDH, 0, 0, 0, 0, 1);}

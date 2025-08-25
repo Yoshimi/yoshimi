@@ -57,6 +57,9 @@ decl {\#include "Misc/SynthEngine.h"} {public global
 decl {\#include "MasterUI.h"} {private global
 }
 
+decl {\#include "UI/ScaleTrackedWindow.h"} {public global
+}
+
 class PresetsUI_ {} {
   Function {refresh()} {return_type {virtual void}
   } {
@@ -98,6 +101,7 @@ class PresetsUI {} {
 o->hide();}
       xywh {200 183 265 430} type Double box PLASTIC_THIN_UP_BOX color 7 hide resizable
       code1 {o->size_range(265, 430, 0, 0, 0, 0, 1);} modal
+      class ScaleTrackedWindow
     } {
       Fl_Browser Ucopybrowse {
         callback {//
@@ -166,6 +170,7 @@ o->hide();}
 o->hide();}
       xywh {223 91 265 430} type Double box PLASTIC_THIN_UP_BOX color 7 hide resizable
       code1 {o->size_range(265, 430, 0, 0, 0, 0, 1);} modal
+      class ScaleTrackedWindow
     } {
       Fl_Browser Upastebrowse {
         callback {//

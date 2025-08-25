@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0403
+version 1.0308
 header_name {.h}
 code_name {.cc}
 comment {MasterUI.h} {not_in_source in_header
@@ -27,7 +27,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of the ZynAddSubFX original.} {selected in_source in_header
+This file is a derivative of the ZynAddSubFX original.} {in_source in_header
 }
 
 decl {\#define PANEL_SINGLE_X 1040} {public local
@@ -67,6 +67,9 @@ decl {\#include "UI/WidgetCheckButton.h"} {public local
 }
 
 decl {\#include "UI/WidgetSpinner.h"} {public local
+}
+
+decl {\#include "UI/ScaleTrackedWindow.h"} {public global
 }
 
 decl {\#include "ADnoteUI.h"} {public local
@@ -537,9 +540,10 @@ class MasterUI {: {public GuiUpdates}
 
                 synth->signalGuiWindowClosed();
             }}
-      xywh {9 24 385 525} type Double labelfont 13 labelsize 12 hide resizable
+      xywh {298 197 385 525} type Double labelfont 13 labelsize 12 hide resizable
       code0 {mainDW = 385; mainDH = 470;}
       code1 {masterwindow->size_range(394, 500, 0, 0, 0, 0, 1);}
+      class ScaleTrackedWindow
     } {
       Fl_Box keyHandle {
         label keyhandler
@@ -1415,7 +1419,7 @@ class MasterUI {: {public GuiUpdates}
             code1 {o->value(fetchData(0, PART::control::maxNotes, npart));}
             class WidgetSpinner
           }
-          Fl_Group sysEffBox {open
+          Fl_Group sysEffBox {
             xywh {236 412 139 73} box ENGRAVED_FRAME labelcolor 64
           } {
             Fl_Text_Display sysEffName {
@@ -1621,6 +1625,7 @@ Instance from 1 to 31}
       xywh {46 64 365 290} type Double color 7 labelfont 13 labelsize 13 labelcolor 64 when 0 hide resizable
       code0 {aboutDW = 365; aboutDH = 290;}
       code1 {o->size_range(aboutDW,aboutDH, 0, 0, 0, 0, 1);}
+      class ScaleTrackedWindow
     } {
       Fl_Group aboutFirst {
         xywh {0 0 365 290} color 7 labelcolor 64
@@ -1726,6 +1731,7 @@ Alan Calvert started the project}
       code0 {syseffDW = 120; syseffDH = 245;}
       code1 {o->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("Sends"), UNUSED, TOPLEVEL::windowTitle)).c_str());}
       code2 {o->size_range(syseffDW, syseffDH, 0, 0, 0, 0, 1);}
+      class ScaleTrackedWindow
     } {
       Fl_Button syseffClose {
         label Close
@@ -1853,6 +1859,7 @@ Alan Calvert started the project}
       callback {Panelclose->do_callback();}
       xywh {421 26 1040 320} type Double labelfont 13 labelsize 13 hide resizable
       code1 {o->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("Mixer Panel"), UNUSED, TOPLEVEL::windowTitle)).c_str());}
+      class ScaleTrackedWindow
     } {
       Fl_Group Panelframe {
         xywh {2 2 1036 286} box ENGRAVED_FRAME
@@ -1995,6 +2002,7 @@ Alan Calvert started the project}
       xywh {5 207 420 105} type Double hide resizable
       code0 {queryDW = 420; queryDH = 105;}
       code1 {o->size_range(queryDW, queryDH, 0, 0, 0, 0, 1);} modal
+      class ScaleTrackedWindow
     } {
       Fl_Button yesQ {
         label Yes
@@ -2034,6 +2042,7 @@ Alan Calvert started the project}
       xywh {222 50 270 60} type Double labelcolor 64 hide resizable
       code0 {textinDW = o->w(); textinDH = o->h();}
       code1 {o->size_range(textinDW, textinDH, 0, 0, 0, 0, 1);} modal
+      class ScaleTrackedWindow
     } {
       Fl_Input textLine {
         label {input:}
@@ -2048,6 +2057,7 @@ Alan Calvert started the project}
       code0 {filerDW = o->w(); filerDH = o->h();}
       code1 {o->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("File Manager"), UNUSED, TOPLEVEL::windowTitle)).c_str());}
       code2 {o->size_range(filerDW, filerDH, 0, 0, 0, 0, 1);} modal
+      class ScaleTrackedWindow
     } {
       Fl_Input fileroldpath {
         label {file paths}
@@ -3690,6 +3700,7 @@ Alan Calvert started the project}
     panelwindow->hide();
     if (type == 1)
     {
+        panelwindow->reset(PANEL_SINGLE_X, PANEL_SINGLE_Y);
         if (force)
             panelwindow->size(PANEL_SINGLE_X, PANEL_SINGLE_Y);
         panelwindow->size_range((PANEL_SINGLE_X * 9) / 10, (PANEL_SINGLE_Y * 9) / 10, 0, 0, 0, 0, 1);
@@ -3700,6 +3711,7 @@ Alan Calvert started the project}
     }
     else if (type == 2)
     {
+        panelwindow->reset(PANEL_DUAL_X, PANEL_DUAL_Y);
         if (force)
             panelwindow->size(PANEL_DUAL_X, PANEL_DUAL_Y);
         panelwindow->size_range((PANEL_DUAL_X * 4) / 5, (PANEL_DUAL_Y * 4) / 5, 0, 0, 0, 0, 1);
@@ -3730,6 +3742,7 @@ Alan Calvert started the project}
         defW = (PANEL_DUAL_X * 4) / 5;
         defH = (PANEL_DUAL_Y * 4) / 5;
     }
+    panelwindow->reset(defW, defH);
     if (fetchW < defW || fetchH < defH)
     {
         fetchW = defW; // it's messed up so force default

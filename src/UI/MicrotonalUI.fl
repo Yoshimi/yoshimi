@@ -69,6 +69,7 @@ class MicrotonalUI {} {
       label Scales
       callback {scaleClose->do_callback();}
       xywh {460 128 410 485} type Double hide resizable
+      class ScaleTrackedWindow
       code0 {scaleDW = o->w(); scaleDH = o->h();}
       code1 {o->size_range(scaleDW, scaleDH, 0, 0, 0, 0, 1);}
     } {

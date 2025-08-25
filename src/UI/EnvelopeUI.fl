@@ -38,6 +38,9 @@ decl {\#include "UI/MiscGui.h"} {public local
 decl {\#include "UI/WidgetCheckButton.h"} {public local
 }
 
+decl {\#include "UI/ScaleTrackedWindow.h"} {public global
+}
+
 decl {\#include "UI/WidgetPDial.h"} {public local
 }
 
@@ -357,6 +360,7 @@ class EnvelopeUI {: {public Fl_Group,PresetsUI_}
       label Envelope
       callback {freeClose->do_callback();}
       xywh {1088 97 575 180} type Double hide resizable
+      class ScaleTrackedWindow
       code0 {freeDW = o->w(); freeDH = o->h();}
       code1 {o->size_range(freeDW, freeDH, 0, 0, 0, 0, 1);}
     } {

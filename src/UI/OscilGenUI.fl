@@ -59,6 +59,9 @@ decl {\#include "UI/WidgetPDial.h"} {public local
 decl {\#include "UI/WidgetMWSlider.h"} {public local
 }
 
+decl {\#include "UI/ScaleTrackedWindow.h"} {public local
+}
+
 decl {\#include "EnvelopeUI.h"} {public local
 }
 
@@ -493,6 +496,7 @@ o->hide();}
       code1 {setWindowTitle();}
       code2 {waveDW = o->w() * 9 / 10; waveDH = o->h() * 9 / 10;}
       code3 {o->size_range(waveDW, waveDH, 0, 0, 0, 0, 1);}
+      class ScaleTrackedWindow
     } {
       Fl_Button applybutton {
         label Apply

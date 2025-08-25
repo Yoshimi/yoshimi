@@ -30,6 +30,10 @@ decl {\#include "Misc/Config.h"} {private global
 decl {\#include "MasterUI.h"} {private global
 }
 
+decl {\#include "UI/ScaleTrackedWindow.h"} {public global
+}
+
+
 decl {\#include "Misc/TextMsgBuffer.h"
 
     namespace { // Implementation details...
@@ -49,6 +53,7 @@ class ParametersUI {} {
       label {Yoshimi : Parameters}
       callback {CloseRecent->do_callback();}
       xywh {900 700 250 180} type Double labelfont 13 labelsize 12 align 0 hide resizable
+      class ScaleTrackedWindow
       code0 {paramDW = o->w(); paramDH = o->h();}
       code1 {o->size_range(paramDW, paramDH, 0, 0, 0, 0, 1);}
     } {

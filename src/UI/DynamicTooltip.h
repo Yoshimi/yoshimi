@@ -33,6 +33,7 @@
 #define DynamicTooltip_h
 
 #include <FL/Fl_Menu_Window.H>
+
 #include "UI/MiscGui.h"
 
 /*
@@ -69,6 +70,8 @@ class DynTooltip : private Fl_Menu_Window {
 
   ValueType valueType;
   ValueType graphicsType;
+  /* tooltip font size when this tooltip was last shown */
+  int textSize;
   bool onlyValue;
 
   bool positioned;

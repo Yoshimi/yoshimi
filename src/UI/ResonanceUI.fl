@@ -47,6 +47,9 @@ decl {\#include <cmath>} {private local
 decl {\#include <iostream>} {private local
 }
 
+decl {\#include "UI/ScaleTrackedWindow.h"} {public global
+}
+
 decl {\#include "UI/MiscGui.h"} {public local
 }
 
@@ -309,6 +312,7 @@ class ResonanceUI {: PresetsUI_
       label Resonance
       callback {resClose->do_callback();}
       xywh {355 40 780 305} type Double hide resizable
+      class ScaleTrackedWindow
       code0 {resDW = o->w();resDH = o->h();}
       code1 {resonancewindow->size_range(resDW, resDH, 0, 0, 0, 0, 1);}
     } {

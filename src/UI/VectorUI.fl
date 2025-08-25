@@ -34,6 +34,9 @@ decl {\#include "UI/MiscGui.h"} {public local
 decl {\#include "UI/WidgetSpinner.h"} {public local
 }
 
+decl {\#include "UI/ScaleTrackedWindow.h"} {public local
+}
+
 decl {\#include "BankUI.h"} {public local
 }
 
@@ -74,6 +77,7 @@ class VectorUI {} {
       xywh {382 256 375 295} type Double labelfont 13 labelsize 12 align 0 hide resizable
       code0 {vecDW = o->w();vecDH = o->h();}
       code1 {o->size_range(vecDW, vecDH, 0, 0, 0, 0, 1);}
+      class ScaleTrackedWindow
     } {
       Fl_Spinner setbasechan {
         label {Base Channel}

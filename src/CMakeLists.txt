@@ -387,6 +387,7 @@ if (BuildWithFLTK)
         UI/WidgetMWSlider.cpp
         UI/MiscGui.cpp
         UI/Splash.cpp
+        UI/ScaleTrackedWindow.cpp
     )
     set (YOSHI_INCLUDES ${FLTK_INCLUDE_DIR})
 endif ()
