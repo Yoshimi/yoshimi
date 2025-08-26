@@ -527,15 +527,19 @@ float SUBnote::computerolloff(float freq)
 
 void SUBnote::computeallfiltercoefs()
 {
-    float envfreq = 1.0f;
+    float envfreq = 0.0f;
     float envbw = 1.0f;
     float gain = 1.0f;
 
     if (freqEnvelope != NULL)
     {
-        envfreq = freqEnvelope->envout() / 1200 + freqLFO->lfoout() / 12 * ctl.modwheel.relmod;
-        envfreq = power<2>(envfreq);
+        envfreq = freqEnvelope->envout() / 1200;
     }
+    if (freqLFO != NULL)
+    {
+        envfreq += freqLFO->lfoout() / 1200 * ctl.modwheel.relmod;
+    }
+    envfreq = power<2>(envfreq);
 
     envfreq *= powf(ctl.pitchwheel.relfreq, bendAdjust); // pitch wheel
 
@@ -592,6 +596,7 @@ void SUBnote::computeallfiltercoefs()
 void SUBnote::computecurrentparameters()
 {
     if (freqEnvelope != NULL
+        || freqLFO != NULL
         || bandWidthEnvelope != NULL
         || oldpitchwheel != ctl.pitchwheel.data
         || oldbandwidth != ctl.bandwidth.data

@@ -2391,6 +2391,9 @@ bool InterChange::processSub(CommandBlock& cmd, SynthEngine& synth)
             if (write)
                 part.kit[kititem].subpars->paramsChanged();
             break;
+        case TOPLEVEL::insert::LFOgroup:
+            commandLFO(cmd);
+            break;
         case TOPLEVEL::insert::harmonicAmplitude:
             commandSub(cmd);
             if (write)
@@ -5408,6 +5411,13 @@ void InterChange::commandSub(CommandBlock& cmd)
                 value = param.PBandWidthEnvelopeEnabled;
             break;
 
+        case SUBSYNTH::control::enableFrequencyLFO:
+            if (write)
+                param.PFreqLfoEnabled = value_bool;
+            else
+                value = param.PFreqLfoEnabled;
+            break;
+
         case SUBSYNTH::control::detuneFrequency:
             if (write)
                 param.PDetune = value + 8192;
@@ -6402,6 +6412,21 @@ void InterChange::commandLFO(CommandBlock& cmd)
                 break;
             case TOPLEVEL::insertType::filter:
                 lfoReadWrite(cmd, part.kit[kititem].adpars->GlobalPar.FilterLfo);
+                break;
+        }
+    }
+    else if (engine == PART::engine::subSynth)
+    {
+        switch (insertParam)
+        {
+            case TOPLEVEL::insertType::amplitude:
+                lfoReadWrite(cmd, part.kit[kititem].subpars->AmpLfo.get());
+                break;
+            case TOPLEVEL::insertType::frequency:
+                lfoReadWrite(cmd, part.kit[kititem].subpars->FreqLfo.get());
+                break;
+            case TOPLEVEL::insertType::filter:
+                lfoReadWrite(cmd, part.kit[kititem].subpars->GlobalFilterLfo.get());
                 break;
         }
     }
@@ -7888,7 +7913,7 @@ float InterChange::returnLimits(CommandBlock& cmd)
             ResonanceLimits resonancelimits;
             return resonancelimits.getLimits(&cmd);
         }
-        if (insert == TOPLEVEL::insert::LFOgroup && engine != PART::engine::subSynth && parameter <= TOPLEVEL::insertType::filter)
+        if (insert == TOPLEVEL::insert::LFOgroup && parameter <= TOPLEVEL::insertType::filter)
         {
             LFOlimit lfolimits;
             return lfolimits.getLFOlimits(&cmd);

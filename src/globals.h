@@ -869,6 +869,7 @@ namespace SUBSYNTH // usage SUBSYNTH::control::volume
         bandwidth = 16,
         bandwidthScale,
         enableBandwidthEnvelope,
+        enableFrequencyLFO,
 
         detuneFrequency = 32,
         equalTemperVariation,

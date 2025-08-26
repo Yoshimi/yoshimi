@@ -981,16 +981,34 @@ void TextData::encodeSubSynth(string& source, CommandBlock& allData)
         encodeEnvelope(source, allData);
         return;
     }
+    else if (findAndStep(source, "Amp LFO"))
+    {
+        allData.data.parameter = TOPLEVEL::insertType::amplitude;
+        encodeLFO(source, allData);
+        return;
+    }
     else if (findAndStep(source, "Filt Env"))
     {
         allData.data.parameter = TOPLEVEL::insertType::filter;
         encodeEnvelope(source, allData);
         return;
     }
+    else if (findAndStep(source, "Filt LFO"))
+    {
+        allData.data.parameter = TOPLEVEL::insertType::filter;
+        encodeLFO(source, allData);
+        return;
+    }
     else if (findAndStep(source, "Freq Env"))
     {
         allData.data.parameter = TOPLEVEL::insertType::frequency;
         encodeEnvelope(source, allData);
+        return;
+    }
+    else if (findAndStep(source, "Freq LFO"))
+    {
+        allData.data.parameter = TOPLEVEL::insertType::frequency;
+        encodeLFO(source, allData);
         return;
     }
     else if (findAndStep(source, "Band Env"))
@@ -1062,6 +1080,12 @@ void TextData::encodeSubSynth(string& source, CommandBlock& allData)
         if (findAndStep(source, "Env Enab"))
         {
             ctl = SUBSYNTH::control::enableFrequencyEnvelope;
+            allData.data.control = ctl;
+            return;
+        }
+        else if (findAndStep(source, "LFO Enab"))
+        {
+            ctl = SUBSYNTH::control::enableFrequencyLFO;
             allData.data.control = ctl;
             return;
         }
