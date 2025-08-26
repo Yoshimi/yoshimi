@@ -233,6 +233,9 @@ string DataText::resolveAll(SynthEngine& synth, CommandBlock& cmd, bool addValue
             case TOPLEVEL::insert::envelopeGroup:
                 commandName = resolveEnvelope(cmd, addValue);
                 break;
+            case TOPLEVEL::insert::LFOgroup:
+                commandName = resolveLFO(cmd, addValue);
+                break;
             case TOPLEVEL::insert::envelopePointDelete:
                 commandName = resolveEnvelope(cmd, addValue);
                 break;
@@ -2259,6 +2262,11 @@ string DataText::resolveSub(CommandBlock& cmd, bool addValue)
             yesno = true;
             break;
 
+        case SUBSYNTH::control::enableFrequencyLFO:
+            contstr = "Frequency LFO Enab";
+            yesno = true;
+            break;
+
         case SUBSYNTH::control::detuneFrequency:
             contstr = "Detune";
             break;
@@ -2877,6 +2885,8 @@ string DataText::resolveLFO(CommandBlock& cmd, bool addValue)
 
     if (engine == PART::engine::addSynth)
         name = " AddSynth";
+    else if (engine == PART::engine::subSynth)
+        name = " SubSynth";
     else if (engine == PART::engine::padSynth)
         name = " PadSynth";
     else if (engine >= PART::engine::addVoice1)

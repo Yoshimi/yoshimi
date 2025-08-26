@@ -306,7 +306,7 @@ TOPLEVEL::insertType::amplitude);}
           label {Frequency LFO}
           xywh {515 140 280 75} box FLAT_BOX color 51 align 144 deactivate
           code0 {o->init(synth, npart, kititem, PART::engine::subSynth,
-TOPLEVEL::insertType::amplitude);}
+TOPLEVEL::insertType::frequency);}
           class LFOUI
         } {}
         Fl_Check_Button freqee {
@@ -331,7 +331,7 @@ TOPLEVEL::insertType::amplitude);}
             freqlfogroup->activate();
         o->show();
         freqsettingsui->redraw();
-        //send_data (0, SUBSYNTH::control::enableFreq, o->value(), TOPLEVEL::type::Integer);}
+        send_data (0, SUBSYNTH::control::enableFrequencyLFO, o->value(), TOPLEVEL::type::Integer);}
           xywh {520 144 36 13} down_box DOWN_BOX selection_color 64 labelfont 3 labelsize 10 labelcolor 226
           class Fl_Check_Button2
         }
@@ -660,6 +660,14 @@ TOPLEVEL::insertType::filter);}
     freqee->show();
     freqsettingsui->redraw();
 
+    freqlfo->value(collect_readData(synth, 0, SUBSYNTH::control::enableFrequencyLFO, npart, kititem, PART::engine::subSynth));
+    if (freqlfo->value() == 0)
+        freqlfogroup->deactivate();
+    else
+        freqlfogroup->activate();
+    freqlfo->show();
+    freqsettingsui->redraw();
+
     octave->value(collect_readData(synth, 0, SUBSYNTH::control::octave, npart, kititem, PART::engine::subSynth));
 
     int detVal = collect_readData(synth, 0, SUBSYNTH::control::detuneFrequency, npart, kititem, PART::engine::subSynth);
@@ -964,6 +972,15 @@ TOPLEVEL::insertType::filter);}
             else
                 freqenvelopegroup->deactivate();
             freqee->show();
+            break;
+
+        case SUBSYNTH::control::enableFrequencyLFO:
+            freqlfo->value(value);
+            if (val_bool)
+                freqlfogroup->activate();
+            else
+                freqlfogroup->deactivate();
+            freqlfo->show();
             break;
 
         case SUBSYNTH::control::overtoneParameter1:

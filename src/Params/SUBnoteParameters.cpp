@@ -81,6 +81,7 @@ void SUBnoteParameters::defaults()
     PCoarseDetune = 0;
     PDetuneType = 1;
     PFreqEnvelopeEnabled = false;
+    PFreqLfoEnabled = false;
     PBandWidthEnvelopeEnabled = false;
 
     POvertoneSpread.type = 0;
@@ -211,7 +212,7 @@ void SUBnoteParameters::add2XML(XMLtree& xmlSubSynth)
                 GlobalFilterEnvelope->add2XML(xmlEnv);
 
             XMLtree xmlLfo = xmlFilterParams.addElm("FILTER_LFO");
-                GlobalFilterEnvelope->add2XML(xmlLfo);
+                GlobalFilterLfo->add2XML(xmlLfo);
         }
 }
 
