@@ -201,7 +201,18 @@ inline void DynTooltip::reposition()
 {
     if (!positioned)
     {
-        position(Fl::event_x_root() + xoffs, Fl::event_y_root() + yoffs);
+        const int cursor_y = Fl::event_y_root();
+
+        // Check if tooltip would extend below screen
+        // (in practice it is more lenient, but better to be safe than to have an invisible tooltip)
+        if (cursor_y + yoffs + h() > Fl::h())
+        {
+            position(Fl::event_x_root() + xoffs, cursor_y - yoffs - h());
+        }
+        else
+        {
+            position(Fl::event_x_root() + xoffs, cursor_y + yoffs);
+        }
         positioned = true;
     }
 }
