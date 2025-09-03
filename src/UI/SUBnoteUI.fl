@@ -585,7 +585,7 @@ TOPLEVEL::insertType::filter);}
         label C
         callback {//
         synth->getGuiMaster()->getPresetsUi()->Ucopy(npart, kititem, PART::engine::subSynth);}
-        xywh {610 529 25 15} box THIN_UP_BOX value 1 color 179 labelfont 1 labelsize 11 labelcolor 197
+        xywh {610 529 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 197
       }
       Fl_Button subPaste {
         label P

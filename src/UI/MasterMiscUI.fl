@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0308
+version 1.0403
 header_name {.h}
 code_name {.cc}
 comment {MasterUI.h} {not_in_source in_header
@@ -11,7 +11,7 @@ comment {MasterUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014-2024, Will Godfrey
+Copyright 2014-2025, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU General Public
@@ -265,6 +265,10 @@ class VUMeter {: {public Fl_Box}
     int mid = (w() / 2) - 2;
     int actualpart = npart + *plgroup;
     float Vpeak = fetchData(0, MAIN::control::readPartPeak, TOPLEVEL::section::main, actualpart);
+
+    if (panelpart.oldpeak[actualpart] > 0)
+        panelpart.oldpeak[actualpart] = 0;
+
     if (Vpeak < 0) // its inactive
     {
         fl_color(45);
@@ -272,7 +276,7 @@ class VUMeter {: {public Fl_Box}
     }
     else
     {
-
+        // draw LH VU
         if (Vpeak > 1.0f)
         {
             panelpart.clip[actualpart] = true;
@@ -286,23 +290,28 @@ class VUMeter {: {public Fl_Box}
         db = (db > 1.0) ? 1.0 : db;
         db = db * ly - 2;
         panelpart.oldpeak[actualpart] = int(db);
-        fl_rectf(ox, oy,mid, ly, graph_back);
+        fl_rectf(ox, oy, mid, ly, graph_back);
         fl_color(VU_level);
-        fl_rectf(ox, oy + ly - panelpart.oldpeak[actualpart], mid, panelpart.oldpeak[actualpart]);
+        if (panelpart.oldpeak[actualpart] > 0)
+            fl_rectf(ox, oy + ly - panelpart.oldpeak[actualpart], mid, panelpart.oldpeak[actualpart]);
         if (panelpart.clip[actualpart])
             fl_rectf(ox, oy, mid, 4, VU_over);
 
+        // draw RH VU
         Vpeak = fetchData(0, MAIN::control::readPartPeak, TOPLEVEL::section::main, actualpart, 1);
         if (Vpeak > 1.0)
             panelpart.clipR[actualpart] = true;
+
+        // draw the vu lines
         db = asDecibel(Vpeak);
         db = (MIN_DB - db) / MIN_DB;
         db = (db > 1.0) ? 1.0 : db;
         db = db * ly - 2;
         panelpart.oldpeakR[actualpart] = int(db);
-        fl_rectf(ox + mid, oy,lx - mid, ly, graph_back);
+        fl_rectf(ox + mid, oy, lx - mid, ly, graph_back);
         fl_color(VU_level);
-        fl_rectf(ox + mid, oy + ly - panelpart.oldpeakR[actualpart], lx - mid, panelpart.oldpeakR[actualpart]);
+        if (panelpart.oldpeakR[actualpart] > 0)
+            fl_rectf(ox + mid, oy + ly - panelpart.oldpeakR[actualpart], lx - mid, panelpart.oldpeakR[actualpart]);
         if (panelpart.clipR[actualpart])
             fl_rectf(ox + mid, oy, lx - mid, 4, VU_over);
 

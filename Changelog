@@ -1,5 +1,12 @@
 yoshimi 2.3.4.1 M
 
+
+2025-9-3 Will
+bn 2399
+Merged in SubSynth LFO work from Kristian
+Adjusted Mixer panel VU limits for FLTK 1.4.x compatibility.
+Updated User Guide.
+
 2025-8-30 Will
 bn 2398
 Added missing include file to LV2 cmake file
