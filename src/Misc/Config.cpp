@@ -77,6 +77,8 @@ using std::endl;
 
 namespace { // Implementation details...
 
+    const uint XML_UNCOMPRESSED{0};
+
     TextMsgBuffer& textMsgBuffer = TextMsgBuffer::instance();
 
 
@@ -701,7 +703,7 @@ bool Config::updateConfig(int configKey, int value)
                 xmlBase.addPar_bool("enable_auto_instance" , par(Cfg::enableAutoInstance));
                 xmlBase.addPar_uint("handle_padsynth_build", par(Cfg::handlePadSynthBuild));
                 xmlBase.addPar_int ("gzip_compression"     , par(Cfg::XMLcompressionLevel));
-                xmlBase.addPar_int ("enable_part_reports" , par(Cfg::enablePartReports));
+                xmlBase.addPar_int ("enable_part_reports"  , par(Cfg::enablePartReports));
                 xmlBase.addPar_bool("banks_checked"        , par(Cfg::banksChecked));
 
                 // the following are system defined;
@@ -709,7 +711,7 @@ bool Config::updateConfig(int configKey, int value)
                 xmlBase.addPar_str ("guide_version"   , guideVersion);
                 xmlBase.addPar_str ("manual"          , manualFile);
 
-                if (newXml.saveXMLfile(baseConfig, getLogger(), par(Cfg::XMLcompressionLevel)))
+                if (newXml.saveXMLfile(baseConfig, getLogger(), XML_UNCOMPRESSED))
                     return true;
                 else
                     Log("updateConfig: failed to write updated base config to \""+baseConfig+"\".");
@@ -813,7 +815,7 @@ bool Config::updateConfig(int configKey, int value)
                 xmlConf.addPar_int("root_current_ID", currentRoot); // always store the current root
                 xmlConf.addPar_int("bank_current_ID", currentBank); // always store the current bank
 
-                if (newXml.saveXMLfile(configFile, getLogger(), gzipCompression))
+                if (newXml.saveXMLfile(configFile, getLogger(), XML_UNCOMPRESSED))
                     return true;
                 else
                     Log("updateConfig: failed to write updated instance config to \""+configFile+"\".");
@@ -1068,7 +1070,7 @@ bool Config::saveMasterConfig()
     XMLStore xml{TOPLEVEL::XML::MasterConfig};
     initBaseConfig(xml);
 
-    bool success = xml and xml.saveXMLfile(baseConfig, getLogger(), gzipCompression);
+    bool success = xml and xml.saveXMLfile(baseConfig, getLogger(), XML_UNCOMPRESSED);
     if (success)
         configChanged = false;
     else
@@ -1081,7 +1083,7 @@ bool Config::saveInstanceConfig()
     XMLStore xml{TOPLEVEL::XML::Config};
     addConfigXML(xml);
 
-    bool success = xml and xml.saveXMLfile(configFile, getLogger(), gzipCompression);
+    bool success = xml and xml.saveXMLfile(configFile, getLogger(), XML_UNCOMPRESSED);
     if (success)
         configChanged = false;
     else
