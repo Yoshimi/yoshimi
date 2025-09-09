@@ -835,15 +835,18 @@ bool Config::extractBaseParameters(XMLStore& xml)
         return false;
     }
 
+    // the following two settings are special, since
+    // - it is possible to override them from the cmdline (but not persistently)
+    // - it is dangerous to disable them from the running instance (leaves half broken, running GUI)
+    // thus we keep the persistent setting in separate state flags (storedGui, storedCli)
     storedGui  = basePars.getPar_bool("enable_gui", showGui);
     if (not guiChanged)
         showGui = storedGui;
-
-    showSplash = basePars.getPar_bool("enable_splash", showSplash);
-
     storedCli  = basePars.getPar_bool("enable_CLI", showCli);
     if (not cliChanged)
         showCli = storedCli;
+
+    showSplash = basePars.getPar_bool("enable_splash", showSplash);
     showCLIcontext  = basePars.getPar_int("show_CLI_context", 1, 0, 2);
 
     singlePath   = basePars.getPar_bool("enable_single_master", singlePath);
