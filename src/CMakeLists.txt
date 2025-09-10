@@ -55,7 +55,7 @@ add_definitions(-Wno-vla) # Nothing wrong with variable length arrays
 
 project (Yoshimi)
 
-set (YOSHIMI_VERSION "2.3.4.1")
+set (YOSHIMI_VERSION "2.3.4.2")
 file (WRITE version.txt "${YOSHIMI_VERSION}")
 
 

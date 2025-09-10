@@ -3046,21 +3046,19 @@ void InterChange::commandConfig(CommandBlock& cmd)
             if (write)
             {
                 synth.getRuntime().storedGui = value_bool;
-                synth.getRuntime().showGui = value_bool;
                 synth.getRuntime().updateConfig(control, value);
             }
             else
-                value = synth.getRuntime().showGui;
+                value = synth.getRuntime().storedGui;
             break;
         case CONFIG::control::enableCLI:
             if (write)
             {
                 synth.getRuntime().storedCli = value_bool;
-                synth.getRuntime().showCli = value_bool;
                 synth.getRuntime().updateConfig(control, value);
             }
             else
-                value = synth.getRuntime().showCli;
+                value = synth.getRuntime().storedCli;
             break;
         case CONFIG::control::showSplash:
             if (write)

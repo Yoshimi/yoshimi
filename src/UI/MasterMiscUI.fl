@@ -265,6 +265,8 @@ class VUMeter {: {public Fl_Box}
     int mid = (w() / 2) - 2;
     int actualpart = npart + *plgroup;
     float Vpeak = fetchData(0, MAIN::control::readPartPeak, TOPLEVEL::section::main, actualpart);
+    if (panelpart.oldpeak[actualpart] > 0)
+        panelpart.oldpeak[actualpart] = 0;
     if (Vpeak < 0) // its inactive
     {
         fl_color(45);
@@ -288,7 +290,8 @@ class VUMeter {: {public Fl_Box}
         panelpart.oldpeak[actualpart] = int(db);
         fl_rectf(ox, oy,mid, ly, graph_back);
         fl_color(VU_level);
-        fl_rectf(ox, oy + ly - panelpart.oldpeak[actualpart], mid, panelpart.oldpeak[actualpart]);
+        if (panelpart.oldpeak[actualpart] > 0)
+            fl_rectf(ox, oy + ly - panelpart.oldpeak[actualpart], mid, panelpart.oldpeak[actualpart]);
         if (panelpart.clip[actualpart])
             fl_rectf(ox, oy, mid, 4, VU_over);
 
@@ -302,7 +305,8 @@ class VUMeter {: {public Fl_Box}
         panelpart.oldpeakR[actualpart] = int(db);
         fl_rectf(ox + mid, oy,lx - mid, ly, graph_back);
         fl_color(VU_level);
-        fl_rectf(ox + mid, oy + ly - panelpart.oldpeakR[actualpart], lx - mid, panelpart.oldpeakR[actualpart]);
+        if (panelpart.oldpeakR[actualpart] > 0)
+            fl_rectf(ox + mid, oy + ly - panelpart.oldpeakR[actualpart], lx - mid, panelpart.oldpeakR[actualpart]);
         if (panelpart.clipR[actualpart])
             fl_rectf(ox + mid, oy, lx - mid, 4, VU_over);
 

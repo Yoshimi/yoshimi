@@ -77,8 +77,9 @@ using std::endl;
 
 namespace { // Implementation details...
 
-    TextMsgBuffer& textMsgBuffer = TextMsgBuffer::instance();
+    const uint XML_UNCOMPRESSED{0};
 
+    TextMsgBuffer& textMsgBuffer = TextMsgBuffer::instance();
 
     static std::regex VERSION_SYNTAX{R"~((\d+)(?:\.(\d+))?(?:\.(\d+))?)~", std::regex::optimize};
 
@@ -701,7 +702,7 @@ bool Config::updateConfig(int configKey, int value)
                 xmlBase.addPar_bool("enable_auto_instance" , par(Cfg::enableAutoInstance));
                 xmlBase.addPar_uint("handle_padsynth_build", par(Cfg::handlePadSynthBuild));
                 xmlBase.addPar_int ("gzip_compression"     , par(Cfg::XMLcompressionLevel));
-                xmlBase.addPar_int ("enable_part_reports" , par(Cfg::enablePartReports));
+                xmlBase.addPar_int ("enable_part_reports"  , par(Cfg::enablePartReports));
                 xmlBase.addPar_bool("banks_checked"        , par(Cfg::banksChecked));
 
                 // the following are system defined;
@@ -709,7 +710,7 @@ bool Config::updateConfig(int configKey, int value)
                 xmlBase.addPar_str ("guide_version"   , guideVersion);
                 xmlBase.addPar_str ("manual"          , manualFile);
 
-                if (newXml.saveXMLfile(baseConfig, getLogger(), par(Cfg::XMLcompressionLevel)))
+                if (newXml.saveXMLfile(baseConfig, getLogger(), XML_UNCOMPRESSED))
                     return true;
                 else
                     Log("updateConfig: failed to write updated base config to \""+baseConfig+"\".");
@@ -813,7 +814,7 @@ bool Config::updateConfig(int configKey, int value)
                 xmlConf.addPar_int("root_current_ID", currentRoot); // always store the current root
                 xmlConf.addPar_int("bank_current_ID", currentBank); // always store the current bank
 
-                if (newXml.saveXMLfile(configFile, getLogger(), gzipCompression))
+                if (newXml.saveXMLfile(configFile, getLogger(), XML_UNCOMPRESSED))
                     return true;
                 else
                     Log("updateConfig: failed to write updated instance config to \""+configFile+"\".");
@@ -833,15 +834,20 @@ bool Config::extractBaseParameters(XMLStore& xml)
         return false;
     }
 
+    // the following two settings are special, since
+    // - it is possible to override them from the cmdline (but not persistently)
+    // - it is dangerous to disable them from the running instance (leaves half broken, running GUI)
+    // thus we keep the persistent setting in separate state flags (storedGui, storedCli)
     storedGui  = basePars.getPar_bool("enable_gui", showGui);
     if (not guiChanged)
         showGui = storedGui;
 
-    showSplash = basePars.getPar_bool("enable_splash", showSplash);
-
     storedCli  = basePars.getPar_bool("enable_CLI", showCli);
     if (not cliChanged)
         showCli = storedCli;
+
+    showSplash = basePars.getPar_bool("enable_splash", showSplash);
+
     showCLIcontext  = basePars.getPar_int("show_CLI_context", 1, 0, 2);
 
     singlePath   = basePars.getPar_bool("enable_single_master", singlePath);
@@ -1068,7 +1074,7 @@ bool Config::saveMasterConfig()
     XMLStore xml{TOPLEVEL::XML::MasterConfig};
     initBaseConfig(xml);
 
-    bool success = xml and xml.saveXMLfile(baseConfig, getLogger(), gzipCompression);
+    bool success = xml and xml.saveXMLfile(baseConfig, getLogger(), XML_UNCOMPRESSED);
     if (success)
         configChanged = false;
     else
@@ -1081,7 +1087,7 @@ bool Config::saveInstanceConfig()
     XMLStore xml{TOPLEVEL::XML::Config};
     addConfigXML(xml);
 
-    bool success = xml and xml.saveXMLfile(configFile, getLogger(), gzipCompression);
+    bool success = xml and xml.saveXMLfile(configFile, getLogger(), XML_UNCOMPRESSED);
     if (success)
         configChanged = false;
     else

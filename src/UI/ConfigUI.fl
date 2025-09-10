@@ -347,7 +347,7 @@ fillThemes();
                         else
                             o->value(1);}
             tooltip {Enable starting with this graphical interface} xywh {190 160 27 25} down_box DOWN_BOX selection_color 64 labelsize 12 labelcolor 64 align 4
-            code0 {o->value(synth->getRuntime().showGui);}
+            code0 {o->value(synth->getRuntime().storedGui);}
             code1 {if (current_ID != 0) o->hide(); else if (isLV2()) o->deactivate();}
             class Fl_Check_Button2
           }
@@ -356,7 +356,7 @@ fillThemes();
             callback {//
                         send_data(0, CONFIG::control::enableCLI, o->value(), TOPLEVEL::type::Integer);}
             tooltip {Enable starting with interactive command line interface} xywh {190 180 27 25} down_box DOWN_BOX selection_color 64 labelsize 12 labelcolor 64 align 4
-            code0 {o->value(synth->getRuntime().showCli);}
+            code0 {o->value(synth->getRuntime().storedCli);}
             code1 {if (current_ID != 0) o->hide(); else if (isLV2()) o->deactivate();}
             class Fl_Check_Button2
           }
@@ -2071,8 +2071,8 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
                     logTimes->value(synth->getRuntime().showTimes);
                     logXML->value(synth->getRuntime().logXMLheaders);
                     saveAllXML->value(synth->getRuntime().xmlmax);
-                    enableGUI->value(synth->getRuntime().showGui);
-                    enableCLI->value(synth->getRuntime().showCli);
+                    enableGUI->value(synth->getRuntime().storedGui);
+                    enableCLI->value(synth->getRuntime().storedCli);
                     break;
     }} {}
   }

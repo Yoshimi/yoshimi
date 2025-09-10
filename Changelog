@@ -1,4 +1,13 @@
-yoshimi 2.3.4.1
+yoshimi 2.3.4.2
+
+2025-9-10 Will + Hermann
+bn 2400 ***out of sequence***
+Fixed Mixer panel VU drawing error.
+Corrected Config file saving (always uncompressed).
+Instance files now always uncompressed.
+Changed config logic so GUI and CLI active status changes
+    don't lock-out current running instance.
+Set bugfix release version 2.3.4.2
 
 2025-6-10 Will + Hermann
 bn 2392
