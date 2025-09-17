@@ -61,7 +61,12 @@ int ScaleTrackedWindow::handle(int ev) {
 
 
 int ScaleTrackedWindow::tooltipSize() const {
-    return int(_dScale * 11);
+    float result = _dScale * 10;
+    if (result < 12)
+    {
+        result = 12;
+    }
+    return int(result);
 }
 
 float ScaleTrackedWindow::dScale() const {
