@@ -1,0 +1,23 @@
+Version 2.3.5
+
+The SubSynth engine now has a set of LFOs matching the behaviour
+of the other two engines. The user guide has also been updated.
+
+Popup tooltip windows rescale the match the size of the parent window.
+
+There has been further refinement of the underlying code to improve
+reliability and make the underlying code more consistent and retain
+compatibility with source code libraries.
+
+
+Yoshimi source code is available from either:
+https://sourceforge.net/projects/yoshimi
+Or:
+https://github.com/Yoshimi/yoshimi
+
+Full build instructions are in 'INSTALL'.
+
+Our list archive is at:
+https://www.freelists.org/archive/yoshimi
+To post, email to:
+yoshimi@freelists.org

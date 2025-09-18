@@ -41,13 +41,17 @@
     Version 2.3.3 has improved memory management, extension to keyboard shortcuts, better configuration control, and expands theme colour control, and adds realtime theme editing.
     </p>
     <p>
-    Version 2.3.3 A new 'Omni' made has been added. Warnings provided when overwriting edited  instruments. Revision of XML files for cross-compatibility with MXML versions.
+    Version 2.3.3 has a new 'Omni' mode added. Warnings provided when overwriting edited  instruments. Revision of XML files for cross-compatibility with MXML versions.
+    </p>
+    Version 2.3.5 has a set of LFOs added to the SubSynth engine. Also tooltip sizes
+    now track the respective window size.
+    <p>
     </p>
   </description>
    <launchable type="desktop-id">yoshimi.desktop</launchable>
 
   <releases>
-      <release type="stable" version="2.3.4" date="2025-06-09" />
+      <release type="stable" version="2.3.5" date="2025-09-22" />
   </releases>
   <provides>
     <binary>yoshimi</binary>

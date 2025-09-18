@@ -4,16 +4,14 @@ Yoshimi is a software audio synthesizer, currently only available for Linux.
 
 ### Current version
 
-Version 2.3.4
+Version 2.3.5
 
 
-* New feature: Independent control of MIDI Omni setting for all parts.
+* New feature: A set of LFOs for the SubSynth engine.
 
-* New feature: Warnings when unsaved instruments could be overwritten.
+* New feature: Popup tooltips scale to match the parent window.
 
-* Compatibilty fixes for FLTK V 1.4.x
-
-* Reorganisation of XML management for simplicity and MXML 4.x recognition.
+* Various code refinements.
 
 ### Building
 

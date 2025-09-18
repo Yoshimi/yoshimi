@@ -8,10 +8,6 @@ Ensure all new files have been added to commit!!!
 
 Don't forget to create and push the tag on releases!
 
-Rebase yoshipi branch to release version.
-    This is so that owners of newer versions of this unit
-    can upgrade to a stable version.
-
 use /usr/bin/appstream-util validate {file} to check metadata.
     Get images from:
     https://yoshimi.sourceforge.io/docs/user-guide
@@ -50,6 +46,15 @@ README.txt/README.md
 
 set tag to release version.
 
-After commit
+push to both github and sourceforge.
+
+Some of the Yoshimi Pi units out in the wild are set to the 'yoshipi'
+branch. This is synchronised with the latest release version, so allows
+those users to update without needing to know anything about the code.
+
+Therefore, switch to the yoshipi branch and rebase this to the current
+release pushing it to both github and sourceforge.
+
+After commit release
     Update wikipedia entry.
     Tell everyone :)
