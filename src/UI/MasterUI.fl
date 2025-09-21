@@ -27,10 +27,10 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of the ZynAddSubFX original.} {in_source in_header
+This file is a derivative of the ZynAddSubFX original.} {selected in_source in_header
 }
 
-decl {\#define PANEL_SINGLE_X 1040} {selected public local
+decl {\#define PANEL_SINGLE_X 1040} {public local
 }
 
 decl {\#define PANEL_SINGLE_Y 320} {public local
@@ -540,7 +540,7 @@ class MasterUI {: {public GuiUpdates}
 
                 synth->signalGuiWindowClosed();
             }}
-      xywh {298 197 385 525} type Double labelfont 13 labelsize 12 hide resizable
+      xywh {411 233 385 525} type Double labelfont 13 labelsize 12 hide resizable
       code0 {mainDW = 385; mainDH = 470;}
       code1 {masterwindow->size_range(394, 500, 0, 0, 0, 0, 1);}
       class ScaleTrackedWindow
@@ -678,9 +678,6 @@ class MasterUI {: {public GuiUpdates}
             xywh {350 197 25 14} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 197
           }
         }
-      }
-      Fl_Box topcontrols1 {
-        xywh {267 35 114 136} box ENGRAVED_FRAME
       }
       Fl_Menu_Bar mastermenu {
         callback {//
@@ -985,17 +982,6 @@ class MasterUI {: {public GuiUpdates}
         label {Master  }
         xywh {3 24 380 148} labeltype NO_LABEL labelsize 11 labelcolor 96 align 22
       } {
-        Fl_Dial globalfinedetune {
-          label Detune
-          callback {//
-          o->selection_color(setKnob(o->value(),64));
-          send_data(TOPLEVEL::action::lowPrio, MAIN::control::detune, o->value(), 0, TOPLEVEL::section::main);}
-          tooltip {Global Fine Detune} xywh {278 43 40 40} box ROUND_UP_BOX color 29 labelsize 10 labelcolor 64 maximum 127 value 64
-          code0 {o->setValueType(VC_GlobalFineDetune);}
-          code1 {o->value(synth->microtonal.Pglobalfinedetune);}
-          code2 {o->selection_color(setKnob(o->value(),64));}
-          class WidgetPDial
-        }
         Fl_Button mainreset {
           label Reset
           callback {//
@@ -1017,17 +1003,6 @@ class MasterUI {: {public GuiUpdates}
           callback {//
                 send_data(TOPLEVEL::action::muteAndLoop, MAIN::control::stopSound, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
           tooltip {Cease all sound immediately!} xywh {7 30 66 24} box PLASTIC_UP_BOX color 89 labelfont 1 labelsize 11 labelcolor 64 align 16
-        }
-        Fl_Dial mastervolumedial {
-          label Volume
-          callback {//
-                o->selection_color(setKnob(o->value(),90));
-                send_data(0, MAIN::control::volume, o->value(), 0, TOPLEVEL::section::main);}
-          tooltip {Master Volume} xywh {330 43 40 40} box ROUND_UP_BOX color 29 labelsize 10 labelcolor 64 maximum 127
-          code0 {o->setValueType(VC_MasterVolume);}
-          code1 {o->value(synth->Pvolume);}
-          code2 {o->selection_color(setKnob(o->value(),90));}
-          class WidgetPDial
         }
         Fl_Button mainvirtkeyb {
           label {Virtual Key&board}
@@ -1069,6 +1044,50 @@ class MasterUI {: {public GuiUpdates}
           callback {//
                 send_data(0, MAIN::control::redo,  0, TOPLEVEL::type::Integer, TOPLEVEL::section::undoMark);}
           tooltip {Re-apply last change} xywh {195 91 66 24} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 64
+        }
+        Fl_Box topcontrols1 {
+          xywh {267 30 114 142} box ENGRAVED_FRAME
+        }
+        Fl_Dial globalfinedetune {
+          label Detune
+          callback {//
+          o->selection_color(setKnob(o->value(),64));
+          send_data(TOPLEVEL::action::lowPrio, MAIN::control::detune, o->value(), 0, TOPLEVEL::section::main);}
+          tooltip {Global Fine Detune} xywh {278 42 40 40} box ROUND_UP_BOX color 29 labelsize 10 labelcolor 64 maximum 127 value 64
+          code0 {o->setValueType(VC_GlobalFineDetune);}
+          code1 {o->value(synth->microtonal.Pglobalfinedetune);}
+          code2 {o->selection_color(setKnob(o->value(),64));}
+          class WidgetPDial
+        }
+        Fl_Dial mastervolumedial {
+          label Volume
+          callback {//
+                o->selection_color(setKnob(o->value(),90));
+                send_data(0, MAIN::control::volume, o->value(), 0, TOPLEVEL::section::main);}
+          tooltip {Master Volume} xywh {330 42 40 40} box ROUND_UP_BOX color 29 labelsize 10 labelcolor 64 maximum 127
+          code0 {o->setValueType(VC_MasterVolume);}
+          code1 {o->value(synth->Pvolume);}
+          code2 {o->selection_color(setKnob(o->value(),90));}
+          class WidgetPDial
+        }
+        Fl_Spinner masterkeyshift {
+          label {Key Shift}
+          callback {//
+        send_data(TOPLEVEL::action::lowPrio, MAIN::control::keyShift, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
+          tooltip {Shift pitch +/- N semitones} xywh {328 108 44 20} labelsize 10 labelcolor 64 minimum -36 maximum 36 textfont 1 textsize 12 textcolor 64
+          code0 {o->range(MIN_KEY_SHIFT, MAX_KEY_SHIFT);o->step(1.0);}
+          code1 {o->value(synth->Pkeyshift - 64);}
+          class WidgetSpinner
+        }
+        Fl_Spinner bpmfallback {
+          label {F. BPM}
+          callback {//
+        send_data(TOPLEVEL::action::forceUpdate, MAIN::control::bpmFallback, o->value(), 0, TOPLEVEL::section::main);}
+          tooltip {Fallback BPM (Beats Per Minute). This is only used if the MIDI driver does not provide its own BPM information.} xywh {316 142 56 20} labelsize 10 labelcolor 64 minimum 0 maximum 0 value 120 textfont 1 textsize 12 textcolor 64
+          code0 {o->range(BPM_FALLBACK_MIN, BPM_FALLBACK_MAX);}
+          code1 {o->step(1.0); o->type(FL_FLOAT_INPUT);}
+          code2 {setBpmFallbackValue(synth->PbpmFallback);}
+          class WidgetSpinner
         }
       }
       Fl_Group syseffectuigroup {
@@ -1529,25 +1548,6 @@ class MasterUI {: {public GuiUpdates}
         send_data(0, MAIN::control::mono,  tmp, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
         tooltip {Master Mono/Stereo switch} xywh {7 90 66 24} box PLASTIC_UP_BOX down_box PLASTIC_UP_BOX color 228 selection_color 89 labelfont 3 labelsize 11 labelcolor 226
         code0 {o->value(synth->masterMono);}
-      }
-      Fl_Spinner masterkeyshift {
-        label {Key Shift}
-        callback {//
-        send_data(TOPLEVEL::action::lowPrio, MAIN::control::keyShift, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
-        tooltip {Shift pitch +/- N semitones} xywh {330 108 44 20} labelsize 10 labelcolor 64 minimum -36 maximum 36 textfont 1 textsize 12 textcolor 64
-        code0 {o->range(MIN_KEY_SHIFT, MAX_KEY_SHIFT);o->step(1.0);}
-        code1 {o->value(synth->Pkeyshift - 64);}
-        class WidgetSpinner
-      }
-      Fl_Spinner bpmfallback {
-        label {F. BPM}
-        callback {//
-        send_data(TOPLEVEL::action::forceUpdate, MAIN::control::bpmFallback, o->value(), 0, TOPLEVEL::section::main);}
-        tooltip {Fallback BPM (Beats Per Minute). This is only used if the MIDI driver does not provide its own BPM information.} xywh {318 140 56 20} labelsize 10 labelcolor 64 minimum 0 maximum 0 value 120 textfont 1 textsize 12 textcolor 64
-        code0 {o->range(BPM_FALLBACK_MIN, BPM_FALLBACK_MAX);}
-        code1 {o->step(1.0); o->type(FL_FLOAT_INPUT);}
-        code2 {setBpmFallbackValue(synth->PbpmFallback);}
-        class WidgetSpinner
       }
       Fl_Spinner maxparts {
         label of
