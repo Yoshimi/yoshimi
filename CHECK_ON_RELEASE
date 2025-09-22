@@ -17,7 +17,7 @@ use /usr/bin/appstream-util validate {file} to check metadata.
     Disable extra compiler tests.
 
 Before the commit (but after build) run the python file:
-    run sh set to update build number and guide.
+    run 'sh set' to update build number and guide.
     This will ensure the guide has the correct version number.
 
 /desktop/yoshimi.1
