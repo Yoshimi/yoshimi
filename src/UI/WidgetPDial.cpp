@@ -90,7 +90,6 @@ int WidgetPDial::handle(int event)
 
     double dragsize, v, min = minimum(), max = maximum();
     int my, mx;
-
     int res = 0;
 
     switch (event)
@@ -171,7 +170,8 @@ void WidgetPDial::drawgradient(int cx,int cy,int sx,double m1,double m2)
 
 void WidgetPDial::draw()
 {
-    int cx = x(), cy = y(), sx = w(), sy = h();
+    float scale = Fl::screen_scale(0);
+    int cx = x() * scale, cy = y() * scale, sx = w() * scale, sy = h() * scale;
     double d = (sx>sy)?sy:sx; // d = the smallest side -2
     double dh = d/2;
        /*
@@ -182,8 +182,8 @@ void WidgetPDial::draw()
     double val = (value() - minimum()) / (maximum() - minimum());
     cairo_t *cr;
     cairo_surface_t* Xsurface = cairo_xlib_surface_create
-        (fl_display, fl_window, fl_visual->visual,Fl_Window::current()->w(),
-         Fl_Window::current()->h());
+        (fl_display, fl_window, fl_visual->visual,Fl_Window::current()->w() * scale,
+         Fl_Window::current()->h() * scale);
     cr = cairo_create (Xsurface);
     cairo_translate(cr,cx+dh,cy+dh);
     //relative lengths of the various parts:

@@ -1,4 +1,10 @@
-yoshimi 2.3.5 rc2
+yoshimi 2.3.5 rc3
+
+2025-9-25 Will
+bn 2405
+Corrected rotatary knob scaling for fltk 1.4
+Bugfix: not shoing correct colour for yoshimi instruments.
+set version as 2.3.5 rc3
 
 2025-9-21 Will
 bn 2403
