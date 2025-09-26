@@ -170,7 +170,12 @@ void WidgetPDial::drawgradient(int cx,int cy,int sx,double m1,double m2)
 
 void WidgetPDial::draw()
 {
-    float scale = Fl::screen_scale(0);
+    float scale = 1.0;
+#ifdef IS_FLTK_4
+        scale = Fl::screen_scale(0);
+#endif
+
+    //std::cout << "here " << FLTKFOUR << std::endl;
     int cx = x() * scale, cy = y() * scale, sx = w() * scale, sy = h() * scale;
     double d = (sx>sy)?sy:sx; // d = the smallest side -2
     double dh = d/2;

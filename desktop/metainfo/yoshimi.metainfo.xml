@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright 2016-2024 Yoshimi project <willgodfrey@musically.me.uk> -->
+<!-- Copyright 2016-2025 Yoshimi project <willgodfrey@musically.me.uk> -->
 <component type="desktop-application">
   <id>net.sourceforge.projects.yoshimi_2247</id>
   <metadata_license>CC-BY-4.0</metadata_license>
@@ -51,7 +51,7 @@
    <launchable type="desktop-id">yoshimi.desktop</launchable>
 
   <releases>
-      <release type="stable" version="2.3.5" date="2025-09-22" />
+      <release type="stable" version="2.3.5" date="2025-09-26" />
   </releases>
   <provides>
     <binary>yoshimi</binary>

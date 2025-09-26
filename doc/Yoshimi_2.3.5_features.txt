@@ -1,13 +1,20 @@
 Version 2.3.5
 
 The SubSynth engine now has a set of LFOs matching the behaviour
-of the other two engines. The user guide has also been updated.
+of the other two engines. The user guide has been updated accordingly.
 
-Popup tooltip windows rescale the match the size of the parent window.
+Envelope 'freemode' points can now be MIDI-Learned.
+
+Popup tooltip overlays rescale to match the size of the parent window.
+
+Corrected the issue where disabling the GUI was immediate, and could
+only be restored from the CLI.
 
 There has been further refinement of the underlying code to improve
-reliability and make the underlying code more consistent and retain
-compatibility with source code libraries.
+reliability and make the code more consistent, and retain compatibility
+with source code libraries.
+
+Some more instruments have been added to the default banks.
 
 
 Yoshimi source code is available from either:

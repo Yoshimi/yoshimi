@@ -102,6 +102,8 @@ option (BuildForDiagnostic "Add diagnostics and debug info for optimised release
 
 option (BuildWithFLTK "Build with FLTK GUI" ON)
 
+option (BuildWithFLTK4 "Build for FLTK V4+" ON)
+
 #option to build lv2 plugin
 option (LV2Plugin "Build yoshimi lv2 plugin interface" ON)
 
@@ -149,6 +151,10 @@ set (BuildOptions_Release
 
 if (BuildWithFLTK)
     add_definitions (-DGUI_FLTK)
+endif ()
+
+if (BuildWithFLTK4)
+    add_definitions (-DIS_FLTK_4)
 endif ()
 
 find_package (PkgConfig REQUIRED)

@@ -250,6 +250,17 @@ Config::Config(SynthEngine& synthInstance)
 
 void Config::init()
 {
+
+
+    /*string command = "fltk-config --api-version";
+    string result = "";
+    file::cmd2string(command, result);
+    //std::cout << result << std::endl;
+    if (stoi(result) >= 1.4)
+    {
+        set a constant here for WidgetPDial ?
+    }*/
+
     if (isLV2) return; //skip further setup, which is irrelevant for LV2 plugin instance.
 
     switch (audioEngine)
