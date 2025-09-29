@@ -43,15 +43,14 @@
     <p>
     Version 2.3.3 has a new 'Omni' mode added. Warnings provided when overwriting edited  instruments. Revision of XML files for cross-compatibility with MXML versions.
     </p>
-    Version 2.3.5 has a set of LFOs added to the SubSynth engine. Also tooltip sizes
-    now track the respective window size.
     <p>
+    Version 2.3.5 has a set of LFOs added to the SubSynth engine. Also tooltip sizes now track the respective window size.
     </p>
   </description>
-   <launchable type="desktop-id">yoshimi.desktop</launchable>
+  <launchable type="desktop-id">yoshimi.desktop</launchable>
 
   <releases>
-      <release type="stable" version="2.3.5" date="2025-09-26" />
+    <release type="stable" version="2.3.5" date="2025-09-26" />
   </releases>
   <provides>
     <binary>yoshimi</binary>
