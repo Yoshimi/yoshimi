@@ -155,9 +155,9 @@ class BankSlot {: {public Fl_Button, BankProcess_}
     bankID = bk;
     lastSeen = last;
     if (bank->engines_used(rt, bk, nslot) & 8)
-        labelcolor(yoshi_ins_typ);
+        labelcolor(yoshi_ins_typ);     // Slot marked as Yoshimi-format instrument in the banks-file;
     else
-        labelcolor(gen_text);} {}
+        labelcolor(bank_text);} {}
   }
   decl {int *what, *whatslot, nslot, highlight, *nselected;} {private local
   }
@@ -216,6 +216,11 @@ class BankSlot {: {public Fl_Button, BankProcess_}
     draw_box(value() ? (down_box() ? down_box() : fl_down(box())) : box(), x(), y(), w(), h(), Fl_Color(17));
 
     labelcolor(bank_text);
+        draw_label();
+        if (engine & 8)   // Slot marked as Yoshimi-format instrument in the banks-file
+            labelcolor(yoshi_ins_typ);
+        else
+            labelcolor(bank_text);
         draw_label();
 
     if (Fl::focus() == this) draw_focus();} {}

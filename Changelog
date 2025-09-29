@@ -1,4 +1,10 @@
-yoshimi 2.3.5 M
+yoshimi 2.3.5.1
+
+2025-9-29 Will
+bn 2408
+BugFix: Banks not showing Yoshimi type instrument colour.
+BugFix: Off by 1 errors in CLI - envelope code.
+Set bugfix version 2.3.5.1
 
 2025-9-27 Will
 bn 2407
