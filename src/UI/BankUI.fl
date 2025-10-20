@@ -215,13 +215,11 @@ class BankSlot {: {public Fl_Button, BankProcess_}
     //frame for label
     draw_box(value() ? (down_box() ? down_box() : fl_down(box())) : box(), x(), y(), w(), h(), Fl_Color(17));
 
-    labelcolor(bank_text);
-        draw_label();
-        if (engine & 8)   // Slot marked as Yoshimi-format instrument in the banks-file
-            labelcolor(yoshi_ins_typ);
-        else
-            labelcolor(bank_text);
-        draw_label();
+    if (engine & 8)   // Slot marked as Yoshimi-format instrument in the banks-file
+        labelcolor(yoshi_ins_typ);
+    else
+        labelcolor(bank_text);
+    draw_label();
 
     if (Fl::focus() == this) draw_focus();} {}
   }

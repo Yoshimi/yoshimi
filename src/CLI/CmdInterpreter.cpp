@@ -4457,6 +4457,13 @@ int CmdInterpreter::subSynth(Parser& input, unsigned char controlType)
         }
     }
 
+    if (cmd == -1 && input.matchnMove(3, "lfo"))
+    {
+        bitSet(context, LEVEL::LFO);
+        insertType = TOPLEVEL::insert::LFOgroup;
+        return LFOselect(input, controlType);
+    }
+
     if (cmd == -1 && input.matchnMove(3, "filter"))
     {
         bitSet(context, LEVEL::Filter);

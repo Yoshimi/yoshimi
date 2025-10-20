@@ -1,5 +1,9 @@
 yoshimi 2.3.5.1
 
+2025-10-20
+bn 2409
+Added SubSynth LFOs to CLI access.
+
 2025-9-29 Will
 bn 2408
 BugFix: Banks not showing Yoshimi type instrument colour.

@@ -549,6 +549,8 @@ install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/../desktop/yoshimi_alt.svg
     DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/scalable/apps)
 install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/../desktop/metainfo/yoshimi.metainfo.xml
     DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/metainfo)
+install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/../desktop/metainfo/yoshimi.appdata.xml
+    DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/metainfo)
 install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/../desktop/yoshimi.1
     DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
 

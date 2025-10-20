@@ -413,6 +413,7 @@ std::string subsynthlist [] = {
     "HArmonic Position <s>",    "start position (Zero, Random, Maximum)",
     "BAnd Width <n>",           "common bandwidth",
     "BAnd Scale <n>",           "bandwidth slope v frequency",
+    "LFO ...",                  "enter LFO insert context",
     "FILter ...",               "enter Filter insert context",
     "ENVelope ...",             "enter Envelope insert context",
     "@end","@end"
