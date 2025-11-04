@@ -14,6 +14,10 @@ if they have been closed first - been there since V 1.4.1 :(
 Add dynfilter filter types to CLI prompt.
 Never been done before :(
 
+Add dedicated CCs for selection from external instruments, patchsets and states.
+Add indicator of kitmode in Edit window.
+Add auto/fixed scale sizes for tooltips.
+
 CLI waveform (in voice) changes don't update GUI unless waveform window is open too.
 
 LV2: internal sound banks do not appear to be exposed as LV2 presets
