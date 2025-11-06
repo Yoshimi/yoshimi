@@ -1,4 +1,9 @@
-yoshimi 2.3.5.1
+yoshimi 2.3.5.2
+
+2025-11-06
+bn 2410
+Permanently removed (apparently) redunant code in UI/WidgetCheckButton.cpp
+Set version 2.3.5.2
 
 2025-10-20
 bn 2409
