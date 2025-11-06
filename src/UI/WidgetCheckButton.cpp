@@ -50,11 +50,11 @@ void Fl_Light_Button2::draw()
         draw_box(down_box(), x()+dx, y()+dy, W, W, FL_BACKGROUND2_COLOR);
         if (value())
         {
-          if (Fl::is_scheme("gtk+"))
+          /*if (Fl::is_scheme("gtk+"))
           {
             fl_color(FL_SELECTION_COLOR);
           }
-          else
+          else*/
           {
             fl_color(col);
           }
@@ -89,14 +89,15 @@ void Fl_Light_Button2::draw()
           int tdx = dx + (W - tW) / 2;
           int tdy = dy + (W - tW) / 2;
 
-          if (Fl::is_scheme("gtk+"))
+          /*if (Fl::is_scheme("gtk+"))
           {
             fl_color(FL_SELECTION_COLOR);
             tW --;
             fl_pie(x() + tdx - 1, y() + tdy - 1, tW + 3, tW + 3, 0.0, 360.0);
             fl_color(fl_color_average(FL_WHITE, FL_SELECTION_COLOR, 0.2f));
           }
-          else fl_color(col);
+          else */
+            fl_color(col);
 
           switch (tW)
           {
@@ -125,11 +126,11 @@ void Fl_Light_Button2::draw()
               break;
           }
 
-          if (Fl::is_scheme("gtk+"))
+          /*if (Fl::is_scheme("gtk+"))
           {
             fl_color(fl_color_average(FL_WHITE, FL_SELECTION_COLOR, 0.5));
             fl_arc(x() + tdx, y() + tdy, tW + 1, tW + 1, 60.0, 180.0);
-          }
+          }*/
         }
         break;
       default :
