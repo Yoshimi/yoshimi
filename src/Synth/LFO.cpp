@@ -79,8 +79,11 @@ LFO::LFO(LFOParams *_lfopars, float _basefreq, SynthEngine *_synth):
     incrnd = nextincrnd = 1.0f;
 
     Recompute();
-    if (lfopars->fel == 0) // this is a Frequency LFO
+    if (lfopars->fel == 0) { // this is a Frequency LFO
         x -= 0.25f; // change the starting phase
+        if (x < 0.0f)
+            x += 1.0f;
+    }
     amp1 = (1 - lfornd) + lfornd * synth->numRandom();
     amp2 = (1 - lfornd) + lfornd * synth->numRandom();
     computenextincrnd(); // twice because I want incrnd & nextincrnd to be random
