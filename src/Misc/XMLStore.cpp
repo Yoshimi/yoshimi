@@ -268,8 +268,7 @@ struct XMLtree::Node
         }
         Node& setText(OStr content)
         {
-            bool leadingWhitespace{false};
-            mxmlNewText(mxmlElm(), leadingWhitespace, content);
+            mxmlNewOpaque(mxmlElm(), content);
             return *this;
         }
 

@@ -640,55 +640,6 @@ inline string loadGzipped(string const& filename, string& report)
     }
     return readStream.str();
 }
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////TODO 4/25 : old version --> obsolete after switch to XMLStore
-inline char * loadGzipped_OBSOLETE_(string const& _filename, string * report)
-{
-    string filename = _filename;
-    char *data = NULL;
-    gzFile gzf  = gzopen(filename.c_str(), "rb");
-    if (!gzf)
-    {
-        *report = ("Failed to open file " + filename + " for load: " + string(strerror(errno)));
-        return NULL;
-    }
-    const int bufSize = 4096;
-    char fetchBuf[4097];
-    int this_read;
-    int total_bytes = 0;
-    stringstream readStream;
-    for (bool quit = false; !quit;)
-    {
-        memset(fetchBuf, 0, sizeof(fetchBuf) * sizeof(char));
-        this_read = gzread(gzf, fetchBuf, bufSize);
-        if (this_read > 0)
-        {
-            readStream << fetchBuf;
-            total_bytes += this_read;
-        }
-        else if (this_read < 0)
-        {
-            int errnum;
-            *report = ("Read error in zlib: " + string(gzerror(gzf, &errnum)));
-            if (errnum == Z_ERRNO)
-                *report = ("Filesystem error: " + string(strerror(errno)));
-            quit = true;
-        }
-        else if (total_bytes > 0)
-        {
-            data = new char[total_bytes + 1];
-            if (data)
-            {
-                memset(data, 0, total_bytes + 1);
-                memcpy(data, readStream.str().c_str(), total_bytes);
-            }
-            quit = true;
-        }
-    }
-    gzclose(gzf);
-    //*report = "it looks like we successfully loaded" + filename;
-    return data;
-}
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////TODO 4/25 : old version --> obsolete after switch to XMLStore
 
 /*
  * This is used for text files, preserving individual lines. These can
