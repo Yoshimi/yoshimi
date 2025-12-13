@@ -151,7 +151,33 @@ namespace { // internal details of MXML integration
             return mxmlFindElement(mxmlElm(), mxmlElm(), elmName, attribName, attribVal, MXML_DESCEND_FIRST);
         }
 
-        static mxml_node_t* parse(const char* xml)
+
+        void setAttrStr(OStr& attribName, OStr& val)
+        {
+            mxmlElementSetAttr(mxmlElm(), attribName, val);
+        }
+
+        const char * getAttrStr(OStr& attribName)
+        {
+            return mxmlElementGetAttr(mxmlElm(), attribName);
+        }
+
+        void addTextContent(OStr& content)
+        {
+            mxmlNewOpaque(mxmlElm(), content);
+        }
+
+        const char * getFirstTextContent()
+        {
+            mxml_node_t* child = mxmlGetFirstChild(mxmlElm());
+            if (child and MXML_TYPE_OPAQUE == mxmlGetType(child))
+                return mxmlGetOpaque(child);
+            else
+                return nullptr;
+        }
+
+
+        static mxml_node_t* parseOpaque(const char* xml)
         {
             return mxmlLoadString(NULL, xml, PARSE_CONTENT_OPAQUE);
         }                                //  ^^^^^ treat all node content as »opaque« data, i.e. passed-through as-is
@@ -248,7 +274,7 @@ struct XMLtree::Node
         static Node* parse(const char* xml)
         {
             assert (xml);
-            return asNode(Policy::parse(xml));
+            return asNode(parseOpaque(xml));
         }
 
         void addRef()
@@ -280,27 +306,24 @@ struct XMLtree::Node
 
         Node& setAttrib(OStr attribName, OStr val)
         {
-            mxmlElementSetAttr(mxmlElm(), attribName, val);
+            setAttrStr(attribName, val);
             return *this;
         }
         Node& setText(OStr content)
-        {
-            mxmlNewOpaque(mxmlElm(), content);
+        {// String always stored as content within a node
+            assert (not mxmlGetFirstChild(mxmlElm())); // no children yet
+            addTextContent(content);
             return *this;
         }
 
         const char * getAttrib(OStr attribName)
         {
-            return mxmlElementGetAttr(mxmlElm(), attribName);
+            return getAttrStr(attribName);
         }
 
         const char * getText()
-        {
-            mxml_node_t* child = mxmlGetFirstChild(mxmlElm());
-            if (child and MXML_TYPE_OPAQUE == mxmlGetType(child))
-                return mxmlGetOpaque(child);
-            else
-                return nullptr;
+        {// complete content of a node, but no nested nodes
+            return getFirstTextContent();
         }
     };
 
