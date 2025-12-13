@@ -75,7 +75,7 @@ namespace { // internal details of MXML integration
     }
 
 
-    const char* XMLStore_whitespace_callback(mxml_node_t* node, int where)
+    const char* XMLStore_whitespace_callback(void*, mxml_node_t* node, mxml_ws_t where)
     {
         const char* name = mxmlGetElement(node);
 
@@ -129,14 +129,47 @@ namespace { // internal details of MXML integration
         #define MXML_TYPE_OPAQUE  MXML_OPAQUE
         #define MXML_TYPE_TEXT    MXML_TEXT
 
-        constexpr auto PARSE_CONTENT_OPAQUE = MXML_OPAQUE_CALLBACK;
 
-        constexpr auto RENDER_WHITESPACE = XMLStore_whitespace_callback;
+        static mxml_node_t* parseOpaque(const char* xml)
+        {
+            return mxmlLoadString(MXML_NO_PARENT, xml, MXML_OPAQUE_CALLBACK);
+        }                                          //  ^^^^ treat all node content as »opaque« data, i.e. passed-through as-is
+
+        char* render()
+        {
+            mxmlSetWrapMargin(0);
+            // disable automatic line wrapping and control whitespace per callback
+            return mxmlSaveAllocString(mxmlElm(), [](mxml_node_t* node, int where)
+                                                   { return XMLStore_whitespace_callback(nullptr, node, where); });
+        }
+
 
 #else   /* ==================== MXML Current API (from v4) ==================== */
-        #error "Support for MXML v4 not yet implemented"
+
         #define MXML_NO_PARENT nullptr
+
+
+        static mxml_node_t* parseOpaque(const char* xml)
+        {// treat all node content as »opaque« data, i.e. passed-through as-is
+            mxml_options_t* options = mxmlOptionsNew();
+            mxmlOptionsSetWrapMargin(options, 0);   // disable automatic line-wrap
+            mxmlOptionsSetTypeValue(options, MXML_TYPE_OPAQUE);
+            mxml_node_t* document = mxmlLoadString(MXML_NO_PARENT, options, xml);
+            mxmlOptionsDelete(options);
+            return document;
+        }
+
+        char* render()
+        {// disable automatic line wrapping and control whitespace per callback
+            mxml_options_t* options = mxmlOptionsNew();
+            mxmlOptionsSetWrapMargin(options, 0);
+            mxmlOptionsSetWhitespaceCallback(options, XMLStore_whitespace_callback, /*cbdata*/nullptr);
+            char* buffer = mxmlSaveAllocString(mxmlElm(), options);
+            mxmlOptionsDelete(options);
+            return buffer;
+        }
 #endif  /* ====== MXML version switch ======= */
+
 
 
         mxml_node_t* mxmlElm()
@@ -174,19 +207,6 @@ namespace { // internal details of MXML integration
                 return mxmlGetOpaque(child);
             else
                 return nullptr;
-        }
-
-
-        static mxml_node_t* parseOpaque(const char* xml)
-        {
-            return mxmlLoadString(NULL, xml, PARSE_CONTENT_OPAQUE);
-        }                                //  ^^^^^ treat all node content as »opaque« data, i.e. passed-through as-is
-
-        char* render()
-        {
-            mxmlSetWrapMargin(0);
-            // disable automatic line wrapping and control whitespace per callback
-            return mxmlSaveAllocString(mxmlElm(), RENDER_WHITESPACE);
         }
     };
 }//(End)internal details
