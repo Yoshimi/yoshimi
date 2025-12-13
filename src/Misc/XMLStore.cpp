@@ -122,6 +122,23 @@ namespace { // internal details of MXML integration
     /** Configuration how to adapt and use the MXML API */
     struct Policy
     {
+#if MXML_MAJOR_VERSION < 4
+        /* ==================== MXML Legacy API (until v3) ==================== */
+
+        #define MXML_TYPE_ELEMENT MXML_ELEMENT
+        #define MXML_TYPE_OPAQUE  MXML_OPAQUE
+        #define MXML_TYPE_TEXT    MXML_TEXT
+
+        constexpr auto PARSE_CONTENT_OPAQUE = MXML_OPAQUE_CALLBACK;
+
+        constexpr auto RENDER_WHITESPACE = XMLStore_whitespace_callback;
+
+#else   /* ==================== MXML Current API (from v4) ==================== */
+        #error "Support for MXML v4 not yet implemented"
+        #define MXML_NO_PARENT nullptr
+#endif  /* ====== MXML version switch ======= */
+
+
         mxml_node_t* mxmlElm()
         {
             return reinterpret_cast<mxml_node_t*>(this);
@@ -136,14 +153,14 @@ namespace { // internal details of MXML integration
 
         static mxml_node_t* parse(const char* xml)
         {
-            return mxmlLoadString(NULL, xml, MXML_OPAQUE_CALLBACK);  // treat all node content as »opaque« data, i.e. passed-through as-is
-        }
+            return mxmlLoadString(NULL, xml, PARSE_CONTENT_OPAQUE);
+        }                                //  ^^^^^ treat all node content as »opaque« data, i.e. passed-through as-is
 
         char* render()
         {
             mxmlSetWrapMargin(0);
             // disable automatic line wrapping and control whitespace per callback
-            return mxmlSaveAllocString(mxmlElm(), XMLStore_whitespace_callback);
+            return mxmlSaveAllocString(mxmlElm(), RENDER_WHITESPACE);
         }
     };
 }//(End)internal details
@@ -186,17 +203,17 @@ string renderXmlType(TOPLEVEL::XML type)
 
 TOPLEVEL::XML parseXMLtype(string const& spec)
 {
-    if (spec == "Instrument")      return TOPLEVEL::XML::Instrument;
-    if (spec == "Parameters")      return TOPLEVEL::XML::Patch;
-    if (spec == "Scales")          return TOPLEVEL::XML::Scale;
-    if (spec == "Session")         return TOPLEVEL::XML::State;
-    if (spec == "Vector Control")  return TOPLEVEL::XML::Vector;
-    if (spec == "Midi Learn")      return TOPLEVEL::XML::MLearn;
-    if (spec == "Config Base")     return TOPLEVEL::XML::MasterConfig;
-    if (spec == "Config Instance") return TOPLEVEL::XML::Config;
-    if (spec == "Presets")         return TOPLEVEL::XML::Presets;
-    if (spec == "Roots and Banks") return TOPLEVEL::XML::Bank;
-    if (spec == "Recent Files")    return TOPLEVEL::XML::History;
+    if (spec == "Instrument")         return TOPLEVEL::XML::Instrument;
+    if (spec == "Parameters")         return TOPLEVEL::XML::Patch;
+    if (spec == "Scales")             return TOPLEVEL::XML::Scale;
+    if (spec == "Session")            return TOPLEVEL::XML::State;
+    if (spec == "Vector Control")     return TOPLEVEL::XML::Vector;
+    if (spec == "Midi Learn")         return TOPLEVEL::XML::MLearn;
+    if (spec == "Config Base")        return TOPLEVEL::XML::MasterConfig;
+    if (spec == "Config Instance")    return TOPLEVEL::XML::Config;
+    if (spec == "Presets")            return TOPLEVEL::XML::Presets;
+    if (spec == "Roots and Banks")    return TOPLEVEL::XML::Bank;
+    if (spec == "Recent Files")       return TOPLEVEL::XML::History;
     if (spec == "Preset Directories") return TOPLEVEL::XML::PresetDirs;
 
     return TOPLEVEL::XML::Instrument;
@@ -280,7 +297,7 @@ struct XMLtree::Node
         const char * getText()
         {
             mxml_node_t* child = mxmlGetFirstChild(mxmlElm());
-            if (child and MXML_OPAQUE == mxmlGetType(child))
+            if (child and MXML_TYPE_OPAQUE == mxmlGetType(child))
                 return mxmlGetOpaque(child);
             else
                 return nullptr;
