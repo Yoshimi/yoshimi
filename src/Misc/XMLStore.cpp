@@ -56,7 +56,7 @@ using std::move;
 
 namespace { // internal details of MXML integration
 
-    const auto XML_HEADER = "?xml version=\"1.0\" encoding=\"UTF-8\"?";
+    const auto XML_VER    = "1.0";
     const auto ROOT_ZYN   = "ZynAddSubFX-data";
     const auto ROOT_YOSHI = "Yoshimi-data";
 
@@ -65,7 +65,7 @@ namespace { // internal details of MXML integration
         return meta.isZynCompat()? ROOT_ZYN : ROOT_YOSHI;
     }
 
-    /** @remark our XML files often start with leading whitespace
+    /** @remark ancient XML files often start with leading whitespace
      *          which is not tolerated by the XML parser */
     const char* withoutLeadingWhitespace(const char * text)
     {
@@ -75,18 +75,32 @@ namespace { // internal details of MXML integration
     }
 
 
+    #if MXML_MAJOR_VERSION < 4
+        #define mxml_ws_t int
+    #endif
+
     const char* XMLStore_whitespace_callback(void*, mxml_node_t* node, mxml_ws_t where)
     {
+        const auto NO_WHITESPACE = nullptr;
+        const auto INSERT_NEWLINE = "\n";
+
         const char* name = mxmlGetElement(node);
 
-        if (where == MXML_WS_BEFORE_OPEN && name && !strncmp(name, "?xml", 4))
-            return NULL;
-        if (where == MXML_WS_BEFORE_CLOSE && name && !strncmp(name, "string", 6))
-            return NULL;
+        auto isCloseString = [&]{ return where == MXML_WS_BEFORE_CLOSE and name and !strncmp(name, "string", 6); };
+        auto isXMLDocStart = [&]{ return where == MXML_WS_BEFORE_OPEN  and
+                                                                       #if MXML_MAJOR_VERSION >= 4
+                                                                          mxmlGetType(node) == MXML_TYPE_DIRECTIVE
+                                                                       #else
+                                                                          name and !strncmp(name, "?xml", 4)  // Legacy-MXML creates an Element with name="?xml...."
+                                                                       #endif
+                                                                       ;};
+        if (isXMLDocStart() or isCloseString())
+            return NO_WHITESPACE;
 
-        if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
-            return "\n";
-        return NULL;
+        if (where == MXML_WS_BEFORE_OPEN or where == MXML_WS_BEFORE_CLOSE)
+            return INSERT_NEWLINE;
+
+        return NO_WHITESPACE;
     }
 
 
@@ -135,6 +149,14 @@ namespace { // internal details of MXML integration
             return mxmlLoadString(MXML_NO_PARENT, xml, MXML_OPAQUE_CALLBACK);
         }                                          //  ^^^^ treat all node content as »opaque« data, i.e. passed-through as-is
 
+        static mxml_node_t* buildDocRoot(const char* doctypeID)
+        {// setup a new tree as valid XML with given doctype
+            mxml_node_t* root = mxmlNewXML(XML_VER);
+            mxml_node_t* decl = mxmlNewElement(root, "!DOCTYPE");
+            mxmlElementSetAttr(decl, doctypeID, nullptr);
+            return root;
+        }
+
         char* render()
         {
             mxmlSetWrapMargin(0);
@@ -157,6 +179,13 @@ namespace { // internal details of MXML integration
             mxml_node_t* document = mxmlLoadString(MXML_NO_PARENT, options, xml);
             mxmlOptionsDelete(options);
             return document;
+        }
+
+        static mxml_node_t* buildDocRoot(string doctypeID)
+        {// setup a new tree as valid XML with given doctype
+            mxml_node_t* root = mxmlNewXML(XML_VER);
+            mxmlNewDeclaration(root, OStr{"DOCTYPE "+doctypeID});
+            return root;
         }
 
         char* render()
@@ -265,6 +294,14 @@ TOPLEVEL::XML parseXMLtype(string const& spec)
     return TOPLEVEL::XML::Instrument;
 }
 
+/** An _opaque_ enum that allows XMLStore to invoke XMLtree::makeRoot()
+ *  Technically, both classes are mutually dependent, but only on that function.
+ */
+enum XMLtree::DocType : uint {
+    DT_ZYN, DT_YOSHIMI
+};
+
+
 
 
 
@@ -286,9 +323,9 @@ struct XMLtree::Node
             return reinterpret_cast<Node*>(mxmlElm);
         }
 
-        static Node* newTree()
+        static Node* newTree(DocType dt)
         {
-            return asNode(mxmlNewElement(MXML_NO_PARENT, XML_HEADER));
+            return asNode(buildDocRoot(dt == DT_ZYN? ROOT_ZYN:ROOT_YOSHI));
         }
 
         static Node* parse(const char* xml)
@@ -377,6 +414,21 @@ XMLtree::XMLtree(XMLtree&& ref)
 }
 
 
+/**
+ * @internal Init to allow XMLStore the setup of a valid new Yoshimi XML document.
+ * @see XMLStore::buildXMLRoot()
+ * @warning note the side-effect; wipes out any content established thus far.
+ * @remark the DocType enum is deliberately declared forward and thus the possible
+ *         enumerators are only known within this translation unit.
+ */
+XMLtree& XMLtree::makeRoot(DocType doctype)
+{
+    if (node)
+        node->unref();
+    node = Node::newTree(doctype);
+    return *this;
+}
+
 /** Factory: create from XML buffer.
  * @remark buffer is owned by caller and will only be read
  * @return new XMLtree handle, which can be empty in case of parsing failure.
@@ -398,8 +450,7 @@ char* XMLtree::render()
 
 XMLtree XMLtree::addElm(string name)
 {
-    if (!node)
-        node = Node::newTree();
+    assert (node);
     return node->addChild(name);
 }
 
@@ -667,7 +718,7 @@ void XMLStore::buildXMLRoot()
 
     if (meta.isZynCompat())
     {
-        root.addElm("!DOCTYPE").addAttrib(topElmName(meta));
+        root.makeRoot(XMLtree::DT_ZYN);
         root.addElm(topElmName(meta))
             .addAttrib("version-major",     asString(meta.zynVer.maj))
             .addAttrib("version-minor",     asString(meta.zynVer.min))
@@ -683,7 +734,7 @@ void XMLStore::buildXMLRoot()
     }
     else
     {// Yoshimi native format
-        root.addElm("!DOCTYPE").addAttrib(topElmName(meta));
+        root.makeRoot(XMLtree::DT_YOSHIMI);
         root.addElm(topElmName(meta))
             .addAttrib("Yoshimi-major",   asString(meta.yoshimiVer.maj))
             .addAttrib("Yoshimi-minor",   asString(meta.yoshimiVer.min))

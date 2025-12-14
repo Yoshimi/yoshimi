@@ -46,6 +46,7 @@ class SynthEngine;
 /**
  * Structured data subtree,
  * which can be loaded and stored as XML.
+ * Used as builder for valid Yoshimi data layout.
  * @note this is a smart-pointer, delegating to
  *       MXML ref-count based memory management.
  */
@@ -70,6 +71,9 @@ class XMLtree
 
         static XMLtree parse(const char*);                       // Factory: create from XML buffer
         char* render();                                          // render XMLtree into new malloc() buffer
+
+        enum DocType:uint;
+        XMLtree& makeRoot(DocType);                              // Root-init used by the implementation of XMLStore::buildXMLRoot()
 
         XMLtree addElm(string name);
         XMLtree addElm(string name, uint id);
