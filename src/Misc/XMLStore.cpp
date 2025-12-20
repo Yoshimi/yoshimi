@@ -56,7 +56,7 @@ using std::move;
 
 namespace { // internal details of MXML integration
 
-    const auto XML_HEADER = "?xml version=\"1.0\" encoding=\"UTF-8\"?";
+    const auto XML_VER    = "1.0";
     const auto ROOT_ZYN   = "ZynAddSubFX-data";
     const auto ROOT_YOSHI = "Yoshimi-data";
 
@@ -65,7 +65,7 @@ namespace { // internal details of MXML integration
         return meta.isZynCompat()? ROOT_ZYN : ROOT_YOSHI;
     }
 
-    /** @remark our XML files often start with leading whitespace
+    /** @remark ancient XML files often start with leading whitespace
      *          which is not tolerated by the XML parser */
     const char* withoutLeadingWhitespace(const char * text)
     {
@@ -75,18 +75,32 @@ namespace { // internal details of MXML integration
     }
 
 
-    const char* XMLStore_whitespace_callback(mxml_node_t* node, int where)
+    #if MXML_MAJOR_VERSION < 4
+        #define mxml_ws_t int
+    #endif
+
+    const char* XMLStore_whitespace_callback(void*, mxml_node_t* node, mxml_ws_t where)
     {
+        const auto NO_WHITESPACE = nullptr;
+        const auto INSERT_NEWLINE = "\n";
+
         const char* name = mxmlGetElement(node);
 
-        if (where == MXML_WS_BEFORE_OPEN && name && !strncmp(name, "?xml", 4))
-            return NULL;
-        if (where == MXML_WS_BEFORE_CLOSE && name && !strncmp(name, "string", 6))
-            return NULL;
+        auto isCloseString = [&]{ return where == MXML_WS_BEFORE_CLOSE and name and !strncmp(name, "string", 6); };
+        auto isXMLDocStart = [&]{ return where == MXML_WS_BEFORE_OPEN  and
+                                                                       #if MXML_MAJOR_VERSION >= 4
+                                                                          mxmlGetType(node) == MXML_TYPE_DIRECTIVE
+                                                                       #else
+                                                                          name and !strncmp(name, "?xml", 4)  // Legacy-MXML creates an Element with name="?xml...."
+                                                                       #endif
+                                                                       ;};
+        if (isXMLDocStart() or isCloseString())
+            return NO_WHITESPACE;
 
-        if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
-            return "\n";
-        return NULL;
+        if (where == MXML_WS_BEFORE_OPEN or where == MXML_WS_BEFORE_CLOSE)
+            return INSERT_NEWLINE;
+
+        return NO_WHITESPACE;
     }
 
 
@@ -122,6 +136,71 @@ namespace { // internal details of MXML integration
     /** Configuration how to adapt and use the MXML API */
     struct Policy
     {
+#if MXML_MAJOR_VERSION < 4
+        /* ==================== MXML Legacy API (until v3) ==================== */
+
+        #define MXML_TYPE_ELEMENT MXML_ELEMENT
+        #define MXML_TYPE_OPAQUE  MXML_OPAQUE
+        #define MXML_TYPE_TEXT    MXML_TEXT
+
+
+        static mxml_node_t* parseOpaque(const char* xml)
+        {
+            return mxmlLoadString(MXML_NO_PARENT, xml, MXML_OPAQUE_CALLBACK);
+        }                                          //  ^^^^ treat all node content as »opaque« data, i.e. passed-through as-is
+
+        static mxml_node_t* buildDocRoot(const char* doctypeID)
+        {// setup a new tree as valid XML with given doctype
+            mxml_node_t* root = mxmlNewXML(XML_VER);
+            mxml_node_t* decl = mxmlNewElement(root, "!DOCTYPE");
+            mxmlElementSetAttr(decl, doctypeID, nullptr);
+            return root;
+        }
+
+        char* render()
+        {
+            mxmlSetWrapMargin(0);
+            // disable automatic line wrapping and control whitespace per callback
+            return mxmlSaveAllocString(mxmlElm(), [](mxml_node_t* node, int where)
+                                                   { return XMLStore_whitespace_callback(nullptr, node, where); });
+        }
+
+
+#else   /* ==================== MXML Current API (from v4) ==================== */
+
+        #define MXML_NO_PARENT nullptr
+
+
+        static mxml_node_t* parseOpaque(const char* xml)
+        {// treat all node content as »opaque« data, i.e. passed-through as-is
+            mxml_options_t* options = mxmlOptionsNew();
+            mxmlOptionsSetWrapMargin(options, 0);   // disable automatic line-wrap
+            mxmlOptionsSetTypeValue(options, MXML_TYPE_OPAQUE);
+            mxml_node_t* document = mxmlLoadString(MXML_NO_PARENT, options, xml);
+            mxmlOptionsDelete(options);
+            return document;
+        }
+
+        static mxml_node_t* buildDocRoot(string doctypeID)
+        {// setup a new tree as valid XML with given doctype
+            mxml_node_t* root = mxmlNewXML(XML_VER);
+            mxmlNewDeclaration(root, OStr{"DOCTYPE "+doctypeID});
+            return root;
+        }
+
+        char* render()
+        {// disable automatic line wrapping and control whitespace per callback
+            mxml_options_t* options = mxmlOptionsNew();
+            mxmlOptionsSetWrapMargin(options, 0);
+            mxmlOptionsSetWhitespaceCallback(options, XMLStore_whitespace_callback, /*cbdata*/nullptr);
+            char* buffer = mxmlSaveAllocString(mxmlElm(), options);
+            mxmlOptionsDelete(options);
+            return buffer;
+        }
+#endif  /* ====== MXML version switch ======= */
+
+
+
         mxml_node_t* mxmlElm()
         {
             return reinterpret_cast<mxml_node_t*>(this);
@@ -134,16 +213,29 @@ namespace { // internal details of MXML integration
             return mxmlFindElement(mxmlElm(), mxmlElm(), elmName, attribName, attribVal, MXML_DESCEND_FIRST);
         }
 
-        static mxml_node_t* parse(const char* xml)
+
+        void setAttrStr(OStr& attribName, OStr& val)
         {
-            return mxmlLoadString(NULL, xml, MXML_OPAQUE_CALLBACK);  // treat all node content as »opaque« data, i.e. passed-through as-is
+            mxmlElementSetAttr(mxmlElm(), attribName, val);
         }
 
-        char* render()
+        const char * getAttrStr(OStr& attribName)
         {
-            mxmlSetWrapMargin(0);
-            // disable automatic line wrapping and control whitespace per callback
-            return mxmlSaveAllocString(mxmlElm(), XMLStore_whitespace_callback);
+            return mxmlElementGetAttr(mxmlElm(), attribName);
+        }
+
+        void addTextContent(OStr& content)
+        {
+            mxmlNewOpaque(mxmlElm(), content);
+        }
+
+        const char * getFirstTextContent()
+        {
+            mxml_node_t* child = mxmlGetFirstChild(mxmlElm());
+            if (child and MXML_TYPE_OPAQUE == mxmlGetType(child))
+                return mxmlGetOpaque(child);
+            else
+                return nullptr;
         }
     };
 }//(End)internal details
@@ -186,21 +278,29 @@ string renderXmlType(TOPLEVEL::XML type)
 
 TOPLEVEL::XML parseXMLtype(string const& spec)
 {
-    if (spec == "Instrument")      return TOPLEVEL::XML::Instrument;
-    if (spec == "Parameters")      return TOPLEVEL::XML::Patch;
-    if (spec == "Scales")          return TOPLEVEL::XML::Scale;
-    if (spec == "Session")         return TOPLEVEL::XML::State;
-    if (spec == "Vector Control")  return TOPLEVEL::XML::Vector;
-    if (spec == "Midi Learn")      return TOPLEVEL::XML::MLearn;
-    if (spec == "Config Base")     return TOPLEVEL::XML::MasterConfig;
-    if (spec == "Config Instance") return TOPLEVEL::XML::Config;
-    if (spec == "Presets")         return TOPLEVEL::XML::Presets;
-    if (spec == "Roots and Banks") return TOPLEVEL::XML::Bank;
-    if (spec == "Recent Files")    return TOPLEVEL::XML::History;
+    if (spec == "Instrument")         return TOPLEVEL::XML::Instrument;
+    if (spec == "Parameters")         return TOPLEVEL::XML::Patch;
+    if (spec == "Scales")             return TOPLEVEL::XML::Scale;
+    if (spec == "Session")            return TOPLEVEL::XML::State;
+    if (spec == "Vector Control")     return TOPLEVEL::XML::Vector;
+    if (spec == "Midi Learn")         return TOPLEVEL::XML::MLearn;
+    if (spec == "Config Base")        return TOPLEVEL::XML::MasterConfig;
+    if (spec == "Config Instance")    return TOPLEVEL::XML::Config;
+    if (spec == "Presets")            return TOPLEVEL::XML::Presets;
+    if (spec == "Roots and Banks")    return TOPLEVEL::XML::Bank;
+    if (spec == "Recent Files")       return TOPLEVEL::XML::History;
     if (spec == "Preset Directories") return TOPLEVEL::XML::PresetDirs;
 
     return TOPLEVEL::XML::Instrument;
 }
+
+/** An _opaque_ enum that allows XMLStore to invoke XMLtree::makeRoot()
+ *  Technically, both classes are mutually dependent, but only on that function.
+ */
+enum XMLtree::DocType : uint {
+    DT_ZYN, DT_YOSHIMI
+};
+
 
 
 
@@ -223,15 +323,15 @@ struct XMLtree::Node
             return reinterpret_cast<Node*>(mxmlElm);
         }
 
-        static Node* newTree()
+        static Node* newTree(DocType dt)
         {
-            return asNode(mxmlNewElement(MXML_NO_PARENT, XML_HEADER));
+            return asNode(buildDocRoot(dt == DT_ZYN? ROOT_ZYN:ROOT_YOSHI));
         }
 
         static Node* parse(const char* xml)
         {
             assert (xml);
-            return asNode(Policy::parse(xml));
+            return asNode(parseOpaque(xml));
         }
 
         void addRef()
@@ -263,28 +363,24 @@ struct XMLtree::Node
 
         Node& setAttrib(OStr attribName, OStr val)
         {
-            mxmlElementSetAttr(mxmlElm(), attribName, val);
+            setAttrStr(attribName, val);
             return *this;
         }
         Node& setText(OStr content)
-        {
-            bool leadingWhitespace{false};
-            mxmlNewText(mxmlElm(), leadingWhitespace, content);
+        {// String always stored as content within a node
+            assert (not mxmlGetFirstChild(mxmlElm())); // no children yet
+            addTextContent(content);
             return *this;
         }
 
         const char * getAttrib(OStr attribName)
         {
-            return mxmlElementGetAttr(mxmlElm(), attribName);
+            return getAttrStr(attribName);
         }
 
         const char * getText()
-        {
-            mxml_node_t* child = mxmlGetFirstChild(mxmlElm());
-            if (child and MXML_OPAQUE == mxmlGetType(child))
-                return mxmlGetOpaque(child);
-            else
-                return nullptr;
+        {// complete content of a node, but no nested nodes
+            return getFirstTextContent();
         }
     };
 
@@ -318,6 +414,21 @@ XMLtree::XMLtree(XMLtree&& ref)
 }
 
 
+/**
+ * @internal Init to allow XMLStore the setup of a valid new Yoshimi XML document.
+ * @see XMLStore::buildXMLRoot()
+ * @warning note the side-effect; wipes out any content established thus far.
+ * @remark the DocType enum is deliberately declared forward and thus the possible
+ *         enumerators are only known within this translation unit.
+ */
+XMLtree& XMLtree::makeRoot(DocType doctype)
+{
+    if (node)
+        node->unref();
+    node = Node::newTree(doctype);
+    return *this;
+}
+
 /** Factory: create from XML buffer.
  * @remark buffer is owned by caller and will only be read
  * @return new XMLtree handle, which can be empty in case of parsing failure.
@@ -339,8 +450,7 @@ char* XMLtree::render()
 
 XMLtree XMLtree::addElm(string name)
 {
-    if (!node)
-        node = Node::newTree();
+    assert (node);
     return node->addChild(name);
 }
 
@@ -608,7 +718,7 @@ void XMLStore::buildXMLRoot()
 
     if (meta.isZynCompat())
     {
-        root.addElm("!DOCTYPE").addAttrib(topElmName(meta));
+        root.makeRoot(XMLtree::DT_ZYN);
         root.addElm(topElmName(meta))
             .addAttrib("version-major",     asString(meta.zynVer.maj))
             .addAttrib("version-minor",     asString(meta.zynVer.min))
@@ -624,7 +734,7 @@ void XMLStore::buildXMLRoot()
     }
     else
     {// Yoshimi native format
-        root.addElm("!DOCTYPE").addAttrib(topElmName(meta));
+        root.makeRoot(XMLtree::DT_YOSHIMI);
         root.addElm(topElmName(meta))
             .addAttrib("Yoshimi-major",   asString(meta.yoshimiVer.maj))
             .addAttrib("Yoshimi-minor",   asString(meta.yoshimiVer.min))

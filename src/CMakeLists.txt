@@ -179,7 +179,7 @@ find_package(ZLIB REQUIRED)
 pkg_check_modules (FFTW3F REQUIRED fftw3f>=0.22)
 
 # mxml
-pkg_check_modules (MXML REQUIRED mxml>=2.5)
+pkg_search_module (MXML REQUIRED mxml4 mxml>=2.5)
 
 # Alsa
 if ("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")

@@ -1,5 +1,10 @@
 yoshimi 2.3.5.2
 
+2025-12-14 Hermann
+bn 2411
+Provide code variant to support MXML v4 in src/Misc/XMLStore.cpp
+Builds upon the rework of XML handling from 2025-6-1 (bn 2387).
+
 2025-11-06
 bn 2410
 Permanently removed (apparently) redunant code in UI/WidgetCheckButton.cpp
@@ -118,6 +123,13 @@ Set version 2.3.4 rc1
 2025-6-6 Will
 bn 2387
 Merged in changed parts warnings from parts branch.
+
+2025-6-1 Hermann
+Rework of XML handling code and Yoshimi data formats:
+All access to the MXML library now confined to a single
+translation unit XMLStore.cpp, automatic memory management
+now delegated to MXML. Processing of metadata consolidated.
+This refactoring became necessary to support MXML v4 (see 2025-12)
 
 2025-5-26 Will
 bn 2386
