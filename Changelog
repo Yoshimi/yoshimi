@@ -1,16 +1,21 @@
 yoshimi 2.3.5.2
 
+2025-12-20 Will
+bn 2412
+Set version 2.3.5.3
+Formal release of XML V3/V4 identification.
+
 2025-12-14 Hermann
 bn 2411
 Provide code variant to support MXML v4 in src/Misc/XMLStore.cpp
 Builds upon the rework of XML handling from 2025-6-1 (bn 2387).
 
-2025-11-06
+2025-11-06 Will
 bn 2410
 Permanently removed (apparently) redunant code in UI/WidgetCheckButton.cpp
 Set version 2.3.5.2
 
-2025-10-20
+2025-10-20 Will
 bn 2409
 Added SubSynth LFOs to CLI access.
 
