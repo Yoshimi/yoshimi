@@ -1455,19 +1455,27 @@ void custom_graphics(ValueType vt, float val,int W,int H)
             const float p = ((int)val / 64.0f) * 3.0;
 
             /* Cairo not necessary, but makes it easier to read the graph */
-            cairo_t *cr;
+#if FL_API_VERSION > 10400
+            cairo_t *cr = Fl::cairo_make_current(Fl_Window::current());
+#else
             cairo_surface_t* Xsurface = cairo_xlib_surface_create
                 (fl_display, fl_window, fl_visual->visual,
                  Fl_Window::current()->w(), Fl_Window::current()->h());
-            cr = cairo_create (Xsurface);
-
+            cairo_t *cr = cairo_create (Xsurface);
+#endif
+            cairo_save(cr);
             cairo_set_source_rgb(cr, 1, 0, 0);
             cairo_set_line_width(cr, 1.5);
             cairo_move_to(cr, x0, cy - ry * log10(power<50>(p)));
             cairo_line_to(cr, x0 + _w, cy - ry * log10(powf(0.05, p)));
             cairo_stroke(cr);
-
-            cairo_surface_destroy(Xsurface);  cairo_destroy(cr);
+            cairo_restore(cr);
+#if FL_API_VERSION > 10400
+            Fl::cairo_flush(cr);
+#else
+            cairo_surface_destroy(Xsurface);
+            cairo_destroy(cr);
+#endif
         }
         break;
     }

@@ -191,11 +191,15 @@ void WidgetPDial::draw()
         * fl_pie(cx - 2, cy - 2, d + 4, d + 4, 0, 360);
         */
     double val = (value() - minimum()) / (maximum() - minimum());
-    cairo_t *cr;
+#if FL_API_VERSION > 10400
+    cairo_t* cr = Fl::cairo_make_current(window());
+#else
     cairo_surface_t* Xsurface = cairo_xlib_surface_create
         (fl_display, fl_window, fl_visual->visual,Fl_Window::current()->w() * scale,
-         Fl_Window::current()->h() * scale);
-    cr = cairo_create (Xsurface);
+        Fl_Window::current()->h() * scale);
+    cairo_t* cr = cairo_create (Xsurface);
+#endif
+    cairo_save(cr);
     cairo_translate(cr,cx+dh,cy+dh);
     //relative lengths of the various parts:
     double rCint = 10.5/35;
@@ -286,7 +290,14 @@ void WidgetPDial::draw()
     cairo_stroke (cr);
     //freeing the resources
     cairo_pattern_destroy(pat);
-    cairo_surface_destroy(Xsurface);  cairo_destroy(cr);
+    cairo_restore(cr);
+#if FL_API_VERSION > 10400
+    // Fltk handles the lifecycle of cr in fltk >= 1.4.0
+    Fl::cairo_flush(cr);
+#else
+    cairo_surface_destroy(Xsurface);
+    cairo_destroy(cr);
+#endif
 }
 
 inline void WidgetPDial::pdialcolor(int r,int g,int b)
