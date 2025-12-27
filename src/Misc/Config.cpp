@@ -43,17 +43,21 @@
 #include <jack/session.h>
 #endif
 
+#include "ConfBuild.h"
+#include "Misc/Config.h"
 #include "Misc/XMLStore.h"
 #include "Misc/SynthEngine.h"
-#include "Misc/Config.h"
 #include "Misc/FileMgrFuncs.h"
 #include "Misc/NumericFuncs.h"
 #include "Misc/FormatFuncs.h"
 #include "Misc/TextMsgBuffer.h"
+
 #ifdef GUI_FLTK
+#ifdef YOSHIMI_FORCE_X11
+    extern bool fl_disable_wayland = true;
+#endif
     #include "MasterUI.h"
 #endif
-#include "ConfBuild.h"
 
 using file::isRegularFile;
 using file::createDir;

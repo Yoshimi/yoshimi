@@ -1455,9 +1455,11 @@ void custom_graphics(ValueType vt, float val,int W,int H)
             const float p = ((int)val / 64.0f) * 3.0;
 
             /* Cairo not necessary, but makes it easier to read the graph */
-#if FL_API_VERSION > 10400
+#ifndef YOSHIMI_CAIRO_LEGACY
             cairo_t *cr = Fl::cairo_make_current(Fl_Window::current());
+
 #else
+            // Legacy solution : retrieve drawing surface from XServer
             cairo_surface_t* Xsurface = cairo_xlib_surface_create
                 (fl_display, fl_window, fl_visual->visual,
                  Fl_Window::current()->w(), Fl_Window::current()->h());
@@ -1470,7 +1472,7 @@ void custom_graphics(ValueType vt, float val,int W,int H)
             cairo_line_to(cr, x0 + _w, cy - ry * log10(powf(0.05, p)));
             cairo_stroke(cr);
             cairo_restore(cr);
-#if FL_API_VERSION > 10400
+#ifndef YOSHIMI_CAIRO_LEGACY
             Fl::cairo_flush(cr);
 #else
             cairo_surface_destroy(Xsurface);

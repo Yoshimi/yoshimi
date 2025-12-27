@@ -24,6 +24,7 @@
 
 #include <string>
 
+#include "Misc/Config.h"
 #include "Misc/SynthEngine.h"
 #include "Misc/FileMgrFuncs.h"
 #include "Misc/FormatFuncs.h"

@@ -360,11 +360,13 @@ bool InstanceManager::Instance::startUp(PluginCreator pluginCreator)
                     synth->setWindowTitle(client->midiClientName());
                 else
                     runtime().toConsole = false;
+#ifdef YOSHIMI_FORCE_X11
+                cout << "\n\n WARNING: Yoshimi forced to X11 due to missing Cairo support in FLTK\n\n"<<endl;
+#endif
 #else
                 runtime().toConsole = false;
 #endif
                 runtime().startupReport(client->midiClientName());
-
                 if (isPrimary())
                     cout << "\nYay! We're up and running :-)\n";
                 else
