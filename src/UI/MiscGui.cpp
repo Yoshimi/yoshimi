@@ -1444,6 +1444,10 @@ void custom_graphics(ValueType vt, float val,int W,int H)
         fl_color(38);
         fl_line(x0 - margin, cy, x0 + _w, cy);
 
+        fl_color(255,0,0);
+        fl_line_style(0, int(1 * cy/36));
+        fl_line(x0, cy - (val * 0.8f), x0 + _w, cy + (val * 0.65f));
+    return;
         /* Function curve */
         fl_color(tooltip_curve);
         if ((int)val == 0)
