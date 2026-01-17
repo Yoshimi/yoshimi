@@ -1,5 +1,11 @@
 yoshimi 2.3.5.3
 
+2026-01-17 Will
+bn 2415
+SubSynth bandwidth scale drawing no longer uses cairo
+(although the original code has been kept but disabled)
+Minor adjustments also made to graph line widths and colours.
+
 2025-12-27 Will
 bn 2414
 Merged in Jespers cario-fltk1.4 / Wayland patch
