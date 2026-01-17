@@ -1394,7 +1394,7 @@ void custom_graphics(ValueType vt, float val,int W,int H)
         string xMarkers[] = {"x10","x100","x1k","x10k","10%","1%","0.1%","0.01%"};
 
         /* Scale lines */
-
+        fl_line_style(0, 1); // just to be sure
         fl_font(fl_font(),8);
         for (i = 0; i < 4; i++) /* 10x / 10%, 100x / 1% ... */
         {
@@ -1440,16 +1440,19 @@ void custom_graphics(ValueType vt, float val,int W,int H)
         /* Unit marker at the lower right of the graph */
         fl_draw("Hz", x0 + _w, y0 + 4, 20, 12, Fl_Align(FL_ALIGN_LEFT));
 
-        /* Vertical center line */
-        fl_color(38);
+        /* Horizontal center line */
+        fl_line_style(0, 2);
+        fl_color(tooltip_grid);
         fl_line(x0 - margin, cy, x0 + _w, cy);
 
-        fl_color(255,0,0);
-        fl_line_style(0, int(1 * cy/36));
+        /* Function curve */
+        fl_color(reson_graph_line); // red by default
         fl_line(x0, cy - (val * 0.8f), x0 + _w, cy + (val * 0.65f));
     return;
-        /* Function curve */
-        fl_color(tooltip_curve);
+
+    /*
+     * The following no longer used.
+     */
         if ((int)val == 0)
         {
             fl_line(x0, cy, x0 + _w, cy);
