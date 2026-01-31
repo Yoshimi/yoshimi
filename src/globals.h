@@ -633,32 +633,32 @@ namespace PART // usage PART::control::volume
 {
     enum control : uchar {
         enable = 0,
+        volume,
+        velocitySense,
+        panning,
+        velocityOffset,
+        midiChannel,
+        omni,
+        minNote,
+        maxNote,
+        minToLastKey,
+        maxToLastKey,
+        resetMinMaxKey,
+        maxNotes,
+        keyShift,
+        partToSystemEffect1,
+        partToSystemEffect2,
+        partToSystemEffect3,
+        partToSystemEffect4,
+        kitItemMute = 25, // last not marked as instrument changed
+        enableKitLine,
         enableAdd,
         enableSub,
         enablePad,
-        enableKitLine,
-        kitItemMute,
-        volume = 10,         // . |
-        velocitySense,       // . |
-        panning,             // . |
-        velocityOffset,      // . |
-        midiChannel,         // . |
-        omni,                // . |
-        keyMode,             // . |
-        channelATset,        // . |
-        keyATset,            // . |
-        minNote,             // . |
-        maxNote,             // .  > 20 not stored in instruments.
-        minToLastKey,        // . |
-        maxToLastKey,        // . |
-        resetMinMaxKey,      // . |
-        maxNotes,            // . |
-        keyShift,            // . |
-        partToSystemEffect1, // . |
-        partToSystemEffect2, // . |
-        partToSystemEffect3, // . |
-        partToSystemEffect4, // . |
-        effectNumber = 40,      //
+        keyMode,
+        channelATset,
+        keyATset,
+        effectNumber = 40,
         portamento,
         humanise = 50,
         humanvelocity,

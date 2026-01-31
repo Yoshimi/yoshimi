@@ -2140,9 +2140,11 @@ bool InterChange::commandSendReal(CommandBlock& cmd)
     uchar engine = cmd.data.engine;
     if(npart < NUM_MIDI_PARTS && (type & TOPLEVEL::type::Write))
     {
-        if (synth.getRuntime().enablePartReports)
+        if (synth.getRuntime().enablePartReports && control > PART::control::kitItemMute)
             partsChanged.set(npart);
 /*
+        // Test which parts have been changed
+
         std::cout<< std::endl;
         for (int i = 0; i < 64; ++i) // easier to read this way!
         {
