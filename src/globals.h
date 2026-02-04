@@ -724,7 +724,8 @@ namespace PART // usage PART::control::volume
         Off = 0,
         Multi,
         Single,
-        CrossFade
+        CrossFadeVel,
+        CrossFadeVol,
     };
 
     enum engine : uchar {

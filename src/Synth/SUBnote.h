@@ -59,6 +59,7 @@ class SUBnote
         void performPortamento(Note);
         void legatoFadeIn(Note);
         void legatoFadeOut();
+        void setVolumeAdjustment(float val) { volumeAdjustment = val; }
 
         void noteout(float* outl, float* outr);
         void releasekey();
@@ -110,6 +111,7 @@ class SUBnote
 
         int firsttick;
         float volume;
+        float volumeAdjustment;
         float oldamplitude;
         float newamplitude;
 

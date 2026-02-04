@@ -74,6 +74,7 @@ SUBnote::SUBnote(SUBnoteParameters& parameters, Controller& ctl_, Note note_, bo
     , globalFilterR{}
     , noteStatus{NOTE_ENABLED}
     , firsttick{1}
+    , volumeAdjustment{1.0f}
     , lfilter{}
     , rfilter{}
     , tmpsmp{synth.getRuntime().genTmp1}
@@ -127,6 +128,7 @@ SUBnote::SUBnote(SUBnote const& orig)
     , noteStatus{orig.noteStatus}
     , firsttick{orig.firsttick}
     , volume{orig.volume}
+    , volumeAdjustment{orig.volumeAdjustment}
     , oldamplitude{orig.oldamplitude}
     , newamplitude{orig.newamplitude}
     , lfilter{}
@@ -604,7 +606,10 @@ void SUBnote::computecurrentparameters()
         computeallfiltercoefs();
 
     // Envelope
-    newamplitude = volume * ampEnvelope->envout_dB() * ampLFO->amplfoout();
+    newamplitude = volume
+        * volumeAdjustment
+        * ampEnvelope->envout_dB()
+        * ampLFO->amplfoout();
 
     // Filter
     if (globalFilterL != NULL)

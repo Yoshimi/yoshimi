@@ -4279,23 +4279,44 @@ void InterChange::commandPart(CommandBlock& cmd)
         case PART::control::kitMode:
             if (write)
             {
-                if (value_int == 3) // crossfade
+                switch (value_int)
                 {
+                case 3: // velocity based crossfade
                     part.Pkitmode = 1; // normal kit mode (multiple kit items playing)
                     part.PkitfadeType = 1;
                     value = 1; // just to be sure
-                }
-                else
-                {
+                    break;
+                case 4: // volume based crossfade
+                    part.Pkitmode = 1; // normal kit mode (multiple kit items playing)
+                    part.PkitfadeType = 2;
+                    value = 1; // just to be sure
+                    break;
+                default:
                     part.PkitfadeType = 0;
                     part.Pkitmode = value_int;
+                    break;
                 }
             }
             else
             {
                 value = part.Pkitmode;
-                if (value == 1 && part.PkitfadeType == 1)
-                    value = 3; // encode crossfade velocity mode
+                if (value == 1)
+                {
+                    // encode crossfade mode
+                    switch (part.PkitfadeType)
+                    {
+                    case 1:
+                        value = 3; // velocity based
+                        break;
+                    case 2:
+                        value = 4; // volume based
+                        break;
+                    case 0:
+                    default:
+                        // No change.
+                        break;
+                    }
+                }
             }
             break;
 

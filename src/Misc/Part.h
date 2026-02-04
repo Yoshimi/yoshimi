@@ -146,7 +146,7 @@ class Part
         uchar  Pvelsns;        // velocity sensing (amplitude velocity scale)
         uchar  Pveloffs;       // velocity offset
         uchar  Pkitmode;       // Part uses kit mode: 0 == off, 1 == on, 2 == "Single": only first applicable kit item can play
-        uchar  PkitfadeType;   // type of cross fade, 0 off (multi)
+        uchar  PkitfadeType;   // type of cross fade, 0 = off (multi), 1 = velocity based, 2 = volume based
         uchar  Pdrummode;      // if all keys are mapped and the system is 12tET (used for drums)
         uchar  Pkeymode;       // 0 = poly, 1 = mono, > 1 = legato;
         uint   PchannelATchoice;
@@ -199,7 +199,7 @@ class Part
         void ReleaseNotePos(int pos);
         void monoNoteHistoryRecall();
 
-        void startNewNotes        (int pos, size_t item, size_t currItem, Note, bool portamento);
+        void startNewNotes        (int pos, size_t item, size_t currItem, Note, bool portamento, float volumeAdjustment);
         void startLegato          (int pos, size_t item, size_t currItem, Note);
         void startLegatoPortamento(int pos, size_t item, size_t currItem, Note);
         float computeKitItemCrossfade(size_t item, int midiNote);

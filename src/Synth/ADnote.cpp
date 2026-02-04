@@ -57,6 +57,7 @@ ADnote::ADnoteGlobal::ADnoteGlobal()
     , freqEnvelope{}
     , freqLFO{}
     , volume{0.0f}
+    , volumeAdjustment{1.0f}
     , randpanL{0.0f}
     , randpanR{0.0f}
     , fadeinAdjustment{0.0f}
@@ -74,6 +75,7 @@ ADnote::ADnoteGlobal::ADnoteGlobal(ADnoteGlobal const& o)
     , freqEnvelope{}
     , freqLFO{}
     , volume{o.volume}
+    , volumeAdjustment{o.volumeAdjustment}
     , randpanL{o.randpanL}
     , randpanR{o.randpanR}
     , fadeinAdjustment{o.fadeinAdjustment}
@@ -651,6 +653,7 @@ void ADnote::construct(size_t unison_total_size)
     initSubVoices(unison_total_size);
 
     globalnewamplitude = noteGlobal.volume
+                         * noteGlobal.volumeAdjustment
                          * noteGlobal.ampEnvelope->envout_dB()
                          * noteGlobal.ampLFO->amplfoout();
 }
@@ -1511,6 +1514,7 @@ void ADnote::computeWorkingParameters()
                        + noteGlobal.freqLFO->lfoout() * ctl.modwheel.relmod);
     globaloldamplitude = globalnewamplitude;
     globalnewamplitude = noteGlobal.volume
+                         * noteGlobal.volumeAdjustment
                          * noteGlobal.ampEnvelope->envout_dB()
                          * noteGlobal.ampLFO->amplfoout();
     float globalfilterpitch = noteGlobal.filterEnvelope->envout()

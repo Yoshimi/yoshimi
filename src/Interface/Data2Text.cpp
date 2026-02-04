@@ -1645,7 +1645,10 @@ string DataText::resolvePart(CommandBlock& cmd, bool addValue)
                         contstr += "single";
                         break;
                     case 3:
-                        contstr += "crossfade";
+                        contstr += "crossfade vel";
+                        break;
+                    case 4:
+                        contstr += "crossfade vol";
                         break;
                 }
             }
