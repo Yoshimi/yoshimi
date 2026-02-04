@@ -149,6 +149,7 @@ class ADnote
         void performPortamento(Note);
         void legatoFadeIn(Note);
         void legatoFadeOut();
+        void setVolumeAdjustment(float val) { noteGlobal.volumeAdjustment = val; }
 
     private:
         void construct(size_t unison_total_size);
@@ -228,6 +229,7 @@ class ADnote
             // AMPLITUDE GLOBAL PARAMETERS
             //****************************
             float volume;   // [ 0 .. 1 ]
+            float volumeAdjustment;
             float randpanL; // [ 0 .. 1 ]
             float randpanR;
             float fadeinAdjustment;

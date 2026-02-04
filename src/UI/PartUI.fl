@@ -674,9 +674,9 @@ class PartUI {: {public Fl_Group, PartUI_}
             kitlist->deactivate();
 
         send_data(0, PART::control::kitMode, tmp, TOPLEVEL::type::Integer, npart);}
-        tooltip {Single = only 1st item in defined note range sounds} xywh {41 348 88 19} down_box BORDER_BOX labelsize 11 labelcolor 64 textfont 1 textsize 11 textcolor 64
-        code0 {o->add("Off");o->add("Multi");o->add("Single");o->add("Crossfade");}
-        code1 {if (part->PkitfadeType == 1) {o->value(3);} else {o->value(part->Pkitmode);}}
+        tooltip {Single = only 1st item in defined note range sounds} xywh {41 348 148 19} down_box BORDER_BOX labelsize 11 labelcolor 64 textfont 1 textsize 11 textcolor 64
+        code0 {o->add("Off");o->add("Multi");o->add("Single");o->add("Crossfade (velocity)");o->add("Crossfade (volume)");}
+        code1 {if (part->PkitfadeType == 1) {o->value(3);} else if (part->PkitfadeType == 2) {o->value(4);} else {o->value(part->Pkitmode);}}
         code2 {partKitOn = o->value() > 0;}
         code3 {if (!partKitOn) kitlist->deactivate();}
       } {}
@@ -1522,13 +1522,17 @@ class PartUI {: {public Fl_Group, PartUI_}
             break;
 
         case PART::control::kitMode:
-            if (part->PkitfadeType == 1)
+            switch (part->PkitfadeType)
             {
+            case 1:
                 kitMode->value(3);
-            }
-            else
-            {
+                break;
+            case 2:
+                kitMode->value(4);
+                break;
+            default:
                 kitMode->value(valInt);
+                break;
             }
             partKitOn =  (kitMode->value() > 0);
             if (partKitOn > 0)
@@ -1926,13 +1930,17 @@ class PartUI {: {public Fl_Group, PartUI_}
     code {//
         instrumentkitlist->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("Kit List"), npart, TOPLEVEL::windowTitle)).c_str());
         drumMode->value(part->Pdrummode);
-            if (part->PkitfadeType == 1)
+            switch (part->PkitfadeType)
             {
+            case 1:
                 kitMode->value(3);
-            }
-            else
-            {
+                break;
+            case 2:
+                kitMode->value(4);
+                break;
+            default:
                 kitMode->value(part->Pkitmode);
+                break;
             }
         if (kitMode->value())
         {

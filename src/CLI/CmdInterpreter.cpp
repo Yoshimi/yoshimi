@@ -323,11 +323,17 @@ string CmdInterpreter::buildPartStatus(bool showPartDetails)
                 else
                     result += "S";
                 break;
-            case PART::kitType::CrossFade:
+            case PART::kitType::CrossFadeVel:
                 if (justPart)
-                    result += (front + "Crossfade" + back);
+                    result += (front + "Crossfade vel" + back);
                 else
                     result += "C";
+                break;
+            case PART::kitType::CrossFadeVol:
+                if (justPart)
+                    result += (front + "Crossfade vol" + back);
+                else
+                    result += "V";
                 break;
             default:
                 break;
@@ -2794,8 +2800,11 @@ void CmdInterpreter::listCurrentParts(Parser& input, list<string>& msg_buf)
                     case PART::kitType::Single:
                         name += "Single";
                         break;
-                    case PART::kitType::CrossFade:
-                        name += "Crossfade";
+                    case PART::kitType::CrossFadeVel:
+                        name += "Crossfade vel";
+                        break;
+                    case PART::kitType::CrossFadeVol:
+                        name += "Crossfade vol";
                         break;
                 }
             }
@@ -5631,8 +5640,10 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
         tmp = PART::kitType::Multi;
     else if (input.matchnMove(2, "single"))
         tmp = PART::kitType::Single;
-    else if (input.matchnMove(2, "crossfade"))
-        tmp = PART::kitType::CrossFade;
+    else if (input.matchnMove(2, "crossfade vel"))
+        tmp = PART::kitType::CrossFadeVel;
+    else if (input.matchnMove(2, "crossfade vol"))
+        tmp = PART::kitType::CrossFadeVol;
     else if (input.matchnMove(3, "kit"))
     {
         if (kitMode == PART::kitType::Off)

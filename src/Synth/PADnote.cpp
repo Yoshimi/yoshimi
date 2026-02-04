@@ -146,9 +146,10 @@ PADnote::PADnote(const PADnote &orig)
     auto& gpar = noteGlobal;
     auto& opar = orig.noteGlobal;
 
-    gpar.detune  = opar.detune;
-    gpar.volume  = opar.volume;
-    gpar.panning = opar.panning;
+    gpar.detune           = opar.detune;
+    gpar.volume           = opar.volume;
+    gpar.volumeAdjustment = opar.volumeAdjustment;
+    gpar.panning          = opar.panning;
 
     gpar.fadeinAdjustment = opar.fadeinAdjustment;
     gpar.punch = opar.punch;
@@ -349,6 +350,7 @@ void PADnote::computecurrentparameters()
         + noteGlobal.freqLFO->lfoout() * ctl.modwheel.relmod + noteGlobal.detune);
     globaloldamplitude = globalnewamplitude;
     globalnewamplitude = noteGlobal.volume
+        * noteGlobal.volumeAdjustment
         * noteGlobal.ampEnvelope->envout_dB()
         * noteGlobal.ampLFO->amplfoout();
 

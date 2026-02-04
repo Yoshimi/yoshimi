@@ -411,19 +411,28 @@ namespace { // Helpers to handle the tree kinds of KitItemNotes uniformly...
 
 
 // Start a regular note or a new Legato chain
-void Part::startNewNotes(int pos, size_t item, size_t currItem, Note note, bool portamento)
+void Part::startNewNotes(int pos, size_t item, size_t currItem, Note note, bool portamento, float volumeAdjustment)
 {
     if (kit[item].adpars && kit[item].Padenabled)
+    {
         partnote[pos].kitItem[currItem].adnote =
             new ADnote(*kit[item].adpars, *ctl, note, portamento);
+        partnote[pos].kitItem[currItem].adnote->setVolumeAdjustment(volumeAdjustment);
+    }
 
     if (kit[item].subpars && kit[item].Psubenabled)
+    {
         partnote[pos].kitItem[currItem].subnote =
             new SUBnote(*kit[item].subpars, *ctl, note, portamento);
+        partnote[pos].kitItem[currItem].subnote->setVolumeAdjustment(volumeAdjustment);
+    }
 
     if (kit[item].padpars && kit[item].Ppadenabled)
+    {
         partnote[pos].kitItem[currItem].padnote =
             new PADnote(*kit[item].padpars, *ctl, note, portamento);
+        partnote[pos].kitItem[currItem].padnote->setVolumeAdjustment(volumeAdjustment);
+    }
 
     // Each Kit-item can send to any Part(Insert) effect, or just directly to Part-output (encoded as Psendtoparteffect==127)
     // The part effects in turn can send to the next one (default) or to some effect downstream or to output.
@@ -683,7 +692,7 @@ void Part::NoteOn(int note, int velocity, bool renote)
         {// start regular notes or a new chain of legato notes
             if (Pkitmode == 0)
                 // non-Kit mode: init Add-, Sub and PAD-notes...
-                startNewNotes(pos,0,0, Note{note,noteFreq,vel}, portamento);
+                startNewNotes(pos,0,0, Note{note,noteFreq,vel}, portamento, 1.0f);
 
             else
             {// init new notes in "kit mode"
@@ -696,7 +705,7 @@ void Part::NoteOn(int note, int velocity, bool renote)
                         continue;
 
                     size_t currItem = partnote[pos].itemsplaying;
-                    float itemVelocity = vel;
+                    float xfadeFactor = 1.0f;
                     if (PkitfadeType > 0) // expanded for future changes
                     {
                         if ((item & 1) == 0)
@@ -707,10 +716,15 @@ void Part::NoteOn(int note, int velocity, bool renote)
                             mult = 1 - mult; // second in a pair is always the inverse
                         if (mult >= 0)
                         {
-                            itemVelocity *= mult;
+                            xfadeFactor *= mult;
                         }
                     }
-                    startNewNotes(pos,item,currItem, Note{note,noteFreq,itemVelocity}, portamento);
+                    if (PkitfadeType == 2)
+                        // Crossfade using volume
+                        startNewNotes(pos,item,currItem, Note{note,noteFreq,vel}, portamento, xfadeFactor);
+                    else
+                        // Crossfade using velocity
+                        startNewNotes(pos,item,currItem, Note{note,noteFreq,xfadeFactor*vel}, portamento, 1.0f);
                     if (Pkitmode == 2 // "single" kit item mode
                         and 0 < partnote[pos].itemsplaying
                        ) // successfully started at least one note

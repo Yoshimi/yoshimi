@@ -57,6 +57,7 @@ class PADnote
         void performPortamento(Note);
         void legatoFadeIn(Note);
         void legatoFadeOut();
+        void setVolumeAdjustment(float val) { noteGlobal.volumeAdjustment = val; }
 
         void noteout(float* outl, float* outr);
         bool finished() const { return noteStatus == NOTE_DISABLED; }
@@ -112,6 +113,7 @@ class PADnote
             // AMPLITUDE GLOBAL PARAMETERS
             //****************************
             float volume;  // [ 0 .. 1 ]
+            float volumeAdjustment {1.0f};
             float panning; // [ 0 .. 1 ]
             float fadeinAdjustment;
 
