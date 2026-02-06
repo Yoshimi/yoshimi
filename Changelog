@@ -1,5 +1,13 @@
 yoshimi 2.3.5.3
 
+2026-02-6 Will
+bn 2418
+BugFix: Some part level changes were reporting an unrecognised effect.
+This was caused by the position of effectNumber in globals.h
+Moving this past those controls so that it is with the other effect
+controls cures the problem.
+It seems it is acting as a group boundary.
+
 2026-02-5 Will
 bn 2417
 Included Improved Crossfade from Kristian.
