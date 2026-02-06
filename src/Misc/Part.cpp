@@ -1850,7 +1850,7 @@ float Part::getLimits(CommandBlock *getData)
 
         case PART::control::kitMode:
             def = 0;
-            max = 3;
+            max = 4;
             break;
         case PART::control::effectNumber:
             max = 2;
