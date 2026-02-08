@@ -5640,10 +5640,12 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
         tmp = PART::kitType::Multi;
     else if (input.matchnMove(2, "single"))
         tmp = PART::kitType::Single;
-    else if (input.matchnMove(2, "crossfade vel"))
+    else if (input.matchnMove(2, "crossfade"))
+    {
         tmp = PART::kitType::CrossFadeVel;
-    else if (input.matchnMove(2, "crossfade vol"))
-        tmp = PART::kitType::CrossFadeVol;
+        if (input.matchnMove(2, "volume"))
+            tmp = PART::kitType::CrossFadeVol;
+    }
     else if (input.matchnMove(3, "kit"))
     {
         if (kitMode == PART::kitType::Off)

@@ -663,7 +663,7 @@ namespace PART // usage PART::control::volume
         humanvelocity,
         drumMode,
         kitMode,
-        effectNumber = 64,
+        effectNumber = 64, // start of effects grouping
         kitEffectNum,
         effectType,
         effectDestination,
@@ -1151,7 +1151,7 @@ namespace EFFECT // usage EFFECT::control::level
 }
 
 namespace DISPLAY  // usage DISPLAY::control::hide
-{
+{ // *** Not currently in use ***
     enum control : char {
         hide = 0, // current window
         show,

@@ -1,5 +1,10 @@
 yoshimi 2.3.5.3
 
+2026-02-8 Will
+bn 2419
+Made small adjustment to CLI CrossFade controls
+Added/adjusted comments in globals h
+
 2026-02-6 Will
 bn 2418
 BugFix: Some part level changes were reporting an unrecognised effect.
