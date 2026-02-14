@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright 2016-2025 Yoshimi project <willgodfrey@musically.me.uk> -->
+<!-- Copyright 2016-2026 Yoshimi project <willgodfrey@musically.me.uk> -->
 <component type="desktop-application">
   <id>net.sourceforge.projects.yoshimi_2247</id>
   <metadata_license>CC-BY-4.0</metadata_license>
@@ -46,11 +46,15 @@
     <p>
     Version 2.3.5 has a set of LFOs added to the SubSynth engine. Also tooltip sizes now track the respective window size.
     </p>
+    <p>
+    Version 2.3.6 now has part kit mode Crossfade Volume as well as crosfade velocity.
+    It is also compatible with old and new versions of MXML and FLTK, and can run under the wayland windowing system.
+    </p>
   </description>
   <launchable type="desktop-id">yoshimi.desktop</launchable>
 
   <releases>
-    <release type="stable" version="2.3.5" date="2025-09-26" />
+    <release type="stable" version="2.3.6" date="2026-02-14" />
   </releases>
   <provides>
     <binary>yoshimi</binary>

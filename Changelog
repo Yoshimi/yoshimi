@@ -1,4 +1,10 @@
-yoshimi 2.3.5.3
+yoshimi 2.3.6
+
+2026-02-14 Will
+bn 2420
+Replaced main window tabs with emulated type (simliar to AddSynth Voice tabs).
+Updated docs.
+Set release version 2.3.6
 
 2026-02-8 Will
 bn 2419
@@ -21,7 +27,7 @@ Updated dev_notes.
 
 2026-01-17 Will
 bn 2416
-Changing partlevel controls are no longer marked as instriment changed.
+Changing partlevel controls are no longer marked as instrument changed.
 
 2026-01-17 Will
 bn 2415

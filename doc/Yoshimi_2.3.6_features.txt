@@ -1,0 +1,23 @@
+Version 2.3.5
+
+We been particularly busy making sure that Yoshimi can work with both old and new versions of FLTK and MXML. Both of these have made breaking changes.
+At the same time we've ensured that Yoshimi can run under the wayland windoing system.
+There were some false positives regarding the identification of edited instruments. We now make a distiction betweed instrument and part controls. Part controls are not read back by an instrument load, but are in patchset and state files.
+
+There was an anomally in the main window where on odd occasions the FBPM value became obscured/missing. This has now been resolved.
+
+There has been more refinements of the underlying code improving
+reliability and consistency.
+
+
+Yoshimi source code is available from either:
+https://sourceforge.net/projects/yoshimi
+Or:
+https://github.com/Yoshimi/yoshimi
+
+Full build instructions are in 'INSTALL'.
+
+Our list archive is at:
+https://www.freelists.org/archive/yoshimi
+To post, email to:
+yoshimi@freelists.org

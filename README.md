@@ -4,12 +4,14 @@ Yoshimi is a software audio synthesizer, currently only available for Linux.
 
 ### Current version
 
-Version 2.3.5
+Version 2.3.6
 
 
-* New feature: A set of LFOs for the SubSynth engine.
+* New feature: Kit Mode now has a crossfade Volume option as well as Velocity..
 
-* New feature: Popup tooltips scale to match the parent window.
+* New feature: Yoshimi now recognises old and new versions of MXML and FLTK.
+
+* New feature: Yoshimi car run on the waylnad windowng system without issues.
 
 * Various code refinements.
 
