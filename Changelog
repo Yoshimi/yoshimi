@@ -1,4 +1,11 @@
-yoshimi 2.3.6
+yoshimi 2.3.6.1
+
+2026-02-17 Will
+bn 2421
+Removed orphaned appdata line in CmakeLists.txt
+Resolved oversize spinner arrows in main window when at default size.
+Corrected spelling errors in docs.
+Set bugfix version 2.3.6.1
 
 2026-02-14 Will
 bn 2420

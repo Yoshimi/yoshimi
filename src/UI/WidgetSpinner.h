@@ -39,7 +39,17 @@ public:
   WidgetSpinner(int x,int y,int w,int h,const char *l = 0);
   void labelsize(int size)
   {
-    float sizeMod = size * 0.7f - 6; // scaling only works if all similar size
+    /*
+     * The next line makes a fine adjustment that stops the arrows
+     * going massively over size when the host window is compressed
+     * on some systems.
+     * The line afterwards changes the size of the arrows relative
+     * to their enclosing box
+     * Scaling only works if all spinners are a similar size
+     */
+    size *= 1.2;
+    float sizeMod = size * 0.6f - 6;
+
     Fl_Spinner::labelsize(size);
     this->up_button_->labelsize(sizeMod);
     this->down_button_->labelsize(sizeMod);

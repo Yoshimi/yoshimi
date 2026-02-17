@@ -1,13 +1,12 @@
-Version 2.3.5
+Version 2.3.6
 
-We been particularly busy making sure that Yoshimi can work with both old and new versions of FLTK and MXML. Both of these have made breaking changes.
-At the same time we've ensured that Yoshimi can run under the wayland windoing system.
-There were some false positives regarding the identification of edited instruments. We now make a distiction betweed instrument and part controls. Part controls are not read back by an instrument load, but are in patchset and state files.
+We've been particularly busy making sure that Yoshimi can work with both old and new versions of FLTK and MXML. Both of these have made breaking changes.
+At the same time we've ensured that Yoshimi can run under the wayland windowing system.
+There were some false positives regarding the identification of edited instruments. We now make a distinction between instrument and part controls. Part controls are not read back by an instrument load, but are in patchset and state files.
 
-There was an anomally in the main window where on odd occasions the FBPM value became obscured/missing. This has now been resolved.
+There was an anomaly in the main window where on odd occasions the F.BPM value became obscured/missing. This has now been resolved.
 
-There has been more refinements of the underlying code improving
-reliability and consistency.
+There have been more refinements of the underlying code improving reliability and consistency.
 
 
 Yoshimi source code is available from either:
