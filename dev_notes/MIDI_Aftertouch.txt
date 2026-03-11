@@ -7,7 +7,7 @@ Note number is 'par' & 0xff. Pressure value is 'par' >> 8.
 
 
 channel aftertouch
-D0 = DF
+D0-DF
 becomes CC 641
 
 This is  translated as CC 129 and implemented as channel aftertouch and for MIDI
