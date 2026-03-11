@@ -175,6 +175,7 @@ class Bank
         size_t generateSingleRoot(string const& newRoot, bool clear = true);
 
         uint getVersion() {return version; }
+        bool isEmpty()    {return roots.empty(); }
 
     private:
         uint version;

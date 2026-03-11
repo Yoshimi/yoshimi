@@ -2666,6 +2666,9 @@ bool SynthEngine::installBanks()
 
 bool SynthEngine::saveBanks()
 {
+    if (bank.isEmpty())
+        return true;
+
     string name = file::configDir() + '/' + YOSHIMI;
     string bankname = name + ".banks";
 
