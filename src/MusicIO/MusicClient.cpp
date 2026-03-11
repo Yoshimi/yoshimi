@@ -85,6 +85,7 @@ void MusicClient::createEngines(audio_driver useAudio, midi_driver useMidi)
 #endif /*ALSA*/
 #endif /*LV2*/
         default:
+            audioIO.reset();
             break;
     }
 
@@ -107,6 +108,7 @@ void MusicClient::createEngines(audio_driver useAudio, midi_driver useMidi)
 #endif /*ALSA*/
 #endif /*LV2*/
         default:
+            midiIO.reset();
             break;
     }
 
