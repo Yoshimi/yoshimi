@@ -1072,6 +1072,16 @@ class PADnoteUI {: {public PresetsUI_}
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "PadSynth");
+
+    if (hrpostype->value() == 0)
+    {
+        hrpospar1->deactivate();
+        hrpospar2->deactivate();
+        hrpospar3->deactivate();
+    }
+    else if (hrpostype->value() == 7)
+        hrpospar2->deactivate();
+
     if (fetchW < padDW || fetchH < padDH)
     {
         fetchW = padDW;
