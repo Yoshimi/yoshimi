@@ -1,4 +1,8 @@
-yoshimi 2.3.6.1
+yoshimi 2.3.6.2
+
+2026-03-24 Will
+bn 2424
+BugFix: Padsynth not activating correct harmonic modifiers on instrument loading.
 
 2026-03-11 Will
 bn 2422

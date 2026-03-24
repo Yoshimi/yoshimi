@@ -12,7 +12,7 @@ comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
 Copyright 2015-2021, Will Godfrey
-Copyright 2022-2024, Ichthyostega, Will Godfrey
+Copyright 2022-2026, Ichthyostega, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU General Public
@@ -277,7 +277,7 @@ class PADnoteUI {: {public PresetsUI_}
     Fl_Window padnotewindow {
       label {PAD synth Parameters}
       callback {padClose->do_callback();}
-      xywh {464 151 580 440} type Double hide resizable
+      xywh {348 145 580 440} type Double hide resizable
       code0 {o->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("PadSynth"), npart, TOPLEVEL::windowTitle, kititem)).c_str());}
       code1 {padDW = o->w(); padDH = o->h();}
       code2 {padnotewindow->size_range(padDW, padDH, 0, 0, 0, 0, 1);}
@@ -495,7 +495,7 @@ class PADnoteUI {: {public PresetsUI_}
               callback {//
               o->selection_color(setKnob(o->value(),64));
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::overtoneParameter1, o->value(), TOPLEVEL::type::Integer);}
-              tooltip {Spread upper harmonics according to the 'OvertonesPosition' type.} xywh {470 315 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 255 step 1 deactivate
+              tooltip {Spread upper harmonics according to the 'OvertonesPosition' type.} xywh {472 315 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 255 step 1
               code0 {o->value(pars->Phrpos.par1);}
               code1 {o->selection_color(setKnob(o->value(),64));}
               class WidgetPDial
@@ -505,7 +505,7 @@ class PADnoteUI {: {public PresetsUI_}
               callback {//
               o->selection_color(setKnob(o->value(),64));
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::overtoneParameter2, o->value(), TOPLEVEL::type::Integer);}
-              tooltip {Further variation on the harmonics spread: threshold (ShiftU/L), exponent (Power), frequency (Sine).} xywh {505 315 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 255 step 1 deactivate
+              tooltip {Further variation on the harmonics spread: threshold (ShiftU/L), exponent (Power), frequency (Sine).} xywh {505 315 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 255 step 1
               code0 {o->value(pars->Phrpos.par2);}
               code1 {o->selection_color(setKnob(o->value(),64));}
               class WidgetPDial
@@ -515,7 +515,7 @@ class PADnoteUI {: {public PresetsUI_}
               callback {//
               o->selection_color(setKnob(o->value(),0));
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::overtoneForceHarmonics, o->value(), TOPLEVEL::type::Integer);}
-              tooltip {Increasingly force each partial towards the next regular harmonic position, reduce the noisiness.} xywh {540 315 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 255 step 1 deactivate
+              tooltip {Increasingly force each partial towards the next regular harmonic position, reduce the noisiness.} xywh {540 315 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 255 step 1
               code0 {o->value(pars->Phrpos.par3);}
               code1 {o->setValueType(VC_percent255);}
               code2 {o->selection_color(setKnob(o->value(),0));}
