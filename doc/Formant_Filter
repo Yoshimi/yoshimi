@@ -1,3 +1,5 @@
+Reviewed  01/06/2026 - Will Godfrey
+
 All six vowels are always available, and from the main filter window a preset stores all of them, their formants and the sequence information.
 When actually in the formant editing window itself you only store the formants of the currently selected vowel as a preset. No other data at all.
 Even though you may only have three or four formants per vowel enabled and active, Yoshimi will store (and recover) all twelve possible formants per vowel. Initially formants have fairly random settings for 'Freq' 'Q' and 'Amp', but once saved these values become fixed.

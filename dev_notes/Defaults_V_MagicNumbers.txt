@@ -1,3 +1,5 @@
+Updated  01/06/2026 - Will Godfrey
+
 A new system for defining and accessing default values is being developed.
 Initially it is being applied in parallel with the existing mixture of labels and
 numbers. When complete, all control labels and anonymous numbers will be replaced by
@@ -19,3 +21,6 @@ sliders. Then menus, followed by spin boxes and number rollers.
 Finally, check boxes will have just:
 bool default
 bool learnable
+
+
+Work on this is currently stalled

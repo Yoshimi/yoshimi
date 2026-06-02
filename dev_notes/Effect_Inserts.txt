@@ -1,3 +1,5 @@
+Updated  01/06/2026 - Will Godfrey
+
 This is a simple list of all the effect inserts, their control numbers and actions.
 These apply regardless of whether the effect is in System effects, Insertion
 effects, or individual part effects.
@@ -28,9 +30,10 @@ Echo
 1   Panning
 2   Delay
 3   L/R delay
-4   L/R crosover
+4   L/R crossover
 5   Feedback
 6   Damping
+7   Separate (L/R delay)
 
 16 Preset number (0-8)
 17  BPM

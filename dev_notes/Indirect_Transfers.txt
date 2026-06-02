@@ -1,3 +1,5 @@
+Reviewed  01/06/2026 - Will Godfrey
+
 This was intended primarily for direct transfers of text between non-RT threads, or
 operations that tend to be text heavy. Although synchronised and using
 TextMsgBuffer, these do not normally enter the Command functions. TextMsgBuffer is

@@ -5,6 +5,8 @@ There are three calls:
 
 void TextMsgBuffer::clear()
 
+Reviewed  02/06/2026 - Will Godfrey
+
 int TextMsgBuffer::push( string )
 
 string TextMsgBuffer::fetch( int )

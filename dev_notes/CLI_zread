@@ -1,3 +1,5 @@
+Reviewed  01/06/2026 - Will Godfrey
+
 This command is not documented in the User Guide as it is intended only for test
 purposes. It intentionally performs no error checks itself so it's possible to
 discover the response to values that should never normally be set. For this reason

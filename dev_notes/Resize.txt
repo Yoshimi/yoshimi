@@ -1,3 +1,5 @@
+Updated  02/06/2026 - Will Godfrey
+
 FLTK manages window resizes itself, but not text or some user drawn graphics. Our
 resize code fills in these elements.
 
@@ -34,3 +36,6 @@ The FLTK file chooser proved intractable so has been replaced with our bespoke f
 chooser. This actually has other benefits, being tailored to our exact requirements.
 
 We have also implemented our own code for the 'Alert' and 'Choice' operations.
+
+A fairly recent addition is that Tooltips are also resized along with other text in
+a spescific window. This may be further revised.

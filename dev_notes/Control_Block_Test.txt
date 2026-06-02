@@ -1,6 +1,14 @@
+Updated  02/06/2026 - Will Godfrey
+
 This can be called from anywhere in the code with:
 
     synth->CBtest(datablock);
 
 Where datablock is any defined control block.
 This is most often getData or putData
+
+If datablock is pointing to a text message this will be read and removed from the
+list, but not displayed. However if the following line is used then the message
+line will be printed but without removing it from the message list.
+
+synth->CBtest(datablock, false);

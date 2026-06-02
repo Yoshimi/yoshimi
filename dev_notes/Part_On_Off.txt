@@ -1,3 +1,5 @@
+Reviewed  02/06/2026 - Will Godfrey
+
 This control has a degree of intelligence built in.
 
 If a part is on, then sending 0 will switch it off and sending 1 will switch it back

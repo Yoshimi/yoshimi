@@ -1,3 +1,5 @@
+Reviewed  01/06/2026 - Will Godfrey
+
 There are four significant constants set in globals.h
 At the time of writing there still is no standard consistent across platforms so
 please use these in all new calculations.

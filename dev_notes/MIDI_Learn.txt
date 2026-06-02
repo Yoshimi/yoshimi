@@ -1,3 +1,6 @@
+Updated  02/06/2026 - Will Godfrey
+(Merged in MIDI Learn Run Sequence)
+
 The learn process comes after *recognised* NRPNs and vectors, but before all other
 controllers.
 
@@ -109,3 +112,20 @@ Time to scan is very difficult to measure. Finding a bunch of  5 controls at the
 end of a list of 20 usually returned less than 3uS, and very occasionally one at
 around 8uS. The search is fairly straightforward so presumably ones right at the
 end of a full list would be worst case around 160uS
+
+
+
+MIDI Learn Run Sequence:
+
+hen receiving either a normal CC or an NRPN, the first action is to convert this to
+a float in the range as close as possible to 0 - 127. The ratios are fiddled a bit
+as otherwise you either couldn't quite reach 127, so some controls missed out a bit
+on range, or you went slightly over which had odd results depending on the actual
+control.
+
+Next, the value is compressed or limited, and/or inverted depending on the Min Max
+settings in the MIDI-learn window.
+
+Finally it is expanded to the actual range of the control that was learned, using
+the limits code. Controls that have a wider range than the incoming type will have
+an evenly spaced granularity.

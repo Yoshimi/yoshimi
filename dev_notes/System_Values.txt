@@ -1,3 +1,5 @@
+Reviewed  02/06/2026 - Will Godfrey
+
 This is a means of exposing various controls to NRPNs.
 
 All of the commands produce log output in a manner designed to be compatible with
