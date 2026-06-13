@@ -1,3 +1,11 @@
+Envelope correction factor
+
+Put in patch
+
+If missing ask user what buffer size and sample rate was originally used.
+Store factor based on these.
+Always use the value to modify the envelope time.
+
 
 BUG! instrument swap partially fails when going across bank roots.
 Only seems to affect non-writable areas (with no related warning)
