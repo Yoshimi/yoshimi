@@ -1,7 +1,13 @@
-yoshimi 2.3.6.2
+yoshimi 2.3.6.4
 
-2026-06-0 Will
-Made small adjustments to panel window list item text.
+Failed to set correct tag and version number!
+
+2026-06-13 Will
+Updates to dev notes and HTML user guide. Both of these had been getting
+rather out of date.
+Minor adjustments in the code. In particular a rogue spacew that might have
+prevented a specific message being sent.
+Set version 2.3.6.4
 
 2026-06-02 Will
 bn 2425
