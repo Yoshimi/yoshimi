@@ -1,5 +1,13 @@
 yoshimi 2.3.6.4
 
+2026-06-29 Will
+bn 2427
+Changed 'magic' number in MIDIlearn to a label.
+Preparing for MIDIlearn editing extension.
+Minor text corrections.
+
+2026-06-14 Will
+bn 2426
 Failed to set correct tag and version number!
 
 2026-06-13 Will

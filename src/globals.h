@@ -450,6 +450,8 @@ namespace MIDILEARN // usage MIDILEARN::control::block
         sendLearnMessage, // currently GUI only
         sendRefreshRequest, // currently GUI only
         reportActivity = 24,
+        selectChannel = 48,
+        editText,
         clearAll = 96,
         loadList = 128,
         loadFromRecent,
