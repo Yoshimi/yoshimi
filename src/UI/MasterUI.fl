@@ -312,7 +312,7 @@ class KeyHandle {: {public Fl_Box}
   }
 }
 
-class MasterUI {selected : {public GuiUpdates}
+class MasterUI {: {public GuiUpdates}
 } {
   Function {MasterUI(InterChange& _interChange, InterfaceAnchor connectionData)
 	 : GuiUpdates{_interChange, std::move(connectionData)}} {} {
@@ -4986,7 +4986,7 @@ bpmfallback->format(format);} {}
   }
   decl {float mainDH;} {private local
   }
-  decl {float mainScale;} {private local
+  decl {float mainScale;} {public local
   }
   decl {int panelType;} {private local
   }

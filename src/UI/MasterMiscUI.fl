@@ -131,7 +131,8 @@ class VUMeter {: {public Fl_Box}
         panelpart.oldpeakR[i] = 0;
         panelpart.clip[i] = false;
         panelpart.clipR[i] = false;
-    }} {}
+    }
+    VUdScale = 1.0;} {}
   }
   Function {fetchData(float value, int control, int part, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int offset = UNUSED, int miscmsg = UNUSED)} {return_type float
   } {
@@ -235,12 +236,13 @@ class VUMeter {: {public Fl_Box}
                 fl_rectf(ox + VULENX + 2, oy + ly / 2, lx - VULENX - 3, (ly - 2) / 2 - 2, graph_back);
 
             // show maxdB
+            VUdScale = synth->getGuiMaster()->mainScale * 10.0;
             static char tmpstr[8];
             const char *dbtag = "dB";
 
             if ((maxdbl > NO_DB))
             {
-                fl_font(FL_HELVETICA | FL_BOLD, 9);
+                fl_font(FL_HELVETICA | FL_BOLD, int(VUdScale));
                 fl_color(VU_text);
                 snprintf(tmpstr, 7, "%+3.f%s", maxdbl + 0.5f, dbtag);
                 fl_draw(tmpstr, ox + VULENX + 1, oy + 1,
@@ -249,7 +251,7 @@ class VUMeter {: {public Fl_Box}
 
             if ((maxdbr > NO_DB))
             {
-                fl_font(FL_HELVETICA | FL_BOLD, 9);
+                fl_font(FL_HELVETICA | FL_BOLD, int(VUdScale));
                 fl_color(VU_text);
                 snprintf(tmpstr, 7, "%+3.f%s", maxdbr + 0.5f, dbtag);
                 fl_draw(tmpstr, ox + VULENX + 1, oy + ly / 2 + 1,
@@ -388,6 +390,8 @@ class VUMeter {: {public Fl_Box}
   decl {int tick500;} {private local
   }
   decl {int npart;} {private local
+  }
+  decl {float VUdScale;} {public local
   }
   decl {float oldrmsdbl;} {private local
   }
