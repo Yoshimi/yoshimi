@@ -30,13 +30,11 @@
 #include "MusicIO/AlsaEngine.h"
 #endif // HAVE_ALSA
 #endif // YOSHIMI_LV2_PLUGIN != 1
-#include <iostream>
 #include <stdlib.h>
 #include <cassert>
 #include <memory>
 #include <thread>
 #include <string>
-#include <set>
 
 using std::string;
 using std::unique_ptr;
