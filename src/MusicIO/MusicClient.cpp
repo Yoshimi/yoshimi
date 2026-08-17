@@ -22,15 +22,19 @@
 */
 
 #include "MusicIO/MusicClient.h"
+#include "MusicIO/MusicIO.h"
 #include "Misc/SynthEngine.h"
-#include "MusicIO/AlsaEngine.h"
+#ifndef YOSHIMI_LV2_PLUGIN
 #include "MusicIO/JackEngine.h"
-#include <iostream>
+#ifdef HAVE_ALSA
+#include "MusicIO/AlsaEngine.h"
+#endif // HAVE_ALSA
+#endif // YOSHIMI_LV2_PLUGIN != 1
 #include <stdlib.h>
 #include <cassert>
+#include <memory>
 #include <thread>
 #include <string>
-#include <set>
 
 using std::string;
 using std::unique_ptr;
