@@ -5854,7 +5854,7 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
         }
         if (tmp == PART::aftertouchType::modulation * 2 && controlType != type_read)
             return REPLY::value_msg;
-        return sendNormal(synth, 0, tmp & (PART::aftertouchType::modulation * 2 - 1), controlType, cmd, npart);
+        return sendNormal(synth, 0, tmp & PART::aftertouchType::allTargets, controlType, cmd, npart);
     }
     if (input.matchnMove(1, "destination"))
     {
