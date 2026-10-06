@@ -78,9 +78,9 @@ void ADnoteParameters::defaults()
 
     // Amplitude Global Parameters
     GlobalPar.PVolume = 90;
+    GlobalPar.PRandom = false; // must be reset before evaluating the panning law
     setGlobalPan(GlobalPar.PPanning = 64, synth.getRuntime().panLaw); // center
     GlobalPar.PAmpVelocityScaleFunction = 64;
-    GlobalPar.PRandom = false;
     GlobalPar.PWidth = 63;
     GlobalPar.AmpEnvelope->defaults();
     GlobalPar.AmpLfo->defaults();
@@ -132,8 +132,8 @@ void ADnoteParameters::defaults(const uint nvoice)
     VoicePar[nvoice].PDelay = 0;
     VoicePar[nvoice].PVolume = 100;
     VoicePar[nvoice].PVolumeminus = 0;
+    VoicePar[nvoice].PRandom = false; // must be cleared before the panning setup
     setVoicePan(nvoice, VoicePar[nvoice].PPanning = 64, synth.getRuntime().panLaw); // center
-    VoicePar[nvoice].PRandom = false;
     VoicePar[nvoice].PWidth = 63;
     VoicePar[nvoice].PDetune = 8192; // 8192 = 0
     VoicePar[nvoice].PCoarseDetune = 0;
