@@ -54,7 +54,8 @@ EffectLFO::EffectLFO(SynthEngine& _synth)
  * Relevant for automated testing. */
 void EffectLFO::resetState()
 {
-    xr = xl = 0.0f;
+    xl = 0.0f;
+    xr = xdelta;
     ampl1 = synth.numRandom();
     ampl2 = synth.numRandom();
     ampr1 = synth.numRandom();
