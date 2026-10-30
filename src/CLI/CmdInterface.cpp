@@ -87,7 +87,13 @@ void CmdInterface::cmdIfaceCommandLoop()
     bool exit{false};
     while (not exit)
     {
-        parser.readline();
+        if (not parser.readline())
+        {// End of input: no further commands can arrive, so retire the command line.
+         // Without this, the loop would keep spinning (and printing prompts) forever.
+         // The Synth itself is not affected and continues to run.
+            getRuntime().Log("End of input: CLI interface closes.");
+            break;
+        }
         if (parser.isTooLarge())
             std::cout << "*** Error: line too long" << std::endl;
         else if (parser.isValid())

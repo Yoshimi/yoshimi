@@ -62,8 +62,8 @@ SUBnoteParameters::SUBnoteParameters(SynthEngine& _synth) : ParamBase{_synth}
 void SUBnoteParameters::defaults()
 {
     PVolume = 96;
+    PRandom = false; // must be reset before evaluating the panning law
     setPan(PPanning = 64, synth.getRuntime().panLaw);
-    PRandom = false;
     PWidth = 63;
     PAmpVelocityScaleFunction = 90;
     Pfixedfreq = 0;

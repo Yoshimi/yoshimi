@@ -145,17 +145,21 @@ class Parser
             prompt = newPrompt;
         }
 
-        void readline()
+        /** read the next input line.
+         * @return `false` at the end of input (STDIN closed, Ctrl-D)
+         */
+        bool readline()
         {
             cleanUp();
             buffer = ::readline(prompt.c_str());
-            if (!buffer)
-                cleanUp();
-            else
+            if (not buffer)
             {
-                point = mark = buffer;
-                add_history(buffer);
+                cleanUp();
+                return false;
             }
+            point = mark = buffer;
+            add_history(buffer);
+            return true;
         }
 
         // initialise the parser with an externally owned and managed buffer

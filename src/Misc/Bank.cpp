@@ -1310,7 +1310,10 @@ size_t Bank::generateSingleRoot(string const& newRoot, bool clear)
     createDir(newRoot);
 
     // add bank
-    string newBank = newRoot + "newBank";
+    string newBank = newRoot;
+    if (not newBank.empty() and newBank.back() != '/')
+        newBank += '/';  // protect against newRoot without trailing slash
+    newBank += "newBank";
     createDir(newBank);
     string toSave = newBank + "/" + EXTEN::validBank;
     saveText(string(YOSHIMI_VERSION), toSave);

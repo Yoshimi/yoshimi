@@ -238,8 +238,8 @@ int main(int argc, char *argv[])
     cout << YOSHIMI<< " " << YOSHIMI_VERSION << " is starting...\n" << endl; // guaranteed start message
 
 
-    struct termios  oldTerm;
-    tcgetattr(0, &oldTerm);
+    termios terminalSettings;
+    bool terminalSaved = (0 == tcgetattr(0, &terminalSettings)); // fails when STDIN is not a terminal
     bool bExitSuccess = false;
     bool mainThreadStarted = false;
 
@@ -310,8 +310,8 @@ int main(int argc, char *argv[])
     bExitSuccess = true;
 
 bail_out:
-    if (Config::primary().showCli)
-        tcsetattr(0, TCSANOW, &oldTerm);
+    if (Config::primary().showCli and terminalSaved)
+        tcsetattr(0, TCSANOW, &terminalSettings);
 
     if (bExitSuccess)
     {

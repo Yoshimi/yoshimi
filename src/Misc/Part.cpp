@@ -1668,8 +1668,8 @@ void Part::getfromXML(XMLtree& xmlPart)
     else
         Pkeymode = PART_MONO;
 
-    PchannelATchoice = xmlPart.getPar_int("channel_aftertouch", PchannelATchoice, 0, 255);
-    PkeyATchoice     = xmlPart.getPar_int("key_aftertouch",     PkeyATchoice, 0, 255);
+    PchannelATchoice = xmlPart.getPar_int("channel_aftertouch", PchannelATchoice, 0, PART::aftertouchType::allTargets);
+    PkeyATchoice     = xmlPart.getPar_int("key_aftertouch",     PkeyATchoice,     0, PART::aftertouchType::allTargets);
 
     Pkeylimit = xmlPart.getPar_127("key_limit", Pkeylimit);
     if (Pkeylimit < 1 or Pkeylimit > POLYPHONY)
@@ -1773,7 +1773,7 @@ float Part::getLimits(CommandBlock *getData)
         case PART::control::keyATset:
             min = 0;
             def = 0;
-            max = PART::aftertouchType::modulation * 2;
+            max = PART::aftertouchType::allTargets;
             break;
 
         case PART::control::keyMode:

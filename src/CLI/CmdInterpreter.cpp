@@ -2193,7 +2193,7 @@ int CmdInterpreter::envelopeSelect(Parser& input, unsigned char controlType)
     if (engine == PART::engine::addVoice1 || engine == PART::engine::addMod1)
         engine += voiceNumber;
 
-    if (input.matchnMove(2, "amplitute"))
+    if (input.matchnMove(2, "amplitude") || input.matchnMove(2, "amplitute")) // old misspelling still accepted for existing scripts
         group = TOPLEVEL::insertType::amplitude;
     else if (input.matchnMove(2, "frequency"))
         group = TOPLEVEL::insertType::frequency;
@@ -5854,7 +5854,7 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
         }
         if (tmp == PART::aftertouchType::modulation * 2 && controlType != type_read)
             return REPLY::value_msg;
-        return sendNormal(synth, 0, tmp & (PART::aftertouchType::modulation * 2 - 1), controlType, cmd, npart);
+        return sendNormal(synth, 0, tmp & PART::aftertouchType::allTargets, controlType, cmd, npart);
     }
     if (input.matchnMove(1, "destination"))
     {

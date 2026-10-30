@@ -744,15 +744,16 @@ namespace PART // usage PART::control::volume
     namespace aftertouchType {
         enum {  // all powers of 2 handled bit-wise
             off = 0,
-            filterCutoff,
-            filterCutoffDown,
-            filterQ = 4,
-            filterQdown = 8,
-            pitchBend = 16,
-            pitchBendDown = 32,
-            volume = 64,
-            modulation = 128 // this MUST be the highest bit
+            filterCutoff = 1,
+            filterCutoffDown = 2,
+            filterQ          = 4,
+            filterQdown      = 8,
+            pitchBend        = 16,
+            pitchBendDown    = 32,
+            volume           = 64,
+            modulation       = 128 // this MUST be the highest bit
         };
+        const int allTargets = modulation * 2 - 1; // all bits set
     }
 
     namespace envelope
