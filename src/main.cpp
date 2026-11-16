@@ -120,6 +120,9 @@ static void* mainThread(void*)
     SplashScreen splash;
     if (showGUI)
     {
+        // Set icon. See UI/MiscGui.cpp
+        setAppWindowIconAndClass();
+        
         if (showSplash)
             splash.showPopup();
         else

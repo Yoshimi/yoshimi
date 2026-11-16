@@ -130,6 +130,9 @@ enum ValueType {
     VC_RandWalkSpread,
 };
 
+// For applicatio icon. See same cpp file
+void setAppWindowIconAndClass();
+
 float collect_readData(SynthEngine *synth, float value, unsigned char control, unsigned char part, unsigned char kititem = UNUSED, unsigned char engine = UNUSED, unsigned char insert = UNUSED, unsigned char parameter = UNUSED, unsigned char offset = UNUSED, unsigned char miscmsg = UNUSED, unsigned char request = UNUSED);
 
 void collect_writeData(SynthEngine *synth, float value, unsigned char action, unsigned char type, unsigned char control, unsigned char part, unsigned char kititem = UNUSED, unsigned char engine = UNUSED, unsigned char insert = UNUSED, unsigned char parameter = UNUSED, unsigned char offset = UNUSED, unsigned char miscmsg = UNUSED);

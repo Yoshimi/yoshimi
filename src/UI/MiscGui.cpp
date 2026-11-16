@@ -28,6 +28,9 @@
 
 #include <FL/Fl.H>
 #include <FL/fl_draw.H>
+/* Lorenzo: need these for setting icon */
+#include <FL/Fl_PNG_Image.H>
+#include <FL/Fl_Window.H>
 
 #include <FL/platform.H>
 #include <cairo.h>
@@ -44,6 +47,22 @@ using func::power;
 namespace { // Implementation details...
 
     TextMsgBuffer& textMsgBuffer = TextMsgBuffer::instance();
+}
+
+// Lorenzo: Added this to load the icon from YoshimiIconPngHex file
+// which is a hex version of the icon. Also sets the xclass to "yoshimi"
+// Essentially copied / adapted from how the splash is shown so it can be set as Fl_PNG_Image
+// Important: the hex icon file needs to exist at compile time in "UI/YoshimiIconPngHex"
+// These were useful:
+// https://www.fltk.org/doc-1.4/classFl__Window.htmlhttps://www.fltk.org/doc-1.4/classFl__Window.html#aaf849aeb0878174971fdb6dab5388873
+void setAppWindowIconAndClass()
+{
+    static const uchar yoshimiIconPng[] = {
+    #include "UI/YoshimiIconPngHex"
+    };
+    static Fl_PNG_Image yoshimiIcon{"yoshimi", yoshimiIconPng, sizeof(yoshimiIconPng)};
+    Fl_Window::default_xclass("yoshimi");
+    Fl_Window::default_icon(&yoshimiIcon);
 }
 
 float collect_readData(SynthEngine *synth, float value, unsigned char control, unsigned char part, unsigned char kititem, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char offset, unsigned char miscmsg, unsigned char request)
