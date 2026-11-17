@@ -1283,12 +1283,8 @@ void Config::defaultPresets()
     auto presetDirsToTry = std::array{presetDir
                                      ,file::configDir()+"/presets"
                                      ,extendLocalPath("/presets")
-                                        /*
-                                         * TODO
-                                         * We shouldn't be setting these directly
-                                         */
-                                     ,string{"/usr/share/yoshimi/presets"}
-                                     ,string{"/usr/local/share/yoshimi/presets"}
+                                     ,string{file::systemShare+"yoshimi/presets"}
+                                     ,string{file::localShare+"yoshimi/presets"}
                                      };
     int actual{0};
     Log("Setup default preset directories...", _SYS_::LogNotSerious);
@@ -1653,13 +1649,13 @@ std::string Config::findHtmlManual()
 {
     string namelist = "";
     string tempnames = "";
-    if(file::cmd2string("find /usr/share/doc/ -xdev -type f -name 'yoshimi_user_guide_version' 2>/dev/null", tempnames))
+    if(file::cmd2string("find "+file::systemShare+"doc/ -xdev -type f -name 'yoshimi_user_guide_version' 2>/dev/null", tempnames))
     {
         namelist = tempnames;
         tempnames = "";
     }
 
-    if(file::cmd2string("find /usr/local/share/doc/ -xdev -type f -name 'yoshimi_user_guide_version' 2>/dev/null", tempnames))
+    if(file::cmd2string("find "+file::localShare+"doc/ -xdev -type f -name 'yoshimi_user_guide_version' 2>/dev/null", tempnames))
     {
         namelist += tempnames;
         tempnames = "";

@@ -1582,10 +1582,10 @@ bool Bank::establishBanks(optional<string> bankFile)
 
     string bankdirs[] = {
         foundLocal + "yoshimi/banks",
-        "/usr/share/yoshimi/banks",
-        "/usr/local/share/yoshimi/banks",
-        "/usr/share/zynaddsubfx/banks",
-        "/usr/local/share/zynaddsubfx/banks",
+        file::systemShare+"yoshimi/banks",
+        file::localShare+"yoshimi/banks",
+        file::systemShare+"zynaddsubfx/banks",
+        file::localShare+"zynaddsubfx/banks",
         foundLocal + "zynaddsubfx/banks",
         extendLocalPath("/banks"),
         "@end"

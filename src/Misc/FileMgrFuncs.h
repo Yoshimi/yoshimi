@@ -243,6 +243,10 @@ inline bool presetsList(string dirname, string const& type, std::vector<string>&
 }
 
 
+inline string systemShare = "/usr/share/";
+inline string localShare = "/usr/local/share/";
+
+
 /*
  * This is only intended for calls on the local filesystem
  * and to known locations, so buffer size should be adequate
@@ -834,13 +838,13 @@ inline string findExampleFile(string leafname)
         }
         if (fullname.empty())
         {
-            string tmp = "/usr/local/share/" + string(YOSHIMI) + "/examples/" + leafname;
+            string tmp = localShare + string(YOSHIMI) + "/examples/" + leafname;
             if (isRegularFile(tmp))
                 fullname = tmp;
         }
         if (fullname.empty())
         {
-            string tmp = "/usr/share/" + string(YOSHIMI) + "/examples/" + leafname;
+            string tmp = systemShare + string(YOSHIMI) + "/examples/" + leafname;
             if (isRegularFile(tmp))
                 fullname = tmp;
         }
