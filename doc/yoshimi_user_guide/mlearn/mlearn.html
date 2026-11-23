@@ -15,11 +15,17 @@
     To use this, you hold down the <em>Ctrl</em> key, then right-click on the knob/slider you want to link to. This will pop up either of the two windows below depending whether or not the control is learnable.<br>
     To be more precise it is the <em>change</em> in control value that triggers a learn action, so if you just click on (say) a slider it might fail to register. Therefore always give a slight movement too.
     </p>
+    <p>
+    <span class="warn">Warning</span><br>MIDI learn changes the actual contents of instruments so learned instruments should not be resaved, as the original characteristics will be lost.
+    </p>
+    <p>
     <img src="images/learning.png" alt="MIDI Learning window" width="40%">
     <img src="images/cantlearn.png" alt="MIDI Can't Learn window" width="50%" style="float: right">
     <img src="../images/boundry.png" alt="divider" class="wideline">
     If the control is learnable, this action will pop up the MIDI learned window (if it's not already visible), with all the details.
     <img src="images/mlearn.png" alt="The MIDI Learn window" class="image">
+    </p>
+
     <p>
     In the example shown, you can see that learned controls are displayed as lines of settings, followed by a description of what is actually being managed. All controls are then editable, with the exception of NRPN numbers.
     <br><br>

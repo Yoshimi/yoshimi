@@ -735,18 +735,18 @@ void MidiLearn::insertLine(ushort CC, uchar chan)
 
         list<LearnBlock>::iterator it;
         it = midi_list.begin();
-        int lineNo = 0;
+//        int lineNo = 0;
         if (not midi_list.empty())
         { // CC is priority
             while (CC > it->CC && it != midi_list.end()) // CC is priority
             { // find start of group
                 ++it;
-                ++lineNo;
+//                ++lineNo;
             }
             while (CC == it->CC && chan >= it->chan && it != midi_list.end())
             { // insert at end of same channel
                 ++it;
-                ++lineNo;
+//                ++lineNo;
             }
         }
         if (it == midi_list.end())
